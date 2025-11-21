@@ -5,10 +5,53 @@
 // Try Prisma Accelerate: https://pris.ly/cli/accelerate-init
 
 generator client {
-  provider = "prisma-client"
-  output   = "../src/generated/prisma"
+  provider = "prisma-client-js"
 }
 
 datasource db {
   provider = "postgresql"
+}
+
+model User {
+  id        String   @id @default(cuid())
+  email     String   @unique
+  password  String
+  name      String?
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  sites     Site[]
+}
+
+model Site {
+  id            String   @id @default(cuid())
+  userId        String
+  user          User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  
+  // CV Data
+  title         String   @default("My Personal Website")
+  cvUrl         String?
+  cvTextData    String?  @db.Text
+  
+  // External Links
+  linkedinUrl   String?
+  githubUrl     String?
+  
+  // Generated Content
+  htmlContent   String?  @db.Text
+  cssContent    String?  @db.Text
+  
+  // Deployment
+  status        String   @default("draft") // draft, generating, published
+  vercelUrl     String?
+  
+  // Revision Control
+  revisionCount Int      @default(0)
+  maxRevisions  Int      @default(1)
+  
+  // Timestamps
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
+  publishedAt   DateTime?
+  
+  @@index([userId])
 }

@@ -67,7 +67,7 @@
   ```
 
 #### Gün 6-7: Veritabanı Kurulumu
-- [ ] **Prisma schema tasarla**
+- [x] **Prisma schema tasarla**
   ```prisma
   model User {
     id        String   @id @default(cuid())
@@ -95,7 +95,7 @@
     updatedAt     DateTime  @updatedAt
   }
   ```
-- [ ] **Prisma migration çalıştır**
+- [x] **Prisma migration çalıştır**
   ```bash
   npx prisma migrate dev --name init
   ```
