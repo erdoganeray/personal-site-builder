@@ -33,22 +33,22 @@
 ### **Hafta 1: Temel Kurulum ve Planlama**
 
 #### Gün 1-2: Proje Başlangıç
-- [ ] Git repository oluştur (GitHub/GitLab)
-- [ ] Basit bir proje dokümantasyonu yaz
+- [x] Git repository oluştur (GitHub/GitLab)
+- [x] Basit bir proje dokümantasyonu yaz
   - Kullanıcı akışı (user flow)
   - Ekran tasarımları (basit çizimler yeterli)
   - Veritabanı tabloları
-- [ ] Geliştirme ortamını hazırla
+- [x] Geliştirme ortamını hazırla
   - VSCode kurulumu
   - Node.js ve npm kurulumu
 
 #### Gün 3-5: Teknoloji Stack Kurulumu
-- [ ] **Next.js projesi oluştur**
+- [x] **Next.js projesi oluştur**
   ```bash
   npx create-next-app@latest personal-site-builder --typescript
   cd personal-site-builder
   ```
-- [ ] **Temel kütüphaneleri kur**
+- [x] **Temel kütüphaneleri kur**
   ```bash
   npm install @prisma/client prisma
   npm install @google/generative-ai
@@ -56,9 +56,9 @@
   npm install @uploadthing/react
   npm install tailwindcss
   ```
-- [ ] **Supabase hesabı aç** (ücretsiz PostgreSQL database)
-- [ ] **Google AI Studio'dan Gemini API key al**
-- [ ] **Environment variables dosyası oluştur** (.env.local)
+- [x] **Supabase hesabı aç** (ücretsiz PostgreSQL database)
+- [x] **Google AI Studio'dan Gemini API key al**
+- [x] **Environment variables dosyası oluştur** (.env.local)
   ```
   DATABASE_URL="postgresql://..."
   GEMINI_API_KEY="..."
