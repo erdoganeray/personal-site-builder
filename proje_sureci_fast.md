@@ -263,17 +263,17 @@
 ### **Hafta 5: Preview ve Revize Sistemi**
 
 #### Gün 29-31: Preview Sayfası
-- [ ] **Preview sayfası oluştur**
+- [x] **Preview sayfası oluştur**
   - `/app/preview/[siteId]/page.tsx`
   - Oluşturulan HTML'i iframe içinde göster
   - "Beğendim, Yayınla" butonu
   - "Revize İste" butonu (1 kez kullanılabilir)
 
 #### Gün 32-35: Revize Sistemi
-- [ ] **Revize formu**
+- [x] **Revize formu**
   - Kullanıcı ne değiştirmek istediğini yazabilir
   - "Daha renkli olsun", "Fotoğrafım daha büyük olsun" gibi
-- [ ] **Revize API endpoint'i**
+- [x] **Revize API endpoint'i**
   - `/app/api/site/revise/route.ts`
   - Mevcut HTML'i al
   - Kullanıcı isteğini Gemini'ye gönder
@@ -289,7 +289,7 @@
 - [ ] **Cloudflare hesabı ve API token**
   - https://dash.cloudflare.com/profile/api-tokens adresinden token al
   - R2 için Access Key/Secret oluştur
-  - `.env.local` dosyasına ekle
+  - `.env` dosyasına ekle
 - [ ] **AWS SDK kurulumu** (R2 S3-compatible)
   ```bash
   npm install @aws-sdk/client-s3
