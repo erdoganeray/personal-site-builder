@@ -14,6 +14,9 @@ export default function DashboardPage() {
     const [loading, setLoading] = useState(true);
     const [deleting, setDeleting] = useState(false);
     const [generating, setGenerating] = useState(false);
+    const [linkedinUrl, setLinkedinUrl] = useState("");
+    const [githubUrl, setGithubUrl] = useState("");
+    const [savingLinks, setSavingLinks] = useState(false);
 
     useEffect(() => {
         if (status === "unauthenticated") {
@@ -32,6 +35,12 @@ export default function DashboardPage() {
                 const data = await response.json();
                 const userSite = data.sites?.[0] || null;
                 setSite(userSite);
+                
+                // LinkedIn ve GitHub URL'lerini state'e aktar
+                if (userSite) {
+                    setLinkedinUrl(userSite.linkedinUrl || "");
+                    setGithubUrl(userSite.githubUrl || "");
+                }
                 
                 // Eğer site varsa ve CV data'sı varsa, parse et
                 if (userSite?.cvTextData) {
@@ -116,6 +125,44 @@ export default function DashboardPage() {
             alert("Bir hata oluştu. Lütfen tekrar deneyin.");
         } finally {
             setGenerating(false);
+        }
+    };
+
+    const handleSaveLinks = async () => {
+        if (!site) return;
+
+        setSavingLinks(true);
+        try {
+            const response = await fetch("/api/site/update-links", {
+                method: "PATCH",
+                headers: {
+                    "Content-Type": "application/json",
+                },
+                body: JSON.stringify({
+                    siteId: site.id,
+                    linkedinUrl: linkedinUrl.trim(),
+                    githubUrl: githubUrl.trim(),
+                }),
+            });
+
+            const data = await response.json();
+
+            if (response.ok) {
+                // State'i güncelle
+                setSite({
+                    ...site,
+                    linkedinUrl: linkedinUrl.trim(),
+                    githubUrl: githubUrl.trim(),
+                });
+                alert("Linkler başarıyla kaydedildi!");
+            } else {
+                alert(data.error || "Linkler kaydedilemedi");
+            }
+        } catch (error) {
+            console.error("Link kaydetme hatası:", error);
+            alert("Bir hata oluştu");
+        } finally {
+            setSavingLinks(false);
         }
     };
 
@@ -400,10 +447,8 @@ export default function DashboardPage() {
                                             <input
                                                 type="url"
                                                 placeholder="https://linkedin.com/in/kullaniciadi"
-                                                value={site?.linkedinUrl || ""}
-                                                onChange={(e) => {
-                                                    // TODO: LinkedIn URL'i güncelleme
-                                                }}
+                                                value={linkedinUrl}
+                                                onChange={(e) => setLinkedinUrl(e.target.value)}
                                                 className="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-blue-500 dark:bg-gray-700 dark:text-white"
                                             />
                                         </div>
@@ -414,13 +459,18 @@ export default function DashboardPage() {
                                             <input
                                                 type="url"
                                                 placeholder="https://github.com/kullaniciadi"
-                                                value={site?.githubUrl || ""}
-                                                onChange={(e) => {
-                                                    // TODO: GitHub URL'i güncelleme
-                                                }}
+                                                value={githubUrl}
+                                                onChange={(e) => setGithubUrl(e.target.value)}
                                                 className="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-blue-500 dark:bg-gray-700 dark:text-white"
                                             />
                                         </div>
+                                        <button
+                                            onClick={handleSaveLinks}
+                                            disabled={savingLinks}
+                                            className="w-full bg-blue-600 hover:bg-blue-700 disabled:bg-gray-400 text-white font-medium py-2 px-4 rounded-lg transition-colors duration-200"
+                                        >
+                                            {savingLinks ? "Kaydediliyor..." : "Linkleri Kaydet"}
+                                        </button>
                                     </div>
                                 </div>
                             </div>

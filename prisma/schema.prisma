@@ -18,6 +18,7 @@ model User {
   email     String   @unique
   password  String
   name      String?
+  username  String?  @unique // URL-safe username (subdomain için)
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
   sites     Site[]
@@ -43,7 +44,8 @@ model Site {
   
   // Deployment
   status        String   @default("draft") // draft, generating, published
-  vercelUrl     String?
+  subdomain     String?  @unique // ahmet-yilmaz.yourdomain.com
+  cloudflareUrl String?  // Tam URL: https://ahmet-yilmaz.yourdomain.com
   
   // Revision Control
   revisionCount Int      @default(0)
