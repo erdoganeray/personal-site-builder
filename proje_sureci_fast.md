@@ -105,16 +105,16 @@
 ### **Hafta 2: Kullanıcı Girişi (Authentication)**
 
 #### Gün 8-10: Auth Sistemi
-- [ ] **NextAuth.js kurulumu**
+- [x] **NextAuth.js kurulumu**
   ```bash
   npm install next-auth
   ```
-- [ ] **Login/Register sayfaları oluştur**
+- [x] **Login/Register sayfaları oluştur**
   - `/app/login/page.tsx` - Giriş sayfası
   - `/app/register/page.tsx` - Kayıt sayfası
-- [ ] **API route'ları oluştur**
+- [x] **API route'ları oluştur**
   - `/app/api/auth/[...nextauth]/route.ts` - NextAuth handler
-- [ ] **Basit bir dashboard sayfası** oluştur
+- [x] **Basit bir dashboard sayfası** oluştur
   - `/app/dashboard/page.tsx` - Kullanıcı paneli
 
 #### Gün 11-14: Auth Testleri
