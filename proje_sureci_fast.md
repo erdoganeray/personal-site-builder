@@ -13,14 +13,14 @@
 3. **LinkedIn/GitHub link girişi** - Kullanıcı manuel olarak linklerini ekler
 4. **Gemini ile site oluşturma** - AI ile otomatik HTML/CSS üretimi
 5. **Preview + 1 revize hakkı** - Kullanıcı sonucu görebilir ve 1 kez değişiklik isteyebilir
-6. **Vercel deployment** - Tek tuşla yayınlama
+6. **Cloudflare Pages deployment** - Tek tuşla yayınlama, kolay custom domain
 7. **Sadece ücretsiz plan** - Ödeme sistemi yok
 
 ### ❌ Şimdilik Yapılmayacaklar
 - ❌ Mobil uygulama
 - ❌ Blog sistemi
 - ❌ Portfolio galeri
-- ❌ Özel domain
+- ❌ Custom domain (isimsoyisim.com) - MVP'de subdomain kullan (ahmet.yourdomain.com)
 - ❌ Ödeme sistemi
 - ❌ Sınırsız revize
 - ❌ DOCX/PNG CV formatları
@@ -63,7 +63,11 @@
   DATABASE_URL="postgresql://..."
   GEMINI_API_KEY="..."
   NEXTAUTH_SECRET="..."
-  VERCEL_TOKEN="..."
+  CLOUDFLARE_ACCOUNT_ID="..."
+  CLOUDFLARE_API_TOKEN="..."
+  CLOUDFLARE_ZONE_ID="..." # Ana domain'in zone ID'si
+  R2_ACCESS_KEY_ID="..."
+  R2_SECRET_ACCESS_KEY="..."
   ```
 
 #### Gün 6-7: Veritabanı Kurulumu
@@ -279,38 +283,71 @@
 
 ---
 
-### **Hafta 6: Vercel Deployment Entegrasyonu**
+### **Hafta 6: Cloudflare Pages + R2 Deployment Entegrasyonu**
 
-#### Gün 36-38: Vercel API Kurulumu
-- [ ] **Vercel hesabı ve token**
-  - https://vercel.com/account/tokens adresinden token al
+#### Gün 36-38: Cloudflare Kurulumu
+- [ ] **Cloudflare hesabı ve API token**
+  - https://dash.cloudflare.com/profile/api-tokens adresinden token al
+  - R2 için Access Key/Secret oluştur
   - `.env.local` dosyasına ekle
+- [ ] **AWS SDK kurulumu** (R2 S3-compatible)
+  ```bash
+  npm install @aws-sdk/client-s3
+  ```
 - [ ] **Deployment fonksiyonu oluştur**
   ```typescript
-  // lib/vercel-deploy.ts
-  export async function deployToVercel(siteId: string, htmlContent: string) {
-    const response = await fetch('https://api.vercel.com/v13/deployments', {
+  // lib/cloudflare-deploy.ts
+  import { S3Client, PutObjectCommand } from "@aws-sdk/client-s3";
+
+  const r2Client = new S3Client({
+    region: "auto",
+    endpoint: `https://${process.env.CLOUDFLARE_ACCOUNT_ID}.r2.cloudflarestorage.com`,
+    credentials: {
+      accessKeyId: process.env.R2_ACCESS_KEY_ID!,
+      secretAccessKey: process.env.R2_SECRET_ACCESS_KEY!,
+    },
+  });
+
+  export async function deployToCloudflare(
+    username: string,
+    siteId: string, 
+    htmlContent: string
+  ) {
+    // 1. R2 bucket'a yükle
+    const key = `sites/${siteId}/index.html`;
+    
+    await r2Client.send(
+      new PutObjectCommand({
+        Bucket: "user-sites",
+        Key: key,
+        Body: htmlContent,
+        ContentType: "text/html",
+        CacheControl: "public, max-age=3600",
+      })
+    );
+
+    // 2. Otomatik subdomain oluştur (Cloudflare DNS API)
+    const subdomain = `${username}.yourdomain.com`;
+    
+    await fetch(`https://api.cloudflare.com/client/v4/zones/${process.env.CLOUDFLARE_ZONE_ID}/dns_records`, {
       method: 'POST',
       headers: {
-        'Authorization': `Bearer ${process.env.VERCEL_TOKEN}`,
+        'Authorization': `Bearer ${process.env.CLOUDFLARE_API_TOKEN}`,
         'Content-Type': 'application/json',
       },
       body: JSON.stringify({
-        name: `user-site-${siteId}`,
-        files: [
-          {
-            file: 'index.html',
-            data: htmlContent,
-          },
-        ],
-        projectSettings: {
-          framework: null,
-        },
+        type: 'CNAME',
+        name: username, // ahmet-yilmaz
+        content: 'your-r2-public-url.r2.dev',
+        proxied: true, // Cloudflare CDN + SSL
+        ttl: 1, // Otomatik
       }),
     });
     
-    const data = await response.json();
-    return data.url; // https://user-site-abc123.vercel.app
+    return {
+      url: `https://${subdomain}`,
+      subdomain: subdomain,
+    };
   }
   ```
 
@@ -318,13 +355,20 @@
 - [ ] **"Yayınla" butonu endpoint'i**
   - `/app/api/site/publish/route.ts`
   - Site HTML'ini al
-  - Vercel'e deploy et
+  - Cloudflare R2'ye deploy et
+  - Otomatik subdomain oluştur (username.yourdomain.com)
   - URL'i veritabanına kaydet
   - Site status'ünü "published" yap
 - [ ] **Başarı sayfası**
   - "Siteniz yayında!" mesajı
-  - Canlı site URL'i göster
+  - Canlı subdomain URL'i göster (https://ahmet-yilmaz.yourdomain.com)
+  - "Siteniz 30 saniye içinde aktif olacak" (DNS yayılma)
   - Sosyal medyada paylaş butonları
+  - QR kod oluştur (mobil paylaşım için)
+- [ ] **Subdomain kullanıcı adı kontrolü**
+  - Kullanıcı adı benzersiz mi kontrol et
+  - URL-safe format (tire ile ayır, özel karakter yok)
+  - Örnek: "Ahmet Yılmaz" → "ahmet-yilmaz"
 
 ---
 
@@ -367,26 +411,36 @@
   - [ ] Site oluşturma (Gemini çalışıyor mu?)
   - [ ] Preview görüntüleme
   - [ ] Revize isteği (1 kez)
-  - [ ] Vercel'e yayınlama
-  - [ ] Canlı siteyi ziyaret et
+  - [ ] Cloudflare'e yayınlama
+  - [ ] Canlı siteyi ziyaret et (.pages.dev domain)
 - [ ] **Edge case'ler**
   - Çok büyük PDF
   - Bozuk PDF
   - Gemini hata verirse ne olur?
-  - Vercel deployment başarısız olursa?
+  - Cloudflare R2 upload başarısız olursa?
 
 #### Gün 54-56: Production Hazırlığı
 - [ ] **Environment variables kontrol**
   - Production Supabase database
   - Production Gemini API key (kotalar yeterli mi?)
-  - Production Vercel token
-- [ ] **Vercel'e ana uygulamayı deploy et**
+  - Production Cloudflare API token, Zone ID ve R2 credentials
+- [ ] **Cloudflare R2 bucket oluştur**
+  - Bucket adı: "user-sites"
+  - Public access ayarları
+  - R2 custom domain bağla (sites.yourdomain.com gibi)
+- [ ] **Cloudflare DNS wildcard ayarı**
+  - Wildcard CNAME: *.yourdomain.com → R2 bucket URL
+  - Wildcard SSL sertifikası (Cloudflare otomatik)
+  - Test et: ahmet.yourdomain.com erişilebilir mi?
+- [ ] **Ana uygulamayı deploy et** (Vercel/Netlify/Railway)
   ```bash
+  # Vercel kullanıyorsan
   npm install -g vercel
   vercel --prod
   ```
-- [ ] **Domain bağla** (isterseniz)
-  - Örnek: personalwebbuilder.com
+- [ ] **Domain bağla** (ana uygulama için)
+  - Ana site: app.yourdomain.com veya personalwebbuilder.com
+  - Kullanıcı siteleri: *.yourdomain.com (wildcard)
 
 #### Gün 57-60: Soft Launch
 - [ ] **Beta kullanıcılar davet et**
@@ -414,8 +468,8 @@
 
 ### AI & Deployment
 - **Google Gemini 2.0 Flash** - AI site üretimi
-- **Vercel API** - Otomatik deployment
-- **pdf-parse** - PDF işleme
+- **Cloudflare Pages + R2** - Otomatik deployment ve hosting
+- **AWS SDK v3** - R2 (S3-compatible) entegrasyonu
 
 ### Authentication
 - **NextAuth.js** - Kullanıcı girişi
@@ -441,6 +495,7 @@ model User {
   email     String   @unique
   password  String
   name      String?
+  username  String?  @unique // URL-safe username (subdomain için)
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
   sites     Site[]
@@ -466,7 +521,8 @@ model Site {
   
   // Deployment
   status        String   @default("draft") // draft, generating, published
-  vercelUrl     String?
+  subdomain     String?  @unique // ahmet-yilmaz.yourdomain.com
+  cloudflareUrl String?  // Tam URL: https://ahmet-yilmaz.yourdomain.com
   
   // Revision Control
   revisionCount Int      @default(0)
@@ -524,9 +580,15 @@ model Site {
     ↓
 [Beğendim, Yayınla]
     ↓
-[Vercel'e Deploy Ediliyor...]
+[Subdomain seçin: ahmet-yilmaz]
     ↓
-[Başarı! Siteniz: https://xxx.vercel.app]
+[Cloudflare'e Deploy Ediliyor...]
+    ↓
+[Otomatik: DNS kaydı oluşturuluyor]
+    ↓
+[Otomatik: SSL sertifikası aktif]
+    ↓
+[Başarı! Siteniz: https://ahmet-yilmaz.yourdomain.com]
 ```
 
 ---
@@ -623,11 +685,12 @@ Sadece JSON döndür.
 - JSON çıktısı alamazsan, regex ile HTML'i parse et
 - Fallback: Basit bir template kullan
 
-### Sorun 4: Vercel Deployment Başarısız
+### Sorun 4: Cloudflare R2 Upload Başarısız
 **Çözüm:**
-- Hata mesajını logla
+- Hata mesajını logla (S3 error kodları)
 - Kullanıcıya "Yayınlama başarısız, tekrar deneyin" mesajı göster
 - Retry mekanizması ekle (max 3 deneme)
+- R2 bucket izinlerini kontrol et
 
 ### Sorun 5: Kullanıcı Revize Sayısını Aşmak İstiyor
 **Çözüm:**
@@ -745,7 +808,8 @@ Canlıya almadan önce bu listeyi kontrol et:
 
 ### Sabah (09:00)
 - [ ] Son testleri yap
-- [ ] Vercel production deployment'ı kontrol et
+- [ ] Ana uygulama production deployment'ı kontrol et
+- [ ] Cloudflare R2 bucket erişilebilirliğini test et
 - [ ] Database backup al
 
 ### Öğlen (12:00)
@@ -774,16 +838,26 @@ MVP başarılıysa (20+ yayınlanmış site, pozitif feedback):
 2. **Template seçimi** - 3-4 hazır tasarım
 3. **Daha fazla revize** - 3 revize hakkı
 4. **SEO optimizasyonu** - Meta tags, sitemap
+5. **Analytics dashboard** - Ziyaretçi istatistikleri
 
 ### Ay 3-4: Monetization
 1. **Stripe entegrasyonu**
-2. **Ücretli plan** ($5/ay)
+2. **Ücretli plan** ($5-10/ay)
   - Sınırsız revize
-  - Custom domain
+  - **Custom domain desteği** (isimsoyisim.com)
+    - Kullanıcı kendi domain'ini bağlayabilir
+    - Uygulama içinde rehber göster
+    - DNS doğrulama sistemi
+    - Otomatik SSL (Cloudflare)
+  - Analytics ve istatistikler
   - Priority support
+  - Daha fazla storage
+  - Fotoğraf ve medya yükleme
 3. **Free plan limitler**
   - Sadece 1 site
-  - Vercel subdomain
+  - Subdomain (ahmet.yourdomain.com)
+  - 1 revize hakkı
+  - Temel özellikler
 
 ### Ay 4-6: Genişleme
 1. **Blog sistemi** - Markdown editor
