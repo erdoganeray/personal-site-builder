@@ -139,16 +139,71 @@
   - URL'i veritabanına kaydet
 
 #### Gün 18-21: PDF İçerik Çıkarma
-- [ ] **PDF parsing için basit yöntem**
-  ```bash
-  npm install pdf-parse
+- [x] **Gemini ile PDF parsing**
+  - Gemini API'nin multimodal özelliğini kullan (PDF upload desteği)
+  - PDF dosyasını doğrudan Gemini'ye gönder
+  - Gemini'den yapılandırılmış JSON çıktısı al
+- [x] **CV'den yapılandırılmış veri çıkar**
+  ```typescript
+  // lib/gemini-pdf-parser.ts
+  import { GoogleGenerativeAI } from "@google/generative-ai";
+  
+  export async function parseCVFromPDF(pdfBuffer: Buffer) {
+    const genAI = new GoogleGenerativeAI(process.env.GEMINI_API_KEY!);
+    const model = genAI.getGenerativeModel({ model: "gemini-2.5-flash" });
+    
+    const prompt = `
+    Bu PDF dosyasındaki CV/özgeçmiş bilgilerini analiz et ve aşağıdaki 
+    JSON formatında yapılandırılmış olarak döndür:
+    
+    {
+      "personalInfo": {
+        "name": "Ad Soyad",
+        "email": "email@example.com",
+        "phone": "telefon",
+        "location": "şehir, ülke",
+        "title": "meslek/unvan"
+      },
+      "summary": "kısa özet/bio",
+      "experience": [
+        {
+          "company": "şirket adı",
+          "position": "pozisyon",
+          "duration": "tarih aralığı",
+          "description": "açıklama"
+        }
+      ],
+      "education": [
+        {
+          "school": "okul adı",
+          "degree": "derece",
+          "field": "bölüm",
+          "year": "yıl"
+        }
+      ],
+      "skills": ["skill1", "skill2", ...],
+      "languages": ["dil1", "dil2", ...]
+    }
+    
+    Sadece JSON döndür, başka açıklama ekleme.
+    `;
+    
+    const result = await model.generateContent([
+      {
+        inlineData: {
+          data: pdfBuffer.toString('base64'),
+          mimeType: 'application/pdf'
+        }
+      },
+      prompt
+    ]);
+    
+    return JSON.parse(result.response.text());
+  }
   ```
-- [ ] **CV'den text çıkar**
-  - İsim, email, telefon
-  - İş deneyimleri
-  - Eğitim bilgileri
-  - Yetenekler
-- [ ] **Çıkarılan veriyi JSON olarak sakla**
+- [x] **Çıkarılan veriyi JSON olarak sakla**
+  - API endpoint'te Gemini'den gelen veriyi veritabanına kaydet
+  - Hata durumunda kullanıcıya anlamlı mesaj göster
 
 ---
 
@@ -163,7 +218,7 @@
   const genAI = new GoogleGenerativeAI(process.env.GEMINI_API_KEY!);
   
   export async function generateWebsite(cvData: any) {
-    const model = genAI.getGenerativeModel({ model: "gemini-2.0-flash-exp" });
+    const model = genAI.getGenerativeModel({ model: "gemini-2.5-flash" });
     
     const prompt = `
     Sen bir web tasarımcısısın. Aşağıdaki CV bilgilerini kullanarak 
