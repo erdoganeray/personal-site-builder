@@ -118,22 +118,22 @@
   - `/app/dashboard/page.tsx` - Kullanıcı paneli
 
 #### Gün 11-14: Auth Testleri
-- [ ] Kayıt ol akışını test et
-- [ ] Giriş yap akışını test et
-- [ ] Çıkış yap akışını test et
-- [ ] Dashboard'a authentication kontrolü ekle
+- [x] Kayıt ol akışını test et
+- [x] Giriş yap akışını test et
+- [x] Çıkış yap akışını test et
+- [x] Dashboard'a authentication kontrolü ekle
 
 ---
 
 ### **Hafta 3: CV Yükleme Sistemi**
 
 #### Gün 15-17: Dosya Yükleme
-- [ ] **UploadThing kurulumu** (ücretsiz dosya yükleme servisi)
-- [ ] **CV yükleme formu oluştur**
+- [x] **UploadThing kurulumu** (ücretsiz dosya yükleme servisi)
+- [x] **CV yükleme formu oluştur**
   - Dashboard'da "CV Yükle" butonu
   - PDF dosyası seçme
   - Yükleme progress bar'ı
-- [ ] **API endpoint: PDF'i işle**
+- [x] **API endpoint: PDF'i işle**
   - `/app/api/cv/upload/route.ts`
   - PDF'i UploadThing'e yükle
   - URL'i veritabanına kaydet
