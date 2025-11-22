@@ -11,6 +11,8 @@ interface Site {
   status: string;
   revisionCount: number;
   maxRevisions: number;
+  deployedUrl?: string | null;
+  cloudflareUrl?: string | null;
 }
 
 interface RevisionModalProps {
@@ -128,6 +130,8 @@ export default function PreviewPage({ params }: { params: Promise<{ siteId: stri
   const [isRevisionModalOpen, setIsRevisionModalOpen] = useState(false);
   const [isRevising, setIsRevising] = useState(false);
   const [revisionMessage, setRevisionMessage] = useState<{ type: 'success' | 'error'; text: string } | null>(null);
+  const [publishing, setPublishing] = useState(false);
+  const [unpublishing, setUnpublishing] = useState(false);
   
   // Unwrap params Promise
   const { siteId } = use(params);
@@ -241,6 +245,105 @@ export default function PreviewPage({ params }: { params: Promise<{ siteId: stri
     }
   };
 
+  const handlePublish = async () => {
+    if (!site) return;
+
+    if (!confirm("Sitenizi yayınlamak istediğinizden emin misiniz? Bu işlem sitenizi Cloudflare'de canlıya alacak.")) {
+      return;
+    }
+
+    setPublishing(true);
+    setRevisionMessage(null);
+
+    try {
+      const response = await fetch("/api/site/publish", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          siteId: site.id,
+        }),
+      });
+
+      const data = await response.json();
+
+      if (!response.ok) {
+        throw new Error(data.error || "Site yayınlanamadı");
+      }
+
+      // Başarılı yayınlama
+      setRevisionMessage({
+        type: 'success',
+        text: `Site başarıyla yayınlandı! URL: ${data.deployedUrl}`,
+      });
+      
+      // Site'ı yeniden yükle
+      await fetchSite();
+
+      // Kullanıcıya yayınlanan siteyi göster
+      setTimeout(() => {
+        window.open(data.deployedUrl, '_blank');
+      }, 1500);
+
+    } catch (err) {
+      console.error("Yayınlama hatası:", err);
+      setRevisionMessage({
+        type: 'error',
+        text: err instanceof Error ? err.message : "Site yayınlanamadı",
+      });
+    } finally {
+      setPublishing(false);
+    }
+  };
+
+  const handleUnpublish = async () => {
+    if (!site) return;
+
+    if (!confirm("Sitenizi yayından kaldırmak istediğinizden emin misiniz? Site artık canlıda olmayacak.")) {
+      return;
+    }
+
+    setUnpublishing(true);
+    setRevisionMessage(null);
+
+    try {
+      const response = await fetch("/api/site/unpublish", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          siteId: site.id,
+        }),
+      });
+
+      const data = await response.json();
+
+      if (!response.ok) {
+        throw new Error(data.error || "Site yayından kaldırılamadı");
+      }
+
+      // Başarılı
+      setRevisionMessage({
+        type: 'success',
+        text: "Site yayından kaldırıldı!",
+      });
+      
+      // Site'ı yeniden yükle
+      await fetchSite();
+
+    } catch (err) {
+      console.error("Yayından kaldırma hatası:", err);
+      setRevisionMessage({
+        type: 'error',
+        text: err instanceof Error ? err.message : "Site yayından kaldırılamadı",
+      });
+    } finally {
+      setUnpublishing(false);
+    }
+  };
+
   if (status === "loading" || loading) {
     return (
       <div className="min-h-screen bg-gradient-to-br from-gray-900 via-gray-800 to-gray-900 flex items-center justify-center">
@@ -322,18 +425,74 @@ export default function PreviewPage({ params }: { params: Promise<{ siteId: stri
                 </button>
               )}
 
-              <button
-                onClick={() => {
-                  // TODO: Yayınlama işlemi
-                  alert("Yayınlama özelliği yakında eklenecek!");
-                }}
-                className="px-6 py-2 bg-green-600 hover:bg-green-700 text-white rounded-lg transition duration-200 flex items-center gap-2 font-medium"
-              >
-                <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
-                </svg>
-                <span>Beğendim, Yayınla!</span>
-              </button>
+              {site.status !== 'published' ? (
+                <button
+                  onClick={handlePublish}
+                  disabled={publishing}
+                  className="px-6 py-2 bg-green-600 hover:bg-green-700 disabled:bg-gray-400 text-white rounded-lg transition duration-200 flex items-center gap-2 font-medium disabled:cursor-not-allowed"
+                >
+                  {publishing ? (
+                    <>
+                      <svg className="animate-spin h-5 w-5" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                        <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
+                        <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                      </svg>
+                      <span>Yayınlanıyor...</span>
+                    </>
+                  ) : (
+                    <>
+                      <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
+                      </svg>
+                      <span>Beğendim, Yayınla!</span>
+                    </>
+                  )}
+                </button>
+              ) : (
+                <div className="flex items-center gap-3">
+                  <div className="px-4 py-2 bg-green-100 border border-green-300 text-green-800 rounded-lg flex items-center gap-2 font-medium">
+                    <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
+                    </svg>
+                    <span>Yayında</span>
+                  </div>
+                  {(site.deployedUrl || site.cloudflareUrl) && (
+                    <a
+                      href={site.deployedUrl || site.cloudflareUrl || '#'}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-lg transition duration-200 flex items-center gap-2 font-medium"
+                    >
+                      <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14" />
+                      </svg>
+                      <span>Siteyi Aç</span>
+                    </a>
+                  )}
+                  <button
+                    onClick={handleUnpublish}
+                    disabled={unpublishing}
+                    className="px-4 py-2 bg-red-600 hover:bg-red-700 disabled:bg-gray-400 text-white rounded-lg transition duration-200 flex items-center gap-2 font-medium disabled:cursor-not-allowed"
+                  >
+                    {unpublishing ? (
+                      <>
+                        <svg className="animate-spin h-5 w-5" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                          <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
+                          <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                        </svg>
+                        <span>Kaldırılıyor...</span>
+                      </>
+                    ) : (
+                      <>
+                        <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M18.364 18.364A9 9 0 005.636 5.636m12.728 12.728A9 9 0 015.636 5.636m12.728 12.728L5.636 5.636" />
+                        </svg>
+                        <span>Yayından Kaldır</span>
+                      </>
+                    )}
+                  </button>
+                </div>
+              )}
             </div>
           </div>
         </div>

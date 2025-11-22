@@ -280,6 +280,9 @@
   - Gemini'den revize edilmiş HTML'i al
   - Veritabanını güncelle
   - Revize sayacını artır (max 1)
+- [x] **"Yayınla" butonunu dashboard ve preview'a ekle**
+  - Dashboard: Yayınla butonu + durum göstergesi
+  - Preview: Yayınla butonu + başarı mesajları
 
 ---
 
