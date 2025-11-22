@@ -19,6 +19,7 @@ export default function PreviewPage({ params }: { params: Promise<{ siteId: stri
   const [site, setSite] = useState<Site | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const [deviceView, setDeviceView] = useState<'desktop' | 'tablet' | 'mobile'>('desktop');
   
   // Unwrap params Promise
   const { siteId } = use(params);
@@ -195,27 +196,56 @@ export default function PreviewPage({ params }: { params: Promise<{ siteId: stri
           <div className="bg-gray-50 border-b border-gray-200 px-4 py-3 flex items-center justify-center gap-2">
             <span className="text-sm text-gray-600">Önizleme:</span>
             <div className="flex gap-2">
-              <button className="px-3 py-1 text-xs bg-blue-600 text-white rounded">
+              <button 
+                onClick={() => setDeviceView('desktop')}
+                className={`px-3 py-1 text-xs rounded transition duration-200 ${
+                  deviceView === 'desktop' 
+                    ? 'bg-blue-600 text-white' 
+                    : 'bg-gray-200 text-gray-700 hover:bg-gray-300'
+                }`}
+              >
                 Desktop
               </button>
-              <button className="px-3 py-1 text-xs bg-gray-200 text-gray-700 rounded hover:bg-gray-300">
+              <button 
+                onClick={() => setDeviceView('tablet')}
+                className={`px-3 py-1 text-xs rounded transition duration-200 ${
+                  deviceView === 'tablet' 
+                    ? 'bg-blue-600 text-white' 
+                    : 'bg-gray-200 text-gray-700 hover:bg-gray-300'
+                }`}
+              >
                 Tablet
               </button>
-              <button className="px-3 py-1 text-xs bg-gray-200 text-gray-700 rounded hover:bg-gray-300">
+              <button 
+                onClick={() => setDeviceView('mobile')}
+                className={`px-3 py-1 text-xs rounded transition duration-200 ${
+                  deviceView === 'mobile' 
+                    ? 'bg-blue-600 text-white' 
+                    : 'bg-gray-200 text-gray-700 hover:bg-gray-300'
+                }`}
+              >
                 Mobile
               </button>
             </div>
           </div>
 
           {/* iframe with generated HTML */}
-          <div className="relative bg-white" style={{ height: '800px', overflow: 'auto' }}>
-            <iframe
-              src={iframeUrl}
-              className="w-full border-0"
-              style={{ height: '100%', minHeight: '800px', display: 'block' }}
-              title="Site Preview"
-              sandbox="allow-same-origin allow-scripts allow-forms allow-popups"
-            />
+          <div className="relative bg-gray-100 flex justify-center items-start p-6" style={{ minHeight: '800px' }}>
+            <div 
+              className="bg-white shadow-2xl transition-all duration-300 ease-in-out"
+              style={{
+                width: deviceView === 'desktop' ? '100%' : deviceView === 'tablet' ? '768px' : '375px',
+                height: '800px',
+                maxWidth: '100%'
+              }}
+            >
+              <iframe
+                src={iframeUrl}
+                className="w-full h-full border-0"
+                title="Site Preview"
+                sandbox="allow-same-origin allow-scripts allow-forms allow-popups"
+              />
+            </div>
           </div>
         </div>
 
