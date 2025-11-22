@@ -210,7 +210,7 @@
 ### **Hafta 4: AI Site Üretimi (En Önemli Kısım!)**
 
 #### Gün 22-25: Gemini Entegrasyonu
-- [ ] **Gemini API client oluştur**
+- [x] **Gemini API client oluştur**
   ```typescript
   // lib/gemini.ts
   import { GoogleGenerativeAI } from "@google/generative-ai";
@@ -246,7 +246,7 @@
   ```
 
 #### Gün 26-28: Site Üretim Endpoint'i
-- [ ] **API route oluştur**
+- [x] **API route oluştur**
   - `/app/api/site/generate/route.ts`
   - CV verisini al
   - Gemini'ye gönder
