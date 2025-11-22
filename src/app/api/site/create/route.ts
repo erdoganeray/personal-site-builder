@@ -17,6 +17,20 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ error: "CV URL is required" }, { status: 400 });
     }
 
+    // Kullanıcının zaten bir sitesi var mı kontrol et
+    const existingSite = await prisma.site.findFirst({
+      where: {
+        userId: session.user.id,
+      },
+    });
+
+    if (existingSite) {
+      return NextResponse.json(
+        { error: "Zaten bir siteniz mevcut. Yeni site oluşturmak için önce mevcut sitenizi silmelisiniz." },
+        { status: 400 }
+      );
+    }
+
     // Site kaydı oluştur
     const site = await prisma.site.create({
       data: {

@@ -5,7 +5,11 @@ import { useState } from "react";
 import { useRouter } from "next/navigation";
 import type { CVData } from "@/lib/gemini-pdf-parser";
 
-export default function CVUploader() {
+interface CVUploaderProps {
+  onAnalyzed?: (cvData: CVData, siteId: string) => void;
+}
+
+export default function CVUploader({ onAnalyzed }: CVUploaderProps) {
   const router = useRouter();
   const [file, setFile] = useState<File | null>(null);
   const [uploading, setUploading] = useState(false);
@@ -126,6 +130,11 @@ export default function CVUploader() {
       // Sonra CV'yi analiz et
       const analyzedData = await analyzeCV(cvUrl, newSiteId);
       setCvData(analyzedData);
+
+      // Parent component'e bildir
+      if (onAnalyzed) {
+        onAnalyzed(analyzedData, newSiteId);
+      }
 
       setAnalyzing(false);
     } catch (err) {
