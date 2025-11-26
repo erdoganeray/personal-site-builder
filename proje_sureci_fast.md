@@ -883,3 +883,10 @@ MVP başarılıysa (20+ yayınlanmış site, pozitif feedback):
 **Not:** Bu doküman senin kişisel rehberin. Her tamamladığın checkbox gurur duyacağın bir adım. Her hafta sonunda ilerlemeyi değerlendir ve gerekirse planı güncelle. En önemlisi: **Vazgeçme!** İlk 2 ay zor olacak ama sonunda çalışan bir ürünün olacak. 
 
 **Başarılar! 💪🔥**
+
+##### Sonrası İçin Kişisel Notlar
+- mvp'de subdomain, post mvp'de custom domain (kullanıcı domain satın alıp dns bağlar)
+- kullanıcı cv'yi word, sunum, linkedin hesabı linki olarak ekleyebilir. ya da dosya yüklemeden form doldurmak isteyebilir.
+- bazı kullanıcılar web sayfasında blog sistemi olmasını isteyebilir.
+- kullanıcılar kendi sitelerinin trafiğini görmek isteyebilir.
+- kullanıcılar sitelerinde çoklu dil desteği eklemek isteyebilir.

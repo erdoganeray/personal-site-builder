@@ -40,6 +40,17 @@ export default function LoginPage() {
     return (
         <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-gray-900 via-gray-800 to-gray-900">
             <div className="bg-gray-800 p-8 rounded-2xl shadow-2xl w-full max-w-md border border-gray-700">
+                <div className="mb-6">
+                    <Link
+                        href="/"
+                        className="inline-flex items-center text-gray-400 hover:text-white transition-colors text-sm"
+                    >
+                        <svg className="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10 19l-7-7m0 0l7-7m-7 7h18" />
+                        </svg>
+                        Ana Sayfaya Dön
+                    </Link>
+                </div>
                 <h1 className="text-3xl font-bold text-white mb-6 text-center">
                     Welcome Back
                 </h1>
