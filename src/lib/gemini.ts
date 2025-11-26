@@ -11,6 +11,7 @@ export interface WebsiteGenerationInput {
   cvData: CVData;
   linkedinUrl?: string;
   githubUrl?: string;
+  customPrompt?: string;
 }
 
 /**
@@ -31,7 +32,7 @@ export async function generateWebsite(
     const genAI = new GoogleGenerativeAI(apiKey);
     const model = genAI.getGenerativeModel({ model: "gemini-2.5-flash" });
 
-    const { cvData, linkedinUrl, githubUrl } = input;
+    const { cvData, linkedinUrl, githubUrl, customPrompt } = input;
 
     // CV verilerini düzenli bir şekilde formatla
     const cvSummary = `
@@ -74,6 +75,8 @@ CV Bilgileri:
 ${cvSummary}
 
 ${socialLinks.length > 0 ? `Sosyal Medya Linkleri:\n${socialLinks.join('\n')}` : ''}
+
+${customPrompt ? `\nÖZEL TASARIM İSTEKLERİ:\n${customPrompt}\n\nYukarıdaki özel tasarım isteklerini DikkatLE uygula ve sitenin tasarımını bu isteklere göre şekillendir.\n` : ''}
 
 Gereksinimler:
 1. Modern ve profesyonel görünüm
@@ -201,38 +204,52 @@ Gereksinimler:
 - Sadece istenen değişiklikleri yap
 - Kod kalitesini ve okunabilirliği koru
 
-Çıktı formatı JSON:
-{
-  "html": "<!DOCTYPE html>...revize edilmiş tam HTML kodu...",
-  "changes": "Yapılan değişikliklerin kısa açıklaması (Türkçe, 2-3 cümle)"
-}
+Çıktı formatı:
+Tam HTML kodunu döndür, sonuna ===CHANGES=== ayırıcısı ekle, sonra yapılan değişiklikleri Türkçe açıkla (2-3 cümle).
 
-SADECE JSON formatında döndür, başka açıklama ekleme.
-JSON'dan önce veya sonra hiçbir metin olmasın.
+Örnek format:
+<!DOCTYPE html>
+<html>
+...tam HTML kodu...
+</html>
+===CHANGES===
+Yapılan değişikliklerin açıklaması burada.
+
+HTML'den önce veya ===CHANGES=== ayırıcısından sonra başka açıklama ekleme.
 `;
 
     const result = await model.generateContent(prompt);
     const responseText = result.response.text();
 
     try {
-      let cleanedText = responseText.trim();
+      // Split by the delimiter
+      const parts = responseText.split('===CHANGES===');
       
-      if (cleanedText.startsWith('```json')) {
-        cleanedText = cleanedText.replace(/^```json\n/, '').replace(/\n```$/, '');
-      } else if (cleanedText.startsWith('```')) {
-        cleanedText = cleanedText.replace(/^```\n/, '').replace(/\n```$/, '');
+      if (parts.length !== 2) {
+        throw new Error("Response format is invalid. Expected ===CHANGES=== delimiter.");
       }
       
-      const parsedResponse = JSON.parse(cleanedText);
+      let html = parts[0].trim();
+      const changes = parts[1].trim();
       
-      if (!parsedResponse.html || !parsedResponse.changes) {
-        throw new Error("Revised response is missing required fields");
+      // Remove markdown code blocks if present
+      if (html.startsWith('```html')) {
+        html = html.replace(/^```html\n/, '').replace(/\n```$/, '');
+      } else if (html.startsWith('```')) {
+        html = html.replace(/^```\n/, '').replace(/\n```$/, '');
       }
       
-      return parsedResponse;
+      if (!html || !changes) {
+        throw new Error("Revised response is missing HTML or changes");
+      }
+      
+      return {
+        html,
+        changes
+      };
       
     } catch (parseError) {
-      console.error("Failed to parse Gemini revision response:", responseText);
+      console.error("Failed to parse Gemini revision response:", responseText.substring(0, 500) + "...");
       throw new Error(
         `Failed to parse AI revision response. Error: ${
           parseError instanceof Error ? parseError.message : String(parseError)

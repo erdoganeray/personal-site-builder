@@ -19,7 +19,7 @@ export async function POST(req: NextRequest) {
 
     // 2. Request body'den siteId'yi al
     const body = await req.json();
-    const { siteId } = body;
+    const { siteId, customPrompt } = body;
 
     if (!siteId) {
       return NextResponse.json(
@@ -88,6 +88,7 @@ export async function POST(req: NextRequest) {
         cvData,
         linkedinUrl: site.linkedinUrl || undefined,
         githubUrl: site.githubUrl || undefined,
+        customPrompt: customPrompt || undefined,
       });
     } catch (geminiError) {
       console.error("Gemini generation error:", geminiError);

@@ -289,15 +289,15 @@
 ### **Hafta 6: Cloudflare Pages + R2 Deployment Entegrasyonu**
 
 #### Gün 36-38: Cloudflare Kurulumu
-- [ ] **Cloudflare hesabı ve API token**
+- [x] **Cloudflare hesabı ve API token**
   - https://dash.cloudflare.com/profile/api-tokens adresinden token al
   - R2 için Access Key/Secret oluştur
   - `.env` dosyasına ekle
-- [ ] **AWS SDK kurulumu** (R2 S3-compatible)
+- [x] **AWS SDK kurulumu** (R2 S3-compatible)
   ```bash
   npm install @aws-sdk/client-s3
   ```
-- [ ] **Deployment fonksiyonu oluştur**
+- [x] **Deployment fonksiyonu oluştur**
   ```typescript
   // lib/cloudflare-deploy.ts
   import { S3Client, PutObjectCommand } from "@aws-sdk/client-s3";
@@ -355,19 +355,17 @@
   ```
 
 #### Gün 39-42: Yayınlama Sistemi
-- [ ] **"Yayınla" butonu endpoint'i**
+- [x] **"Yayınla" butonu endpoint'i**
   - `/app/api/site/publish/route.ts`
   - Site HTML'ini al
   - Cloudflare R2'ye deploy et
   - Otomatik subdomain oluştur (username.yourdomain.com)
   - URL'i veritabanına kaydet
   - Site status'ünü "published" yap
-- [ ] **Başarı sayfası**
+- [x] **Başarı sayfası**
   - "Siteniz yayında!" mesajı
   - Canlı subdomain URL'i göster (https://ahmet-yilmaz.yourdomain.com)
   - "Siteniz 30 saniye içinde aktif olacak" (DNS yayılma)
-  - Sosyal medyada paylaş butonları
-  - QR kod oluştur (mobil paylaşım için)
 - [ ] **Subdomain kullanıcı adı kontrolü**
   - Kullanıcı adı benzersiz mi kontrol et
   - URL-safe format (tire ile ayır, özel karakter yok)
@@ -378,11 +376,11 @@
 ### **Hafta 7: Link Entegrasyonu ve İyileştirmeler**
 
 #### Gün 43-45: LinkedIn/GitHub Link İşleme
-- [ ] **Link ekleme formu**
+- [x] **Link ekleme formu**
   - Dashboard'da "Linklerini Ekle" bölümü
   - LinkedIn URL input
   - GitHub URL input
-- [ ] **Link verilerini Gemini prompt'una ekle**
+- [x] **Link verilerini Gemini prompt'una ekle**
   ```typescript
   const prompt = `
   CV Bilgileri: ${cvData}

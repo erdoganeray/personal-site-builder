@@ -19,6 +19,7 @@ export default function DashboardPage() {
     const [savingLinks, setSavingLinks] = useState(false);
     const [publishing, setPublishing] = useState(false);
     const [unpublishing, setUnpublishing] = useState(false);
+    const [customPrompt, setCustomPrompt] = useState("");
 
     useEffect(() => {
         if (status === "unauthenticated") {
@@ -110,6 +111,7 @@ export default function DashboardPage() {
                 },
                 body: JSON.stringify({
                     siteId: site.id,
+                    customPrompt: customPrompt.trim() || undefined,
                 }),
             });
 
@@ -444,6 +446,23 @@ export default function DashboardPage() {
                                         </div>
                                     </div>
                                 )}
+
+                                {/* Özel Tasarım İstekleri */}
+                                <div className="pt-4 border-t border-gray-200 dark:border-gray-700">
+                                    <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-3">
+                                        Özel Tasarım İstekleri (Opsiyonel)
+                                    </h3>
+                                    <p className="text-sm text-gray-600 dark:text-gray-400 mb-3">
+                                        AI'ya sitenizin nasıl görünmesini istediğinizi anlatın. Örnek: "Minimalist bir tasarım istiyorum, koyu tema kullan, portfolyo projelerimi öne çıkar."
+                                    </p>
+                                    <textarea
+                                        placeholder="Örnek: Modern ve minimalist bir tasarım, mor-mavi renk paleti, portfolyo çalışmalarımı büyük kartlarla göster..."
+                                        value={customPrompt}
+                                        onChange={(e) => setCustomPrompt(e.target.value)}
+                                        rows={4}
+                                        className="w-full px-4 py-3 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-blue-500 dark:bg-gray-700 dark:text-white resize-none"
+                                    />
+                                </div>
 
                                 {/* Action Buttons */}
                                 <div className="space-y-3">
