@@ -47,10 +47,10 @@ export async function POST(req: NextRequest) {
       );
     }
 
-    // 5. HTML içeriği var mı kontrol et
-    if (!site.htmlContent) {
+    // 5. HTML, CSS ve JS içeriği var mı kontrol et
+    if (!site.htmlContent || !site.cssContent || !site.jsContent) {
       return NextResponse.json(
-        { error: "No HTML content to publish. Generate site first." },
+        { error: "Missing content (HTML, CSS, or JS). Generate site first." },
         { status: 400 }
       );
     }
@@ -68,11 +68,13 @@ export async function POST(req: NextRequest) {
       });
     }
 
-    // 7. Cloudflare'e deploy et
+    // 7. Cloudflare'e deploy et (HTML, CSS, JS)
     const deployment = await deployToCloudflare(
       username,
       siteId,
-      site.htmlContent
+      site.htmlContent,
+      site.cssContent,
+      site.jsContent
     );
 
     if (!deployment.success) {

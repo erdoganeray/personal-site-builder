@@ -76,10 +76,10 @@ export async function POST(req: NextRequest) {
       );
     }
 
-    // 6. HTML içeriği kontrolü
-    if (!site.htmlContent) {
+    // 6. HTML, CSS ve JS içeriği kontrolü
+    if (!site.htmlContent || !site.cssContent || !site.jsContent) {
       return NextResponse.json(
-        { error: "Site has no HTML content to revise" },
+        { error: "Site has missing content (HTML, CSS, or JS) to revise" },
         { status: 400 }
       );
     }
@@ -93,7 +93,12 @@ export async function POST(req: NextRequest) {
     // 8. Gemini ile revize yap
     let revisedResult;
     try {
-      revisedResult = await reviseWebsite(site.htmlContent, revisionRequest.trim());
+      revisedResult = await reviseWebsite(
+        site.htmlContent, 
+        site.cssContent, 
+        site.jsContent, 
+        revisionRequest.trim()
+      );
     } catch (geminiError) {
       console.error("Gemini revision error:", geminiError);
       
@@ -112,11 +117,13 @@ export async function POST(req: NextRequest) {
       );
     }
 
-    // 9. Revize edilmiş HTML'i veritabanına kaydet ve revisionCount'u artır
+    // 9. Revize edilmiş HTML, CSS ve JS'i veritabanına kaydet ve revisionCount'u artır
     const updatedSite = await prisma.site.update({
       where: { id: siteId },
       data: {
         htmlContent: revisedResult.html,
+        cssContent: revisedResult.css,
+        jsContent: revisedResult.js,
         status: "draft", // Preview için draft olarak bırak
         revisionCount: site.revisionCount + 1,
         updatedAt: new Date(),

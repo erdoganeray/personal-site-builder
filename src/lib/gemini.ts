@@ -3,6 +3,8 @@ import { CVData } from "./gemini-pdf-parser";
 
 export interface GeneratedWebsite {
   html: string;
+  css: string;
+  js: string;
   title: string;
   description: string;
 }
@@ -96,15 +98,33 @@ Bölümler (sırayla):
 - İletişim (email, telefon, sosyal medya linkleri)
 
 Teknik Detaylar:
-- Tamamen self-contained HTML (tek dosya)
-- Tüm CDN linklerini ekle (Tailwind, Font Awesome)
+- HTML, CSS ve JavaScript'i AYRI AYRI dosyalar olarak üret
+- HTML: Sadece yapı ve içerik, inline style veya script KULLANMA
+- CSS: Tüm stil kuralları ayrı dosyada, Tailwind CDN kullanma (kendi CSS yaz)
+- JavaScript: Tüm interaktif özellikler ayrı dosyada
 - Meta tags ekle (SEO için)
 - Favicon placeholder ekle
-- Smooth scroll için JavaScript kodu ekle
 - Responsive navigation menu (mobil için hamburger menu)
 
+HTML Dosyasında:
+- <link rel="stylesheet" href="styles.css"> ile CSS'i dahil et
+- <script src="script.js"></script> ile JS'i dahil et
+- Inline style veya script kullanma
+
+CSS Dosyasında:
+- Modern, profesyonel stil kuralları
+- Responsive tasarım (media queries)
+- Smooth transitions ve animations
+- Temiz, organize edilmiş CSS
+
+JavaScript Dosyasında:
+- Smooth scroll
+- Hamburger menu toggle
+- Scroll animasyonları
+- Diğer interaktif özellikler
+
 Önemli Kurallar:
-- Tam HTML kodu üret, eksik bırakma
+- Tam kod üret, eksik bırakma
 - Gerçek, çalışan kod yaz (placeholder değil)
 - CV'deki TÜM bilgileri kullan
 - Modern web standartlarına uy
@@ -112,7 +132,9 @@ Teknik Detaylar:
 
 Çıktı formatı JSON olsun:
 {
-  "html": "<!DOCTYPE html>...tam HTML kodu...",
+  "html": "<!DOCTYPE html>...tam HTML kodu (sadece yapı, stil ve script yok)...",
+  "css": "/* Tüm CSS kodları */",
+  "js": "// Tüm JavaScript kodları",
   "title": "Kişinin adı - Kişisel Web Sitesi",
   "description": "Kişinin unvanı ve kısa özeti (max 160 karakter)"
 }
@@ -141,8 +163,8 @@ JSON'dan önce veya sonra hiçbir metin olmasın.
       parsedResponse = JSON.parse(cleanedText);
       
       // Gerekli alanların varlığını kontrol et
-      if (!parsedResponse.html || !parsedResponse.title) {
-        throw new Error("Generated response is missing required fields");
+      if (!parsedResponse.html || !parsedResponse.css || !parsedResponse.js || !parsedResponse.title) {
+        throw new Error("Generated response is missing required fields (html, css, js, or title)");
       }
       
     } catch (parseError) {
@@ -168,15 +190,19 @@ JSON'dan önce veya sonra hiçbir metin olmasın.
 }
 
 /**
- * Mevcut bir HTML'i kullanıcı isteğine göre revize eder
+ * Mevcut bir site'i kullanıcı isteğine göre revize eder
  * @param currentHtml Mevcut HTML kodu
+ * @param currentCss Mevcut CSS kodu
+ * @param currentJs Mevcut JS kodu
  * @param userRequest Kullanıcının revize isteği
- * @returns Revize edilmiş HTML ve yapılan değişikliklerin açıklaması
+ * @returns Revize edilmiş HTML, CSS, JS ve yapılan değişikliklerin açıklaması
  */
 export async function reviseWebsite(
   currentHtml: string,
+  currentCss: string,
+  currentJs: string,
   userRequest: string
-): Promise<{ html: string; changes: string }> {
+): Promise<{ html: string; css: string; js: string; changes: string }> {
   try {
     const apiKey = process.env.GEMINI_API_KEY;
     
@@ -188,10 +214,16 @@ export async function reviseWebsite(
     const model = genAI.getGenerativeModel({ model: "gemini-2.5-flash" });
 
     const prompt = `
-Sen profesyonel bir web tasarımcısısın. Aşağıdaki HTML kodunu kullanıcının isteğine göre revize et.
+Sen profesyonel bir web tasarımcısısın. Aşağıdaki HTML, CSS ve JavaScript kodlarını kullanıcının isteğine göre revize et.
 
 Mevcut HTML:
 ${currentHtml}
+
+Mevcut CSS:
+${currentCss}
+
+Mevcut JavaScript:
+${currentJs}
 
 Kullanıcının İsteği:
 "${userRequest}"
@@ -199,53 +231,47 @@ Kullanıcının İsteği:
 Gereksinimler:
 - Kullanıcının isteğini en iyi şekilde karşıla
 - Responsive ve modern tasarımı koru
-- Tailwind CSS kullanmaya devam et
+- HTML, CSS ve JS'i AYRI AYRI dosyalar olarak döndür
 - Tüm mevcut içeriği koru (bilgi kaybı olmasın)
 - Sadece istenen değişiklikleri yap
 - Kod kalitesini ve okunabilirliği koru
 
-Çıktı formatı:
-Tam HTML kodunu döndür, sonuna ===CHANGES=== ayırıcısı ekle, sonra yapılan değişiklikleri Türkçe açıkla (2-3 cümle).
+Çıktı formatı JSON olsun:
+{
+  "html": "<!DOCTYPE html>...tam HTML kodu...",
+  "css": "/* Tam CSS kodu */",
+  "js": "// Tam JavaScript kodu",
+  "changes": "Yapılan değişikliklerin Türkçe açıklaması (2-3 cümle)"
+}
 
-Örnek format:
-<!DOCTYPE html>
-<html>
-...tam HTML kodu...
-</html>
-===CHANGES===
-Yapılan değişikliklerin açıklaması burada.
-
-HTML'den önce veya ===CHANGES=== ayırıcısından sonra başka açıklama ekleme.
+SADECE JSON formatında döndür, başka açıklama ekleme.
+JSON'dan önce veya sonra hiçbir metin olmasın.
 `;
 
     const result = await model.generateContent(prompt);
     const responseText = result.response.text();
 
     try {
-      // Split by the delimiter
-      const parts = responseText.split('===CHANGES===');
+      // JSON bloğunu temizle
+      let cleanedText = responseText.trim();
       
-      if (parts.length !== 2) {
-        throw new Error("Response format is invalid. Expected ===CHANGES=== delimiter.");
+      if (cleanedText.startsWith('```json')) {
+        cleanedText = cleanedText.replace(/^```json\n/, '').replace(/\n```$/, '');
+      } else if (cleanedText.startsWith('```')) {
+        cleanedText = cleanedText.replace(/^```\n/, '').replace(/\n```$/, '');
       }
       
-      let html = parts[0].trim();
-      const changes = parts[1].trim();
+      const parsed = JSON.parse(cleanedText);
       
-      // Remove markdown code blocks if present
-      if (html.startsWith('```html')) {
-        html = html.replace(/^```html\n/, '').replace(/\n```$/, '');
-      } else if (html.startsWith('```')) {
-        html = html.replace(/^```\n/, '').replace(/\n```$/, '');
-      }
-      
-      if (!html || !changes) {
-        throw new Error("Revised response is missing HTML or changes");
+      if (!parsed.html || !parsed.css || !parsed.js || !parsed.changes) {
+        throw new Error("Revised response is missing required fields (html, css, js, or changes)");
       }
       
       return {
-        html,
-        changes
+        html: parsed.html,
+        css: parsed.css,
+        js: parsed.js,
+        changes: parsed.changes
       };
       
     } catch (parseError) {

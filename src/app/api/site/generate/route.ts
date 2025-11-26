@@ -108,11 +108,13 @@ export async function POST(req: NextRequest) {
       );
     }
 
-    // 8. Üretilen HTML'i veritabanına kaydet
+    // 8. Üretilen HTML, CSS ve JS'i veritabanına kaydet
     const updatedSite = await prisma.site.update({
       where: { id: siteId },
       data: {
         htmlContent: generatedSite.html,
+        cssContent: generatedSite.css,
+        jsContent: generatedSite.js,
         title: generatedSite.title,
         status: "draft", // Preview için draft olarak bırak
         updatedAt: new Date(),

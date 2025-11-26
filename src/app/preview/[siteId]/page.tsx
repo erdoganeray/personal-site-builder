@@ -8,6 +8,8 @@ interface Site {
   id: string;
   title: string;
   htmlContent: string | null;
+  cssContent: string | null;
+  jsContent: string | null;
   status: string;
   revisionCount: number;
   maxRevisions: number;
@@ -136,13 +138,40 @@ export default function PreviewPage({ params }: { params: Promise<{ siteId: stri
   // Unwrap params Promise
   const { siteId } = use(params);
 
-  // Blob URL oluştur - site htmlContent değiştiğinde güncellenir
+  // Blob URL oluştur - site htmlContent, cssContent, jsContent değiştiğinde güncellenir
   const iframeUrl = useMemo(() => {
     if (!site?.htmlContent) return '';
     
-    const blob = new Blob([site.htmlContent], { type: 'text/html' });
+    // HTML'in içine CSS ve JS'i inject et
+    let fullHtml = site.htmlContent;
+    
+    // CSS'i <head> içine ekle (eğer varsa)
+    if (site.cssContent) {
+      const styleTag = `<style>${site.cssContent}</style>`;
+      // </head> etiketinden önce ekle
+      if (fullHtml.includes('</head>')) {
+        fullHtml = fullHtml.replace('</head>', `${styleTag}\n</head>`);
+      } else {
+        // head yoksa en başa ekle
+        fullHtml = styleTag + fullHtml;
+      }
+    }
+    
+    // JS'i <body> sonuna ekle (eğer varsa)
+    if (site.jsContent) {
+      const scriptTag = `<script>${site.jsContent}</script>`;
+      // </body> etiketinden önce ekle
+      if (fullHtml.includes('</body>')) {
+        fullHtml = fullHtml.replace('</body>', `${scriptTag}\n</body>`);
+      } else {
+        // body yoksa en sona ekle
+        fullHtml = fullHtml + scriptTag;
+      }
+    }
+    
+    const blob = new Blob([fullHtml], { type: 'text/html' });
     return URL.createObjectURL(blob);
-  }, [site?.htmlContent]);
+  }, [site?.htmlContent, site?.cssContent, site?.jsContent]);
 
   // Cleanup - component unmount olduğunda blob URL'i temizle
   useEffect(() => {
