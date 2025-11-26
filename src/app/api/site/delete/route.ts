@@ -2,9 +2,16 @@ import { NextRequest, NextResponse } from "next/server";
 import { getServerSession } from "next-auth";
 import { authOptions } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
-import { UTApi } from "uploadthing/server";
+import { S3Client, DeleteObjectCommand } from "@aws-sdk/client-s3";
 
-const utapi = new UTApi();
+const s3Client = new S3Client({
+  region: "auto",
+  endpoint: `https://${process.env.CLOUDFLARE_ACCOUNT_ID}.r2.cloudflarestorage.com`,
+  credentials: {
+    accessKeyId: process.env.R2_ACCESS_KEY_ID!,
+    secretAccessKey: process.env.R2_SECRET_ACCESS_KEY!,
+  },
+});
 
 export async function DELETE(request: NextRequest) {
   try {
@@ -34,18 +41,25 @@ export async function DELETE(request: NextRequest) {
       return NextResponse.json({ error: "Bu siteyi silme yetkiniz yok" }, { status: 403 });
     }
 
-    // UploadThing'den dosyayı sil
+    // R2'den dosyayı sil
     if (site.cvUrl) {
       try {
         // URL'den file key'i çıkar
-        // Örnek URL: https://utfs.io/f/abc123.pdf
-        const fileKey = site.cvUrl.split('/f/')[1];
+        // Örnek URL: https://pub-bf529b02842d4bcf8be2282dc9efb2a6.r2.dev/cvs/cv-123.pdf
+        const url = new URL(site.cvUrl);
+        const fileKey = url.pathname.substring(1); // "/cvs/cv-123.pdf" -> "cvs/cv-123.pdf"
+        
         if (fileKey) {
-          await utapi.deleteFiles(fileKey);
-          console.log("UploadThing'den dosya silindi:", fileKey);
+          await s3Client.send(
+            new DeleteObjectCommand({
+              Bucket: process.env.R2_BUCKET_NAME!,
+              Key: fileKey,
+            })
+          );
+          console.log("R2'den dosya silindi:", fileKey);
         }
-      } catch (uploadError) {
-        console.error("UploadThing silme hatası:", uploadError);
+      } catch (deleteError) {
+        console.error("R2 silme hatası:", deleteError);
         // Dosya silme hatası olsa bile devam et
       }
     }

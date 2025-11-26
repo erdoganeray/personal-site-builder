@@ -1,6 +1,5 @@
 "use client";
 
-import { useUploadThing } from "@/lib/uploadthing";
 import { useState } from "react";
 import { useRouter } from "next/navigation";
 import type { CVData } from "@/lib/gemini-pdf-parser";
@@ -18,27 +17,6 @@ export default function CVUploader({ onAnalyzed }: CVUploaderProps) {
   const [error, setError] = useState<string | null>(null);
   const [cvData, setCvData] = useState<CVData | null>(null);
   const [siteId, setSiteId] = useState<string | null>(null);
-
-  const { startUpload } = useUploadThing("pdfUploader", {
-    onClientUploadComplete: (res) => {
-      console.log("Upload başarılı:", res);
-      setProgress(100);
-      setUploading(false);
-      
-      // Site kaydını oluştur ve CV'yi analiz et
-      if (res && res[0]) {
-        createSiteAndAnalyzeCV(res[0].url);
-      }
-    },
-    onUploadError: (error: Error) => {
-      console.error("Upload hatası:", error);
-      setError(error.message);
-      setUploading(false);
-    },
-    onUploadProgress: (p) => {
-      setProgress(p);
-    },
-  });
 
   const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const selectedFile = e.target.files?.[0];
@@ -63,12 +41,36 @@ export default function CVUploader({ onAnalyzed }: CVUploaderProps) {
     }
 
     setUploading(true);
+    setProgress(0);
     setError(null);
 
     try {
-      await startUpload([file]);
+      // FormData oluştur
+      const formData = new FormData();
+      formData.append("file", file);
+
+      // R2'ye yükle
+      const uploadResponse = await fetch("/api/upload", {
+        method: "POST",
+        body: formData,
+      });
+
+      if (!uploadResponse.ok) {
+        const errorData = await uploadResponse.json();
+        throw new Error(errorData.error || "Yükleme başarısız oldu");
+      }
+
+      const uploadData = await uploadResponse.json();
+      console.log("Upload başarılı:", uploadData.url);
+
+      setProgress(100);
+      setUploading(false);
+
+      // CV'yi analiz et
+      createSiteAndAnalyzeCV(uploadData.url);
     } catch (err) {
-      setError("Yükleme başarısız oldu");
+      console.error("Upload hatası:", err);
+      setError(err instanceof Error ? err.message : "Yükleme başarısız oldu");
       setUploading(false);
     }
   };
