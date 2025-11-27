@@ -53,8 +53,8 @@
   npm install @prisma/client prisma
   npm install @google/generative-ai
   npm install react-hook-form zod
-  npm install @uploadthing/react
-  npm install tailwindcss
+  npm install bcrypt @types/bcrypt
+  npm install @aws-sdk/client-s3
   ```
 - [x] **Supabase hesabı aç** (ücretsiz PostgreSQL database)
 - [x] **Google AI Studio'dan Gemini API key al**
@@ -104,7 +104,6 @@
     githubUrl     String?
     htmlContent   String?
     cssContent    String?
-    jsContent     String?
     status        String    @default("draft")
     revisionCount Int       @default(0)
     maxRevisions  Int       @default(1)
@@ -113,6 +112,7 @@
     publishedAt   DateTime?
     cloudflareUrl String?
     subdomain     String?   @unique
+    jsContent     String?   # JavaScript içeriği
     user          User      @relation(fields: [userId], references: [id], onDelete: Cascade)
 
     @@index([userId])
@@ -151,14 +151,14 @@
 ### **Hafta 3: CV Yükleme Sistemi**
 
 #### Gün 15-17: Dosya Yükleme
-- [x] **UploadThing kurulumu** (ücretsiz dosya yükleme servisi)
 - [x] **CV yükleme formu oluştur**
   - Dashboard'da "CV Yükle" butonu
   - PDF dosyası seçme
   - Yükleme progress bar'ı
 - [x] **API endpoint: PDF'i işle**
-  - `/app/api/cv/upload/route.ts`
-  - PDF'i UploadThing'e yükle
+  - `/app/api/upload/route.ts`
+  - PDF'i direkt olarak işle
+  - Cloudflare R2'ye yükle
   - URL'i veritabanına kaydet
 
 #### Gün 18-21: PDF İçerik Çıkarma
@@ -204,11 +204,15 @@
           "year": "yıl"
         }
       ],
-      "skills": ["skill1", "skill2", ...],
-      "languages": ["dil1", "dil2", ...]
+      "skills": ["skill1", "skill2"],
+      "languages": ["dil1", "dil2"]
     }
     
-    Sadece JSON döndür, başka açıklama ekleme.
+    Önemli kurallar:
+    - Sadece geçerli JSON formatında döndür, başka açıklama ekleme
+    - Eğer bir alan bulunamazsa boş string ("") veya boş array ([]) kullan
+    - Tüm alanları doldur
+    - JSON'ın dışında hiçbir metin ekleme
     `;
     
     const result = await model.generateContent([
@@ -221,7 +225,17 @@
       prompt
     ]);
     
-    return JSON.parse(result.response.text());
+    const responseText = result.response.text();
+    
+    // JSON'ı markdown kod bloklarından temizle
+    let jsonText = responseText.trim();
+    if (jsonText.startsWith('```json')) {
+      jsonText = jsonText.replace(/```json\n?/, '').replace(/\n?```$/, '');
+    } else if (jsonText.startsWith('```')) {
+      jsonText = jsonText.replace(/```\n?/, '').replace(/\n?```$/, '');
+    }
+    
+    return JSON.parse(jsonText);
   }
   ```
 - [x] **Çıkarılan veriyi JSON olarak sakla**
@@ -237,34 +251,71 @@
   ```typescript
   // lib/gemini.ts
   import { GoogleGenerativeAI } from "@google/generative-ai";
+  import { CVData } from "./gemini-pdf-parser";
   
-  const genAI = new GoogleGenerativeAI(process.env.GEMINI_API_KEY!);
-  
-  export async function generateWebsite(cvData: any) {
+  export async function generateWebsite(input: {
+    cvData: CVData;
+    linkedinUrl?: string;
+    githubUrl?: string;
+    customPrompt?: string;
+  }) {
+    const genAI = new GoogleGenerativeAI(process.env.GEMINI_API_KEY!);
     const model = genAI.getGenerativeModel({ model: "gemini-2.5-flash" });
     
+    const { cvData, linkedinUrl, githubUrl, customPrompt } = input;
+    
     const prompt = `
-    Sen bir web tasarımcısısın. Aşağıdaki CV bilgilerini kullanarak 
-    modern, profesyonel bir kişisel web sitesi oluştur.
+    Sen profesyonel bir web tasarımcısısın. Aşağıdaki CV bilgilerini kullanarak 
+    modern, tek sayfalık (single-page) bir kişisel web sitesi oluştur.
     
     CV Bilgileri:
-    ${JSON.stringify(cvData, null, 2)}
+    İsim: ${cvData.personalInfo.name}
+    Email: ${cvData.personalInfo.email || "Belirtilmemiş"}
+    Ünvan: ${cvData.personalInfo.title || "Belirtilmemiş"}
+    Özet: ${cvData.summary || "Belirtilmemiş"}
     
-    Lütfen şunları oluştur:
-    1. Tam HTML kodu (responsive, modern)
-    2. Tailwind CSS ile stillendirilmiş
-    3. Sadece tek sayfa (single page)
-    4. Bölümler: Header, About, Experience, Education, Skills, Contact
+    ${linkedinUrl ? `LinkedIn: ${linkedinUrl}` : ''}
+    ${githubUrl ? `GitHub: ${githubUrl}` : ''}
     
-    Çıktı formatı:
+    ${customPrompt ? `\nÖZEL TASARIM İSTEKLERİ:\n${customPrompt}` : ''}
+    
+    Gereksinimler:
+    1. Modern ve profesyonel görünüm
+    2. Responsive (mobil uyumlu) tasarım
+    3. Temiz CSS kullan (Tailwind CDN kullanma, kendi CSS yaz)
+    4. Smooth scroll animasyonları
+    5. Font Awesome ikon kütüphanesi (CDN)
+    
+    Bölümler: Hero, Hakkımda, İş Deneyimi, Eğitim, Yetenekler, İletişim
+    
+    Teknik Detaylar:
+    - HTML, CSS ve JavaScript'i AYRI AYRI dosyalar olarak üret
+    - HTML: Sadece yapı, inline style veya script KULLANMA
+    - CSS: Tüm stil kuralları ayrı dosyada
+    - JavaScript: Tüm interaktif özellikler ayrı dosyada
+    
+    Çıktı formatı JSON:
     {
       "html": "<!DOCTYPE html>...",
-      "explanation": "Tasarım kararlarının açıklaması"
+      "css": "/* Tüm CSS */",
+      "js": "// Tüm JavaScript",
+      "title": "Ad - Kişisel Web Sitesi",
+      "description": "Özet (max 160 karakter)"
     }
+    
+    SADECE JSON döndür, başka açıklama ekleme.
     `;
     
     const result = await model.generateContent(prompt);
-    return result.response.text();
+    const responseText = result.response.text();
+    
+    // JSON temizle ve parse et
+    let cleanedText = responseText.trim();
+    if (cleanedText.startsWith('```json')) {
+      cleanedText = cleanedText.replace(/^```json\n/, '').replace(/\n```$/, '');
+    }
+    
+    return JSON.parse(cleanedText);
   }
   ```
 
@@ -441,26 +492,35 @@
 
 #### Gün 54-56: Production Hazırlığı
 - [ ] **Environment variables kontrol**
-  - Production Supabase database
+  - Production Supabase database URL ve credentials
   - Production Gemini API key (kotalar yeterli mi?)
-  - Production Cloudflare API token, Zone ID ve R2 credentials
+  - Production Cloudflare API token, Account ID, Zone ID
+  - Production Cloudflare R2 credentials (Access Key, Secret Key)
+  - NextAuth secret değiştir (production için)
 - [ ] **Cloudflare R2 bucket oluştur**
   - Bucket adı: "user-sites"
-  - Public access ayarları
-  - R2 custom domain bağla (sites.yourdomain.com gibi)
+  - Public access ayarları (R2.dev public domain)
+  - CORS ayarları (gerekirse)
 - [ ] **Cloudflare DNS wildcard ayarı**
-  - Wildcard CNAME: *.yourdomain.com → R2 bucket URL
-  - Wildcard SSL sertifikası (Cloudflare otomatik)
-  - Test et: ahmet.yourdomain.com erişilebilir mi?
-- [ ] **Ana uygulamayı deploy et** (Vercel/Netlify/Railway)
+  - Ana domain satın al: personalweb.info (veya benzeri)
+  - Cloudflare'e domain ekle (nameserver'ları değiştir)
+  - Wildcard CNAME: *.personalweb.info → R2 public URL
+  - Wildcard SSL sertifikası (Cloudflare otomatik, Proxied: true)
+  - Test et: test.personalweb.info erişilebilir mi?
+- [ ] **Ana uygulamayı Vercel'e deploy et**
   ```bash
-  # Vercel kullanıyorsan
+  # GitHub repository'den otomatik deploy
+  # veya CLI ile:
   npm install -g vercel
   vercel --prod
   ```
-- [ ] **Domain bağla** (ana uygulama için)
-  - Ana site: app.yourdomain.com veya personalwebbuilder.com
-  - Kullanıcı siteleri: *.yourdomain.com (wildcard)
+  - Vercel dashboard'dan environment variables ekle
+  - Build settings kontrol et (Next.js otomatik detect)
+  - Custom domain bağla (opsiyonel): app.personalweb.info
+- [ ] **Domain bağla**
+  - Ana uygulama: app.personalweb.info (Vercel'de)
+  - Kullanıcı siteleri: *.personalweb.info (Cloudflare R2)
+  - DNS kayıtlarını kontrol et
 
 #### Gün 57-60: Soft Launch
 - [ ] **Beta kullanıcılar davet et**
@@ -485,9 +545,11 @@
 - **Prisma** - Database ORM
 - **Supabase** - PostgreSQL database (ücretsiz)
 - **Cloudflare R2** - Dosya storage (PDF ve oluşturulan siteler)
+- **Bcrypt** - Şifre hash'leme
 
 ### AI & Deployment
-- **Google Gemini 2.5 Flash** - AI site üretimi (HTML/CSS/JS)
+- **Google Gemini 2.5 Flash** - AI site üretimi (HTML/CSS/JS) ve PDF parsing
+- **Vercel** - Ana uygulama deployment (ücretsiz)
 - **Cloudflare R2** - Static site hosting ve file storage
 - **Cloudflare DNS** - Otomatik subdomain yönetimi
 - **AWS SDK v3** - R2 (S3-compatible) entegrasyonu
@@ -529,17 +591,17 @@ model Site {
   
   // CV Data
   title         String    @default("My Personal Website")
-  cvUrl         String?
-  cvTextData    String?
+  cvUrl         String?   // Cloudflare R2'deki PDF URL'i
+  cvTextData    String?   // Gemini'den çıkarılan yapılandırılmış CV verisi (JSON)
   
   // External Links
   linkedinUrl   String?
   githubUrl     String?
   
-  // Generated Content
-  htmlContent   String?
-  cssContent    String?
-  jsContent     String?   // JavaScript içeriği eklendi
+  // Generated Content (Gemini tarafından üretilen)
+  htmlContent   String?   // HTML dosya içeriği
+  cssContent    String?   // CSS dosya içeriği
+  jsContent     String?   // JavaScript dosya içeriği
   
   // Deployment
   status        String    @default("draft") // draft, generating, published
@@ -548,7 +610,7 @@ model Site {
   
   // Revision Control
   revisionCount Int       @default(0)
-  maxRevisions  Int       @default(1)
+  maxRevisions  Int       @default(1) // MVP'de 1 revize hakkı
   
   // Timestamps
   createdAt     DateTime  @default(now())
@@ -565,106 +627,241 @@ model Site {
 
 ### 1️⃣ Kayıt & Giriş
 ```
-[Landing Page] → [Sign Up] → [Login] → [Dashboard]
+[Landing Page (page.tsx)] 
+    ↓
+[Register (register/page.tsx)] → API: /api/register
+    ↓
+[Login (login/page.tsx)] → API: /api/auth/[...nextauth]
+    ↓
+[Dashboard (dashboard/page.tsx)] - NextAuth session kontrolü
 ```
 
 ### 2️⃣ Site Oluşturma
 ```
-[Dashboard]
+[Dashboard] - CVUploader component
     ↓
-[CV Yükle (PDF)]
+[CV Yükle (PDF)] → API: /api/upload
+    ↓ (PDF Cloudflare R2'ye yüklenir)
+    ↓ (Gemini 2.5 Flash ile PDF parse edilir)
+    ↓ (cvTextData JSON olarak veritabanına kaydedilir)
     ↓
-[Linkler Ekle (LinkedIn/GitHub)] - opsiyonel
+[Linkler Ekle (LinkedIn/GitHub)] - Opsiyonel
     ↓
-[Oluştur Butonu]
+[Özel İstek Ekle (customPrompt)] - Opsiyonel
     ↓
+["Site Oluştur" Butonu] → API: /api/site/generate
+    ↓ (CV verisi + linkler Gemini'ye gönderilir)
+    ↓ (Gemini HTML, CSS, JS üretir)
+    ↓ (İçerik veritabanına kaydedilir)
+    ↓ (status: "generating" → "draft")
 [Loading... (30-60 saniye)]
     ↓
-[Preview Sayfası]
+[Preview Sayfası (preview/[siteId]/page.tsx)]
+    ↓ (HTML/CSS/JS iframe içinde gösterilir)
 ```
 
-### 3️⃣ Revize (Opsiyonel)
+### 3️⃣ Revize (Opsiyonel - 1 Hak)
 ```
 [Preview Sayfası]
+    ↓ (revisionCount < maxRevisions kontrolü)
     ↓
-[Revize İste Butonu]
+["Revize İste" Butonu Aktif]
     ↓
-[Revize Formu: "Ne değişsin?"]
+[Revize Formu: "Ne değişsin?"] - Dialog/Modal
     ↓
-[Loading... (30 saniye)]
+[Revize İsteği Gönder] → API: /api/site/revise
+    ↓ (Mevcut HTML/CSS/JS + userRequest Gemini'ye)
+    ↓ (Gemini revize edilmiş kod üretir)
+    ↓ (Yeni içerik veritabanına kaydedilir)
+    ↓ (revisionCount artırılır: 0 → 1)
+[Loading... (30-60 saniye)]
     ↓
-[Yeni Preview]
+[Güncellenmiş Preview]
+    ↓
+["Revize İste" Butonu Devre Dışı] (hak doldu)
 ```
 
 ### 4️⃣ Yayınlama
 ```
 [Preview Sayfası]
     ↓
-[Beğendim, Yayınla]
+["Yayınla" Butonu] → API: /api/site/publish
     ↓
-[Subdomain otomatik oluşturulur: username.personalweb.info]
+[Subdomain oluşturuluyor: username.personalweb.info]
     ↓
-[Cloudflare R2'ye Deploy Ediliyor...]
+[Cloudflare R2'ye Deploy]
+    ↓ (HTML index.html olarak yüklenir)
+    ↓ (CSS styles.css olarak yüklenir)
+    ↓ (JS script.js olarak yüklenir)
+    ↓ (Dosyalar sites/{siteId}/ klasörüne)
     ↓
-[HTML/CSS/JS dosyaları R2'ye yükleniyor]
+[Cloudflare DNS CNAME Kaydı Oluşturma]
+    ↓ (username CNAME → R2 bucket URL)
+    ↓ (Proxied: true - CDN + SSL aktif)
     ↓
-[Otomatik: Cloudflare DNS kaydı oluşturuluyor]
+[Veritabanı Güncelleme]
+    ↓ (status: "draft" → "published")
+    ↓ (publishedAt: şimdiki zaman)
+    ↓ (cloudflareUrl: tam URL)
+    ↓ (subdomain: username)
     ↓
-[Otomatik: SSL sertifikası aktif (Cloudflare)]
+[Başarı Mesajı!]
+"Siteniz yayında: https://username.personalweb.info"
+"30 saniye içinde erişilebilir olacak (DNS propagation)"
+```
+
+### 5️⃣ Yayından Kaldırma (Opsiyonel)
+```
+[Dashboard] → ["Yayından Kaldır" Butonu]
     ↓
-[Başarı! Siteniz: https://username.personalweb.info]
+→ API: /api/site/unpublish
+    ↓ (status: "published" → "draft")
+    ↓ (Cloudflare DNS kaydı silinir - opsiyonel)
+    ↓ (R2 dosyaları silinmez, sadece erişilemez)
 ```
 
 ---
 
 ## 💡 Gemini Prompt Örnekleri
 
-### Temel Site Üretimi Prompt'u
+### PDF Parsing Prompt'u (gemini-pdf-parser.ts)
+```
+Bu PDF dosyasındaki CV/özgeçmiş bilgilerini analiz et ve aşağıdaki 
+JSON formatında yapılandırılmış olarak döndür:
+
+{
+  "personalInfo": {
+    "name": "Ad Soyad",
+    "email": "email@example.com",
+    "phone": "telefon",
+    "location": "şehir, ülke",
+    "title": "meslek/unvan"
+  },
+  "summary": "kısa özet/bio",
+  "experience": [
+    {
+      "company": "şirket adı",
+      "position": "pozisyon",
+      "duration": "tarih aralığı",
+      "description": "açıklama"
+    }
+  ],
+  "education": [
+    {
+      "school": "okul adı",
+      "degree": "derece",
+      "field": "bölüm",
+      "year": "yıl"
+    }
+  ],
+  "skills": ["skill1", "skill2"],
+  "languages": ["dil1", "dil2"]
+}
+
+Önemli kurallar:
+- Sadece geçerli JSON formatında döndür, başka açıklama ekleme
+- Eğer bir alan bulunamazsa boş string ("") veya boş array ([]) kullan
+- Tüm alanları doldur
+- JSON'ın dışında hiçbir metin ekleme
+```
+
+### Temel Site Üretimi Prompt'u (gemini.ts - generateWebsite)
 ```
 Sen profesyonel bir web tasarımcısısın. Aşağıdaki CV bilgilerini kullanarak 
 modern, tek sayfalık (single-page) bir kişisel web sitesi oluştur.
 
 CV Bilgileri:
-- İsim: {name}
-- Email: {email}
-- Telefon: {phone}
-- Özet: {summary}
-- İş Deneyimleri: {experiences}
-- Eğitim: {education}
-- Yetenekler: {skills}
+İsim: {cvData.personalInfo.name}
+Email: {cvData.personalInfo.email}
+Telefon: {cvData.personalInfo.phone}
+Konum: {cvData.personalInfo.location}
+Ünvan: {cvData.personalInfo.title}
 
-Ek Bilgiler:
-- LinkedIn: {linkedinUrl}
-- GitHub: {githubUrl}
+Özet: {cvData.summary}
+
+İş Deneyimleri:
+{cvData.experience.map((exp, idx) => `
+${idx + 1}. ${exp.company} - ${exp.position}
+   Süre: ${exp.duration}
+   Açıklama: ${exp.description}
+`)}
+
+Eğitim:
+{cvData.education.map((edu, idx) => `
+${idx + 1}. ${edu.school}
+   Derece: ${edu.degree}
+   Bölüm: ${edu.field}
+   Yıl: ${edu.year}
+`)}
+
+Yetenekler: {cvData.skills.join(", ")}
+Diller: {cvData.languages.join(", ")}
+
+Sosyal Medya Linkleri:
+{linkedinUrl ? `LinkedIn: ${linkedinUrl}` : ''}
+{githubUrl ? `GitHub: ${githubUrl}` : ''}
+
+{customPrompt ? `
+ÖZEL TASARIM İSTEKLERİ:
+${customPrompt}
+
+Yukarıdaki özel tasarım isteklerini DİKKATLE uygula ve sitenin tasarımını 
+bu isteklere göre şekillendir.
+` : ''}
 
 Gereksinimler:
 1. Modern ve profesyonel görünüm
 2. Responsive (mobil uyumlu) tasarım
-3. Temiz CSS kullan (Tailwind CDN kullanma, kendi CSS yaz)
+3. Tailwind CSS kullan (CDN üzerinden dahil et)
 4. Temiz, okunabilir tipografi
 5. Profesyonel renk paleti (koyu veya açık tema, CV'ye uygun olanı seç)
 6. Smooth scroll animasyonları
-7. Font Awesome ikon kütüphanesi kullan (CDN)
+7. Font Awesome veya benzer ikon kütüphanesi kullan (CDN)
 
 Bölümler (sırayla):
-- Hero Section (isim, ünvan, kısa tanıtım, profil fotoğrafı placeholder)
+- Hero Section (isim, ünvan, kısa tanıtım, profil fotoğrafı placeholder'ı)
 - Hakkımda (summary kısmı)
 - İş Deneyimi (timeline formatında)
 - Eğitim
 - Yetenekler (skill cards veya progress bars)
-- İletişim (email, telefon, LinkedIn, GitHub)
+- İletişim (email, telefon, sosyal medya linkleri)
 
 Teknik Detaylar:
 - HTML, CSS ve JavaScript'i AYRI AYRI dosyalar olarak üret
 - HTML: Sadece yapı ve içerik, inline style veya script KULLANMA
-- CSS: Tüm stil kuralları ayrı dosyada (kendi CSS kodun)
+- CSS: Tüm stil kuralları ayrı dosyada, Tailwind CDN kullanma (kendi CSS yaz)
 - JavaScript: Tüm interaktif özellikler ayrı dosyada
 - Meta tags ekle (SEO için)
+- Favicon placeholder ekle
 - Responsive navigation menu (mobil için hamburger menu)
+
+HTML Dosyasında:
+- <link rel="stylesheet" href="styles.css"> ile CSS'i dahil et
+- <script src="script.js"></script> ile JS'i dahil et
+- Inline style veya script kullanma
+
+CSS Dosyasında:
+- Modern, profesyonel stil kuralları
+- Responsive tasarım (media queries)
+- Smooth transitions ve animations
+- Temiz, organize edilmiş CSS
+
+JavaScript Dosyasında:
+- Smooth scroll
+- Hamburger menu toggle
+- Scroll animasyonları
+- Diğer interaktif özellikler
+
+Önemli Kurallar:
+- Tam kod üret, eksik bırakma
+- Gerçek, çalışan kod yaz (placeholder değil)
+- CV'deki TÜM bilgileri kullan
+- Modern web standartlarına uy
+- Accessibility (a11y) özelliklerine dikkat et
 
 Çıktı formatı JSON olsun:
 {
-  "html": "<!DOCTYPE html>...tam HTML kodu (sadece yapı)...",
+  "html": "<!DOCTYPE html>...tam HTML kodu (sadece yapı, stil ve script yok)...",
   "css": "/* Tüm CSS kodları */",
   "js": "// Tüm JavaScript kodları",
   "title": "Kişinin adı - Kişisel Web Sitesi",
@@ -672,12 +869,13 @@ Teknik Detaylar:
 }
 
 SADECE JSON formatında döndür, başka açıklama ekleme.
+JSON'dan önce veya sonra hiçbir metin olmasın.
 ```
 
-### Revize Prompt'u
+### Revize Prompt'u (gemini.ts - reviseWebsite)
 ```
-Sen profesyonel bir web tasarımcısısın. Aşağıdaki HTML, CSS ve JavaScript kodlarını 
-kullanıcının isteğine göre revize et.
+Sen profesyonel bir web tasarımcısısın. Aşağıdaki HTML, CSS ve JavaScript 
+kodlarını kullanıcının isteğine göre revize et.
 
 Mevcut HTML:
 {currentHtml}
@@ -708,6 +906,7 @@ Gereksinimler:
 }
 
 SADECE JSON formatında döndür, başka açıklama ekleme.
+JSON'dan önce veya sonra hiçbir metin olmasın.
 ```
 
 ---
@@ -820,7 +1019,7 @@ SADECE JSON formatında döndür, başka açıklama ekleme.
 Canlıya almadan önce bu listeyi kontrol et:
 
 ### Güvenlik
-- [ ] API key'leri `.env.local` dosyasında (GitHub'a commit edilmemiş)
+- [ ] API key'leri `.env` dosyasında (GitHub'a commit edilmemiş)
 - [ ] Production environment variables Vercel'de ayarlı
 - [ ] Şifre hash'leme çalışıyor (bcrypt/argon2)
 - [ ] SQL injection koruması var (Prisma otomatik yapıyor)
