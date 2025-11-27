@@ -5,6 +5,131 @@
 **Hedef:** 2 ay içinde çalışan bir MVP (Minimum Viable Product) oluşturmak
 **Strateji:** En temel özelliklere odaklanarak hızlı bir şekilde kullanıcılara ulaşmak ve geri bildirim toplamak
 
+---
+
+## 🗺️ Web Sitesi Haritası ve Bilgi Mimarisi
+
+Bu doküman, kullanıcıların CV'lerini yükleyerek yapay zeka (Gemini API) desteğiyle kişisel web sitelerini oluşturabilecekleri SaaS projesinin site haritasını içerir.
+
+### 1. Public (Ziyaretçi Arayüzü)
+
+Giriş yapmamış kullanıcıların gördüğü, pazarlama ve satış odaklı sayfalar.
+
+#### Ana Sayfa (Landing Page)
+- **Hero Bölümü**: Ana değer önermesi ("CV'nizi siteye dönüştürün"), Demo videosu/GIF, "Ücretsiz Başla" butonu.
+- **Nasıl Çalışır?**: 3 Adımda özet (Yükle → Seç → Yayınla).
+- **Showcase**: Sistemle oluşturulmuş örnek siteler slider'ı.
+- **SSS (Kısa)**: En çok sorulan 3-4 soru.
+
+#### Özellikler (Features)
+- Tek Tıkla Kurulum Detayları.
+- SEO Uyumluluğu.
+- Mobil Uyumluluk (Responsive).
+- Premium Özellikler (Analytics, Çoklu Dil, Blog Modülü).
+
+#### Fiyatlandırma (Pricing)
+- **Free Plan**: isim.projectname.com, Projectname markalı footer.
+- **Pro Plan**: Custom domain, marka kaldırma, gelişmiş özellikler.
+- **Business Plan**: Öncelikli destek, ekstra depolama.
+
+#### Hakkında (About Us)
+- Projenin amacı ve vizyonu.
+
+#### İletişim (Contact)
+- İletişim Formu.
+- Destek Talebi.
+
+#### Kimlik Doğrulama (Auth)
+- Giriş Yap (Login).
+- Kayıt Ol (Register).
+- Şifremi Unuttum (Forgot Password).
+
+### 2. App (Kullanıcı Yönetim Paneli)
+
+Kullanıcının sisteme giriş yaptıktan sonra karşılaştığı yönetim arayüzü.
+
+#### A. Onboarding (İlk Kurulum Akışı)
+Yeni üye olan veya "Yeni Site Oluştur" diyen kullanıcının geçtiği tünel.
+
+**Veri Girişi (Input)**:
+- Dosya Yükleme Alanı (PDF/Word CV).
+- Alternatif: LinkedIn Profil URL girişi veya Manuel Metin Yapıştırma.
+
+**Stil Seçimi (Style)**:
+- Tema Seçimi (Kurumsal, Yaratıcı, Minimalist, Dark/Light).
+- Ana Renk Paleti Seçimi.
+
+**İşleme (Processing)**:
+- Yükleme Ekranı: "Gemini verilerinizi analiz ediyor ve sitenizi kodluyor..." animasyonu.
+- Sonuç: Kullanıcı otomatik olarak Studio (Editör) sayfasına yönlendirilir.
+
+#### B. Dashboard (Ana Kontrol Paneli)
+
+**Genel Bakış**:
+- Oluşturulan sitenin kartı (Önizleme görseli).
+- Durum: Yayında / Yayında Değil.
+- Temel İstatistikler (Ziyaretçi sayısı - Pro özellik).
+- Aksiyon Butonları: "Siteyi Düzenle", "Siteyi Görüntüle".
+
+**Abonelik (Billing)**:
+- Mevcut Plan Bilgisi.
+- Plan Yükseltme (Upgrade Flow).
+- Ödeme Geçmişi / Faturalar.
+
+**Domain Yönetimi**:
+- Subdomain: kullaniciadi.projectname.com düzenleme.
+- Custom Domain (Pro): www.kullaniciadi.com bağlama sihirbazı (DNS ayarları).
+
+**Profil Ayarları**:
+- Ad Soyad, E-posta güncelleme.
+- Şifre değiştirme.
+- Hesap silme.
+
+### 3. Studio (Editör & Tasarım Arayüzü)
+
+Projenin kalbi. Kullanıcının sitesini Gemini ve manuel araçlarla düzenlediği alan.
+
+#### Sol Panel (Araçlar & AI)
+- **Gemini Asistan**: Prompt girişi (Örn: "Hakkımda kısmını daha samimi bir dille yaz", "Arka planı koyu mavi yap").
+- **Manuel Düzenleme**:
+  - Metin Alanları (Başlıklar, Açıklamalar).
+  - Görsel Yükleme/Değiştirme.
+  - Tema/Renk Ayarları.
+- **Kaynak CV**: Yüklenen CV'nin referans olarak görüntülenmesi.
+
+#### Orta Panel (Canvas)
+- **Canlı Önizleme** (Live Preview).
+- **Cihaz Değiştirici**: Masaüstü / Tablet / Mobil görünüm butonları.
+
+#### Üst Bar (Header)
+- Geri Al / İleri Al (Undo/Redo).
+- Yeniden Oluştur (Regenerate): Beğenilmeyen kısımları tamamen baştan yaratma.
+- Yayınla (Publish): Değişiklikleri canlı siteye aktarma butonu.
+
+### 4. Output (Oluşturulan Kullanıcı Web Sitesi)
+
+Son kullanıcının sitesinin mimarisi (kullanici.projectname.com).
+
+**Header**: Logo (İsim), Navigasyon Menüsü, Dil Seçimi (Pro), Dark Mode Switch.
+
+**Hero Bölümü**: Profil fotoğrafı, İsim, Ünvan, Kısa Özet, CTA (CV İndir veya İletişime Geç).
+
+**Hakkında (About)**: Detaylı biyografi (AI tarafından özetlenmiş).
+
+**Deneyim (Experience)**: Timeline (Zaman çizelgesi) formatında iş geçmişi.
+
+**Projeler (Portfolio)**: Proje görselleri, açıklamalar ve linkler.
+
+**Yetenekler (Skills)**: Yeteneklerin görsel sunumu (Bar veya Tag bulutu).
+
+**Blog (Pro Opsiyonel)**: Kullanıcının makale listesi ve detay sayfası.
+
+**İletişim (Contact)**: E-posta linki, Sosyal Medya ikonları veya Form.
+
+**Footer**: Telif hakkı ve "Powered by ProjectName" (Free planda zorunlu).
+
+---
+
 ## 🎯 MVP Kapsamı (Sadece Bunlar!)
 
 ### ✅ Yapılacaklar
