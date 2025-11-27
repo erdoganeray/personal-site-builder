@@ -11,9 +11,9 @@
 1. **Sadece web uygulaması** - Mobil app daha sonra
 2. **PDF CV yükleme** - Sadece PDF formatı
 3. **LinkedIn/GitHub link girişi** - Kullanıcı manuel olarak linklerini ekler
-4. **Gemini ile site oluşturma** - AI ile otomatik HTML/CSS üretimi
+4. **Gemini ile site oluşturma** - AI ile otomatik HTML/CSS/JS üretimi
 5. **Preview + 1 revize hakkı** - Kullanıcı sonucu görebilir ve 1 kez değişiklik isteyebilir
-6. **Cloudflare Pages deployment** - Tek tuşla yayınlama, kolay custom domain
+6. **Cloudflare R2 + Cloudflare Pages deployment** - Tek tuşla yayınlama, MVP'de subdomain (kullaniciadi.personalweb.info)
 7. **Sadece ücretsiz plan** - Ödeme sistemi yok
 
 ### ❌ Şimdilik Yapılmayacaklar
@@ -58,16 +58,26 @@
   ```
 - [x] **Supabase hesabı aç** (ücretsiz PostgreSQL database)
 - [x] **Google AI Studio'dan Gemini API key al**
-- [x] **Environment variables dosyası oluştur** (.env.local)
+- [x] **Environment variables dosyası oluştur** (.env)
   ```
-  DATABASE_URL="postgresql://..."
-  GEMINI_API_KEY="..."
-  NEXTAUTH_SECRET="..."
+  DATABASE_URL='postgresql://...'
+  DIRECT_URL='postgresql://...'
+  GEMINI_API_KEY='AIzaSy...'
+  NEXTAUTH_SECRET='...'
+  NEXTAUTH_URL='http://localhost:3000'
+  VERCEL_TOKEN=''
+  # Cloudflare Account
   CLOUDFLARE_ACCOUNT_ID="..."
-  CLOUDFLARE_API_TOKEN="..."
   CLOUDFLARE_ZONE_ID="..." # Ana domain'in zone ID'si
+  CLOUDFLARE_API_TOKEN="..."
+  # R2 Storage
   R2_ACCESS_KEY_ID="..."
   R2_SECRET_ACCESS_KEY="..."
+  R2_BUCKET_NAME="user-sites"
+  R2_PUBLIC_URL="https://pub-...r2.dev"
+  R2_PUBLIC_DOMAIN="pub-...r2.dev"
+  # Domain
+  NEXT_PUBLIC_BASE_DOMAIN="personalweb.info"
   ```
 
 #### Gün 6-7: Veritabanı Kurulumu
@@ -79,24 +89,33 @@
     password  String
     name      String?
     createdAt DateTime @default(now())
+    updatedAt DateTime @updatedAt
+    username  String?  @unique
     sites     Site[]
   }
 
   model Site {
     id            String    @id @default(cuid())
     userId        String
-    user          User      @relation(fields: [userId], references: [id])
-    title         String
+    title         String    @default("My Personal Website")
     cvUrl         String?
+    cvTextData    String?
     linkedinUrl   String?
     githubUrl     String?
-    htmlContent   String?   @db.Text
-    cssContent    String?   @db.Text
-    status        String    @default("draft") // draft, published
-    vercelUrl     String?
+    htmlContent   String?
+    cssContent    String?
+    jsContent     String?
+    status        String    @default("draft")
     revisionCount Int       @default(0)
+    maxRevisions  Int       @default(1)
     createdAt     DateTime  @default(now())
     updatedAt     DateTime  @updatedAt
+    publishedAt   DateTime?
+    cloudflareUrl String?
+    subdomain     String?   @unique
+    user          User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+    @@index([userId])
   }
   ```
 - [x] **Prisma migration çalıştır**
@@ -211,7 +230,7 @@
 
 ---
 
-### **Hafta 4: AI Site Üretimi (En Önemli Kısım!)**
+### **Hafta 4: AI Site Üretimi (HTML/CSS/JS - En Önemli Kısım!)**
 
 #### Gün 22-25: Gemini Entegrasyonu
 - [x] **Gemini API client oluştur**
@@ -465,11 +484,12 @@
 - **Next.js API Routes** - Backend API
 - **Prisma** - Database ORM
 - **Supabase** - PostgreSQL database (ücretsiz)
-- **UploadThing** - Dosya yükleme (ücretsiz)
+- **Cloudflare R2** - Dosya storage (PDF ve oluşturulan siteler)
 
 ### AI & Deployment
-- **Google Gemini 2.0 Flash** - AI site üretimi
-- **Cloudflare Pages + R2** - Otomatik deployment ve hosting
+- **Google Gemini 2.5 Flash** - AI site üretimi (HTML/CSS/JS)
+- **Cloudflare R2** - Static site hosting ve file storage
+- **Cloudflare DNS** - Otomatik subdomain yönetimi
 - **AWS SDK v3** - R2 (S3-compatible) entegrasyonu
 
 ### Authentication
@@ -503,35 +523,36 @@ model User {
 }
 
 model Site {
-  id            String   @id @default(cuid())
+  id            String    @id @default(cuid())
   userId        String
-  user          User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  user          User      @relation(fields: [userId], references: [id], onDelete: Cascade)
   
   // CV Data
-  title         String   @default("My Personal Website")
+  title         String    @default("My Personal Website")
   cvUrl         String?
-  cvTextData    String?  @db.Text
+  cvTextData    String?
   
   // External Links
   linkedinUrl   String?
   githubUrl     String?
   
   // Generated Content
-  htmlContent   String?  @db.Text
-  cssContent    String?  @db.Text
+  htmlContent   String?
+  cssContent    String?
+  jsContent     String?   // JavaScript içeriği eklendi
   
   // Deployment
-  status        String   @default("draft") // draft, generating, published
-  subdomain     String?  @unique // ahmet-yilmaz.yourdomain.com
-  cloudflareUrl String?  // Tam URL: https://ahmet-yilmaz.yourdomain.com
+  status        String    @default("draft") // draft, generating, published
+  subdomain     String?   @unique // kullaniciadi.personalweb.info
+  cloudflareUrl String?   // Tam URL: https://kullaniciadi.personalweb.info
   
   // Revision Control
-  revisionCount Int      @default(0)
-  maxRevisions  Int      @default(1)
+  revisionCount Int       @default(0)
+  maxRevisions  Int       @default(1)
   
   // Timestamps
-  createdAt     DateTime @default(now())
-  updatedAt     DateTime @updatedAt
+  createdAt     DateTime  @default(now())
+  updatedAt     DateTime  @updatedAt
   publishedAt   DateTime?
   
   @@index([userId])
@@ -581,15 +602,17 @@ model Site {
     ↓
 [Beğendim, Yayınla]
     ↓
-[Subdomain seçin: ahmet-yilmaz]
+[Subdomain otomatik oluşturulur: username.personalweb.info]
     ↓
-[Cloudflare'e Deploy Ediliyor...]
+[Cloudflare R2'ye Deploy Ediliyor...]
     ↓
-[Otomatik: DNS kaydı oluşturuluyor]
+[HTML/CSS/JS dosyaları R2'ye yükleniyor]
     ↓
-[Otomatik: SSL sertifikası aktif]
+[Otomatik: Cloudflare DNS kaydı oluşturuluyor]
     ↓
-[Başarı! Siteniz: https://ahmet-yilmaz.yourdomain.com]
+[Otomatik: SSL sertifikası aktif (Cloudflare)]
+    ↓
+[Başarı! Siteniz: https://username.personalweb.info]
 ```
 
 ---
@@ -616,36 +639,54 @@ Ek Bilgiler:
 
 Gereksinimler:
 1. Modern ve profesyonel görünüm
-2. Responsive (mobil uyumlu)
-3. Tailwind CSS kullan (CDN)
+2. Responsive (mobil uyumlu) tasarım
+3. Temiz CSS kullan (Tailwind CDN kullanma, kendi CSS yaz)
 4. Temiz, okunabilir tipografi
-5. Koyu tema (dark mode)
+5. Profesyonel renk paleti (koyu veya açık tema, CV'ye uygun olanı seç)
 6. Smooth scroll animasyonları
+7. Font Awesome ikon kütüphanesi kullan (CDN)
 
-Bölümler:
-- Hero (isim, başlık, fotoğraf alanı)
-- Hakkında
-- Deneyim
+Bölümler (sırayla):
+- Hero Section (isim, ünvan, kısa tanıtım, profil fotoğrafı placeholder)
+- Hakkımda (summary kısmı)
+- İş Deneyimi (timeline formatında)
 - Eğitim
-- Yetenekler
+- Yetenekler (skill cards veya progress bars)
 - İletişim (email, telefon, LinkedIn, GitHub)
+
+Teknik Detaylar:
+- HTML, CSS ve JavaScript'i AYRI AYRI dosyalar olarak üret
+- HTML: Sadece yapı ve içerik, inline style veya script KULLANMA
+- CSS: Tüm stil kuralları ayrı dosyada (kendi CSS kodun)
+- JavaScript: Tüm interaktif özellikler ayrı dosyada
+- Meta tags ekle (SEO için)
+- Responsive navigation menu (mobil için hamburger menu)
 
 Çıktı formatı JSON olsun:
 {
-  "html": "<!DOCTYPE html>...",
-  "title": "Web sitesi başlığı",
-  "description": "Kısa açıklama"
+  "html": "<!DOCTYPE html>...tam HTML kodu (sadece yapı)...",
+  "css": "/* Tüm CSS kodları */",
+  "js": "// Tüm JavaScript kodları",
+  "title": "Kişinin adı - Kişisel Web Sitesi",
+  "description": "Kişinin unvanı ve kısa özeti (max 160 karakter)"
 }
 
-Sadece JSON döndür, başka açıklama ekleme.
+SADECE JSON formatında döndür, başka açıklama ekleme.
 ```
 
 ### Revize Prompt'u
 ```
-Aşağıdaki HTML kodunu kullanıcının isteğine göre revize et.
+Sen profesyonel bir web tasarımcısısın. Aşağıdaki HTML, CSS ve JavaScript kodlarını 
+kullanıcının isteğine göre revize et.
 
 Mevcut HTML:
 {currentHtml}
+
+Mevcut CSS:
+{currentCss}
+
+Mevcut JavaScript:
+{currentJs}
 
 Kullanıcının İsteği:
 "{userRequest}"
@@ -653,16 +694,20 @@ Kullanıcının İsteği:
 Gereksinimler:
 - Kullanıcının isteğini en iyi şekilde karşıla
 - Responsive ve modern tasarımı koru
-- Tailwind CSS kullanmaya devam et
+- HTML, CSS ve JS'i AYRI AYRI dosyalar olarak döndür
 - Tüm mevcut içeriği koru (bilgi kaybı olmasın)
+- Sadece istenen değişiklikleri yap
+- Kod kalitesini ve okunabilirliği koru
 
-Çıktı formatı JSON:
+Çıktı formatı JSON olsun:
 {
-  "html": "<!DOCTYPE html>...",
-  "changes": "Yapılan değişikliklerin kısa açıklaması"
+  "html": "<!DOCTYPE html>...tam HTML kodu...",
+  "css": "/* Tam CSS kodu */",
+  "js": "// Tam JavaScript kodu",
+  "changes": "Yapılan değişikliklerin Türkçe açıklaması (2-3 cümle)"
 }
 
-Sadece JSON döndür.
+SADECE JSON formatında döndür, başka açıklama ekleme.
 ```
 
 ---
@@ -890,3 +935,5 @@ MVP başarılıysa (20+ yayınlanmış site, pozitif feedback):
 - bazı kullanıcılar web sayfasında blog sistemi olmasını isteyebilir.
 - kullanıcılar kendi sitelerinin trafiğini görmek isteyebilir.
 - kullanıcılar sitelerinde çoklu dil desteği eklemek isteyebilir.
+- kullanıcılar light/dark seçeneği isteyebilir.
+- profilly.io domain i güzel ve uygun fiyatlı (cloudflare in kendisinde de var)
