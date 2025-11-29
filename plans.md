@@ -1,16 +1,24 @@
 # Ideas
 
+## Editor Content
+- tüm revize işlemleri burada olmalı
+- sitenin yayınlanma halinden sonra değişiklik olduysa uyarı çıkmalı
+- gemini chat i olabilir
+
 # Paid Plans Options
 
 ## Free Plan (MVP)
 - static site oluşturma
 - belirli token/sayıda düzenleme hakkı
 - subdomain
+- dosya yükleme limiti (profil fotoğrafı, portfolio)
 
 ## Paid Plan 
 - react, vue ya da next.js gibi daha komplike teknolojiler ile web sitesi oluşturma
-- free plandan daha fazla belirli token/sayıda düzenleme hakkı
+- more belirli token/sayıda düzenleme hakkı
 - domain connection
+- more dosya yükleme limiti (profil fotoğrafı, portfolio, blog images)
+- blog page and blog editor
 
 # Site Features
 - contact

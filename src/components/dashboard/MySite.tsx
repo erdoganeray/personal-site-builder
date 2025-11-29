@@ -290,68 +290,69 @@ export default function MySite({ site, onRefresh }: MySiteProps) {
                             />
                         </div>
                     </div>
-
-                    <div className="mt-3">
-                        <button
-                            onClick={() => router.push("/editor")}
-                            className="w-full bg-gray-700 hover:bg-gray-600 text-white font-bold py-3 px-6 rounded-lg transition-colors duration-200"
-                        >
-                            Editöre Git
-                        </button>
-                    </div>
                 </div>
             )}
 
-            {/* Custom Prompt */}
-            <div className="bg-gray-800 rounded-xl border border-gray-700 p-6">
-                <h3 className="text-xl font-bold text-white mb-3">
-                    Özel Tasarım İstekleri
-                </h3>
-                <p className="text-sm text-gray-400 mb-3">
-                    AI'ya sitenizin nasıl görünmesini istediğinizi anlatın.
-                </p>
-                <textarea
-                    placeholder="Örnek: Modern ve minimalist bir tasarım, mor-mavi renk paleti..."
-                    value={customPrompt}
-                    onChange={(e) => setCustomPrompt(e.target.value)}
-                    rows={4}
-                    className="w-full px-4 py-3 bg-gray-700 border border-gray-600 text-white rounded-lg focus:ring-2 focus:ring-blue-500 resize-none"
-                />
-            </div>
+            {/* Custom Prompt - Sadece site henüz oluşturulmamışsa göster */}
+            {!site.htmlContent && (
+                <div className="bg-gray-800 rounded-xl border border-gray-700 p-6">
+                    <h3 className="text-xl font-bold text-white mb-3">
+                        Özel Tasarım İstekleri
+                    </h3>
+                    <p className="text-sm text-gray-400 mb-3">
+                        AI'ya sitenizin nasıl görünmesini istediğinizi anlatın.
+                    </p>
+                    <textarea
+                        placeholder="Örnek: Modern ve minimalist bir tasarım, mor-mavi renk paleti..."
+                        value={customPrompt}
+                        onChange={(e) => setCustomPrompt(e.target.value)}
+                        rows={4}
+                        className="w-full px-4 py-3 bg-gray-700 border border-gray-600 text-white rounded-lg focus:ring-2 focus:ring-blue-500 resize-none"
+                    />
+                </div>
+            )}
 
             {/* Action Buttons */}
             <div className="space-y-3">
                 {site.htmlContent ? (
                     <>
+                        {/* Site oluşturulmuş ama yayınlanmamış */}
                         {site.status !== "published" && (
-                            <button
-                                onClick={handlePublish}
-                                disabled={publishing}
-                                className="w-full bg-gradient-to-r from-green-600 to-emerald-600 hover:from-green-700 hover:to-emerald-700 disabled:from-gray-400 disabled:to-gray-500 text-white font-bold py-4 px-6 rounded-lg transition-all duration-200"
-                            >
-                                {publishing ? "Yayınlanıyor..." : "Beğendim, Yayınla!"}
-                            </button>
+                            <div className="grid grid-cols-2 gap-3">
+                                <button
+                                    onClick={handlePublish}
+                                    disabled={publishing}
+                                    className="bg-gradient-to-r from-green-600 to-emerald-600 hover:from-green-700 hover:to-emerald-700 disabled:from-gray-400 disabled:to-gray-500 text-white font-bold py-4 px-6 rounded-lg transition-all duration-200"
+                                >
+                                    {publishing ? "Yayınlanıyor..." : "Beğendim, Yayınla!"}
+                                </button>
+                                <button
+                                    onClick={() => router.push("/editor")}
+                                    className="bg-gray-700 hover:bg-gray-600 text-white font-bold py-4 px-6 rounded-lg transition-colors duration-200"
+                                >
+                                    Editöre Git
+                                </button>
+                            </div>
                         )}
 
+                        {/* Site yayınlanmış */}
                         {site.status === "published" && (
-                            <button
-                                onClick={handleUnpublish}
-                                disabled={unpublishing}
-                                className="w-full bg-red-600 hover:bg-red-700 disabled:bg-gray-400 text-white font-bold py-4 px-6 rounded-lg transition-colors duration-200"
-                            >
-                                {unpublishing ? "Kaldırılıyor..." : "Yayından Kaldır"}
-                            </button>
+                            <div className="grid grid-cols-2 gap-3">
+                                <button
+                                    onClick={handleUnpublish}
+                                    disabled={unpublishing}
+                                    className="bg-red-600 hover:bg-red-700 disabled:bg-gray-400 text-white font-bold py-4 px-6 rounded-lg transition-colors duration-200"
+                                >
+                                    {unpublishing ? "Kaldırılıyor..." : "Yayından Kaldır"}
+                                </button>
+                                <button
+                                    onClick={() => router.push("/editor")}
+                                    className="bg-gray-700 hover:bg-gray-600 text-white font-bold py-4 px-6 rounded-lg transition-colors duration-200"
+                                >
+                                    Editöre Git
+                                </button>
+                            </div>
                         )}
-
-                        <button
-                            onClick={handleGenerateSite}
-                            disabled={generating}
-                            className="w-full bg-gradient-to-r from-orange-600 to-red-600 hover:from-orange-700 hover:to-red-700 disabled:from-gray-400 disabled:to-gray-500 text-white font-bold py-4 px-6 rounded-lg transition-all duration-200"
-                        >
-                            {generating
-                                ? "Siteniz yeniden oluşturuluyor..."
-                                : "Sitemi Yeniden Oluştur"}
-                        </button>
                     </>
                 ) : (
                     <button
