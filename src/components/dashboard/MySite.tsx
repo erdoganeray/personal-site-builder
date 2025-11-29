@@ -14,9 +14,6 @@ export default function MySite({ site, onRefresh }: MySiteProps) {
     const [publishing, setPublishing] = useState(false);
     const [unpublishing, setUnpublishing] = useState(false);
     const [customPrompt, setCustomPrompt] = useState("");
-    const [linkedinUrl, setLinkedinUrl] = useState(site?.linkedinUrl || "");
-    const [githubUrl, setGithubUrl] = useState(site?.githubUrl || "");
-    const [savingLinks, setSavingLinks] = useState(false);
     const [viewMode, setViewMode] = useState<"desktop" | "tablet" | "mobile">("desktop");
 
     // Blob URL oluştur - site htmlContent, cssContent, jsContent değiştiğinde güncellenir
@@ -174,39 +171,6 @@ export default function MySite({ site, onRefresh }: MySiteProps) {
         }
     };
 
-    const handleSaveLinks = async () => {
-        if (!site) return;
-
-        setSavingLinks(true);
-        try {
-            const response = await fetch("/api/site/update-links", {
-                method: "PATCH",
-                headers: {
-                    "Content-Type": "application/json",
-                },
-                body: JSON.stringify({
-                    siteId: site.id,
-                    linkedinUrl: linkedinUrl.trim(),
-                    githubUrl: githubUrl.trim(),
-                }),
-            });
-
-            const data = await response.json();
-
-            if (response.ok) {
-                alert("Linkler başarıyla kaydedildi!");
-                onRefresh();
-            } else {
-                alert(data.error || "Linkler kaydedilemedi");
-            }
-        } catch (error) {
-            console.error("Link kaydetme hatası:", error);
-            alert("Bir hata oluştu");
-        } finally {
-            setSavingLinks(false);
-        }
-    };
-
     if (!site) {
         return (
             <div className="space-y-6">
@@ -353,44 +317,6 @@ export default function MySite({ site, onRefresh }: MySiteProps) {
                     rows={4}
                     className="w-full px-4 py-3 bg-gray-700 border border-gray-600 text-white rounded-lg focus:ring-2 focus:ring-blue-500 resize-none"
                 />
-            </div>
-
-            {/* Social Links */}
-            <div className="bg-gray-800 rounded-xl border border-gray-700 p-6">
-                <h3 className="text-xl font-bold text-white mb-3">Sosyal Medya Linkleri</h3>
-                <div className="space-y-3">
-                    <div>
-                        <label className="block text-sm font-medium text-gray-300 mb-1">
-                            LinkedIn Profil URL
-                        </label>
-                        <input
-                            type="url"
-                            placeholder="https://linkedin.com/in/kullaniciadi"
-                            value={linkedinUrl}
-                            onChange={(e) => setLinkedinUrl(e.target.value)}
-                            className="w-full px-4 py-2 bg-gray-700 border border-gray-600 text-white rounded-lg focus:ring-2 focus:ring-blue-500"
-                        />
-                    </div>
-                    <div>
-                        <label className="block text-sm font-medium text-gray-300 mb-1">
-                            GitHub Profil URL
-                        </label>
-                        <input
-                            type="url"
-                            placeholder="https://github.com/kullaniciadi"
-                            value={githubUrl}
-                            onChange={(e) => setGithubUrl(e.target.value)}
-                            className="w-full px-4 py-2 bg-gray-700 border border-gray-600 text-white rounded-lg focus:ring-2 focus:ring-blue-500"
-                        />
-                    </div>
-                    <button
-                        onClick={handleSaveLinks}
-                        disabled={savingLinks}
-                        className="w-full bg-blue-600 hover:bg-blue-700 disabled:bg-gray-400 text-white font-medium py-2 px-4 rounded-lg transition-colors duration-200"
-                    >
-                        {savingLinks ? "Kaydediliyor..." : "Linkleri Kaydet"}
-                    </button>
-                </div>
             </div>
 
             {/* Action Buttons */}

@@ -74,7 +74,18 @@ export async function POST(req: NextRequest) {
         where: { id: siteId },
         data: {
           cvUrl,
-          cvTextData: JSON.stringify(cvData)
+          cvTextData: JSON.stringify(cvData), // Keep for backwards compatibility
+          // Save to structured fields
+          name: cvData.personalInfo.name,
+          jobTitle: cvData.personalInfo.title,
+          email: cvData.personalInfo.email,
+          phone: cvData.personalInfo.phone,
+          location: cvData.personalInfo.location,
+          summary: cvData.summary,
+          experience: JSON.stringify(cvData.experience),
+          education: JSON.stringify(cvData.education),
+          skills: JSON.stringify(cvData.skills),
+          languages: JSON.stringify(cvData.languages),
         }
       });
 

@@ -36,6 +36,16 @@ model Site {
   publishedAt   DateTime?
   cloudflareUrl String?
   subdomain     String?   @unique
+  name          String?
+  jobTitle      String?
+  summary       String?
+  experience    String?
+  education     String?
+  skills        String?
+  languages     String?
+  email         String?
+  phone         String?
+  location      String?
   jsContent     String?
   user          User      @relation(fields: [userId], references: [id], onDelete: Cascade)
 

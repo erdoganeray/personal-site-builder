@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import CVUploader from "@/components/CVUploader";
 import type { CVData } from "@/lib/gemini-pdf-parser";
 
@@ -13,12 +13,157 @@ interface MyInfoProps {
 }
 
 export default function MyInfo({ site, cvData, onDelete, onCVAnalyzed, deleting }: MyInfoProps) {
+    const [isEditing, setIsEditing] = useState(false);
+    const [saving, setSaving] = useState(false);
+    
+    // Form state
+    const [name, setName] = useState("");
+    const [jobTitle, setJobTitle] = useState("");
+    const [email, setEmail] = useState("");
+    const [phone, setPhone] = useState("");
+    const [location, setLocation] = useState("");
+    const [linkedinUrl, setLinkedinUrl] = useState("");
+    const [githubUrl, setGithubUrl] = useState("");
+    const [summary, setSummary] = useState("");
+    const [experience, setExperience] = useState<any[]>([]);
+    const [education, setEducation] = useState<any[]>([]);
+    const [skills, setSkills] = useState<string[]>([]);
+    const [languages, setLanguages] = useState<string[]>([]);
+
+    // Load data from site or cvData
+    useEffect(() => {
+        if (site) {
+            setName(site.name || cvData?.personalInfo?.name || "");
+            setJobTitle(site.jobTitle || cvData?.personalInfo?.title || "");
+            setEmail(site.email || cvData?.personalInfo?.email || "");
+            setPhone(site.phone || cvData?.personalInfo?.phone || "");
+            setLocation(site.location || cvData?.personalInfo?.location || "");
+            setLinkedinUrl(site.linkedinUrl || "");
+            setGithubUrl(site.githubUrl || "");
+            setSummary(site.summary || cvData?.summary || "");
+            
+            // Parse JSON fields
+            try {
+                setExperience(site.experience ? JSON.parse(site.experience) : cvData?.experience || []);
+                setEducation(site.education ? JSON.parse(site.education) : cvData?.education || []);
+                setSkills(site.skills ? JSON.parse(site.skills) : cvData?.skills || []);
+                setLanguages(site.languages ? JSON.parse(site.languages) : cvData?.languages || []);
+            } catch (error) {
+                console.error("Error parsing JSON fields:", error);
+                setExperience(cvData?.experience || []);
+                setEducation(cvData?.education || []);
+                setSkills(cvData?.skills || []);
+                setLanguages(cvData?.languages || []);
+            }
+        }
+    }, [site, cvData]);
+
+    const handleSave = async () => {
+        if (!site) return;
+
+        setSaving(true);
+        try {
+            const response = await fetch("/api/site/update-info", {
+                method: "PATCH",
+                headers: {
+                    "Content-Type": "application/json",
+                },
+                body: JSON.stringify({
+                    siteId: site.id,
+                    name,
+                    jobTitle,
+                    email,
+                    phone,
+                    location,
+                    linkedinUrl,
+                    githubUrl,
+                    summary,
+                    experience,
+                    education,
+                    skills,
+                    languages,
+                }),
+            });
+
+            const data = await response.json();
+
+            if (response.ok) {
+                alert("Bilgileriniz başarıyla kaydedildi!");
+                setIsEditing(false);
+                window.location.reload(); // Refresh to show updated data
+            } else {
+                alert(data.error || "Bilgiler kaydedilemedi");
+            }
+        } catch (error) {
+            console.error("Error saving info:", error);
+            alert("Bir hata oluştu");
+        } finally {
+            setSaving(false);
+        }
+    };
+
+    const addExperience = () => {
+        setExperience([...experience, { company: "", position: "", duration: "", description: "" }]);
+    };
+
+    const removeExperience = (index: number) => {
+        setExperience(experience.filter((_, i) => i !== index));
+    };
+
+    const updateExperience = (index: number, field: string, value: string) => {
+        const updated = [...experience];
+        updated[index] = { ...updated[index], [field]: value };
+        setExperience(updated);
+    };
+
+    const addEducation = () => {
+        setEducation([...education, { school: "", degree: "", field: "", year: "" }]);
+    };
+
+    const removeEducation = (index: number) => {
+        setEducation(education.filter((_, i) => i !== index));
+    };
+
+    const updateEducation = (index: number, field: string, value: string) => {
+        const updated = [...education];
+        updated[index] = { ...updated[index], [field]: value };
+        setEducation(updated);
+    };
+
+    const addSkill = () => {
+        setSkills([...skills, ""]);
+    };
+
+    const removeSkill = (index: number) => {
+        setSkills(skills.filter((_, i) => i !== index));
+    };
+
+    const updateSkill = (index: number, value: string) => {
+        const updated = [...skills];
+        updated[index] = value;
+        setSkills(updated);
+    };
+
+    const addLanguage = () => {
+        setLanguages([...languages, ""]);
+    };
+
+    const removeLanguage = (index: number) => {
+        setLanguages(languages.filter((_, i) => i !== index));
+    };
+
+    const updateLanguage = (index: number, value: string) => {
+        const updated = [...languages];
+        updated[index] = value;
+        setLanguages(updated);
+    };
+
     return (
         <div className="space-y-6">
             <div>
                 <h2 className="text-2xl font-bold text-white mb-2">Bilgilerim</h2>
                 <p className="text-gray-400">
-                    CV'nizi yükleyin veya mevcut CV bilgilerinizi görüntüleyin
+                    CV'nizi yükleyin veya mevcut CV bilgilerinizi görüntüleyin/düzenleyin
                 </p>
             </div>
 
@@ -28,115 +173,374 @@ export default function MyInfo({ site, cvData, onDelete, onCVAnalyzed, deleting 
                 <div className="bg-gray-800 rounded-xl border border-gray-700 p-6">
                     <div className="flex justify-between items-center mb-6">
                         <h3 className="text-xl font-bold text-white">CV'im</h3>
-                        <button
-                            onClick={onDelete}
-                            disabled={deleting}
-                            className="flex items-center gap-2 px-4 py-2 bg-red-600 hover:bg-red-700 disabled:bg-gray-400 text-white rounded-lg transition-colors duration-200"
-                        >
-                            {deleting ? (
-                                <>
-                                    <svg className="animate-spin h-4 w-4" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
-                                        <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
-                                        <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                        <div className="flex gap-2">
+                            {!isEditing ? (
+                                <button
+                                    onClick={() => setIsEditing(true)}
+                                    className="flex items-center gap-2 px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-lg transition-colors duration-200"
+                                >
+                                    <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
                                     </svg>
-                                    <span>Siliniyor...</span>
-                                </>
+                                    <span>Düzenle</span>
+                                </button>
                             ) : (
                                 <>
-                                    <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
-                                    </svg>
-                                    <span>CV'yi Sil</span>
+                                    <button
+                                        onClick={handleSave}
+                                        disabled={saving}
+                                        className="flex items-center gap-2 px-4 py-2 bg-green-600 hover:bg-green-700 disabled:bg-gray-400 text-white rounded-lg transition-colors duration-200"
+                                    >
+                                        {saving ? (
+                                            <>
+                                                <svg className="animate-spin h-4 w-4" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                                                    <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
+                                                    <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                                                </svg>
+                                                <span>Kaydediliyor...</span>
+                                            </>
+                                        ) : (
+                                            <>
+                                                <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
+                                                </svg>
+                                                <span>Kaydet</span>
+                                            </>
+                                        )}
+                                    </button>
+                                    <button
+                                        onClick={() => setIsEditing(false)}
+                                        disabled={saving}
+                                        className="flex items-center gap-2 px-4 py-2 bg-gray-600 hover:bg-gray-700 disabled:bg-gray-400 text-white rounded-lg transition-colors duration-200"
+                                    >
+                                        <span>İptal</span>
+                                    </button>
                                 </>
                             )}
-                        </button>
+                            <button
+                                onClick={onDelete}
+                                disabled={deleting || isEditing}
+                                className="flex items-center gap-2 px-4 py-2 bg-red-600 hover:bg-red-700 disabled:bg-gray-400 text-white rounded-lg transition-colors duration-200"
+                            >
+                                {deleting ? (
+                                    <>
+                                        <svg className="animate-spin h-4 w-4" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                                            <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
+                                            <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                                        </svg>
+                                        <span>Siliniyor...</span>
+                                    </>
+                                ) : (
+                                    <>
+                                        <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
+                                        </svg>
+                                        <span>CV'yi Sil</span>
+                                    </>
+                                )}
+                            </button>
+                        </div>
                     </div>
 
                     <div className="space-y-4">
                         {/* Personal Info */}
                         <div className="bg-gray-700/50 rounded-lg p-4">
                             <h4 className="text-lg font-semibold text-white mb-3">Kişisel Bilgiler</h4>
-                            <div className="space-y-2 text-sm">
-                                <p className="text-gray-300">
-                                    <strong>Ad Soyad:</strong> {cvData.personalInfo.name}
-                                </p>
-                                {cvData.personalInfo.title && (
-                                    <p className="text-gray-300">
-                                        <strong>Ünvan:</strong> {cvData.personalInfo.title}
-                                    </p>
-                                )}
-                                {cvData.personalInfo.email && (
-                                    <p className="text-gray-300">
-                                        <strong>Email:</strong> {cvData.personalInfo.email}
-                                    </p>
-                                )}
-                                {cvData.personalInfo.phone && (
-                                    <p className="text-gray-300">
-                                        <strong>Telefon:</strong> {cvData.personalInfo.phone}
-                                    </p>
-                                )}
-                                {cvData.personalInfo.location && (
-                                    <p className="text-gray-300">
-                                        <strong>Konum:</strong> {cvData.personalInfo.location}
-                                    </p>
-                                )}
+                            <div className="space-y-3">
+                                <div>
+                                    <label className="block text-sm font-medium text-gray-300 mb-1">Ad Soyad</label>
+                                    {isEditing ? (
+                                        <input
+                                            type="text"
+                                            value={name}
+                                            onChange={(e) => setName(e.target.value)}
+                                            className="w-full px-3 py-2 bg-gray-600 border border-gray-500 text-white rounded-lg focus:ring-2 focus:ring-blue-500"
+                                        />
+                                    ) : (
+                                        <p className="text-gray-300">{name || "-"}</p>
+                                    )}
+                                </div>
+                                <div>
+                                    <label className="block text-sm font-medium text-gray-300 mb-1">Ünvan</label>
+                                    {isEditing ? (
+                                        <input
+                                            type="text"
+                                            value={jobTitle}
+                                            onChange={(e) => setJobTitle(e.target.value)}
+                                            className="w-full px-3 py-2 bg-gray-600 border border-gray-500 text-white rounded-lg focus:ring-2 focus:ring-blue-500"
+                                        />
+                                    ) : (
+                                        <p className="text-gray-300">{jobTitle || "-"}</p>
+                                    )}
+                                </div>
+                                <div>
+                                    <label className="block text-sm font-medium text-gray-300 mb-1">Email</label>
+                                    {isEditing ? (
+                                        <input
+                                            type="email"
+                                            value={email}
+                                            onChange={(e) => setEmail(e.target.value)}
+                                            className="w-full px-3 py-2 bg-gray-600 border border-gray-500 text-white rounded-lg focus:ring-2 focus:ring-blue-500"
+                                        />
+                                    ) : (
+                                        <p className="text-gray-300">{email || "-"}</p>
+                                    )}
+                                </div>
+                                <div>
+                                    <label className="block text-sm font-medium text-gray-300 mb-1">Telefon</label>
+                                    {isEditing ? (
+                                        <input
+                                            type="tel"
+                                            value={phone}
+                                            onChange={(e) => setPhone(e.target.value)}
+                                            className="w-full px-3 py-2 bg-gray-600 border border-gray-500 text-white rounded-lg focus:ring-2 focus:ring-blue-500"
+                                        />
+                                    ) : (
+                                        <p className="text-gray-300">{phone || "-"}</p>
+                                    )}
+                                </div>
+                                <div>
+                                    <label className="block text-sm font-medium text-gray-300 mb-1">Konum</label>
+                                    {isEditing ? (
+                                        <input
+                                            type="text"
+                                            value={location}
+                                            onChange={(e) => setLocation(e.target.value)}
+                                            className="w-full px-3 py-2 bg-gray-600 border border-gray-500 text-white rounded-lg focus:ring-2 focus:ring-blue-500"
+                                        />
+                                    ) : (
+                                        <p className="text-gray-300">{location || "-"}</p>
+                                    )}
+                                </div>
+                                <div>
+                                    <label className="block text-sm font-medium text-gray-300 mb-1">LinkedIn URL</label>
+                                    {isEditing ? (
+                                        <input
+                                            type="url"
+                                            value={linkedinUrl}
+                                            onChange={(e) => setLinkedinUrl(e.target.value)}
+                                            placeholder="https://linkedin.com/in/kullaniciadi"
+                                            className="w-full px-3 py-2 bg-gray-600 border border-gray-500 text-white rounded-lg focus:ring-2 focus:ring-blue-500"
+                                        />
+                                    ) : (
+                                        <p className="text-gray-300">{linkedinUrl || "-"}</p>
+                                    )}
+                                </div>
+                                <div>
+                                    <label className="block text-sm font-medium text-gray-300 mb-1">GitHub URL</label>
+                                    {isEditing ? (
+                                        <input
+                                            type="url"
+                                            value={githubUrl}
+                                            onChange={(e) => setGithubUrl(e.target.value)}
+                                            placeholder="https://github.com/kullaniciadi"
+                                            className="w-full px-3 py-2 bg-gray-600 border border-gray-500 text-white rounded-lg focus:ring-2 focus:ring-blue-500"
+                                        />
+                                    ) : (
+                                        <p className="text-gray-300">{githubUrl || "-"}</p>
+                                    )}
+                                </div>
                             </div>
                         </div>
 
                         {/* Summary */}
-                        {cvData.summary && (
-                            <div className="bg-gray-700/50 rounded-lg p-4">
-                                <h4 className="text-lg font-semibold text-white mb-3">Özet</h4>
-                                <p className="text-sm text-gray-300">{cvData.summary}</p>
-                            </div>
-                        )}
+                        <div className="bg-gray-700/50 rounded-lg p-4">
+                            <h4 className="text-lg font-semibold text-white mb-3">Özet</h4>
+                            {isEditing ? (
+                                <textarea
+                                    value={summary}
+                                    onChange={(e) => setSummary(e.target.value)}
+                                    rows={4}
+                                    className="w-full px-3 py-2 bg-gray-600 border border-gray-500 text-white rounded-lg focus:ring-2 focus:ring-blue-500 resize-none"
+                                />
+                            ) : (
+                                <p className="text-sm text-gray-300">{summary || "-"}</p>
+                            )}
+                        </div>
 
                         {/* Experience */}
-                        {cvData.experience.length > 0 && (
-                            <div className="bg-gray-700/50 rounded-lg p-4">
-                                <h4 className="text-lg font-semibold text-white mb-3">
-                                    İş Deneyimi ({cvData.experience.length})
+                        <div className="bg-gray-700/50 rounded-lg p-4">
+                            <div className="flex justify-between items-center mb-3">
+                                <h4 className="text-lg font-semibold text-white">
+                                    İş Deneyimi ({experience.length})
                                 </h4>
-                                <div className="space-y-3">
-                                    {cvData.experience.map((exp, index) => (
-                                        <div key={index} className="text-sm">
-                                            <p className="font-medium text-white">
-                                                {exp.position} - {exp.company}
-                                            </p>
-                                            <p className="text-gray-400">{exp.duration}</p>
-                                        </div>
-                                    ))}
-                                </div>
+                                {isEditing && (
+                                    <button
+                                        onClick={addExperience}
+                                        className="px-3 py-1 bg-blue-600 hover:bg-blue-700 text-white text-sm rounded transition-colors"
+                                    >
+                                        + Ekle
+                                    </button>
+                                )}
                             </div>
-                        )}
+                            <div className="space-y-3">
+                                {experience.map((exp, index) => (
+                                    <div key={index} className="bg-gray-600/50 rounded p-3">
+                                        {isEditing ? (
+                                            <div className="space-y-2">
+                                                <div className="flex justify-end">
+                                                    <button
+                                                        onClick={() => removeExperience(index)}
+                                                        className="text-red-400 hover:text-red-300 text-sm"
+                                                    >
+                                                        Sil
+                                                    </button>
+                                                </div>
+                                                <input
+                                                    type="text"
+                                                    placeholder="Pozisyon"
+                                                    value={exp.position || ""}
+                                                    onChange={(e) => updateExperience(index, "position", e.target.value)}
+                                                    className="w-full px-2 py-1 bg-gray-700 border border-gray-600 text-white rounded text-sm"
+                                                />
+                                                <input
+                                                    type="text"
+                                                    placeholder="Şirket"
+                                                    value={exp.company || ""}
+                                                    onChange={(e) => updateExperience(index, "company", e.target.value)}
+                                                    className="w-full px-2 py-1 bg-gray-700 border border-gray-600 text-white rounded text-sm"
+                                                />
+                                                <input
+                                                    type="text"
+                                                    placeholder="Süre (ör: 2020-2022)"
+                                                    value={exp.duration || ""}
+                                                    onChange={(e) => updateExperience(index, "duration", e.target.value)}
+                                                    className="w-full px-2 py-1 bg-gray-700 border border-gray-600 text-white rounded text-sm"
+                                                />
+                                                <textarea
+                                                    placeholder="Açıklama (opsiyonel)"
+                                                    value={exp.description || ""}
+                                                    onChange={(e) => updateExperience(index, "description", e.target.value)}
+                                                    rows={2}
+                                                    className="w-full px-2 py-1 bg-gray-700 border border-gray-600 text-white rounded text-sm resize-none"
+                                                />
+                                            </div>
+                                        ) : (
+                                            <div className="text-sm">
+                                                <p className="font-medium text-white">
+                                                    {exp.position} - {exp.company}
+                                                </p>
+                                                <p className="text-gray-400">{exp.duration}</p>
+                                                {exp.description && (
+                                                    <p className="text-gray-300 mt-1">{exp.description}</p>
+                                                )}
+                                            </div>
+                                        )}
+                                    </div>
+                                ))}
+                                {experience.length === 0 && <p className="text-gray-400 text-sm">Henüz iş deneyimi eklenmemiş</p>}
+                            </div>
+                        </div>
 
                         {/* Education */}
-                        {cvData.education.length > 0 && (
-                            <div className="bg-gray-700/50 rounded-lg p-4">
-                                <h4 className="text-lg font-semibold text-white mb-3">
-                                    Eğitim ({cvData.education.length})
+                        <div className="bg-gray-700/50 rounded-lg p-4">
+                            <div className="flex justify-between items-center mb-3">
+                                <h4 className="text-lg font-semibold text-white">
+                                    Eğitim ({education.length})
                                 </h4>
-                                <div className="space-y-3">
-                                    {cvData.education.map((edu, index) => (
-                                        <div key={index} className="text-sm">
-                                            <p className="font-medium text-white">
-                                                {edu.degree} - {edu.field}
-                                            </p>
-                                            <p className="text-gray-400">
-                                                {edu.school} ({edu.year})
-                                            </p>
-                                        </div>
-                                    ))}
-                                </div>
+                                {isEditing && (
+                                    <button
+                                        onClick={addEducation}
+                                        className="px-3 py-1 bg-blue-600 hover:bg-blue-700 text-white text-sm rounded transition-colors"
+                                    >
+                                        + Ekle
+                                    </button>
+                                )}
                             </div>
-                        )}
+                            <div className="space-y-3">
+                                {education.map((edu, index) => (
+                                    <div key={index} className="bg-gray-600/50 rounded p-3">
+                                        {isEditing ? (
+                                            <div className="space-y-2">
+                                                <div className="flex justify-end">
+                                                    <button
+                                                        onClick={() => removeEducation(index)}
+                                                        className="text-red-400 hover:text-red-300 text-sm"
+                                                    >
+                                                        Sil
+                                                    </button>
+                                                </div>
+                                                <input
+                                                    type="text"
+                                                    placeholder="Derece (ör: Lisans)"
+                                                    value={edu.degree || ""}
+                                                    onChange={(e) => updateEducation(index, "degree", e.target.value)}
+                                                    className="w-full px-2 py-1 bg-gray-700 border border-gray-600 text-white rounded text-sm"
+                                                />
+                                                <input
+                                                    type="text"
+                                                    placeholder="Alan (ör: Bilgisayar Mühendisliği)"
+                                                    value={edu.field || ""}
+                                                    onChange={(e) => updateEducation(index, "field", e.target.value)}
+                                                    className="w-full px-2 py-1 bg-gray-700 border border-gray-600 text-white rounded text-sm"
+                                                />
+                                                <input
+                                                    type="text"
+                                                    placeholder="Okul"
+                                                    value={edu.school || ""}
+                                                    onChange={(e) => updateEducation(index, "school", e.target.value)}
+                                                    className="w-full px-2 py-1 bg-gray-700 border border-gray-600 text-white rounded text-sm"
+                                                />
+                                                <input
+                                                    type="text"
+                                                    placeholder="Yıl (ör: 2018-2022)"
+                                                    value={edu.year || ""}
+                                                    onChange={(e) => updateEducation(index, "year", e.target.value)}
+                                                    className="w-full px-2 py-1 bg-gray-700 border border-gray-600 text-white rounded text-sm"
+                                                />
+                                            </div>
+                                        ) : (
+                                            <div className="text-sm">
+                                                <p className="font-medium text-white">
+                                                    {edu.degree} - {edu.field}
+                                                </p>
+                                                <p className="text-gray-400">
+                                                    {edu.school} ({edu.year})
+                                                </p>
+                                            </div>
+                                        )}
+                                    </div>
+                                ))}
+                                {education.length === 0 && <p className="text-gray-400 text-sm">Henüz eğitim bilgisi eklenmemiş</p>}
+                            </div>
+                        </div>
 
                         {/* Skills */}
-                        {cvData.skills.length > 0 && (
-                            <div className="bg-gray-700/50 rounded-lg p-4">
-                                <h4 className="text-lg font-semibold text-white mb-3">Yetenekler</h4>
+                        <div className="bg-gray-700/50 rounded-lg p-4">
+                            <div className="flex justify-between items-center mb-3">
+                                <h4 className="text-lg font-semibold text-white">Yetenekler</h4>
+                                {isEditing && (
+                                    <button
+                                        onClick={addSkill}
+                                        className="px-3 py-1 bg-blue-600 hover:bg-blue-700 text-white text-sm rounded transition-colors"
+                                    >
+                                        + Ekle
+                                    </button>
+                                )}
+                            </div>
+                            {isEditing ? (
+                                <div className="space-y-2">
+                                    {skills.map((skill, index) => (
+                                        <div key={index} className="flex gap-2">
+                                            <input
+                                                type="text"
+                                                value={skill}
+                                                onChange={(e) => updateSkill(index, e.target.value)}
+                                                className="flex-1 px-2 py-1 bg-gray-600 border border-gray-500 text-white rounded text-sm"
+                                            />
+                                            <button
+                                                onClick={() => removeSkill(index)}
+                                                className="px-2 text-red-400 hover:text-red-300"
+                                            >
+                                                Sil
+                                            </button>
+                                        </div>
+                                    ))}
+                                    {skills.length === 0 && <p className="text-gray-400 text-sm">Yetenek ekleyin</p>}
+                                </div>
+                            ) : (
                                 <div className="flex flex-wrap gap-2">
-                                    {cvData.skills.map((skill, index) => (
+                                    {skills.map((skill, index) => (
                                         <span
                                             key={index}
                                             className="px-3 py-1 text-sm bg-blue-600 text-white rounded-full"
@@ -144,16 +548,47 @@ export default function MyInfo({ site, cvData, onDelete, onCVAnalyzed, deleting 
                                             {skill}
                                         </span>
                                     ))}
+                                    {skills.length === 0 && <p className="text-gray-400 text-sm">Henüz yetenek eklenmemiş</p>}
                                 </div>
-                            </div>
-                        )}
+                            )}
+                        </div>
 
                         {/* Languages */}
-                        {cvData.languages.length > 0 && (
-                            <div className="bg-gray-700/50 rounded-lg p-4">
-                                <h4 className="text-lg font-semibold text-white mb-3">Diller</h4>
+                        <div className="bg-gray-700/50 rounded-lg p-4">
+                            <div className="flex justify-between items-center mb-3">
+                                <h4 className="text-lg font-semibold text-white">Diller</h4>
+                                {isEditing && (
+                                    <button
+                                        onClick={addLanguage}
+                                        className="px-3 py-1 bg-blue-600 hover:bg-blue-700 text-white text-sm rounded transition-colors"
+                                    >
+                                        + Ekle
+                                    </button>
+                                )}
+                            </div>
+                            {isEditing ? (
+                                <div className="space-y-2">
+                                    {languages.map((lang, index) => (
+                                        <div key={index} className="flex gap-2">
+                                            <input
+                                                type="text"
+                                                value={lang}
+                                                onChange={(e) => updateLanguage(index, e.target.value)}
+                                                className="flex-1 px-2 py-1 bg-gray-600 border border-gray-500 text-white rounded text-sm"
+                                            />
+                                            <button
+                                                onClick={() => removeLanguage(index)}
+                                                className="px-2 text-red-400 hover:text-red-300"
+                                            >
+                                                Sil
+                                            </button>
+                                        </div>
+                                    ))}
+                                    {languages.length === 0 && <p className="text-gray-400 text-sm">Dil ekleyin</p>}
+                                </div>
+                            ) : (
                                 <div className="flex flex-wrap gap-2">
-                                    {cvData.languages.map((lang, index) => (
+                                    {languages.map((lang, index) => (
                                         <span
                                             key={index}
                                             className="px-3 py-1 text-sm bg-green-600 text-white rounded-full"
@@ -161,9 +596,10 @@ export default function MyInfo({ site, cvData, onDelete, onCVAnalyzed, deleting 
                                             {lang}
                                         </span>
                                     ))}
+                                    {languages.length === 0 && <p className="text-gray-400 text-sm">Henüz dil eklenmemiş</p>}
                                 </div>
-                            </div>
-                        )}
+                            )}
+                        </div>
                     </div>
                 </div>
             )}
