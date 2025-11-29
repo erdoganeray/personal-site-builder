@@ -26,6 +26,7 @@ export function createUsernameSlug(name: string): string {
 /**
  * HTML, CSS ve JS içeriğini Cloudflare R2'ye deploy eder ve subdomain oluşturur
  * @param username - Kullanıcı adı (subdomain için)
+ * @param userId - Kullanıcı ID (dosya yolu için)
  * @param siteId - Site ID (dosya yolu için)
  * @param htmlContent - Yüklenecek HTML içeriği
  * @param cssContent - Yüklenecek CSS içeriği
@@ -34,6 +35,7 @@ export function createUsernameSlug(name: string): string {
  */
 export async function deployToCloudflare(
   username: string,
+  userId: string,
   siteId: string,
   htmlContent: string,
   cssContent: string,
@@ -54,7 +56,7 @@ export async function deployToCloudflare(
     await r2Client.send(
       new PutObjectCommand({
         Bucket: bucketName,
-        Key: `sites/${siteId}/index.html`,
+        Key: `users/${userId}/site/${siteId}/index.html`,
         Body: htmlContent,
         ContentType: "text/html; charset=utf-8",
         CacheControl: "public, max-age=3600",
@@ -65,7 +67,7 @@ export async function deployToCloudflare(
     await r2Client.send(
       new PutObjectCommand({
         Bucket: bucketName,
-        Key: `sites/${siteId}/styles.css`,
+        Key: `users/${userId}/site/${siteId}/styles.css`,
         Body: cssContent,
         ContentType: "text/css; charset=utf-8",
         CacheControl: "public, max-age=3600",
@@ -76,18 +78,18 @@ export async function deployToCloudflare(
     await r2Client.send(
       new PutObjectCommand({
         Bucket: bucketName,
-        Key: `sites/${siteId}/script.js`,
+        Key: `users/${userId}/site/${siteId}/script.js`,
         Body: jsContent,
         ContentType: "application/javascript; charset=utf-8",
         CacheControl: "public, max-age=3600",
       })
     );
 
-    console.log(`✅ Site deployed to R2: sites/${siteId}/`);
+    console.log(`✅ Site deployed to R2: users/${userId}/site/${siteId}/`);
 
     // 5. R2 public URL oluştur
     const r2PublicDomain = process.env.R2_PUBLIC_DOMAIN || `${bucketName}.${process.env.CLOUDFLARE_ACCOUNT_ID}.r2.cloudflarestorage.com`;
-    const fullUrl = `https://${r2PublicDomain}/sites/${siteId}/index.html`;
+    const fullUrl = `https://${r2PublicDomain}/users/${userId}/site/${siteId}/index.html`;
 
     // 6. Başarılı yanıt döndür
     return {
@@ -106,9 +108,11 @@ export async function deployToCloudflare(
 
 /**
  * Yayınlanmış siteyi R2'den siler (HTML, CSS, JS)
+ * @param userId - Kullanıcı ID
  * @param siteId - Silinecek site ID
  */
 export async function unpublishFromCloudflare(
+  userId: string,
   siteId: string
 ): Promise<{ success: boolean; error?: string }> {
   try {
@@ -117,9 +121,9 @@ export async function unpublishFromCloudflare(
     
     // HTML, CSS ve JS dosyalarını sil
     const filesToDelete = [
-      `sites/${siteId}/index.html`,
-      `sites/${siteId}/styles.css`,
-      `sites/${siteId}/script.js`,
+      `users/${userId}/site/${siteId}/index.html`,
+      `users/${userId}/site/${siteId}/styles.css`,
+      `users/${userId}/site/${siteId}/script.js`,
     ];
 
     await Promise.all(
@@ -133,7 +137,7 @@ export async function unpublishFromCloudflare(
       )
     );
 
-    console.log(`✅ Site unpublished from R2: ${siteId}`);
+    console.log(`✅ Site unpublished from R2: users/${userId}/site/${siteId}`);
 
     return { success: true };
   } catch (error) {

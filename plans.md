@@ -18,3 +18,7 @@
 - multi languages
 - blog page and blog editor
 - google analytics
+
+# Error Handling
+- ai ile siteniz oluşturuluyor animation eklenecek
+- ai ile siteniz oluşturuluyor sırasında dasboard menüde başka bir yere gidip "Sitem" e girince ai ile siteniz oluşturuluyor animation ı gidiyor ama arkada süreç işliyor, kısaca ui hatası var

@@ -50,22 +50,22 @@ export async function POST(req: NextRequest) {
 
     // Dosya adını temizle ve UUID ekle
     const fileExt = file.name.split(".").pop();
-    const fileName = `cv-${session.user.id}-${randomUUID()}.${fileExt}`;
+    const fileName = `cv-${randomUUID()}.${fileExt}`;
 
     // Dosyayı buffer'a çevir
     const buffer = Buffer.from(await file.arrayBuffer());
 
-    // R2'ye yükle
+    // R2'ye yükle - users/[userId]/cv/ klasörüne
     await s3Client.send(
       new PutObjectCommand({
         Bucket: process.env.R2_BUCKET_NAME!,
-        Key: `cvs/${fileName}`,
+        Key: `users/${session.user.id}/cv/${fileName}`,
         Body: buffer,
         ContentType: file.type,
       })
     );
 
-    const fileUrl = `${process.env.R2_PUBLIC_URL}/cvs/${fileName}`;
+    const fileUrl = `${process.env.R2_PUBLIC_URL}/users/${session.user.id}/cv/${fileName}`;
 
     console.log("File uploaded to R2:", fileUrl);
 

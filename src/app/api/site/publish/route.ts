@@ -71,6 +71,7 @@ export async function POST(req: NextRequest) {
     // 7. Cloudflare'e deploy et (HTML, CSS, JS)
     const deployment = await deployToCloudflare(
       username,
+      site.user.id,
       siteId,
       site.htmlContent,
       site.cssContent,

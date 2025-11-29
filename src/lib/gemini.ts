@@ -153,18 +153,22 @@ JSON'dan önce veya sonra hiçbir metin olmasın.
       // JSON bloğunu temizle (markdown kod bloğu varsa)
       let cleanedText = responseText.trim();
       
-      // ```json veya ``` ile başlıyorsa temizle
-      if (cleanedText.startsWith('```json')) {
-        cleanedText = cleanedText.replace(/^```json\n/, '').replace(/\n```$/, '');
-      } else if (cleanedText.startsWith('```')) {
-        cleanedText = cleanedText.replace(/^```\n/, '').replace(/\n```$/, '');
-      }
+      // ```json veya ``` ile başlıyorsa temizle (regex ile daha güvenli)
+      cleanedText = cleanedText.replace(/^```json\s*/i, '').replace(/^```\s*/, '');
+      cleanedText = cleanedText.replace(/\s*```$/g, '');
+      cleanedText = cleanedText.trim();
       
       parsedResponse = JSON.parse(cleanedText);
       
       // Gerekli alanların varlığını kontrol et
-      if (!parsedResponse.html || !parsedResponse.css || !parsedResponse.js || !parsedResponse.title) {
-        throw new Error("Generated response is missing required fields (html, css, js, or title)");
+      if (!parsedResponse.html || !parsedResponse.css || !parsedResponse.js) {
+        throw new Error("Generated response is missing required fields (html, css, or js)");
+      }
+      
+      // title yoksa HTML'den çıkar veya default kullan
+      if (!parsedResponse.title) {
+        const titleMatch = parsedResponse.html.match(/<title>(.*?)<\/title>/i);
+        parsedResponse.title = titleMatch ? titleMatch[1] : "Personal Website";
       }
       
     } catch (parseError) {
@@ -252,14 +256,12 @@ JSON'dan önce veya sonra hiçbir metin olmasın.
     const responseText = result.response.text();
 
     try {
-      // JSON bloğunu temizle
+      // JSON bloğunu temizle (regex ile daha güvenli)
       let cleanedText = responseText.trim();
       
-      if (cleanedText.startsWith('```json')) {
-        cleanedText = cleanedText.replace(/^```json\n/, '').replace(/\n```$/, '');
-      } else if (cleanedText.startsWith('```')) {
-        cleanedText = cleanedText.replace(/^```\n/, '').replace(/\n```$/, '');
-      }
+      cleanedText = cleanedText.replace(/^```json\s*/i, '').replace(/^```\s*/, '');
+      cleanedText = cleanedText.replace(/\s*```$/g, '');
+      cleanedText = cleanedText.trim();
       
       const parsed = JSON.parse(cleanedText);
       
