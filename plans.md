@@ -52,3 +52,4 @@
 - ai ile siteniz oluşturuluyor sırasında dasboard menüde başka bir yere gidip "Sitem" e girince ai ile siteniz oluşturuluyor animation ı gidiyor ama arkada süreç işliyor, kısaca ui hatası var
 - her revizede güncel bilgiler çekilmeli fakat bu geminida context i çok doldurur, buna bir çözüm bulman lazım.
 - sadece bilgilerim'de değişiklik varsa revize hakkından düşmeden, çünkü bu durumda llm kullanmak şart olmayabilir?
+- publish edilen bir sitede güncelleme yapıldığında direkt publish e yansıayacak mı?

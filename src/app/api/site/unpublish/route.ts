@@ -57,7 +57,7 @@ export async function POST(req: NextRequest) {
 
     // 6. Cloudflare R2'den dosyayı sil
     const unpublishResult = await unpublishFromCloudflare(site.user.id, siteId);
-    
+
     if (!unpublishResult.success) {
       console.warn("⚠️ R2'den silme başarısız:", unpublishResult.error);
       // R2'den silme başarısız olsa bile veritabanını güncelle
@@ -67,7 +67,7 @@ export async function POST(req: NextRequest) {
     const updatedSite = await prisma.site.update({
       where: { id: siteId },
       data: {
-        status: "draft",
+        status: "previewed",
         subdomain: null,
         cloudflareUrl: null,
         publishedAt: null,

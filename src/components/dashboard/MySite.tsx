@@ -2,6 +2,7 @@
 
 import { useState, useMemo, useEffect } from "react";
 import { useRouter } from "next/navigation";
+import { isContentSynced } from "@/lib/sync-utils";
 
 interface MySiteProps {
     site: any;
@@ -13,16 +14,31 @@ export default function MySite({ site, onRefresh }: MySiteProps) {
     const [generating, setGenerating] = useState(false);
     const [publishing, setPublishing] = useState(false);
     const [unpublishing, setUnpublishing] = useState(false);
+    const [deletingPreview, setDeletingPreview] = useState(false);
     const [customPrompt, setCustomPrompt] = useState("");
     const [viewMode, setViewMode] = useState<"desktop" | "tablet" | "mobile">("desktop");
+
+    // Sync status check
+    const syncStatus = useMemo(() => {
+        if (!site) return null;
+
+        if (site.status === 'published') {
+            const isSynced = isContentSynced(site, site.publishContent);
+            if (!isSynced) return 'published_out_of_sync';
+        } else if (site.htmlContent) { // Previewed
+            const isSynced = isContentSynced(site, site.previewContent);
+            if (!isSynced) return 'preview_out_of_sync';
+        }
+        return null;
+    }, [site]);
 
     // Blob URL oluştur - site htmlContent, cssContent, jsContent değiştiğinde güncellenir
     const iframeUrl = useMemo(() => {
         if (!site?.htmlContent) return '';
-        
+
         // HTML'in içine CSS ve JS'i inject et
         let fullHtml = site.htmlContent;
-        
+
         // CSS'i <head> içine ekle (eğer varsa)
         if (site.cssContent) {
             const styleTag = `<style>${site.cssContent}</style>`;
@@ -34,7 +50,7 @@ export default function MySite({ site, onRefresh }: MySiteProps) {
                 fullHtml = styleTag + fullHtml;
             }
         }
-        
+
         // JS'i <body> sonuna ekle (eğer varsa)
         if (site.jsContent) {
             const scriptTag = `<script>${site.jsContent}</script>`;
@@ -46,7 +62,7 @@ export default function MySite({ site, onRefresh }: MySiteProps) {
                 fullHtml = fullHtml + scriptTag;
             }
         }
-        
+
         const blob = new Blob([fullHtml], { type: 'text/html' });
         return URL.createObjectURL(blob);
     }, [site?.htmlContent, site?.cssContent, site?.jsContent]);
@@ -171,6 +187,35 @@ export default function MySite({ site, onRefresh }: MySiteProps) {
         }
     };
 
+    const handleDeletePreview = async () => {
+        if (!site) return;
+
+        if (!confirm("Önizleme sitesini silmek istediğinizden emin misiniz? Bu işlem geri alınamaz.")) {
+            return;
+        }
+
+        setDeletingPreview(true);
+        try {
+            const response = await fetch(`/api/site/delete-preview?id=${site.id}`, {
+                method: "DELETE",
+            });
+
+            const data = await response.json();
+
+            if (response.ok) {
+                alert("Önizleme sitesi başarıyla silindi!");
+                onRefresh();
+            } else {
+                alert(data.error || "Önizleme silinemedi");
+            }
+        } catch (error) {
+            console.error("Silme hatası:", error);
+            alert("Bir hata oluştu. Lütfen tekrar deneyin.");
+        } finally {
+            setDeletingPreview(false);
+        }
+    };
+
     if (!site) {
         return (
             <div className="space-y-6">
@@ -192,16 +237,44 @@ export default function MySite({ site, onRefresh }: MySiteProps) {
                 <p className="text-gray-400">Site durumunuzu görüntüleyin ve yönetin</p>
             </div>
 
+            {/* Sync Warning Banner */}
+            {syncStatus === 'published_out_of_sync' && (
+                <div className="bg-yellow-900/50 border border-yellow-600 rounded-lg p-4 flex items-start gap-3">
+                    <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6 text-yellow-500 flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
+                    </svg>
+                    <div>
+                        <h4 className="font-bold text-yellow-500">Dikkat: Yayınlanan Sitedeki Veriler Güncel Değil</h4>
+                        <p className="text-yellow-200 text-sm mt-1">
+                            Bilgilerinizde değişiklik yaptınız ancak sitenizi henüz güncellemediniz. Değişikliklerin yansıması için sitenizi tekrar oluşturup yayınlamanız gerekmektedir.
+                        </p>
+                    </div>
+                </div>
+            )}
+
+            {syncStatus === 'preview_out_of_sync' && (
+                <div className="bg-blue-900/50 border border-blue-600 rounded-lg p-4 flex items-start gap-3">
+                    <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6 text-blue-500 flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                    </svg>
+                    <div>
+                        <h4 className="font-bold text-blue-500">Bilgi: Önizleme Sitedeki Veriler Güncel Değil</h4>
+                        <p className="text-blue-200 text-sm mt-1">
+                            Bilgilerinizde değişiklik yaptınız. Yeni bilgilerinizi görmek için sitenizi tekrar oluşturmanız gerekmektedir.
+                        </p>
+                    </div>
+                </div>
+            )}
+
             {/* Site Status */}
             <div className="bg-gray-800 rounded-xl border border-gray-700 p-6">
                 <h3 className="text-xl font-bold text-white mb-4">Site Durumu</h3>
                 <div className="flex items-center gap-3 mb-4">
                     <div
-                        className={`px-4 py-2 rounded-full font-semibold ${
-                            site.status === "published"
-                                ? "bg-green-600 text-white"
-                                : "bg-yellow-600 text-white"
-                        }`}
+                        className={`px-4 py-2 rounded-full font-semibold ${site.status === "published"
+                            ? "bg-green-600 text-white"
+                            : "bg-yellow-600 text-white"
+                            }`}
                     >
                         {site.status === "published" ? "✓ Yayında" : "○ Yayında Değil"}
                     </div>
@@ -235,11 +308,10 @@ export default function MySite({ site, onRefresh }: MySiteProps) {
                         <div className="flex items-center gap-2 bg-gray-700 rounded-lg p-1">
                             <button
                                 onClick={() => setViewMode("desktop")}
-                                className={`px-3 py-1 rounded transition-colors ${
-                                    viewMode === "desktop"
-                                        ? "bg-blue-600 text-white"
-                                        : "text-gray-400 hover:text-white"
-                                }`}
+                                className={`px-3 py-1 rounded transition-colors ${viewMode === "desktop"
+                                    ? "bg-blue-600 text-white"
+                                    : "text-gray-400 hover:text-white"
+                                    }`}
                             >
                                 <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9.75 17L9 20l-1 1h8l-1-1-.75-3M3 13h18M5 17h14a2 2 0 002-2V5a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" />
@@ -247,11 +319,10 @@ export default function MySite({ site, onRefresh }: MySiteProps) {
                             </button>
                             <button
                                 onClick={() => setViewMode("tablet")}
-                                className={`px-3 py-1 rounded transition-colors ${
-                                    viewMode === "tablet"
-                                        ? "bg-blue-600 text-white"
-                                        : "text-gray-400 hover:text-white"
-                                }`}
+                                className={`px-3 py-1 rounded transition-colors ${viewMode === "tablet"
+                                    ? "bg-blue-600 text-white"
+                                    : "text-gray-400 hover:text-white"
+                                    }`}
                             >
                                 <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 18h.01M7 21h10a2 2 0 002-2V5a2 2 0 00-2-2H7a2 2 0 00-2 2v14a2 2 0 002 2z" />
@@ -259,11 +330,10 @@ export default function MySite({ site, onRefresh }: MySiteProps) {
                             </button>
                             <button
                                 onClick={() => setViewMode("mobile")}
-                                className={`px-3 py-1 rounded transition-colors ${
-                                    viewMode === "mobile"
-                                        ? "bg-blue-600 text-white"
-                                        : "text-gray-400 hover:text-white"
-                                }`}
+                                className={`px-3 py-1 rounded transition-colors ${viewMode === "mobile"
+                                    ? "bg-blue-600 text-white"
+                                    : "text-gray-400 hover:text-white"
+                                    }`}
                             >
                                 <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 18h.01M8 21h8a2 2 0 002-2V5a2 2 0 00-2-2H8a2 2 0 00-2 2v14a2 2 0 002 2z" />
@@ -274,13 +344,12 @@ export default function MySite({ site, onRefresh }: MySiteProps) {
 
                     <div className="flex justify-center bg-gray-900 rounded-lg">
                         <div
-                            className={`bg-white rounded shadow-xl transition-all duration-300 ${
-                                viewMode === "desktop"
-                                    ? "w-full h-[800px]"
-                                    : viewMode === "tablet"
+                            className={`bg-white rounded shadow-xl transition-all duration-300 ${viewMode === "desktop"
+                                ? "w-full h-[800px]"
+                                : viewMode === "tablet"
                                     ? "w-2/3 h-[800px]"
                                     : "w-1/3 h-[800px]"
-                            }`}
+                                }`}
                         >
                             <iframe
                                 src={iframeUrl}
@@ -318,7 +387,7 @@ export default function MySite({ site, onRefresh }: MySiteProps) {
                     <>
                         {/* Site oluşturulmuş ama yayınlanmamış */}
                         {site.status !== "published" && (
-                            <div className="grid grid-cols-2 gap-3">
+                            <div className="grid grid-cols-3 gap-3">
                                 <button
                                     onClick={handlePublish}
                                     disabled={publishing}
@@ -331,6 +400,13 @@ export default function MySite({ site, onRefresh }: MySiteProps) {
                                     className="bg-gray-700 hover:bg-gray-600 text-white font-bold py-4 px-6 rounded-lg transition-colors duration-200"
                                 >
                                     Editöre Git
+                                </button>
+                                <button
+                                    onClick={handleDeletePreview}
+                                    disabled={deletingPreview}
+                                    className="bg-red-600 hover:bg-red-700 disabled:bg-gray-400 text-white font-bold py-4 px-6 rounded-lg transition-colors duration-200"
+                                >
+                                    {deletingPreview ? "Siliniyor..." : "Önizlemeyi Sil"}
                                 </button>
                             </div>
                         )}

@@ -47,6 +47,8 @@ model Site {
   phone         String?
   location      String?
   jsContent     String?
+  previewContent Json?
+  publishContent Json?
   user          User      @relation(fields: [userId], references: [id], onDelete: Cascade)
 
   @@index([userId])

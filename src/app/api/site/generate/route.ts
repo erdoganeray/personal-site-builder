@@ -9,7 +9,7 @@ export async function POST(req: NextRequest) {
   try {
     // 1. Authentication kontrolü
     const session = await getServerSession(authOptions);
-    
+
     if (!session || !session.user?.email) {
       return NextResponse.json(
         { error: "Unauthorized. Please login first." },
@@ -66,15 +66,57 @@ export async function POST(req: NextRequest) {
     let cvData: CVData;
     try {
       cvData = JSON.parse(site.cvTextData);
+
+      // Merge latest data from database into cvData
+      // This ensures that if user updated their info on the site, we use that instead of the original CV data
+      if (site.name) cvData.personalInfo.name = site.name;
+      if (site.email) cvData.personalInfo.email = site.email;
+      if (site.phone) cvData.personalInfo.phone = site.phone;
+      if (site.location) cvData.personalInfo.location = site.location;
+      if (site.jobTitle) cvData.personalInfo.title = site.jobTitle;
+      if (site.summary) cvData.summary = site.summary;
+
+      if (site.experience) {
+        try {
+          cvData.experience = JSON.parse(site.experience);
+        } catch (e) {
+          console.error("Failed to parse site.experience", e);
+        }
+      }
+
+      if (site.education) {
+        try {
+          cvData.education = JSON.parse(site.education);
+        } catch (e) {
+          console.error("Failed to parse site.education", e);
+        }
+      }
+
+      if (site.skills) {
+        try {
+          cvData.skills = JSON.parse(site.skills);
+        } catch (e) {
+          console.error("Failed to parse site.skills", e);
+        }
+      }
+
+      if (site.languages) {
+        try {
+          cvData.languages = JSON.parse(site.languages);
+        } catch (e) {
+          console.error("Failed to parse site.languages", e);
+        }
+      }
+
     } catch (parseError) {
       console.error("Failed to parse CV data:", parseError);
-      
+
       // Hata durumunda status'ü geri draft yap
       await prisma.site.update({
         where: { id: siteId },
         data: { status: "draft" },
       });
-      
+
       return NextResponse.json(
         { error: "Invalid CV data format. Please re-upload your CV." },
         { status: 400 }
@@ -92,13 +134,13 @@ export async function POST(req: NextRequest) {
       });
     } catch (geminiError) {
       console.error("Gemini generation error:", geminiError);
-      
+
       // Hata durumunda status'ü geri draft yap
       await prisma.site.update({
         where: { id: siteId },
         data: { status: "draft" },
       });
-      
+
       return NextResponse.json(
         {
           error: "Failed to generate website. Please try again.",
@@ -116,8 +158,23 @@ export async function POST(req: NextRequest) {
         cssContent: generatedSite.css,
         jsContent: generatedSite.js,
         title: generatedSite.title,
-        status: "draft", // Preview için draft olarak bırak
+        status: "previewed", // Preview için previewed olarak bırak
         updatedAt: new Date(),
+        // @ts-ignore - Prisma types not updating immediately
+        previewContent: {
+          name: site.name,
+          jobTitle: site.jobTitle,
+          email: site.email,
+          phone: site.phone,
+          location: site.location,
+          linkedinUrl: site.linkedinUrl,
+          githubUrl: site.githubUrl,
+          summary: site.summary,
+          experience: site.experience,
+          education: site.education,
+          skills: site.skills,
+          languages: site.languages,
+        },
       },
     });
 
@@ -136,7 +193,7 @@ export async function POST(req: NextRequest) {
 
   } catch (error) {
     console.error("Unexpected error in /api/site/generate:", error);
-    
+
     return NextResponse.json(
       {
         error: "An unexpected error occurred",
@@ -151,7 +208,7 @@ export async function POST(req: NextRequest) {
 export async function GET(req: NextRequest) {
   try {
     const session = await getServerSession(authOptions);
-    
+
     if (!session || !session.user?.email) {
       return NextResponse.json(
         { error: "Unauthorized" },
@@ -199,7 +256,7 @@ export async function GET(req: NextRequest) {
 
   } catch (error) {
     console.error("Error checking site status:", error);
-    
+
     return NextResponse.json(
       { error: "Failed to check site status" },
       { status: 500 }

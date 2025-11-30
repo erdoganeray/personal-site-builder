@@ -60,7 +60,7 @@ export async function POST(req: NextRequest) {
     if (!username) {
       // Username yoksa email'den oluştur
       username = site.user.email.split("@")[0];
-      
+
       // Veritabanına kaydet
       await prisma.user.update({
         where: { id: site.user.id },
@@ -93,6 +93,8 @@ export async function POST(req: NextRequest) {
         subdomain: deployment.subdomain,
         cloudflareUrl: deployment.url,
         publishedAt: new Date(),
+        // @ts-ignore - Prisma types not updating immediately
+        publishContent: site.previewContent ?? undefined,
       },
     });
 

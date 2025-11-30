@@ -12,7 +12,7 @@ export async function POST(req: NextRequest) {
   try {
     // 1. Kullanıcı authentication kontrolü
     const session = await getServerSession(authOptions);
-    
+
     if (!session?.user?.email) {
       return NextResponse.json(
         { error: "Unauthorized. Please login." },
@@ -94,20 +94,20 @@ export async function POST(req: NextRequest) {
     let revisedResult;
     try {
       revisedResult = await reviseWebsite(
-        site.htmlContent, 
-        site.cssContent, 
-        site.jsContent, 
+        site.htmlContent,
+        site.cssContent,
+        site.jsContent,
         revisionRequest.trim()
       );
     } catch (geminiError) {
       console.error("Gemini revision error:", geminiError);
-      
+
       // Hata durumunda status'ü geri draft yap
       await prisma.site.update({
         where: { id: siteId },
         data: { status: "draft" },
       });
-      
+
       return NextResponse.json(
         {
           error: "Failed to revise website. Please try again with a clearer request.",
@@ -124,7 +124,7 @@ export async function POST(req: NextRequest) {
         htmlContent: revisedResult.html,
         cssContent: revisedResult.css,
         jsContent: revisedResult.js,
-        status: "draft", // Preview için draft olarak bırak
+        status: "previewed", // Preview için previewed olarak bırak
         revisionCount: site.revisionCount + 1,
         updatedAt: new Date(),
       },
@@ -146,7 +146,7 @@ export async function POST(req: NextRequest) {
 
   } catch (error) {
     console.error("Error in /api/site/revise:", error);
-    
+
     return NextResponse.json(
       {
         error: "Internal server error",

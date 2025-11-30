@@ -1,8 +1,10 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, useMemo } from "react";
 import CVUploader from "@/components/CVUploader";
 import type { CVData } from "@/lib/gemini-pdf-parser";
+
+import { isContentSynced, getDiffs, type DiffItem } from "@/lib/sync-utils";
 
 interface MyInfoProps {
     site: any;
@@ -15,7 +17,34 @@ interface MyInfoProps {
 export default function MyInfo({ site, cvData, onDelete, onCVAnalyzed, deleting }: MyInfoProps) {
     const [isEditing, setIsEditing] = useState(false);
     const [saving, setSaving] = useState(false);
-    
+
+    // Sync status check
+    const [showDetails, setShowDetails] = useState(false);
+
+    const { status: syncStatus, diffs } = useMemo(() => {
+        if (!site) return { status: null, diffs: [] };
+
+        let status = null;
+        let snapshot = null;
+
+        if (site.status === 'published') {
+            const isSynced = isContentSynced(site, site.publishContent);
+            if (!isSynced) {
+                status = 'published_out_of_sync';
+                snapshot = site.publishContent;
+            }
+        } else if (site.htmlContent) { // Previewed
+            const isSynced = isContentSynced(site, site.previewContent);
+            if (!isSynced) {
+                status = 'preview_out_of_sync';
+                snapshot = site.previewContent;
+            }
+        }
+
+        const diffs = status ? getDiffs(site, snapshot) : [];
+        return { status, diffs };
+    }, [site]);
+
     // Form state
     const [name, setName] = useState("");
     const [jobTitle, setJobTitle] = useState("");
@@ -41,7 +70,7 @@ export default function MyInfo({ site, cvData, onDelete, onCVAnalyzed, deleting 
             setLinkedinUrl(site.linkedinUrl || "");
             setGithubUrl(site.githubUrl || "");
             setSummary(site.summary || cvData?.summary || "");
-            
+
             // Parse JSON fields
             try {
                 setExperience(site.experience ? JSON.parse(site.experience) : cvData?.experience || []);
@@ -166,6 +195,103 @@ export default function MyInfo({ site, cvData, onDelete, onCVAnalyzed, deleting 
                     CV'nizi yükleyin veya mevcut CV bilgilerinizi görüntüleyin/düzenleyin
                 </p>
             </div>
+
+            {/* Sync Warning Banner */}
+            {syncStatus === 'published_out_of_sync' && (
+                <div className="bg-yellow-900/50 border border-yellow-600 rounded-lg p-4">
+                    <div className="flex items-start gap-3">
+                        <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6 text-yellow-500 flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
+                        </svg>
+                        <div className="flex-1">
+                            <h4 className="font-bold text-yellow-500">Dikkat: Yayınlanan Sitedeki Veriler Güncel Değil</h4>
+                            <p className="text-yellow-200 text-sm mt-1">
+                                Bilgilerinizde değişiklik yaptınız ancak sitenizi henüz güncellemediniz. Değişikliklerin yansıması için "Sitem" sayfasından sitenizi tekrar oluşturup yayınlamanız gerekmektedir.
+                            </p>
+
+                            {diffs.length > 0 && (
+                                <button
+                                    onClick={() => setShowDetails(!showDetails)}
+                                    className="mt-2 text-sm font-medium text-yellow-400 hover:text-yellow-300 underline flex items-center gap-1"
+                                >
+                                    {showDetails ? 'Detayları Gizle' : 'Değişiklikleri Göster'}
+                                    <svg xmlns="http://www.w3.org/2000/svg" className={`h-4 w-4 transition-transform ${showDetails ? 'rotate-180' : ''}`} fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
+                                    </svg>
+                                </button>
+                            )}
+                        </div>
+                    </div>
+
+                    {showDetails && diffs.length > 0 && (
+                        <div className="mt-4 bg-black/30 rounded p-3 space-y-2">
+                            {diffs.map((diff, idx) => (
+                                <div key={idx} className="text-sm border-b border-yellow-800/50 last:border-0 pb-2 last:pb-0">
+                                    <p className="font-semibold text-gray-300 mb-1">{diff.label}</p>
+                                    <div className="grid grid-cols-2 gap-4">
+                                        <div className="bg-red-900/30 p-2 rounded">
+                                            <p className="text-xs text-red-400 mb-1">Eski Bilgi</p>
+                                            <p className="text-red-200 break-words whitespace-pre-wrap">{diff.oldValue}</p>
+                                        </div>
+                                        <div className="bg-green-900/30 p-2 rounded">
+                                            <p className="text-xs text-green-400 mb-1">Yeni Bilgi</p>
+                                            <p className="text-green-200 break-words whitespace-pre-wrap">{diff.newValue}</p>
+                                        </div>
+                                    </div>
+                                </div>
+                            ))}
+                        </div>
+                    )}
+                </div>
+            )}
+
+            {syncStatus === 'preview_out_of_sync' && (
+                <div className="bg-blue-900/50 border border-blue-600 rounded-lg p-4">
+                    <div className="flex items-start gap-3">
+                        <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6 text-blue-500 flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                        </svg>
+                        <div className="flex-1">
+                            <h4 className="font-bold text-blue-500">Bilgi: Önizleme Sitedeki Veriler Güncel Değil</h4>
+                            <p className="text-blue-200 text-sm mt-1">
+                                Bilgilerinizde değişiklik yaptınız. Yeni bilgilerinizi görmek için "Sitem" sayfasından sitenizi tekrar oluşturmanız gerekmektedir.
+                            </p>
+
+                            {diffs.length > 0 && (
+                                <button
+                                    onClick={() => setShowDetails(!showDetails)}
+                                    className="mt-2 text-sm font-medium text-blue-400 hover:text-blue-300 underline flex items-center gap-1"
+                                >
+                                    {showDetails ? 'Detayları Gizle' : 'Değişiklikleri Göster'}
+                                    <svg xmlns="http://www.w3.org/2000/svg" className={`h-4 w-4 transition-transform ${showDetails ? 'rotate-180' : ''}`} fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
+                                    </svg>
+                                </button>
+                            )}
+                        </div>
+                    </div>
+
+                    {showDetails && diffs.length > 0 && (
+                        <div className="mt-4 bg-black/30 rounded p-3 space-y-2">
+                            {diffs.map((diff, idx) => (
+                                <div key={idx} className="text-sm border-b border-blue-800/50 last:border-0 pb-2 last:pb-0">
+                                    <p className="font-semibold text-gray-300 mb-1">{diff.label}</p>
+                                    <div className="grid grid-cols-2 gap-4">
+                                        <div className="bg-red-900/30 p-2 rounded">
+                                            <p className="text-xs text-red-400 mb-1">Eski Bilgi</p>
+                                            <p className="text-red-200 break-words whitespace-pre-wrap">{diff.oldValue}</p>
+                                        </div>
+                                        <div className="bg-green-900/30 p-2 rounded">
+                                            <p className="text-xs text-green-400 mb-1">Yeni Bilgi</p>
+                                            <p className="text-green-200 break-words whitespace-pre-wrap">{diff.newValue}</p>
+                                        </div>
+                                    </div>
+                                </div>
+                            ))}
+                        </div>
+                    )}
+                </div>
+            )}
 
             {!site || !cvData ? (
                 <CVUploader onAnalyzed={onCVAnalyzed} />
