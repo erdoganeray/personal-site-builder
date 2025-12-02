@@ -151,6 +151,9 @@ export default function DashboardPage() {
                                 <Link href="/" className="text-gray-300 hover:text-white transition-colors">
                                     Ana Sayfa
                                 </Link>
+                                <Link href="/editor" className="text-gray-300 hover:text-white transition-colors">
+                                    Editör
+                                </Link>
                                 <div className="relative group">
                                     <button className="px-4 py-2 text-gray-300 hover:text-white transition-colors flex items-center gap-2">
                                         {session.user?.name || session.user?.email}
@@ -200,6 +203,9 @@ export default function DashboardPage() {
                         <div className="flex items-center gap-6">
                             <Link href="/" className="text-gray-300 hover:text-white transition-colors">
                                 Ana Sayfa
+                            </Link>
+                            <Link href="/editor" className="text-gray-300 hover:text-white transition-colors">
+                                Editör
                             </Link>
                             <div className="relative group">
                                 <button className="px-4 py-2 text-gray-300 hover:text-white transition-colors flex items-center gap-2">
