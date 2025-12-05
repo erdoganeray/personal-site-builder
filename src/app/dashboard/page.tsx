@@ -42,9 +42,9 @@ export default function DashboardPage() {
                 setSite(userSite);
                 
                 // Eğer site varsa ve CV data'sı varsa, parse et
-                if (userSite?.cvTextData) {
+                if (userSite?.cvContent) {
                     try {
-                        setCvData(JSON.parse(userSite.cvTextData));
+                        setCvData(userSite.cvContent);
                     } catch (error) {
                         console.error("CV data parse hatası:", error);
                     }

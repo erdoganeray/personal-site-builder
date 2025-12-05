@@ -30,12 +30,26 @@ export async function PATCH(request: NextRequest) {
       return NextResponse.json({ error: "Bu siteyi güncelleme yetkiniz yok" }, { status: 403 });
     }
 
-    // LinkedIn ve GitHub URL'lerini güncelle
+    // Get existing cvContent
+    let cvContent = site.cvContent as any || {
+      personalInfo: {},
+      summary: "",
+      experience: [],
+      education: [],
+      skills: [],
+      languages: [],
+    };
+
+    // Update LinkedIn and GitHub in cvContent
+    if (linkedinUrl !== undefined) cvContent.personalInfo.linkedin = linkedinUrl;
+    if (githubUrl !== undefined) cvContent.personalInfo.github = githubUrl;
+
+    // LinkedIn ve GitHub URL'lerini cvContent içinde güncelle
     const updatedSite = await prisma.site.update({
       where: { id: siteId },
       data: {
-        linkedinUrl: linkedinUrl || null,
-        githubUrl: githubUrl || null,
+        cvContent: cvContent,
+        updatedAt: new Date(),
       },
     });
 
@@ -44,8 +58,7 @@ export async function PATCH(request: NextRequest) {
       message: "Linkler başarıyla güncellendi",
       site: {
         id: updatedSite.id,
-        linkedinUrl: updatedSite.linkedinUrl,
-        githubUrl: updatedSite.githubUrl,
+        cvContent: updatedSite.cvContent,
       }
     });
   } catch (error) {

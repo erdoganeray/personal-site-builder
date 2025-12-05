@@ -2,7 +2,6 @@
 
 import { useState, useMemo, useEffect } from "react";
 import { useRouter } from "next/navigation";
-import { isContentSynced } from "@/lib/sync-utils";
 
 interface MySiteProps {
     site: any;
@@ -17,20 +16,6 @@ export default function MySite({ site, onRefresh }: MySiteProps) {
     const [deletingPreview, setDeletingPreview] = useState(false);
     const [customPrompt, setCustomPrompt] = useState("");
     const [viewMode, setViewMode] = useState<"desktop" | "tablet" | "mobile">("desktop");
-
-    // Sync status check
-    const syncStatus = useMemo(() => {
-        if (!site) return null;
-
-        if (site.status === 'published') {
-            const isSynced = isContentSynced(site, site.publishContent);
-            if (!isSynced) return 'published_out_of_sync';
-        } else if (site.htmlContent) { // Previewed
-            const isSynced = isContentSynced(site, site.previewContent);
-            if (!isSynced) return 'preview_out_of_sync';
-        }
-        return null;
-    }, [site]);
 
     // Blob URL oluştur - site htmlContent, cssContent, jsContent değiştiğinde güncellenir
     const iframeUrl = useMemo(() => {
@@ -236,35 +221,6 @@ export default function MySite({ site, onRefresh }: MySiteProps) {
                 <h2 className="text-2xl font-bold text-white mb-2">Sitem</h2>
                 <p className="text-gray-400">Site durumunuzu görüntüleyin ve yönetin</p>
             </div>
-
-            {/* Sync Warning Banner */}
-            {syncStatus === 'published_out_of_sync' && (
-                <div className="bg-yellow-900/50 border border-yellow-600 rounded-lg p-4 flex items-start gap-3">
-                    <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6 text-yellow-500 flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
-                    </svg>
-                    <div>
-                        <h4 className="font-bold text-yellow-500">Dikkat: Yayınlanan Sitedeki Veriler Güncel Değil</h4>
-                        <p className="text-yellow-200 text-sm mt-1">
-                            Bilgilerinizde değişiklik yaptınız ancak sitenizi henüz güncellemediniz. Değişikliklerin yansıması için sitenizi tekrar oluşturup yayınlamanız gerekmektedir.
-                        </p>
-                    </div>
-                </div>
-            )}
-
-            {syncStatus === 'preview_out_of_sync' && (
-                <div className="bg-blue-900/50 border border-blue-600 rounded-lg p-4 flex items-start gap-3">
-                    <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6 text-blue-500 flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
-                    </svg>
-                    <div>
-                        <h4 className="font-bold text-blue-500">Bilgi: Önizleme Sitedeki Veriler Güncel Değil</h4>
-                        <p className="text-blue-200 text-sm mt-1">
-                            Bilgilerinizde değişiklik yaptınız. Yeni bilgilerinizi görmek için sitenizi tekrar oluşturmanız gerekmektedir.
-                        </p>
-                    </div>
-                </div>
-            )}
 
             {/* Site Status */}
             <div className="bg-gray-800 rounded-xl border border-gray-700 p-6">

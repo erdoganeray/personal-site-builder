@@ -50,22 +50,35 @@ export async function PATCH(req: NextRequest) {
             );
         }
 
-        // Update site with new info
+        // Get existing cvContent or create a new one
+        let cvContent = site.cvContent as any || {
+            personalInfo: {},
+            summary: "",
+            experience: [],
+            education: [],
+            skills: [],
+            languages: [],
+        };
+
+        // Update cvContent with new values
+        if (name !== undefined) cvContent.personalInfo.name = name;
+        if (jobTitle !== undefined) cvContent.personalInfo.title = jobTitle;
+        if (email !== undefined) cvContent.personalInfo.email = email;
+        if (phone !== undefined) cvContent.personalInfo.phone = phone;
+        if (location !== undefined) cvContent.personalInfo.location = location;
+        if (linkedinUrl !== undefined) cvContent.personalInfo.linkedin = linkedinUrl;
+        if (githubUrl !== undefined) cvContent.personalInfo.github = githubUrl;
+        if (summary !== undefined) cvContent.summary = summary;
+        if (experience !== undefined) cvContent.experience = experience;
+        if (education !== undefined) cvContent.education = education;
+        if (skills !== undefined) cvContent.skills = skills;
+        if (languages !== undefined) cvContent.languages = languages;
+
+        // Update site with updated cvContent
         const updatedSite = await prisma.site.update({
             where: { id: siteId },
             data: {
-                name: name || null,
-                jobTitle: jobTitle || null,
-                email: email || null,
-                phone: phone || null,
-                location: location || null,
-                linkedinUrl: linkedinUrl || null,
-                githubUrl: githubUrl || null,
-                summary: summary || null,
-                experience: experience ? JSON.stringify(experience) : null,
-                education: education ? JSON.stringify(education) : null,
-                skills: skills ? JSON.stringify(skills) : null,
-                languages: languages ? JSON.stringify(languages) : null,
+                cvContent: cvContent,
                 updatedAt: new Date(),
             },
         });

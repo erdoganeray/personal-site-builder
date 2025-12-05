@@ -85,11 +85,12 @@ export default function CVUploader({ onAnalyzed }: CVUploaderProps) {
         body: JSON.stringify({ cvUrl }),
       });
 
+      const data = await response.json();
+      
       if (response.ok) {
-        const data = await response.json();
         return data.siteId;
       } else {
-        throw new Error("Site kaydı oluşturulamadı");
+        throw new Error(data.error || "Site kaydı oluşturulamadı");
       }
     } catch (err) {
       console.error("Site kaydetme hatası:", err);

@@ -49,7 +49,7 @@ export async function POST(req: NextRequest) {
     }
 
     // 4. CV verisinin olduğunu kontrol et
-    if (!site.cvTextData) {
+    if (!site.cvContent) {
       return NextResponse.json(
         { error: "CV data is missing. Please upload a CV first." },
         { status: 400 }
@@ -62,52 +62,10 @@ export async function POST(req: NextRequest) {
       data: { status: "generating" },
     });
 
-    // 6. CV verisini parse et
+    // 6. CV verisi zaten JSON formatında
     let cvData: CVData;
     try {
-      cvData = JSON.parse(site.cvTextData);
-
-      // Merge latest data from database into cvData
-      // This ensures that if user updated their info on the site, we use that instead of the original CV data
-      if (site.name) cvData.personalInfo.name = site.name;
-      if (site.email) cvData.personalInfo.email = site.email;
-      if (site.phone) cvData.personalInfo.phone = site.phone;
-      if (site.location) cvData.personalInfo.location = site.location;
-      if (site.jobTitle) cvData.personalInfo.title = site.jobTitle;
-      if (site.summary) cvData.summary = site.summary;
-
-      if (site.experience) {
-        try {
-          cvData.experience = JSON.parse(site.experience);
-        } catch (e) {
-          console.error("Failed to parse site.experience", e);
-        }
-      }
-
-      if (site.education) {
-        try {
-          cvData.education = JSON.parse(site.education);
-        } catch (e) {
-          console.error("Failed to parse site.education", e);
-        }
-      }
-
-      if (site.skills) {
-        try {
-          cvData.skills = JSON.parse(site.skills);
-        } catch (e) {
-          console.error("Failed to parse site.skills", e);
-        }
-      }
-
-      if (site.languages) {
-        try {
-          cvData.languages = JSON.parse(site.languages);
-        } catch (e) {
-          console.error("Failed to parse site.languages", e);
-        }
-      }
-
+      cvData = site.cvContent as CVData;
     } catch (parseError) {
       console.error("Failed to parse CV data:", parseError);
 
@@ -128,8 +86,6 @@ export async function POST(req: NextRequest) {
     try {
       generatedSite = await generateWebsite({
         cvData,
-        linkedinUrl: site.linkedinUrl || undefined,
-        githubUrl: site.githubUrl || undefined,
         customPrompt: customPrompt || undefined,
       });
     } catch (geminiError) {
@@ -160,21 +116,7 @@ export async function POST(req: NextRequest) {
         title: generatedSite.title,
         status: "previewed", // Preview için previewed olarak bırak
         updatedAt: new Date(),
-        // @ts-ignore - Prisma types not updating immediately
-        previewContent: {
-          name: site.name,
-          jobTitle: site.jobTitle,
-          email: site.email,
-          phone: site.phone,
-          location: site.location,
-          linkedinUrl: site.linkedinUrl,
-          githubUrl: site.githubUrl,
-          summary: site.summary,
-          experience: site.experience,
-          education: site.education,
-          skills: site.skills,
-          languages: site.languages,
-        },
+        previewContent: site.cvContent, // Preview için mevcut cvContent'i kaydet
       },
     });
 

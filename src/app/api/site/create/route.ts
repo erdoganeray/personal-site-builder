@@ -25,10 +25,21 @@ export async function POST(request: NextRequest) {
     });
 
     if (existingSite) {
-      return NextResponse.json(
-        { error: "Zaten bir siteniz mevcut. Yeni site oluşturmak için önce mevcut sitenizi silmelisiniz." },
-        { status: 400 }
-      );
+      // Mevcut siteyi güncelle
+      const updatedSite = await prisma.site.update({
+        where: { id: existingSite.id },
+        data: {
+          cvUrl: cvUrl,
+          status: "draft",
+          updatedAt: new Date(),
+        },
+      });
+
+      return NextResponse.json({ 
+        success: true, 
+        siteId: updatedSite.id,
+        message: "CV başarıyla güncellendi" 
+      });
     }
 
     // Site kaydı oluştur

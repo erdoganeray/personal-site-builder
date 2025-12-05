@@ -18,54 +18,21 @@ export interface ContentSnapshot {
 export function isContentSynced(currentSite: Site, snapshot: any): boolean {
     if (!snapshot) return false;
 
-    // Helper to normalize values for comparison
-    const normalize = (val: any) => {
-        if (val === null || val === undefined) return "";
-        return String(val).trim();
-    };
-
-    // Helper to normalize JSON fields
-    const normalizeJson = (val: any) => {
-        if (!val) return [];
-        if (typeof val === 'string') {
-            try {
-                return JSON.parse(val);
-            } catch {
-                return [];
-            }
-        }
-        return val;
-    };
-
-    // Compare simple fields
-    const simpleFields = [
-        'name', 'jobTitle', 'email', 'phone', 'location',
-        'linkedinUrl', 'githubUrl', 'summary'
-    ] as const;
-
-    for (const field of simpleFields) {
-        // @ts-ignore - dynamic access
-        if (normalize(currentSite[field]) !== normalize(snapshot[field])) {
-            return false;
-        }
+    // cvContent'i karşılaştır
+    // Artık tüm bilgiler cvContent JSON alanında tutuluyor
+    const currentContent = currentSite.cvContent;
+    
+    if (!currentContent) {
+        // cvContent yoksa ama snapshot varsa, sync değil
+        return false;
     }
 
-    // Compare complex fields (arrays)
-    const complexFields = [
-        'experience', 'education', 'skills', 'languages'
-    ] as const;
+    // JSON karşılaştırması yap
+    // Her iki tarafı da normalize et
+    const normalizedCurrent = JSON.stringify(currentContent);
+    const normalizedSnapshot = JSON.stringify(snapshot);
 
-    for (const field of complexFields) {
-        // @ts-ignore - dynamic access
-        const current = normalizeJson(currentSite[field]);
-        const snap = normalizeJson(snapshot[field]);
-
-        if (JSON.stringify(current) !== JSON.stringify(snap)) {
-            return false;
-        }
-    }
-
-    return true;
+    return normalizedCurrent === normalizedSnapshot;
 }
 
 export interface DiffItem {
@@ -79,6 +46,17 @@ export function getDiffs(currentSite: Site, snapshot: any): DiffItem[] {
     if (!snapshot) return [];
 
     const diffs: DiffItem[] = [];
+    
+    const currentContent = currentSite.cvContent as any;
+    
+    if (!currentContent) {
+        return [{
+            field: 'cvContent',
+            label: 'CV İçeriği',
+            oldValue: JSON.stringify(snapshot, null, 2),
+            newValue: '(Boş)'
+        }];
+    }
 
     // Helper to normalize values
     const normalize = (val: any) => {
@@ -111,10 +89,9 @@ export function getDiffs(currentSite: Site, snapshot: any): DiffItem[] {
         summary: 'Özet'
     };
 
-    // Check simple fields
+    // Check simple fields - now from cvContent
     for (const [field, label] of Object.entries(fieldLabels)) {
-        // @ts-ignore
-        const currentVal = normalize(currentSite[field]);
+        const currentVal = normalize(currentContent[field]);
         const snapVal = normalize(snapshot[field]);
 
         if (currentVal !== snapVal) {
@@ -136,15 +113,10 @@ export function getDiffs(currentSite: Site, snapshot: any): DiffItem[] {
     };
 
     for (const [field, label] of Object.entries(complexFields)) {
-        // @ts-ignore
-        const currentVal = normalizeJson(currentSite[field]);
+        const currentVal = normalizeJson(currentContent[field]);
         const snapVal = normalizeJson(snapshot[field]);
 
         if (JSON.stringify(currentVal) !== JSON.stringify(snapVal)) {
-            // For complex fields, we just show that they changed for now
-            // A full deep diff might be too complex for the UI, but we can improve this if needed
-            // Let's format it nicely
-
             let oldStr = '';
             let newStr = '';
 
