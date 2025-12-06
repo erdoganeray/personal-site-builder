@@ -56,8 +56,9 @@ export async function parseCVFromPDF(pdfBuffer: Buffer): Promise<CVData> {
       throw new Error("GEMINI_API_KEY environment variable is not set");
     }
 
+    const modelName = process.env.GEMINI_MODEL || "gemini-2.5-flash";
     const genAI = new GoogleGenerativeAI(apiKey);
-    const model = genAI.getGenerativeModel({ model: "gemini-2.5-flash" });
+    const model = genAI.getGenerativeModel({ model: modelName });
 
     const prompt = `
 Bu PDF dosyasındaki CV/özgeçmiş bilgilerini analiz et ve aşağıdaki 
