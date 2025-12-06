@@ -4,6 +4,16 @@ import { authOptions } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
 import { regeneratePreviewContent } from "@/lib/regenerate-preview";
 
+// URL'lerin başına https:// ekleyen yardımcı fonksiyon
+function ensureHttps(url: string | undefined): string | undefined {
+    if (!url || url.trim() === '') return undefined;
+    const trimmedUrl = url.trim();
+    if (trimmedUrl.startsWith('http://') || trimmedUrl.startsWith('https://')) {
+        return trimmedUrl;
+    }
+    return `https://${trimmedUrl}`;
+}
+
 export async function PATCH(req: NextRequest) {
     try {
         const session = await getServerSession(authOptions);
@@ -25,6 +35,10 @@ export async function PATCH(req: NextRequest) {
             location,
             linkedinUrl,
             githubUrl,
+            facebookUrl,
+            instagramUrl,
+            xUrl,
+            websiteUrl,
             summary,
             experience,
             education,
@@ -68,8 +82,12 @@ export async function PATCH(req: NextRequest) {
         if (email !== undefined) cvContent.personalInfo.email = email;
         if (phone !== undefined) cvContent.personalInfo.phone = phone;
         if (location !== undefined) cvContent.personalInfo.location = location;
-        if (linkedinUrl !== undefined) cvContent.personalInfo.linkedin = linkedinUrl;
-        if (githubUrl !== undefined) cvContent.personalInfo.github = githubUrl;
+        if (linkedinUrl !== undefined) cvContent.personalInfo.linkedin = ensureHttps(linkedinUrl);
+        if (githubUrl !== undefined) cvContent.personalInfo.github = ensureHttps(githubUrl);
+        if (facebookUrl !== undefined) cvContent.personalInfo.facebook = ensureHttps(facebookUrl);
+        if (instagramUrl !== undefined) cvContent.personalInfo.instagram = ensureHttps(instagramUrl);
+        if (xUrl !== undefined) cvContent.personalInfo.x = ensureHttps(xUrl);
+        if (websiteUrl !== undefined) cvContent.personalInfo.website = ensureHttps(websiteUrl);
         if (profilePhotoUrl !== undefined) cvContent.personalInfo.profilePhotoUrl = profilePhotoUrl || null;
         if (summary !== undefined) cvContent.summary = summary;
         if (experience !== undefined) cvContent.experience = experience;

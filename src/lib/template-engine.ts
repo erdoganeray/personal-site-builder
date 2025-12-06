@@ -250,11 +250,17 @@ export function getFooterReplacements(
   cvData: CVData,
   themeColors: ThemeColors
 ): PlaceholderReplacements {
-  // Sosyal medya linklerini oluştur
-  const socialLinks = `
-    <a href="mailto:${cvData.personalInfo.email || '#'}" title="Email" aria-label="Email">📧</a>
-    ${cvData.personalInfo.phone ? `<a href="tel:${cvData.personalInfo.phone}" title="Telefon" aria-label="Telefon">📱</a>` : ''}
-  `.trim();
+  // Sosyal medya linklerini oluştur - sadece dolu olanlar görünsün
+  const socialLinks = [
+    cvData.personalInfo.linkedin ? `<a href="${cvData.personalInfo.linkedin}" target="_blank" rel="noopener noreferrer" title="LinkedIn" aria-label="LinkedIn">💼</a>` : '',
+    cvData.personalInfo.github ? `<a href="${cvData.personalInfo.github}" target="_blank" rel="noopener noreferrer" title="GitHub" aria-label="GitHub">⚙️</a>` : '',
+    cvData.personalInfo.facebook ? `<a href="${cvData.personalInfo.facebook}" target="_blank" rel="noopener noreferrer" title="Facebook" aria-label="Facebook">📘</a>` : '',
+    cvData.personalInfo.instagram ? `<a href="${cvData.personalInfo.instagram}" target="_blank" rel="noopener noreferrer" title="Instagram" aria-label="Instagram">📷</a>` : '',
+    cvData.personalInfo.x ? `<a href="${cvData.personalInfo.x}" target="_blank" rel="noopener noreferrer" title="X (Twitter)" aria-label="X">🐦</a>` : '',
+    cvData.personalInfo.website ? `<a href="${cvData.personalInfo.website}" target="_blank" rel="noopener noreferrer" title="Website" aria-label="Website">🌐</a>` : '',
+    cvData.personalInfo.email ? `<a href="mailto:${cvData.personalInfo.email}" title="Email" aria-label="Email">📧</a>` : '',
+    cvData.personalInfo.phone ? `<a href="tel:${cvData.personalInfo.phone}" title="Telefon" aria-label="Telefon">📱</a>` : '',
+  ].filter(link => link !== '').join('\n    ');
 
   return {
     '{{NAME}}': cvData.personalInfo.name,
@@ -290,11 +296,17 @@ export function getNavigationReplacements(
     .toUpperCase()
     .slice(0, 2);
 
-  // Sosyal medya linklerini oluştur (eğer varsa)
-  const socialLinks = `
-    <a href="mailto:${cvData.personalInfo.email || '#'}" title="Email">📧</a>
-    ${cvData.personalInfo.phone ? `<a href="tel:${cvData.personalInfo.phone}" title="Phone">📱</a>` : ''}
-  `.trim();
+  // Sosyal medya linklerini oluştur - sadece dolu olanlar görünsün
+  const socialLinks = [
+    cvData.personalInfo.linkedin ? `<a href="${cvData.personalInfo.linkedin}" target="_blank" rel="noopener noreferrer" title="LinkedIn" aria-label="LinkedIn">💼</a>` : '',
+    cvData.personalInfo.github ? `<a href="${cvData.personalInfo.github}" target="_blank" rel="noopener noreferrer" title="GitHub" aria-label="GitHub">⚙️</a>` : '',
+    cvData.personalInfo.facebook ? `<a href="${cvData.personalInfo.facebook}" target="_blank" rel="noopener noreferrer" title="Facebook" aria-label="Facebook">📘</a>` : '',
+    cvData.personalInfo.instagram ? `<a href="${cvData.personalInfo.instagram}" target="_blank" rel="noopener noreferrer" title="Instagram" aria-label="Instagram">📷</a>` : '',
+    cvData.personalInfo.x ? `<a href="${cvData.personalInfo.x}" target="_blank" rel="noopener noreferrer" title="X (Twitter)" aria-label="X">🐦</a>` : '',
+    cvData.personalInfo.website ? `<a href="${cvData.personalInfo.website}" target="_blank" rel="noopener noreferrer" title="Website" aria-label="Website">🌐</a>` : '',
+    cvData.personalInfo.email ? `<a href="mailto:${cvData.personalInfo.email}" title="Email" aria-label="Email">📧</a>` : '',
+    cvData.personalInfo.phone ? `<a href="tel:${cvData.personalInfo.phone}" title="Phone" aria-label="Phone">📱</a>` : '',
+  ].filter(link => link !== '').join('\n    ');
 
   return {
     '{{NAME}}': cvData.personalInfo.name,

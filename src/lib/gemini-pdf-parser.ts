@@ -9,6 +9,10 @@ export interface CVPersonalInfo {
   profilePhotoUrl?: string;
   linkedin?: string;
   github?: string;
+  facebook?: string;
+  instagram?: string;
+  x?: string;
+  website?: string;
 }
 
 export interface CVExperience {

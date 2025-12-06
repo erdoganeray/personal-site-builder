@@ -24,6 +24,10 @@ export default function MyInfo({ site, cvData, onDelete, onCVAnalyzed, deleting 
     const [location, setLocation] = useState("");
     const [linkedinUrl, setLinkedinUrl] = useState("");
     const [githubUrl, setGithubUrl] = useState("");
+    const [facebookUrl, setFacebookUrl] = useState("");
+    const [instagramUrl, setInstagramUrl] = useState("");
+    const [xUrl, setXUrl] = useState("");
+    const [websiteUrl, setWebsiteUrl] = useState("");
     const [summary, setSummary] = useState("");
     const [experience, setExperience] = useState<any[]>([]);
     const [education, setEducation] = useState<any[]>([]);
@@ -40,8 +44,12 @@ export default function MyInfo({ site, cvData, onDelete, onCVAnalyzed, deleting 
             setEmail(site.email || cvData?.personalInfo?.email || "");
             setPhone(site.phone || cvData?.personalInfo?.phone || "");
             setLocation(site.location || cvData?.personalInfo?.location || "");
-            setLinkedinUrl(site.linkedinUrl || "");
-            setGithubUrl(site.githubUrl || "");
+            setLinkedinUrl(site.cvContent?.personalInfo?.linkedin || cvData?.personalInfo?.linkedin || "");
+            setGithubUrl(site.cvContent?.personalInfo?.github || cvData?.personalInfo?.github || "");
+            setFacebookUrl(site.cvContent?.personalInfo?.facebook || cvData?.personalInfo?.facebook || "");
+            setInstagramUrl(site.cvContent?.personalInfo?.instagram || cvData?.personalInfo?.instagram || "");
+            setXUrl(site.cvContent?.personalInfo?.x || cvData?.personalInfo?.x || "");
+            setWebsiteUrl(site.cvContent?.personalInfo?.website || cvData?.personalInfo?.website || "");
             setSummary(site.summary || cvData?.summary || "");
             setProfilePhotoUrl(site.cvContent?.personalInfo?.profilePhotoUrl || "");
 
@@ -61,6 +69,16 @@ export default function MyInfo({ site, cvData, onDelete, onCVAnalyzed, deleting 
         }
     }, [site, cvData]);
 
+    // URL'lerin başına https:// ekleyen yardımcı fonksiyon
+    const ensureHttps = (url: string) => {
+        if (!url || url.trim() === '') return '';
+        const trimmedUrl = url.trim();
+        if (trimmedUrl.startsWith('http://') || trimmedUrl.startsWith('https://')) {
+            return trimmedUrl;
+        }
+        return `https://${trimmedUrl}`;
+    };
+
     const handleSave = async () => {
         if (!site) return;
 
@@ -78,8 +96,12 @@ export default function MyInfo({ site, cvData, onDelete, onCVAnalyzed, deleting 
                     email,
                     phone,
                     location,
-                    linkedinUrl,
-                    githubUrl,
+                    linkedinUrl: ensureHttps(linkedinUrl),
+                    githubUrl: ensureHttps(githubUrl),
+                    facebookUrl: ensureHttps(facebookUrl),
+                    instagramUrl: ensureHttps(instagramUrl),
+                    xUrl: ensureHttps(xUrl),
+                    websiteUrl: ensureHttps(websiteUrl),
                     summary,
                     experience,
                     education,
@@ -478,6 +500,62 @@ export default function MyInfo({ site, cvData, onDelete, onCVAnalyzed, deleting 
                                         />
                                     ) : (
                                         <p className="text-gray-300">{githubUrl || "-"}</p>
+                                    )}
+                                </div>
+                                <div>
+                                    <label className="block text-sm font-medium text-gray-300 mb-1">Facebook URL</label>
+                                    {isEditing ? (
+                                        <input
+                                            type="url"
+                                            value={facebookUrl}
+                                            onChange={(e) => setFacebookUrl(e.target.value)}
+                                            placeholder="https://facebook.com/kullaniciadi"
+                                            className="w-full px-3 py-2 bg-gray-600 border border-gray-500 text-white rounded-lg focus:ring-2 focus:ring-blue-500"
+                                        />
+                                    ) : (
+                                        <p className="text-gray-300">{facebookUrl || "-"}</p>
+                                    )}
+                                </div>
+                                <div>
+                                    <label className="block text-sm font-medium text-gray-300 mb-1">Instagram URL</label>
+                                    {isEditing ? (
+                                        <input
+                                            type="url"
+                                            value={instagramUrl}
+                                            onChange={(e) => setInstagramUrl(e.target.value)}
+                                            placeholder="https://instagram.com/kullaniciadi"
+                                            className="w-full px-3 py-2 bg-gray-600 border border-gray-500 text-white rounded-lg focus:ring-2 focus:ring-blue-500"
+                                        />
+                                    ) : (
+                                        <p className="text-gray-300">{instagramUrl || "-"}</p>
+                                    )}
+                                </div>
+                                <div>
+                                    <label className="block text-sm font-medium text-gray-300 mb-1">X (Twitter) URL</label>
+                                    {isEditing ? (
+                                        <input
+                                            type="url"
+                                            value={xUrl}
+                                            onChange={(e) => setXUrl(e.target.value)}
+                                            placeholder="https://x.com/kullaniciadi"
+                                            className="w-full px-3 py-2 bg-gray-600 border border-gray-500 text-white rounded-lg focus:ring-2 focus:ring-blue-500"
+                                        />
+                                    ) : (
+                                        <p className="text-gray-300">{xUrl || "-"}</p>
+                                    )}
+                                </div>
+                                <div>
+                                    <label className="block text-sm font-medium text-gray-300 mb-1">Web Site URL</label>
+                                    {isEditing ? (
+                                        <input
+                                            type="url"
+                                            value={websiteUrl}
+                                            onChange={(e) => setWebsiteUrl(e.target.value)}
+                                            placeholder="https://www.websitesi.com"
+                                            className="w-full px-3 py-2 bg-gray-600 border border-gray-500 text-white rounded-lg focus:ring-2 focus:ring-blue-500"
+                                        />
+                                    ) : (
+                                        <p className="text-gray-300">{websiteUrl || "-"}</p>
                                     )}
                                 </div>
                             </div>

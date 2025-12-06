@@ -35,6 +35,7 @@
 - template önizleme sistemi
 - kullanıcıların custom css ekleyebilmesi
 - template marketplace
+- hazır icon'lar güncellenecek
 
 # Paid Plans Options
 

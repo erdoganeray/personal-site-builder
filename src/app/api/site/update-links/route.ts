@@ -4,6 +4,16 @@ import { authOptions } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
 import { regeneratePreviewContent } from "@/lib/regenerate-preview";
 
+// URL'lerin başına https:// ekleyen yardımcı fonksiyon
+function ensureHttps(url: string | undefined): string | undefined {
+    if (!url || url.trim() === '') return undefined;
+    const trimmedUrl = url.trim();
+    if (trimmedUrl.startsWith('http://') || trimmedUrl.startsWith('https://')) {
+        return trimmedUrl;
+    }
+    return `https://${trimmedUrl}`;
+}
+
 export async function PATCH(request: NextRequest) {
   try {
     const session = await getServerSession(authOptions);
@@ -12,7 +22,7 @@ export async function PATCH(request: NextRequest) {
       return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
     }
 
-    const { siteId, linkedinUrl, githubUrl } = await request.json();
+    const { siteId, linkedinUrl, githubUrl, facebookUrl, instagramUrl, xUrl, websiteUrl } = await request.json();
 
     if (!siteId) {
       return NextResponse.json({ error: "Site ID is required" }, { status: 400 });
@@ -42,8 +52,12 @@ export async function PATCH(request: NextRequest) {
     };
 
     // Update LinkedIn and GitHub in cvContent
-    if (linkedinUrl !== undefined) cvContent.personalInfo.linkedin = linkedinUrl;
-    if (githubUrl !== undefined) cvContent.personalInfo.github = githubUrl;
+    if (linkedinUrl !== undefined) cvContent.personalInfo.linkedin = ensureHttps(linkedinUrl);
+    if (githubUrl !== undefined) cvContent.personalInfo.github = ensureHttps(githubUrl);
+    if (facebookUrl !== undefined) cvContent.personalInfo.facebook = ensureHttps(facebookUrl);
+    if (instagramUrl !== undefined) cvContent.personalInfo.instagram = ensureHttps(instagramUrl);
+    if (xUrl !== undefined) cvContent.personalInfo.x = ensureHttps(xUrl);
+    if (websiteUrl !== undefined) cvContent.personalInfo.website = ensureHttps(websiteUrl);
 
     // LinkedIn ve GitHub URL'lerini cvContent içinde güncelle
     const updatedSite = await prisma.site.update({
