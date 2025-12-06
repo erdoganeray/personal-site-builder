@@ -28,10 +28,20 @@
 - hem preview hem de publish için rollback ui tasarımı
 
 ## "Yayınlanmamış Değişiklikler Mevcut hatası"
-* *ŞU ANKİ SİSTEM:* preview edilince htmlContent/cssContent/jsContent güncellenir, status güncellenir, previewContent güncellenir; publish edildiğinde status güncellenir, publishContent = previewContent olur. bilgilerim kaydet olduğunda status incelenir; published ise publishContent ile karşılaştırılır, previewed ise previewContent ile karşılaştırılır.
+- kaldırılacak (belki sadece publish zamanı bir değişiklik olursa gösterilir)
 
-- preview durumunda bilgilerimde değişiklik varsa -> "bilgilerimdeki değişiklikleri kaldır" ya da "previewcontent i güncelle"
-- publish durumda bilgilerimde değişiklik varsa ->
+## AI-Less Preview Reload
+- previewContent, publishContent içeriklerini projeden kaldıracağız.
+- bilgilerim'deki tüm bilgiler cvContent json olarak saklansın.
+- cvContent içeriğine profil fotoğrafı (link), portfolio fotoğrafları (link, açıklama), facebook linki, twitter linki, instagram linki alanları ekle.
+- cvContent içerikleri NULL olabilir. Örneğin bir kullanıcının cv'sinin eğitim bölümünde GPA bilgisi varken, bir kullanıcının GPA bilgisi olmayabilir. cvContent, belirli bir standartta olmak zorunda olduğu için cv'de olmayan ya da çıkarılamayan bilgiler NULL olmalı.
+- bilgilerim sayfasında profil fotoğrafı yükleme alanı, portfoloio fotoğrafları yükleme alanı, facebook, twitter, instagram linki ekleme alanı ekle.
+- bilgilerim'deki herhangi bir güncelleme anlık olarak cvContent'te sync olmalı.
+- ilk site oluşturma ve info change'ler cvContent üzerinden preview'a yansımalı.
+- belirli template componentler olacak. (hero, about/summary, experience, education, skills, portfolio, contact, languages). Bu component'ların her biri için belirli tarz ve stillere hitap eden çeşitli farklı tasarımlar olacak.
+- kullanıcının girdiği prompt'tan uygun tema renkleri, hangi componentlerin kullanılacağı (örneğin bir kişinin portfolio component i olmak zorunda değil), kullanılacak componentleri hangi template'leri kullanılacağı bilgileri output edilir.
+- ilgili template içerikleri ile gemini api'dan çıkan tasarım kararları ve cvContent içeriği birleştirilir. böylece web page ortaya çıkmış olur.
+- ayrıca, bilgilerim'de bir değişiklik kaydedildiğinde, cvContent değişecek. preview sayfa cvContent'ten yansıtıldığı için, bilgilerim de yapılan herhangi bir info change direkt olarak preview'a yansımış olacak. sabit template'ler ile çalıştığımız için de ui hatası olmayacak.
 
 # Paid Plans Options
 
@@ -57,23 +67,7 @@
 # Error Handling
 - ai ile siteniz oluşturuluyor animation eklenecek
 - ai ile siteniz oluşturuluyor sırasında dasboard menüde başka bir yere gidip "Sitem" e girince ai ile siteniz oluşturuluyor animation ı gidiyor ama arkada süreç işliyor, kısaca ui hatası var
-- her revizede güncel bilgiler çekilmeli fakat bu geminida context i çok doldurur, buna bir çözüm bulman lazım.
-    - sadece bilgilerim'de değişiklik varsa revize hakkından düşmeden, çünkü bu durumda llm kullanmak şart olmayabilir?
 - unpublish durumunda bazı kritik problemler:
     - version history yok,
     - rollback yapılamıyor, son publish siteye geri dönüş yok,
     - subdomain null olunca, başkası aynı subdomain'İ alabilir
-# Karalama
-- Şimdi, şu mantığı iyi oturtmalıyız:
-
-preview durumu bizim playgorund umuz, kullanıcı tüm değişikliklerini yapıp rahatça gözlem yapabilir olmalı. daha sonra geliştireceğimiz editor kısmı da zaten burası ile ilgili olacak.
-
-publish kısmı ise, kullanıcının preview'da görüp onay verdiğinde bir buton ile yayınladığı kısım.
-
-örneğin şöyle bir senaryo da olabilir: kişi preview eder, bazı değişiklikler yapar, publish eder, sitesi publish'len preview (editor üzerinden)da değişiklik yapmaya devam eder, publish sitesi unpublish edilmeden güncellenir.
-
-şöyle bir senaryo da olmalı: kişi preview eder, beğenir publish eder, sonra yapması gereken bir değişiklik fark eder ve bu durumda sitenin publish kalmamasını ister, siteyi unpublish eder, status publish'ten preview a düşer, kişi preview durumunda güncellemelerini yapar, sonra aynı subdomain/domain üzerinden tekrar publish eder. bu senaryodaki en kritik nokta işe şu: kişi cv'sini yükledi, ilk defa preview etti, preview site içeriği: a,b,c olsun. sonra kullanıcı bunu beğendi ve siteyi a,b,c şekliyle publish etti. site publish durumdayken preview ını a,b,d olarak güncelledi. sonra şu anki publish sitesini (a,b,c idi) unpublish etti. status bu durumda preview e geri döndüğünde preview (a,b,c olmamalı; a,b,d olarak kalmalı aynı zamanda rollback ihtimaline karşı unpublish edilmiş a,b,c sitesi kalmalı)
-
-not: mvp'de rollback için en son versiyona dönüş olsun. birden önceki versiyonları daha sonra ele alırız.
-
-tüm bu süreci. özellikle database sürecini planla
