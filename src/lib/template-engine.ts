@@ -238,6 +238,37 @@ export function getContactReplacements(
 }
 
 /**
+ * CV verilerinden footer section için placeholder değerleri oluşturur
+ */
+export function getFooterReplacements(
+  cvData: CVData,
+  themeColors: ThemeColors
+): PlaceholderReplacements {
+  // Sosyal medya linklerini oluştur
+  const socialLinks = `
+    <a href="mailto:${cvData.personalInfo.email || '#'}" title="Email" aria-label="Email">📧</a>
+    ${cvData.personalInfo.phone ? `<a href="tel:${cvData.personalInfo.phone}" title="Telefon" aria-label="Telefon">📱</a>` : ''}
+  `.trim();
+
+  return {
+    '{{NAME}}': cvData.personalInfo.name,
+    '{{TITLE}}': cvData.personalInfo.title || 'Professional',
+    '{{EMAIL}}': cvData.personalInfo.email || 'Email bulunamadı',
+    '{{PHONE}}': cvData.personalInfo.phone || 'Telefon bulunamadı',
+    '{{LOCATION}}': cvData.personalInfo.location || 'Konum belirtilmemiş',
+    '{{SUMMARY}}': cvData.summary || cvData.personalInfo.name + ' - Professional Profile',
+    '{{SOCIAL_LINKS}}': socialLinks,
+    '{{CURRENT_YEAR}}': new Date().getFullYear().toString(),
+    '{{COLOR_PRIMARY}}': themeColors.primary,
+    '{{COLOR_SECONDARY}}': themeColors.secondary,
+    '{{COLOR_ACCENT}}': themeColors.accent,
+    '{{COLOR_BACKGROUND}}': themeColors.background,
+    '{{COLOR_TEXT}}': themeColors.text,
+    '{{COLOR_TEXT_SECONDARY}}': themeColors.textSecondary,
+  };
+}
+
+/**
  * Navigation menu için placeholder değerleri oluşturur
  * Sayfadaki componentlere göre dinamik menu linkleri oluşturur
  */
@@ -294,6 +325,8 @@ export function getReplacementsForComponent(
       return getSkillsReplacements(cvData, themeColors, component.id);
     case 'contact':
       return getContactReplacements(cvData, themeColors);
+    case 'footer':
+      return getFooterReplacements(cvData, themeColors);
     default:
       return {};
   }

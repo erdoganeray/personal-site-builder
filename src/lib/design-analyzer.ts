@@ -75,10 +75,15 @@ CONTACT SECTION:
 2. contact-minimal-centered: Minimal merkezi tasarım, iletişim bilgileri kartları
 3. contact-split-info: Split layout, sol taraf gradient bilgi, sağ taraf form
 
+FOOTER SECTION:
+1. footer-modern-centered: Modern merkezi düzen, grid yapısı, sosyal medya linkleri ve bağlantılar
+2. footer-minimal-simple: Minimal ve sade tasarım, merkezi hizalı, temel bilgiler ve sosyal medya
+3. footer-split-columns: Kolon bazlı profesyonel tasarım, detaylı bilgi ve linkler, gradient arka plan
+
 Görevin:
 1. CV'ye ve kullanıcı isteğine en uygun tema renklerini belirle (hex kodları)
 2. Yukarıdaki template'lerden hangilerinin kullanılacağına karar ver
-3. Her kategoriden (navigation, hero, experience, skills, contact) bir template seç
+3. Her kategoriden (navigation, hero, experience, education, skills, contact, footer) bir template seç
 4. Genel stil anlayışını belirle (modern/minimal/creative/professional)
 
 Renk Seçimi Kriterleri:
@@ -94,6 +99,7 @@ Component Seçimi Kriterleri:
 - Education: CV'deki eğitim bilgisi sayısına göre (varsa mutlaka ekle)
 - Skills: Yetenek sayısına ve görsel tercihine göre
 - Contact: Site stiline uygun (modern site için form, minimal site için minimal-centered)
+- Footer: Her zaman ekle, site stiline uygun template seç
 - Mesleğe uygunluk
 - Kullanıcının özel isteklerini dikkate al
 
@@ -113,7 +119,8 @@ Component Seçimi Kriterleri:
     { "category": "experience", "templateId": "experience-timeline" },
     { "category": "education", "templateId": "education-timeline" },
     { "category": "skills", "templateId": "skills-card-grid" },
-    { "category": "contact", "templateId": "contact-modern-form" }
+    { "category": "contact", "templateId": "contact-modern-form" },
+    { "category": "footer", "templateId": "footer-modern-centered" }
   ],
   "layout": "single-page",
   "style": "modern",

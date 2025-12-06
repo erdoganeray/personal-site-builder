@@ -5,6 +5,7 @@ import { skillsTemplates } from "./skills-templates";
 import { navigationTemplates } from "./navigation-templates";
 import { educationTemplates } from "./education-templates";
 import { contactTemplates } from "./contact-templates";
+import { footerTemplates } from "./footer-templates";
 
 /**
  * Tüm template'lerin merkezi kaydı
@@ -17,6 +18,7 @@ export const allTemplates: ComponentTemplate[] = [
   ...skillsTemplates,
   ...navigationTemplates,
   ...contactTemplates,
+  ...footerTemplates,
 ];
 
 export function getTemplateById(id: string): ComponentTemplate | undefined {
