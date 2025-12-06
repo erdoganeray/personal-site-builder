@@ -225,7 +225,7 @@ export default function MySite({ site, onRefresh }: MySiteProps) {
             {/* Site Status */}
             <div className="bg-gray-800 rounded-xl border border-gray-700 p-6">
                 <h3 className="text-xl font-bold text-white mb-4">Site Durumu</h3>
-                <div className="flex items-center gap-3 mb-4">
+                <div className="flex items-center gap-3 mb-4 flex-wrap">
                     <div
                         className={`px-4 py-2 rounded-full font-semibold ${site.status === "published"
                             ? "bg-green-600 text-white"
@@ -235,9 +235,20 @@ export default function MySite({ site, onRefresh }: MySiteProps) {
                         {site.status === "published" ? "✓ Yayında" : "○ Yayında Değil"}
                     </div>
                     {site.htmlContent && (
-                        <div className="px-4 py-2 bg-blue-600 text-white rounded-full font-semibold">
-                            ✓ Site Oluşturuldu
-                        </div>
+                        <>
+                            <div className="px-4 py-2 bg-blue-600 text-white rounded-full font-semibold">
+                                ✓ Site Oluşturuldu
+                            </div>
+                            {site.status !== "published" && (
+                                <button
+                                    onClick={handleDeletePreview}
+                                    disabled={deletingPreview}
+                                    className="px-4 py-2 bg-red-600 hover:bg-red-700 disabled:bg-gray-400 text-white rounded-full font-semibold transition-colors duration-200"
+                                >
+                                    {deletingPreview ? "Siliniyor..." : "Ön İzlemeyi Sil"}
+                                </button>
+                            )}
+                        </>
                     )}
                 </div>
 
@@ -343,7 +354,7 @@ export default function MySite({ site, onRefresh }: MySiteProps) {
                     <>
                         {/* Site oluşturulmuş ama yayınlanmamış */}
                         {site.status !== "published" && (
-                            <div className="grid grid-cols-3 gap-3">
+                            <div className="grid grid-cols-2 gap-3">
                                 <button
                                     onClick={handlePublish}
                                     disabled={publishing}
@@ -356,13 +367,6 @@ export default function MySite({ site, onRefresh }: MySiteProps) {
                                     className="bg-gray-700 hover:bg-gray-600 text-white font-bold py-4 px-6 rounded-lg transition-colors duration-200"
                                 >
                                     Editöre Git
-                                </button>
-                                <button
-                                    onClick={handleDeletePreview}
-                                    disabled={deletingPreview}
-                                    className="bg-red-600 hover:bg-red-700 disabled:bg-gray-400 text-white font-bold py-4 px-6 rounded-lg transition-colors duration-200"
-                                >
-                                    {deletingPreview ? "Siliniyor..." : "Önizlemeyi Sil"}
                                 </button>
                             </div>
                         )}
