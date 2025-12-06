@@ -61,6 +61,11 @@ EXPERIENCE SECTION:
 1. experience-timeline: Zaman çizelgesi şeklinde dikey düzen
 2. experience-cards: Kart grid düzeni, modern ve tıklanabilir görünüm
 
+EDUCATION SECTION:
+1. education-timeline: Zaman çizelgesi şeklinde eğitim gösterimi, emoji ikonlu
+2. education-cards: Kart grid düzeni, modern ve tıklanabilir görünüm
+3. education-modern: Modern gradient tasarım, header düzeni, hover efektli
+
 SKILLS SECTION:
 1. skills-progress-bars: İlerleme çubukları ile yetenek gösterimi
 2. skills-card-grid: Kart grid düzeni, ikon ve isimle yetenek gösterimi
@@ -81,6 +86,7 @@ Component Seçimi Kriterleri:
 - Navigation: Sayfanın genel stiline uygun (minimal site için minimal nav, creative site için sidebar)
 - Hero: Kişinin deneyim seviyesi (çok deneyimli için timeline, az için cards)
 - Experience: CV'deki iş deneyimi sayısına göre
+- Education: CV'deki eğitim bilgisi sayısına göre (varsa mutlaka ekle)
 - Skills: Yetenek sayısına ve görsel tercihine göre
 - Mesleğe uygunluk
 - Kullanıcının özel isteklerini dikkate al
@@ -99,6 +105,7 @@ Component Seçimi Kriterleri:
     { "category": "navigation", "templateId": "nav-classic-horizontal" },
     { "category": "hero", "templateId": "hero-modern-centered" },
     { "category": "experience", "templateId": "experience-timeline" },
+    { "category": "education", "templateId": "education-timeline" },
     { "category": "skills", "templateId": "skills-card-grid" }
   ],
   "layout": "single-page",

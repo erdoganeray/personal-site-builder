@@ -3,6 +3,7 @@ import { heroTemplates } from "./hero-templates";
 import { experienceTemplates } from "./experience-templates";
 import { skillsTemplates } from "./skills-templates";
 import { navigationTemplates } from "./navigation-templates";
+import { educationTemplates } from "./education-templates";
 
 /**
  * Tüm template'lerin merkezi kaydı
@@ -11,6 +12,7 @@ import { navigationTemplates } from "./navigation-templates";
 export const allTemplates: ComponentTemplate[] = [
   ...heroTemplates,
   ...experienceTemplates,
+  ...educationTemplates,
   ...skillsTemplates,
   ...navigationTemplates,
 ];

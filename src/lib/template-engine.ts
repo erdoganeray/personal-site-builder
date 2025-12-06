@@ -105,6 +105,68 @@ export function getExperienceReplacements(
 }
 
 /**
+ * CV verilerinden education section için HTML items oluşturur
+ */
+export function generateEducationItems(
+  cvData: CVData,
+  templateId: string
+): string {
+  if (templateId === 'education-timeline') {
+    return cvData.education.map(edu => `
+      <div class="education-item">
+        <div class="education-duration">${edu.year}</div>
+        <h3 class="education-degree">${edu.degree}</h3>
+        <div class="education-school">${edu.school}</div>
+        <p class="education-description">${edu.field}</p>
+      </div>
+    `).join('\n');
+  } else if (templateId === 'education-cards') {
+    return cvData.education.map(edu => `
+      <div class="education-card">
+        <div class="education-duration">${edu.year}</div>
+        <h3 class="education-degree">${edu.degree}</h3>
+        <div class="education-school">${edu.school}</div>
+        <p class="education-description">${edu.field}</p>
+      </div>
+    `).join('\n');
+  } else if (templateId === 'education-modern') {
+    return cvData.education.map(edu => `
+      <div class="education-modern-item">
+        <div class="education-header">
+          <div class="education-title-group">
+            <h3 class="education-degree">${edu.degree}</h3>
+            <div class="education-school">${edu.school}</div>
+          </div>
+          <div class="education-duration">${edu.year}</div>
+        </div>
+        <p class="education-description">${edu.field}</p>
+      </div>
+    `).join('\n');
+  }
+  
+  return '';
+}
+
+/**
+ * CV verilerinden education section için placeholder değerleri oluşturur
+ */
+export function getEducationReplacements(
+  cvData: CVData,
+  themeColors: ThemeColors,
+  templateId: string
+): PlaceholderReplacements {
+  return {
+    '{{EDUCATION_ITEMS}}': generateEducationItems(cvData, templateId),
+    '{{COLOR_PRIMARY}}': themeColors.primary,
+    '{{COLOR_SECONDARY}}': themeColors.secondary,
+    '{{COLOR_ACCENT}}': themeColors.accent,
+    '{{COLOR_BACKGROUND}}': themeColors.background,
+    '{{COLOR_TEXT}}': themeColors.text,
+    '{{COLOR_TEXT_SECONDARY}}': themeColors.textSecondary,
+  };
+}
+
+/**
  * CV verilerinden skills section için HTML items oluşturur
  */
 export function generateSkillItems(
@@ -206,6 +268,8 @@ export function getReplacementsForComponent(
       return getHeroReplacements(cvData, themeColors);
     case 'experience':
       return getExperienceReplacements(cvData, themeColors, component.id);
+    case 'education':
+      return getEducationReplacements(cvData, themeColors, component.id);
     case 'skills':
       return getSkillsReplacements(cvData, themeColors, component.id);
     default:
