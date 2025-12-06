@@ -30,6 +30,7 @@ export async function PATCH(req: NextRequest) {
             education,
             skills,
             languages,
+            profilePhotoUrl,
         } = body;
 
         if (!siteId) {
@@ -69,6 +70,7 @@ export async function PATCH(req: NextRequest) {
         if (location !== undefined) cvContent.personalInfo.location = location;
         if (linkedinUrl !== undefined) cvContent.personalInfo.linkedin = linkedinUrl;
         if (githubUrl !== undefined) cvContent.personalInfo.github = githubUrl;
+        if (profilePhotoUrl !== undefined) cvContent.personalInfo.profilePhotoUrl = profilePhotoUrl || null;
         if (summary !== undefined) cvContent.summary = summary;
         if (experience !== undefined) cvContent.experience = experience;
         if (education !== undefined) cvContent.education = education;

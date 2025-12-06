@@ -29,6 +29,8 @@ export default function MyInfo({ site, cvData, onDelete, onCVAnalyzed, deleting 
     const [education, setEducation] = useState<any[]>([]);
     const [skills, setSkills] = useState<string[]>([]);
     const [languages, setLanguages] = useState<string[]>([]);
+    const [profilePhotoUrl, setProfilePhotoUrl] = useState("");
+    const [uploadingPhoto, setUploadingPhoto] = useState(false);
 
     // Load data from site or cvData
     useEffect(() => {
@@ -41,6 +43,7 @@ export default function MyInfo({ site, cvData, onDelete, onCVAnalyzed, deleting 
             setLinkedinUrl(site.linkedinUrl || "");
             setGithubUrl(site.githubUrl || "");
             setSummary(site.summary || cvData?.summary || "");
+            setProfilePhotoUrl(site.cvContent?.personalInfo?.profilePhotoUrl || "");
 
             // Parse JSON fields
             try {
@@ -82,6 +85,7 @@ export default function MyInfo({ site, cvData, onDelete, onCVAnalyzed, deleting 
                     education,
                     skills,
                     languages,
+                    profilePhotoUrl,
                 }),
             });
 
@@ -142,6 +146,78 @@ export default function MyInfo({ site, cvData, onDelete, onCVAnalyzed, deleting 
         const updated = [...skills];
         updated[index] = value;
         setSkills(updated);
+    };
+
+    const handlePhotoUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
+        const file = e.target.files?.[0];
+        if (!file) return;
+
+        // Validate file type
+        const allowedTypes = ["image/jpeg", "image/jpg", "image/png", "image/webp"];
+        if (!allowedTypes.includes(file.type)) {
+            alert("Sadece JPEG, PNG ve WebP formatları desteklenmektedir");
+            return;
+        }
+
+        // Validate file size (5MB)
+        if (file.size > 5 * 1024 * 1024) {
+            alert("Dosya boyutu 5MB'dan küçük olmalıdır");
+            return;
+        }
+
+        setUploadingPhoto(true);
+        try {
+            const formData = new FormData();
+            formData.append("file", file);
+
+            const response = await fetch("/api/upload/profile-photo", {
+                method: "POST",
+                body: formData,
+            });
+
+            const data = await response.json();
+
+            if (response.ok) {
+                setProfilePhotoUrl(data.url);
+                alert("Profil fotoğrafı yüklendi! Değişiklikleri kaydetmeyi unutmayın.");
+            } else {
+                alert(data.error || "Fotoğraf yüklenemedi");
+            }
+        } catch (error) {
+            console.error("Error uploading photo:", error);
+            alert("Bir hata oluştu");
+        } finally {
+            setUploadingPhoto(false);
+        }
+    };
+
+    const handlePhotoDelete = async () => {
+        if (!profilePhotoUrl) return;
+        
+        if (!confirm("Profil fotoğrafını silmek istediğinizden emin misiniz?")) {
+            return;
+        }
+
+        setUploadingPhoto(true);
+        try {
+            const response = await fetch(`/api/upload/profile-photo?url=${encodeURIComponent(profilePhotoUrl)}`, {
+                method: "DELETE",
+            });
+
+            const data = await response.json();
+
+            if (response.ok) {
+                setProfilePhotoUrl("");
+                alert("Profil fotoğrafı silindi! Değişiklikleri kaydetmeyi unutmayın.");
+            } else {
+                alert(data.error || "Fotoğraf silinemedi");
+            }
+        } catch (error) {
+            console.error("Error deleting photo:", error);
+            alert("Bir hata oluştu");
+        } finally {
+            setUploadingPhoto(false);
+        }
     };
 
     const addLanguage = () => {
@@ -246,6 +322,70 @@ export default function MyInfo({ site, cvData, onDelete, onCVAnalyzed, deleting 
                         {/* Personal Info */}
                         <div className="bg-gray-700/50 rounded-lg p-4">
                             <h4 className="text-lg font-semibold text-white mb-3">Kişisel Bilgiler</h4>
+                            
+                            {/* Profile Photo Section */}
+                            <div className="mb-6 flex flex-col items-center">
+                                <div className="w-32 h-32 rounded-full bg-gray-600 flex items-center justify-center mb-3 overflow-hidden border-4 border-gray-500">
+                                    {profilePhotoUrl ? (
+                                        <img 
+                                            src={profilePhotoUrl} 
+                                            alt="Profile" 
+                                            className="w-full h-full object-cover"
+                                        />
+                                    ) : (
+                                        <span className="text-4xl text-gray-400 font-semibold">
+                                            {name ? name.split(' ').map(n => n[0]).join('').toUpperCase().slice(0, 2) : '?'}
+                                        </span>
+                                    )}
+                                </div>
+                                {isEditing && (
+                                    <div className="flex gap-2">
+                                        <label className="cursor-pointer">
+                                            <input
+                                                type="file"
+                                                accept="image/jpeg,image/jpg,image/png,image/webp"
+                                                onChange={handlePhotoUpload}
+                                                disabled={uploadingPhoto}
+                                                className="hidden"
+                                            />
+                                            <span className={`inline-flex items-center gap-2 px-4 py-2 rounded-lg text-sm font-medium transition-colors ${
+                                                uploadingPhoto 
+                                                    ? 'bg-gray-600 text-gray-400 cursor-not-allowed' 
+                                                    : 'bg-blue-600 hover:bg-blue-700 text-white'
+                                            }`}>
+                                                {uploadingPhoto ? (
+                                                    <>
+                                                        <svg className="animate-spin h-4 w-4" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                                                            <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
+                                                            <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                                                        </svg>
+                                                        Yükleniyor...
+                                                    </>
+                                                ) : (
+                                                    <>
+                                                        <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" />
+                                                        </svg>
+                                                        Fotoğraf Ekle
+                                                    </>
+                                                )}
+                                            </span>
+                                        </label>
+                                        {profilePhotoUrl && !uploadingPhoto && (
+                                            <button
+                                                onClick={handlePhotoDelete}
+                                                className="inline-flex items-center gap-2 px-4 py-2 bg-red-600 hover:bg-red-700 text-white rounded-lg text-sm font-medium transition-colors"
+                                            >
+                                                <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
+                                                </svg>
+                                                Fotoğrafı Sil
+                                            </button>
+                                        )}
+                                    </div>
+                                )}
+                            </div>
+
                             <div className="space-y-3">
                                 <div>
                                     <label className="block text-sm font-medium text-gray-300 mb-1">Ad Soyad</label>

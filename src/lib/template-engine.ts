@@ -40,12 +40,18 @@ export function getHeroReplacements(
     .toUpperCase()
     .slice(0, 2);
 
+  // Generate profile image content - either <img> tag or initials
+  const profilePhotoUrl = cvData.personalInfo.profilePhotoUrl;
+  const profileImageContent = profilePhotoUrl
+    ? `<img src="${profilePhotoUrl}" alt="${cvData.personalInfo.name}" style="width: 100%; height: 100%; object-fit: cover; border-radius: inherit;" />`
+    : initials;
+
   return {
     '{{NAME}}': cvData.personalInfo.name,
     '{{INITIALS}}': initials,
     '{{TITLE}}': cvData.personalInfo.title || 'Professional',
     '{{SUMMARY}}': cvData.summary || cvData.personalInfo.name + ' - Professional Profile',
-    '{{PROFILE_IMAGE}}': initials, // İlk harfler profil resmi yerine
+    '{{PROFILE_IMAGE}}': profileImageContent,
     '{{COLOR_PRIMARY}}': themeColors.primary,
     '{{COLOR_SECONDARY}}': themeColors.secondary,
     '{{COLOR_ACCENT}}': themeColors.accent,

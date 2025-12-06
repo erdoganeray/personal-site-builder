@@ -80,6 +80,7 @@
     - bozuk pdf
     - gemini hata verirse?
     - cloudflare r2 bozuksa?
+- yeni cv eklendiğinde cloudflare'dan silinmeli, kişinin tek cv'si olmalı
 
 # Güvenlik
 - API key'leri `.env` dosyasında (GitHub'a commit edilmemiş)

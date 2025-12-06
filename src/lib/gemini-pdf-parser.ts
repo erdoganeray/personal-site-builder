@@ -6,6 +6,9 @@ export interface CVPersonalInfo {
   phone?: string;
   location?: string;
   title?: string;
+  profilePhotoUrl?: string;
+  linkedin?: string;
+  github?: string;
 }
 
 export interface CVExperience {
