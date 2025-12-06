@@ -4,6 +4,9 @@ import { authOptions } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
 import { generateWebsite } from "@/lib/gemini";
 import { CVData } from "@/lib/gemini-pdf-parser";
+import { analyzeSiteDesign } from "@/lib/design-analyzer";
+import { getTemplateById } from "@/components/site-templates";
+import { populateTemplate } from "@/lib/template-engine";
 
 export async function POST(req: NextRequest) {
   try {
@@ -81,17 +84,15 @@ export async function POST(req: NextRequest) {
       );
     }
 
-    // 7. Gemini ile website oluştur
-    let generatedSite;
+    // 7. Gemini ile tasarım planını oluştur (renk + component seçimi)
+    console.log("Analyzing site design with Gemini...");
+    let designPlan;
     try {
-      generatedSite = await generateWebsite({
-        cvData,
-        customPrompt: customPrompt || undefined,
-      });
-    } catch (geminiError) {
-      console.error("Gemini generation error:", geminiError);
+      designPlan = await analyzeSiteDesign(cvData, customPrompt);
+      console.log("Design plan created:", JSON.stringify(designPlan, null, 2));
+    } catch (designError) {
+      console.error("Design analysis error:", designError);
 
-      // Hata durumunda status'ü geri draft yap
       await prisma.site.update({
         where: { id: siteId },
         data: { status: "draft" },
@@ -99,38 +100,153 @@ export async function POST(req: NextRequest) {
 
       return NextResponse.json(
         {
-          error: "Failed to generate website. Please try again.",
-          details: geminiError instanceof Error ? geminiError.message : "Unknown error",
+          error: "Failed to analyze design requirements. Please try again.",
+          details: designError instanceof Error ? designError.message : "Unknown error",
         },
         { status: 500 }
       );
     }
 
-    // 8. Üretilen HTML, CSS ve JS'i veritabanına kaydet
+    // 8. Seçilen template'leri al ve CV verileriyle doldur
+    console.log("Populating templates with CV data...");
+    let finalHtml = '';
+    let finalCss = '';
+    let finalJs = '';
+
+    try {
+      // HTML başlangıcı
+      finalHtml = `<!DOCTYPE html>
+<html lang="tr">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>${cvData.personalInfo.name} - Kişisel Web Sitesi</title>
+  <meta name="description" content="${cvData.personalInfo.title || 'Professional Portfolio'}">
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+`;
+
+      // Her component için template'i doldur
+      for (const selected of designPlan.selectedComponents) {
+        const template = getTemplateById(selected.templateId);
+        
+        if (!template) {
+          console.warn(`Template not found: ${selected.templateId}`);
+          continue;
+        }
+
+        const populated = populateTemplate(template, cvData, designPlan.themeColors);
+        
+        finalHtml += populated.html + '\n';
+        finalCss += populated.css + '\n\n';
+        if (populated.js) {
+          finalJs += populated.js + '\n\n';
+        }
+      }
+
+      // HTML bitişi
+      finalHtml += `
+  <script src="script.js"></script>
+</body>
+</html>`;
+
+      // CSS reset ve genel stiller ekle
+      finalCss = `
+/* CSS Reset */
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+body {
+  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+  line-height: 1.6;
+  color: ${designPlan.themeColors.text};
+  background: ${designPlan.themeColors.background};
+}
+
+.container {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 0 2rem;
+}
+
+html {
+  scroll-behavior: smooth;
+}
+
+a {
+  text-decoration: none;
+  color: inherit;
+}
+
+${finalCss}
+`;
+
+      // JS için temel smooth scroll ekle
+      finalJs = `
+// Smooth scroll
+document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+  anchor.addEventListener('click', function (e) {
+    e.preventDefault();
+    const target = document.querySelector(this.getAttribute('href'));
+    if (target) {
+      target.scrollIntoView({ behavior: 'smooth' });
+    }
+  });
+});
+
+${finalJs}
+`;
+
+    } catch (templateError) {
+      console.error("Template population error:", templateError);
+
+      await prisma.site.update({
+        where: { id: siteId },
+        data: { status: "draft" },
+      });
+
+      return NextResponse.json(
+        {
+          error: "Failed to generate website from templates. Please try again.",
+          details: templateError instanceof Error ? templateError.message : "Unknown error",
+        },
+        { status: 500 }
+      );
+    }
+
+    // 9. Üretilen HTML, CSS ve JS'i veritabanına kaydet
     const updatedSite = await prisma.site.update({
       where: { id: siteId },
       data: {
-        htmlContent: generatedSite.html,
-        cssContent: generatedSite.css,
-        jsContent: generatedSite.js,
-        title: generatedSite.title,
-        status: "previewed", // Preview için previewed olarak bırak
+        htmlContent: finalHtml,
+        cssContent: finalCss,
+        jsContent: finalJs,
+        title: `${cvData.personalInfo.name} - Kişisel Web Sitesi`,
+        status: "previewed",
         updatedAt: new Date(),
-        previewContent: site.cvContent, // Preview için mevcut cvContent'i kaydet
+        designPlan: designPlan, // Tasarım planını kaydet
+        previewContent: {
+          cvData: site.cvContent,
+          designPlan: designPlan
+        },
       },
     });
 
     // 9. Başarılı response döndür
     return NextResponse.json({
       success: true,
-      message: "Website generated successfully",
+      message: "Website generated successfully using template system",
       site: {
         id: updatedSite.id,
         title: updatedSite.title,
         status: updatedSite.status,
         previewUrl: `/preview/${updatedSite.id}`,
       },
-      description: generatedSite.description,
+      designPlan: designPlan,
     });
 
   } catch (error) {

@@ -99,16 +99,35 @@ JSON formatında yapılandırılmış olarak döndür:
 
     const responseText = result.response.text();
     
+    console.log("Gemini raw response:", responseText.substring(0, 500));
+    
     // JSON'ı markdown kod bloklarından temizle
     let jsonText = responseText.trim();
-    if (jsonText.startsWith('```json')) {
-      jsonText = jsonText.replace(/```json\n?/, '').replace(/\n?```$/, '');
-    } else if (jsonText.startsWith('```')) {
-      jsonText = jsonText.replace(/```\n?/, '').replace(/\n?```$/, '');
+    
+    // ```json veya ``` ile başlıyorsa temizle
+    jsonText = jsonText.replace(/^```json\s*/i, '');
+    jsonText = jsonText.replace(/^```\s*/, '');
+    jsonText = jsonText.replace(/\s*```$/g, '');
+    jsonText = jsonText.trim();
+    
+    // JSON objesini bul (regex ile)
+    const jsonMatch = jsonText.match(/\{[\s\S]*\}/);
+    if (!jsonMatch) {
+      console.error("JSON bulunamadı. Tam yanıt:", responseText);
+      throw new Error("Gemini yanıtında geçerli JSON bulunamadı");
     }
+    
+    jsonText = jsonMatch[0];
 
     // JSON parse et
-    const cvData = JSON.parse(jsonText) as CVData;
+    let cvData: CVData;
+    try {
+      cvData = JSON.parse(jsonText) as CVData;
+    } catch (parseError) {
+      console.error("JSON parse hatası:", parseError);
+      console.error("Parse edilmeye çalışılan text:", jsonText.substring(0, 500));
+      throw new Error("JSON parse edilemedi: " + (parseError instanceof Error ? parseError.message : "Bilinmeyen hata"));
+    }
 
     // Temel validasyon
     if (!cvData.personalInfo || !cvData.personalInfo.name) {

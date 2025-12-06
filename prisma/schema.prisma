@@ -24,8 +24,10 @@ model Site {
   title          String    @default("My Personal Website")
   cvUrl          String?
   cvContent      Json?
+  designPlan     Json?     // Tema renkleri ve seçilen component'ler
   htmlContent    String?
   cssContent     String?
+  jsContent      String?
   status         String    @default("draft")
   revisionCount  Int       @default(0)
   maxRevisions   Int       @default(1)
@@ -34,7 +36,6 @@ model Site {
   publishedAt    DateTime?
   cloudflareUrl  String?
   subdomain      String?   @unique
-  jsContent      String?
   previewContent Json?
   publishContent Json?
   user           User      @relation(fields: [userId], references: [id], onDelete: Cascade)
