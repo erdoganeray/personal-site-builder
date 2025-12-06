@@ -84,7 +84,8 @@ export async function POST(req: NextRequest) {
       );
     }
 
-    // 7. Site status'ünü "generating" yap
+    // 7. Önceki status'ü sakla ve "generating" yap
+    const previousStatus = site.status;
     await prisma.site.update({
       where: { id: siteId },
       data: { status: "generating" },
@@ -102,10 +103,10 @@ export async function POST(req: NextRequest) {
     } catch (geminiError) {
       console.error("Gemini revision error:", geminiError);
 
-      // Hata durumunda status'ü geri draft yap
+      // Hata durumunda status'ü önceki haline geri al
       await prisma.site.update({
         where: { id: siteId },
-        data: { status: "draft" },
+        data: { status: previousStatus },
       });
 
       return NextResponse.json(
@@ -118,13 +119,14 @@ export async function POST(req: NextRequest) {
     }
 
     // 9. Revize edilmiş HTML, CSS ve JS'i veritabanına kaydet ve revisionCount'u artır
+    // Status'ü önceki haline (previewed veya published) geri getir
     const updatedSite = await prisma.site.update({
       where: { id: siteId },
       data: {
         htmlContent: revisedResult.html,
         cssContent: revisedResult.css,
         jsContent: revisedResult.js,
-        status: "previewed", // Preview için previewed olarak bırak
+        status: previousStatus, // Önceki status'ü koru (previewed veya published)
         revisionCount: site.revisionCount + 1,
         updatedAt: new Date(),
       },

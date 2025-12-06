@@ -16,20 +16,12 @@
 
 ## User Page
 - word/linkedin profile cv upload
-- profile photo upload
-- portfolio upload
 - blog images upload
 - billing/domain/settings bölümleri aktif hale getirilmeli
 
 ## Editor Content Page
-- tüm revize işlemleri burada olmalı
-- sitenin yayınlanma halinden sonra değişiklik olduysa uyarı çıkmalı
-- gemini chat i olabilir
-- burada preview gösterilecek, kullanıcı isterse en son yine bu ekrandan publish edebilecek. burayı kodlarken database deki cvContent, publishContent i nasıl işlemen gerektiğinden emin ol. yani değişiklik hemen publish e yansımamalı, mutlaka kullanıcı onayı gelmeli
 - hem preview hem de publish için rollback ui tasarımı
 - sayfa yenilenince chat mesajları kayboluyor. kaybolmasın.
-- revise sırasında html/css/js baştan komple yazılmamalı, template sistemine uygun olmalı
-- editor de tasarımı revise ettin. dashboard a dönüp bilgi değiştirip kaydet dedikten sonra revise edilmeyen tasarım üzerinden güncelleniyor. editor ile dashboard eşleşmiyor.
 
 ## AI-Less Component Template Sistemi
 - cvContent içerikleri NULL olabilir. Örneğin bir kullanıcının cv'sinin eğitim bölümünde GPA bilgisi varken, bir kullanıcının GPA bilgisi olmayabilir. cvContent, belirli bir standartta olmak zorunda olduğu için cv'de olmayan ya da çıkarılamayan bilgiler NULL olmalı.
@@ -38,9 +30,9 @@
 - template marketplace
 - hazır icon'lar güncellenecek
 - portfolio olarak sadece resim ekleniyor, başlık/açıklama/link de eklenebilir olmalı.
-- bilgilerim de içerik silme gibi komple component silme de olmalı (örneğin eğitim component ini komple silme, ya da eğitimdeki tüm eğitim bilgilerini silince eğitim component i full kaldırılmalı) (kaldırılan componentler elle eklenebilmeli ya da cv'yi tekrar analiz edip cv'den ilgili component'in tekrardan analiz edilmesini sağlayabiliriz)
 - user, template leri kendi seçebilir
 - componentlerin sırasını drag and drop ile belirleyebilir
+- preview/publish sync olduğunda warning çıkıyor, warning içeriği düzgün şekilde gösterilmeli
 
 # Paid Plans Options
 

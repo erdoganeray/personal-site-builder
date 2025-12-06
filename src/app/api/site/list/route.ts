@@ -18,6 +18,26 @@ export async function GET(request: NextRequest) {
       orderBy: {
         createdAt: "desc",
       },
+      select: {
+        id: true,
+        userId: true,
+        htmlContent: true,
+        cssContent: true,
+        jsContent: true,
+        cvContent: true,
+        status: true,
+        revisionCount: true,
+        maxRevisions: true,
+        createdAt: true,
+        updatedAt: true,
+        publishedAt: true,
+        cloudflareUrl: true,
+        subdomain: true,
+        publishedHtmlContent: true,
+        publishedCssContent: true,
+        publishedJsContent: true,
+        publishedCvContent: true,
+      },
     });
 
     return NextResponse.json({ sites });

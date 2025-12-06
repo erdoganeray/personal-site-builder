@@ -85,7 +85,7 @@ export async function POST(req: NextRequest) {
       );
     }
 
-    // 8. Veritabanını güncelle
+    // 8. Veritabanını güncelle ve published snapshot'ları kaydet
     const updatedSite = await prisma.site.update({
       where: { id: siteId },
       data: {
@@ -93,6 +93,11 @@ export async function POST(req: NextRequest) {
         subdomain: deployment.subdomain,
         cloudflareUrl: deployment.url,
         publishedAt: new Date(),
+        // Save published content snapshots for change detection
+        publishedHtmlContent: site.htmlContent,
+        publishedCssContent: site.cssContent,
+        publishedJsContent: site.jsContent,
+        publishedCvContent: site.cvContent,
       },
     });
 

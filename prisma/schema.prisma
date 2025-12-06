@@ -36,6 +36,13 @@ model Site {
   publishedAt    DateTime?
   cloudflareUrl  String?
   subdomain      String?   @unique
+  
+  // Published content snapshots - used for change detection
+  publishedHtmlContent  String?
+  publishedCssContent   String?
+  publishedJsContent    String?
+  publishedCvContent    Json?
+  
   user           User      @relation(fields: [userId], references: [id], onDelete: Cascade)
 
   @@index([userId])

@@ -3,6 +3,7 @@
 import { useState, useEffect } from "react";
 import CVUploader from "@/components/CVUploader";
 import type { CVData } from "@/lib/gemini-pdf-parser";
+import { hasUnpublishedChanges } from "@/lib/change-detection";
 
 interface MyInfoProps {
     site: any;
@@ -15,6 +16,7 @@ interface MyInfoProps {
 export default function MyInfo({ site, cvData, onDelete, onCVAnalyzed, deleting }: MyInfoProps) {
     const [isEditing, setIsEditing] = useState(false);
     const [saving, setSaving] = useState(false);
+    const [publishing, setPublishing] = useState(false);
 
     // Form state
     const [name, setName] = useState("");
@@ -344,6 +346,72 @@ export default function MyInfo({ site, cvData, onDelete, onCVAnalyzed, deleting 
                     CV'nizi yükleyin veya mevcut CV bilgilerinizi görüntüleyin/düzenleyin
                 </p>
             </div>
+
+            {/* Unpublished Changes Warning - Always show at top if published and has changes */}
+            {site && site.status === "published" && hasUnpublishedChanges(site) && (
+                <div className="bg-yellow-900/30 border border-yellow-700 rounded-lg p-4">
+                    <div className="flex items-start gap-3">
+                        <svg className="w-6 h-6 text-yellow-400 flex-shrink-0 mt-0.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
+                        </svg>
+                        <div className="flex-1">
+                            <p className="text-yellow-300 font-semibold mb-1">
+                                ⚠️ Yayınlanan site son değişiklikleri içermiyor
+                            </p>
+                            <p className="text-yellow-200 text-sm mb-3">
+                                Yayınlanan sitenizi güncellemek için aşağıdaki butona tıklayın.
+                            </p>
+                            <button
+                                onClick={async () => {
+                                    if (!confirm("Sitenizi yeniden yayınlamak istediğinizden emin misiniz?")) return;
+                                    setPublishing(true);
+                                    try {
+                                        const response = await fetch("/api/site/publish", {
+                                            method: "POST",
+                                            headers: { "Content-Type": "application/json" },
+                                            body: JSON.stringify({ siteId: site.id }),
+                                        });
+                                        const data = await response.json();
+                                        if (response.ok) {
+                                            alert(`Site başarıyla yeniden yayınlandı!\nURL: ${data.deployedUrl}`);
+                                            window.location.reload();
+                                        } else {
+                                            alert(data.error || "Site yayınlanamadı");
+                                        }
+                                    } catch (error) {
+                                        console.error("Yayınlama hatası:", error);
+                                        alert("Bir hata oluştu. Lütfen tekrar deneyin.");
+                                    } finally {
+                                        setPublishing(false);
+                                    }
+                                }}
+                                disabled={publishing}
+                                className="bg-yellow-600 hover:bg-yellow-700 disabled:bg-gray-400 text-white font-semibold py-2 px-4 rounded-lg transition-colors duration-200 text-sm"
+                            >
+                                {publishing ? "Yayınlanıyor..." : "Yeniden Yayınla"}
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            )}
+
+            {/* Published Site Warning */}
+            {site && site.status === "published" && isEditing && !hasUnpublishedChanges(site) && (
+                <div className="bg-blue-900/30 border border-blue-700 rounded-lg p-4">
+                    <div className="flex items-start gap-3">
+                        <svg className="w-5 h-5 text-blue-400 flex-shrink-0 mt-0.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                        </svg>
+                        <div className="flex-1">
+                            <p className="text-blue-300 text-sm">
+                                <strong>💡 Not:</strong> Bu değişiklikler önizleme sitenize yansıyacak. Yayınlanan sitenizi güncellemek için <strong>"Sitem"</strong> sekmesinden <strong>"Yeniden Yayınla"</strong> butonuna tıklayın.
+                            </p>
+                        </div>
+                    </div>
+                </div>
+            )}
+
+
 
             {!site || !cvData ? (
                 <CVUploader onAnalyzed={onCVAnalyzed} />

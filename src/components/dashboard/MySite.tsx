@@ -2,6 +2,7 @@
 
 import { useState, useMemo, useEffect } from "react";
 import { useRouter } from "next/navigation";
+import { hasUnpublishedChanges } from "@/lib/change-detection";
 
 interface MySiteProps {
     site: any;
@@ -16,6 +17,9 @@ export default function MySite({ site, onRefresh }: MySiteProps) {
     const [deletingPreview, setDeletingPreview] = useState(false);
     const [customPrompt, setCustomPrompt] = useState("");
     const [viewMode, setViewMode] = useState<"desktop" | "tablet" | "mobile">("desktop");
+
+    // Check for unpublished changes
+    const hasChanges = site ? hasUnpublishedChanges(site) : false;
 
     // Blob URL oluştur - site htmlContent, cssContent, jsContent değiştiğinde güncellenir
     const iframeUrl = useMemo(() => {
@@ -225,6 +229,7 @@ export default function MySite({ site, onRefresh }: MySiteProps) {
             {/* Site Status */}
             <div className="bg-gray-800 rounded-xl border border-gray-700 p-6">
                 <h3 className="text-xl font-bold text-white mb-4">Site Durumu</h3>
+                
                 <div className="flex items-center gap-3 mb-4 flex-wrap">
                     <div
                         className={`px-4 py-2 rounded-full font-semibold ${site.status === "published"
@@ -251,6 +256,29 @@ export default function MySite({ site, onRefresh }: MySiteProps) {
                         </>
                     )}
                 </div>
+                
+                {/* Unpublished Changes Warning */}
+                {hasChanges && (
+                    <div className="bg-yellow-900/30 border border-yellow-700 rounded-lg p-4 mb-4">
+                        <div className="flex items-start gap-3">
+                            <svg className="w-6 h-6 text-yellow-400 flex-shrink-0 mt-0.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
+                            </svg>
+                            <div className="flex-1">
+                                <p className="text-yellow-300 font-semibold mb-3">
+                                    ⚠️ Yayınlanan site son değişiklikleri içermiyor
+                                </p>
+                                <button
+                                    onClick={handlePublish}
+                                    disabled={publishing}
+                                    className="bg-yellow-600 hover:bg-yellow-700 disabled:bg-gray-400 text-white font-semibold py-2 px-4 rounded-lg transition-colors duration-200 text-sm"
+                                >
+                                    {publishing ? "Yayınlanıyor..." : "Yeniden Yayınla"}
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                )}
 
                 {site.status === "published" && (site.deployedUrl || site.cloudflareUrl) && (
                     <div className="bg-green-900/30 border border-green-700 rounded-lg p-4 mb-4">
@@ -265,6 +293,35 @@ export default function MySite({ site, onRefresh }: MySiteProps) {
                         </a>
                     </div>
                 )}
+
+                {/* Action Buttons in Site Status */}
+                <div className="space-y-3 mt-4">
+                    {site.htmlContent ? (
+                        <>
+                            {/* Site oluşturulmuş ama yayınlanmamış */}
+                            {site.status !== "published" && (
+                                <button
+                                    onClick={handlePublish}
+                                    disabled={publishing}
+                                    className="w-full bg-gradient-to-r from-green-600 to-emerald-600 hover:from-green-700 hover:to-emerald-700 disabled:from-gray-400 disabled:to-gray-500 text-white font-bold py-4 px-6 rounded-lg transition-all duration-200"
+                                >
+                                    {publishing ? "Yayınlanıyor..." : "Beğendim, Yayınla!"}
+                                </button>
+                            )}
+
+                            {/* Site yayınlanmış */}
+                            {site.status === "published" && (
+                                <button
+                                    onClick={handleUnpublish}
+                                    disabled={unpublishing}
+                                    className="w-full bg-red-600 hover:bg-red-700 disabled:bg-gray-400 text-white font-bold py-4 px-6 rounded-lg transition-colors duration-200"
+                                >
+                                    {unpublishing ? "Kaldırılıyor..." : "Yayından Kaldır"}
+                                </button>
+                            )}
+                        </>
+                    ) : null}
+                </div>
             </div>
 
             {/* Preview Section */}
@@ -345,61 +402,17 @@ export default function MySite({ site, onRefresh }: MySiteProps) {
                         rows={4}
                         className="w-full px-4 py-3 bg-gray-700 border border-gray-600 text-white rounded-lg focus:ring-2 focus:ring-blue-500 resize-none"
                     />
-                </div>
-            )}
-
-            {/* Action Buttons */}
-            <div className="space-y-3">
-                {site.htmlContent ? (
-                    <>
-                        {/* Site oluşturulmuş ama yayınlanmamış */}
-                        {site.status !== "published" && (
-                            <div className="grid grid-cols-2 gap-3">
-                                <button
-                                    onClick={handlePublish}
-                                    disabled={publishing}
-                                    className="bg-gradient-to-r from-green-600 to-emerald-600 hover:from-green-700 hover:to-emerald-700 disabled:from-gray-400 disabled:to-gray-500 text-white font-bold py-4 px-6 rounded-lg transition-all duration-200"
-                                >
-                                    {publishing ? "Yayınlanıyor..." : "Beğendim, Yayınla!"}
-                                </button>
-                                <button
-                                    onClick={() => router.push("/editor")}
-                                    className="bg-gray-700 hover:bg-gray-600 text-white font-bold py-4 px-6 rounded-lg transition-colors duration-200"
-                                >
-                                    Editöre Git
-                                </button>
-                            </div>
-                        )}
-
-                        {/* Site yayınlanmış */}
-                        {site.status === "published" && (
-                            <div className="grid grid-cols-2 gap-3">
-                                <button
-                                    onClick={handleUnpublish}
-                                    disabled={unpublishing}
-                                    className="bg-red-600 hover:bg-red-700 disabled:bg-gray-400 text-white font-bold py-4 px-6 rounded-lg transition-colors duration-200"
-                                >
-                                    {unpublishing ? "Kaldırılıyor..." : "Yayından Kaldır"}
-                                </button>
-                                <button
-                                    onClick={() => router.push("/editor")}
-                                    className="bg-gray-700 hover:bg-gray-600 text-white font-bold py-4 px-6 rounded-lg transition-colors duration-200"
-                                >
-                                    Editöre Git
-                                </button>
-                            </div>
-                        )}
-                    </>
-                ) : (
+                    
+                    {/* Generate Button */}
                     <button
                         onClick={handleGenerateSite}
                         disabled={generating}
-                        className="w-full bg-gradient-to-r from-green-600 to-blue-600 hover:from-green-700 hover:to-blue-700 disabled:from-gray-400 disabled:to-gray-500 text-white font-bold py-4 px-6 rounded-lg transition-all duration-200"
+                        className="w-full mt-4 bg-gradient-to-r from-green-600 to-blue-600 hover:from-green-700 hover:to-blue-700 disabled:from-gray-400 disabled:to-gray-500 text-white font-bold py-4 px-6 rounded-lg transition-all duration-200"
                     >
                         {generating ? "AI ile siteniz oluşturuluyor..." : "AI ile Sitemi Oluştur →"}
                     </button>
-                )}
-            </div>
+                </div>
+            )}
         </div>
     );
 }
