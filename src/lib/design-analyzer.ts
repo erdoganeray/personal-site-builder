@@ -70,10 +70,15 @@ SKILLS SECTION:
 1. skills-progress-bars: İlerleme çubukları ile yetenek gösterimi
 2. skills-card-grid: Kart grid düzeni, ikon ve isimle yetenek gösterimi
 
+CONTACT SECTION:
+1. contact-modern-form: Modern iletişim formu ve bilgi kartları, iki kolonlu düzen
+2. contact-minimal-centered: Minimal merkezi tasarım, iletişim bilgileri kartları
+3. contact-split-info: Split layout, sol taraf gradient bilgi, sağ taraf form
+
 Görevin:
 1. CV'ye ve kullanıcı isteğine en uygun tema renklerini belirle (hex kodları)
 2. Yukarıdaki template'lerden hangilerinin kullanılacağına karar ver
-3. Her kategoriden (navigation, hero, experience, skills) bir template seç
+3. Her kategoriden (navigation, hero, experience, skills, contact) bir template seç
 4. Genel stil anlayışını belirle (modern/minimal/creative/professional)
 
 Renk Seçimi Kriterleri:
@@ -88,6 +93,7 @@ Component Seçimi Kriterleri:
 - Experience: CV'deki iş deneyimi sayısına göre
 - Education: CV'deki eğitim bilgisi sayısına göre (varsa mutlaka ekle)
 - Skills: Yetenek sayısına ve görsel tercihine göre
+- Contact: Site stiline uygun (modern site için form, minimal site için minimal-centered)
 - Mesleğe uygunluk
 - Kullanıcının özel isteklerini dikkate al
 
@@ -106,7 +112,8 @@ Component Seçimi Kriterleri:
     { "category": "hero", "templateId": "hero-modern-centered" },
     { "category": "experience", "templateId": "experience-timeline" },
     { "category": "education", "templateId": "education-timeline" },
-    { "category": "skills", "templateId": "skills-card-grid" }
+    { "category": "skills", "templateId": "skills-card-grid" },
+    { "category": "contact", "templateId": "contact-modern-form" }
   ],
   "layout": "single-page",
   "style": "modern",

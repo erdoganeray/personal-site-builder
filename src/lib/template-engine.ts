@@ -218,6 +218,26 @@ export function getSkillsReplacements(
 }
 
 /**
+ * CV verilerinden contact section için placeholder değerleri oluşturur
+ */
+export function getContactReplacements(
+  cvData: CVData,
+  themeColors: ThemeColors
+): PlaceholderReplacements {
+  return {
+    '{{EMAIL}}': cvData.personalInfo.email || 'Email bulunamadı',
+    '{{PHONE}}': cvData.personalInfo.phone || 'Telefon bulunamadı',
+    '{{LOCATION}}': cvData.personalInfo.location || 'Konum belirtilmemiş',
+    '{{COLOR_PRIMARY}}': themeColors.primary,
+    '{{COLOR_SECONDARY}}': themeColors.secondary,
+    '{{COLOR_ACCENT}}': themeColors.accent,
+    '{{COLOR_BACKGROUND}}': themeColors.background,
+    '{{COLOR_TEXT}}': themeColors.text,
+    '{{COLOR_TEXT_SECONDARY}}': themeColors.textSecondary,
+  };
+}
+
+/**
  * Navigation menu için placeholder değerleri oluşturur
  * Sayfadaki componentlere göre dinamik menu linkleri oluşturur
  */
@@ -272,6 +292,8 @@ export function getReplacementsForComponent(
       return getEducationReplacements(cvData, themeColors, component.id);
     case 'skills':
       return getSkillsReplacements(cvData, themeColors, component.id);
+    case 'contact':
+      return getContactReplacements(cvData, themeColors);
     default:
       return {};
   }

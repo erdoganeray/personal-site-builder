@@ -18,6 +18,7 @@ export interface ComponentTemplate {
   htmlTemplate: string;
   cssTemplate: string;
   jsTemplate?: string;
+  placeholders?: string[];
   dataSchema?: {
     [key: string]: {
       type: string;

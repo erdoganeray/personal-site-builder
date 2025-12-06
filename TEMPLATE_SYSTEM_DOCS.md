@@ -68,6 +68,11 @@ Her template şunları içerir:
 1. **skills-progress-bars**: İlerleme çubukları
 2. **skills-card-grid**: Kart grid düzeni
 
+### Contact Section
+1. **contact-modern-form**: Modern iletişim formu ve bilgi kartları, iki kolonlu düzen
+2. **contact-minimal-centered**: Minimal merkezi tasarım, iletişim bilgileri kartları
+3. **contact-split-info**: Split layout, sol taraf gradient bilgi, sağ taraf form
+
 ## Yeni Template Ekleme
 
 1. İlgili kategori dosyasını açın (örn: `hero-templates.ts`)
@@ -90,7 +95,25 @@ export const heroTemplate3: ComponentTemplate = {
 export const heroTemplates = [heroTemplate1, heroTemplate2, heroTemplate3];
 ```
 
-4. Gerekirse `template-engine.ts` içinde yeni placeholder replacement fonksiyonu ekleyin
+4. Template'i `index.ts` dosyasına import edin ve `allTemplates` array'ine ekleyin:
+
+```typescript
+import { heroTemplates } from "./hero-templates";
+// ...
+export const allTemplates: ComponentTemplate[] = [
+  ...heroTemplates,
+  // ...
+];
+```
+
+5. `design-analyzer.ts` dosyasına yeni template'i ekleyin:
+   - Template listesine ve açıklamasına ekleyin
+   - Örnek JSON çıktısına ekleyin (gerekirse)
+
+6. Gerekirse `template-engine.ts` içinde:
+   - Yeni `generate{Category}Items()` fonksiyonu ekleyin
+   - Yeni `get{Category}Replacements()` fonksiyonu ekleyin
+   - `getReplacementsForComponent()` switch case'ine yeni kategori ekleyin
 
 ## API Kullanımı
 
