@@ -289,6 +289,78 @@ export function getPortfolioReplacements(
 }
 
 /**
+ * CV verilerinden languages section için HTML items oluşturur
+ */
+export function generateLanguageItems(
+  cvData: CVData,
+  templateId: string
+): string {
+  if (!cvData.languages || cvData.languages.length === 0) {
+    return '';
+  }
+
+  // Dil seviyelerini belirle (Native, Fluent, Advanced, Intermediate, Basic)
+  const levels = ['Native', 'Fluent', 'Advanced', 'Intermediate', 'Basic'];
+  const levelPercentages = { Native: 100, Fluent: 90, Advanced: 75, Intermediate: 60, Basic: 40 };
+  
+  const languagesWithLevels = cvData.languages.map((lang, index) => {
+    // Döngüsel olarak seviye ata veya ilk dil Native, sonrakiler Fluent/Advanced
+    const level = index === 0 ? 'Native' : levels[Math.min(index, levels.length - 1)];
+    return { name: lang, level, percentage: levelPercentages[level as keyof typeof levelPercentages] };
+  });
+
+  if (templateId === 'languages-progress-bars') {
+    return languagesWithLevels.map(lang => `
+      <div class="language-item">
+        <div class="language-name">
+          <span>${lang.name}</span>
+          <span class="language-level">${lang.level}</span>
+        </div>
+        <div class="language-bar">
+          <div class="language-progress" style="width: ${lang.percentage}%"></div>
+        </div>
+      </div>
+    `).join('\n');
+  } else if (templateId === 'languages-card-grid') {
+    return languagesWithLevels.map(lang => `
+      <div class="language-card">
+        <div class="language-icon">🌍</div>
+        <div class="language-name">${lang.name}</div>
+        <div class="language-level">${lang.level}</div>
+      </div>
+    `).join('\n');
+  } else if (templateId === 'languages-minimalist') {
+    return languagesWithLevels.map(lang => `
+      <div class="language-item-minimal">
+        <div class="language-name-minimal">${lang.name}</div>
+        <div class="language-level-minimal">${lang.level}</div>
+      </div>
+    `).join('\n');
+  }
+  
+  return '';
+}
+
+/**
+ * CV verilerinden languages section için placeholder değerleri oluşturur
+ */
+export function getLanguagesReplacements(
+  cvData: CVData,
+  themeColors: ThemeColors,
+  templateId: string
+): PlaceholderReplacements {
+  return {
+    '{{LANGUAGE_ITEMS}}': generateLanguageItems(cvData, templateId),
+    '{{COLOR_PRIMARY}}': themeColors.primary,
+    '{{COLOR_SECONDARY}}': themeColors.secondary,
+    '{{COLOR_ACCENT}}': themeColors.accent,
+    '{{COLOR_BACKGROUND}}': themeColors.background,
+    '{{COLOR_TEXT}}': themeColors.text,
+    '{{COLOR_TEXT_SECONDARY}}': themeColors.textSecondary,
+  };
+}
+
+/**
  * CV verilerinden contact section için placeholder değerleri oluşturur
  */
 export function getContactReplacements(
@@ -408,6 +480,8 @@ export function getReplacementsForComponent(
       return getPortfolioReplacements(cvData, themeColors, component.id);
     case 'skills':
       return getSkillsReplacements(cvData, themeColors, component.id);
+    case 'languages':
+      return getLanguagesReplacements(cvData, themeColors, component.id);
     case 'contact':
       return getContactReplacements(cvData, themeColors);
     case 'footer':

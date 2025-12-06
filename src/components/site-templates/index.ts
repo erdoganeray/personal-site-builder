@@ -2,6 +2,7 @@ import { ComponentTemplate } from "@/types/templates";
 import { heroTemplates } from "./hero-templates";
 import { experienceTemplates } from "./experience-templates";
 import { skillsTemplates } from "./skills-templates";
+import { languagesTemplates } from "./languages-templates";
 import { navigationTemplates } from "./navigation-templates";
 import { educationTemplates } from "./education-templates";
 import { portfolioTemplates } from "./portfolio-templates";
@@ -18,6 +19,7 @@ export const allTemplates: ComponentTemplate[] = [
   ...educationTemplates,
   ...portfolioTemplates,
   ...skillsTemplates,
+  ...languagesTemplates,
   ...navigationTemplates,
   ...contactTemplates,
   ...footerTemplates,

@@ -14,7 +14,7 @@ export interface ThemeColors {
 export interface ComponentTemplate {
   id: string;
   name: string;
-  category: 'navigation' | 'hero' | 'about' | 'experience' | 'education' | 'portfolio' | 'skills' | 'contact' | 'footer';
+  category: 'navigation' | 'hero' | 'about' | 'experience' | 'education' | 'portfolio' | 'skills' | 'languages' | 'contact' | 'footer';
   htmlTemplate: string;
   cssTemplate: string;
   jsTemplate?: string;

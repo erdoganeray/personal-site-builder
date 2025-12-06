@@ -35,7 +35,7 @@
 - template marketplace
 - hazır icon'lar güncellenecek
 - portfolio olarak sadece resim ekleniyor, başlık/açıklama/link de eklenebilir olmalı.
-- bilgilerim de içerik silme gibi komple component silme de olmalı (örneğin eğitim component ini komple silme, ya da eğitimdeki tüm eğitim bilgilerini silince eğitim component i full kaldırılmalı)
+- bilgilerim de içerik silme gibi komple component silme de olmalı (örneğin eğitim component ini komple silme, ya da eğitimdeki tüm eğitim bilgilerini silince eğitim component i full kaldırılmalı) (kaldırılan componentler elle eklenebilmeli ya da cv'yi tekrar analiz edip cv'den ilgili component'in tekrardan analiz edilmesini sağlayabiliriz)
 - user, template leri kendi seçebilir
 
 # Paid Plans Options

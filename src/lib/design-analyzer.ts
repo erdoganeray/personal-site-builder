@@ -76,6 +76,11 @@ SKILLS SECTION:
 1. skills-progress-bars: İlerleme çubukları ile yetenek gösterimi
 2. skills-card-grid: Kart grid düzeni, ikon ve isimle yetenek gösterimi
 
+LANGUAGES SECTION (OPTIONAL - sadece diller varsa ekle):
+1. languages-progress-bars: İlerleme çubukları ile dil seviyesi gösterimi
+2. languages-card-grid: Kart grid düzeni, ikon ve dil seviyesi
+3. languages-minimalist: Minimal liste düzeni, dil ve seviye
+
 CONTACT SECTION:
 1. contact-modern-form: Modern iletişim formu ve bilgi kartları, iki kolonlu düzen
 2. contact-minimal-centered: Minimal merkezi tasarım, iletişim bilgileri kartları
@@ -105,6 +110,7 @@ Component Seçimi Kriterleri:
 - Education: CV'deki eğitim bilgisi sayısına göre (varsa mutlaka ekle)
 - Portfolio: SADECE portfolio fotoğrafları varsa ekle (${cvData.portfolio?.length || 0} adet var). Education ve Skills arasına yerleştir. Yoksa hiç ekleme!
 - Skills: Yetenek sayısına ve görsel tercihine göre
+- Languages: SADECE dil bilgisi varsa ekle (${cvData.languages?.length || 0} adet var). Skills'den sonra, Contact'tan önce yerleştir. Yoksa hiç ekleme!
 - Contact: Site stiline uygun (modern site için form, minimal site için minimal-centered)
 - Footer: Her zaman ekle, site stiline uygun template seç
 - Mesleğe uygunluk
@@ -127,6 +133,7 @@ Component Seçimi Kriterleri:
     { "category": "education", "templateId": "education-timeline" },
     // Portfolio burada (eğer fotoğraf varsa) - { "category": "portfolio", "templateId": "portfolio-grid" }
     { "category": "skills", "templateId": "skills-card-grid" },
+    // Languages burada (eğer dil bilgisi varsa) - { "category": "languages", "templateId": "languages-card-grid" }
     { "category": "contact", "templateId": "contact-modern-form" },
     { "category": "footer", "templateId": "footer-modern-centered" }
   ],
