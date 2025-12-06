@@ -30,7 +30,7 @@ model Site {
   jsContent      String?
   status         String    @default("draft")
   revisionCount  Int       @default(0)
-  maxRevisions   Int       @default(1)
+  maxRevisions   Int       @default(5)
   createdAt      DateTime  @default(now())
   updatedAt      DateTime  @updatedAt
   publishedAt    DateTime?

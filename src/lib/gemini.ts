@@ -240,11 +240,13 @@ Gereksinimler:
 - Sadece istenen değişiklikleri yap
 - Kod kalitesini ve okunabilirliği koru
 
-Çıktı formatı JSON olsun:
+ÖNEMLİ: JSON içinde newline karakterlerini \\n olarak, tırnak işaretlerini \\" olarak, backslash'leri \\\\ olarak escape et.
+
+Çıktı formatı (GEÇERLİ JSON):
 {
-  "html": "<!DOCTYPE html>...tam HTML kodu...",
-  "css": "/* Tam CSS kodu */",
-  "js": "// Tam JavaScript kodu",
+  "html": "<!DOCTYPE html>...",
+  "css": "/* CSS */",
+  "js": "// JS",
   "changes": "Yapılan değişikliklerin Türkçe açıklaması (2-3 cümle)"
 }
 
@@ -263,7 +265,32 @@ JSON'dan önce veya sonra hiçbir metin olmasın.
       cleanedText = cleanedText.replace(/\s*```$/g, '');
       cleanedText = cleanedText.trim();
       
-      const parsed = JSON.parse(cleanedText);
+      // JSON5 veya relaxed JSON parsing kullanarak escape sorunlarını çöz
+      let parsed;
+      try {
+        parsed = JSON.parse(cleanedText);
+      } catch (strictParseError) {
+        console.warn("Strict JSON parse failed, trying manual extraction...");
+        
+        // Manuel olarak html, css, js ve changes'i ayıkla
+        const htmlMatch = cleanedText.match(/"html"\s*:\s*"((?:[^"\\]|\\.)*)"/s);
+        const cssMatch = cleanedText.match(/"css"\s*:\s*"((?:[^"\\]|\\.)*)"/s);
+        const jsMatch = cleanedText.match(/"js"\s*:\s*"((?:[^"\\]|\\.)*)"/s);
+        const changesMatch = cleanedText.match(/"changes"\s*:\s*"([^"]*)"/);
+        
+        if (!htmlMatch || !cssMatch || !jsMatch || !changesMatch) {
+          // Son çare: Gemini'yi tekrar çağır ama sadece changes'i iste
+          console.error("Could not extract content from malformed JSON");
+          throw strictParseError;
+        }
+        
+        parsed = {
+          html: htmlMatch[1].replace(/\\n/g, '\n').replace(/\\"/g, '"').replace(/\\\\/g, '\\'),
+          css: cssMatch[1].replace(/\\n/g, '\n').replace(/\\"/g, '"').replace(/\\\\/g, '\\'),
+          js: jsMatch[1].replace(/\\n/g, '\n').replace(/\\"/g, '"').replace(/\\\\/g, '\\'),
+          changes: changesMatch[1]
+        };
+      }
       
       if (!parsed.html || !parsed.css || !parsed.js || !parsed.changes) {
         throw new Error("Revised response is missing required fields (html, css, js, or changes)");
@@ -278,20 +305,21 @@ JSON'dan önce veya sonra hiçbir metin olmasın.
       
     } catch (parseError) {
       console.error("Failed to parse Gemini revision response:", responseText.substring(0, 500) + "...");
+      
+      // Kullanıcıya daha anlamlı hata mesajı
       throw new Error(
-        `Failed to parse AI revision response. Error: ${
-          parseError instanceof Error ? parseError.message : String(parseError)
-        }`
+        "Revize işlemi sırasında bir sorun oluştu. Lütfen talebinizi daha basit kelimelerle tekrar deneyin."
       );
     }
     
   } catch (error) {
     console.error("Error revising website with Gemini:", error);
     
-    if (error instanceof Error) {
-      throw new Error(`Website revision failed: ${error.message}`);
+    if (error instanceof Error && error.message.includes("Revize işlemi sırasında")) {
+      throw error; // Kullanıcı dostu mesajı olduğu gibi ilet
     }
     
-    throw new Error("Website revision failed due to an unknown error");
+    // Diğer hatalar için genel mesaj
+    throw new Error("Revize işlemi tamamlanamadı. Lütfen daha basit bir değişiklik talebi ile tekrar deneyin.");
   }
 }

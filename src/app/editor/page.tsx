@@ -13,6 +13,12 @@ export default function EditorPage() {
     const [inputValue, setInputValue] = useState("");
     const [site, setSite] = useState<any>(null);
     const [loading, setLoading] = useState(true);
+    const [isAnalyzing, setIsAnalyzing] = useState(false);
+    const [isRevising, setIsRevising] = useState(false);
+    const [showConfirmModal, setShowConfirmModal] = useState(false);
+    const [pendingRevision, setPendingRevision] = useState<{ changes: string[]; originalMessage: string } | null>(null);
+    
+    const MAX_CHAR_LIMIT = 500;
 
     useEffect(() => {
         if (status === "unauthenticated") {
@@ -102,12 +108,106 @@ export default function EditorPage() {
         return null;
     }
 
-    const handleSendMessage = () => {
-        if (inputValue.trim()) {
-            setMessages([...messages, { role: "user", content: inputValue }]);
+    const handleSendMessage = async () => {
+        if (inputValue.trim() && !isAnalyzing && !isRevising) {
+            const userMessage = inputValue.trim();
+            setMessages(prev => [...prev, { role: "user", content: userMessage }]);
             setInputValue("");
-            // TODO: API call will be added here
+            setIsAnalyzing(true);
+
+            try {
+                // Analyze the message with Gemini
+                const analyzeResponse = await fetch("/api/site/chat-analyze", {
+                    method: "POST",
+                    headers: { "Content-Type": "application/json" },
+                    body: JSON.stringify({
+                        siteId: site.id,
+                        message: userMessage
+                    })
+                });
+
+                const analyzeData = await analyzeResponse.json();
+
+                if (!analyzeResponse.ok) {
+                    throw new Error(analyzeData.error || "Analiz başarısız oldu");
+                }
+
+                // Add assistant response to chat
+                setMessages(prev => [...prev, { role: "assistant", content: analyzeData.response }]);
+
+                // If it's a revision request, show confirmation modal
+                if (analyzeData.isRevision && analyzeData.changes) {
+                    setPendingRevision({
+                        changes: analyzeData.changes,
+                        originalMessage: userMessage
+                    });
+                    setShowConfirmModal(true);
+                }
+            } catch (error) {
+                console.error("Mesaj gönderme hatası:", error);
+                setMessages(prev => [...prev, {
+                    role: "assistant",
+                    content: "Üzgünüm, mesajınızı işlerken bir hata oluştu. Lütfen tekrar deneyin."
+                }]);
+            } finally {
+                setIsAnalyzing(false);
+            }
         }
+    };
+
+    const handleConfirmRevision = async () => {
+        if (!pendingRevision || !site) return;
+
+        setShowConfirmModal(false);
+        setIsRevising(true);
+        setMessages(prev => [...prev, {
+            role: "assistant",
+            content: "Değişiklikler uygulanıyor, lütfen bekleyin..."
+        }]);
+
+        try {
+            const reviseResponse = await fetch("/api/site/revise", {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({
+                    siteId: site.id,
+                    revisionRequest: pendingRevision.originalMessage
+                })
+            });
+
+            const reviseData = await reviseResponse.json();
+
+            if (!reviseResponse.ok) {
+                throw new Error(reviseData.error || "Revize başarısız oldu");
+            }
+
+            // Update site data to refresh preview
+            await fetchSite();
+
+            setMessages(prev => [...prev, {
+                role: "assistant",
+                content: `✅ Değişiklikler başarıyla uygulandı! ${reviseData.changes || ""}\n\nKalan revize hakkınız: ${reviseData.site.maxRevisions - reviseData.site.revisionCount}`
+            }]);
+
+        } catch (error) {
+            console.error("Revize hatası:", error);
+            setMessages(prev => [...prev, {
+                role: "assistant",
+                content: `❌ Değişiklikler uygulanırken bir hata oluştu: ${error instanceof Error ? error.message : "Bilinmeyen hata"}`
+            }]);
+        } finally {
+            setIsRevising(false);
+            setPendingRevision(null);
+        }
+    };
+
+    const handleCancelRevision = () => {
+        setShowConfirmModal(false);
+        setPendingRevision(null);
+        setMessages(prev => [...prev, {
+            role: "assistant",
+            content: "Değişiklikler iptal edildi."
+        }]);
     };
 
     const deviceSizes = {
@@ -174,7 +274,9 @@ export default function EditorPage() {
                 <div className="flex items-center gap-6">
                     <div className="flex items-center gap-2">
                         <span className="text-gray-400 text-sm">Kalan Revize Hakkı:</span>
-                        <span className="text-white font-bold bg-purple-600 px-3 py-1 rounded-full text-sm">5</span>
+                        <span className="text-white font-bold bg-purple-600 px-3 py-1 rounded-full text-sm">
+                            {site ? site.maxRevisions - site.revisionCount : 0}
+                        </span>
                     </div>
                     <div className="flex items-center gap-2">
                         <span className="text-gray-400 text-sm">Plan:</span>
@@ -238,6 +340,13 @@ export default function EditorPage() {
                             <div className="text-center text-gray-500 mt-8">
                                 <p>Henüz revize talebi yok</p>
                                 <p className="text-sm mt-2">Değişiklik yapmak için aşağıdan mesaj gönderin</p>
+                                <div className="mt-6 text-left bg-gray-700 p-4 rounded-lg text-xs space-y-2">
+                                    <p className="text-white font-semibold mb-2">💡 Örnek talepler:</p>
+                                    <p className="text-gray-300">• "Eğitim bölümünü kaldır"</p>
+                                    <p className="text-gray-300">• "Ana rengi maviye çevir"</p>
+                                    <p className="text-gray-300">• "Portfolio bölümünü üste taşı"</p>
+                                    <p className="text-gray-300">• "Başlık fontunu büyüt"</p>
+                                </div>
                             </div>
                         ) : (
                             messages.map((message, index) => (
@@ -249,29 +358,83 @@ export default function EditorPage() {
                                             : "bg-gray-700 text-gray-200 mr-4"
                                     }`}
                                 >
-                                    <p className="text-sm">{message.content}</p>
+                                    <p className="text-sm whitespace-pre-line">{message.content}</p>
                                 </div>
                             ))
+                        )}
+                        {isAnalyzing && (
+                            <div className="bg-gray-700 text-gray-200 mr-4 p-3 rounded-lg">
+                                <p className="text-sm">Analiz ediliyor...</p>
+                            </div>
+                        )}
+                        
+                        {/* Inline Confirmation Card */}
+                        {showConfirmModal && pendingRevision && (
+                            <div className="bg-gradient-to-br from-blue-900 to-purple-900 border border-purple-500 rounded-lg p-4 mr-4 space-y-3">
+                                <h4 className="text-white font-bold text-sm">📋 Değişiklikleri Onayla</h4>
+                                <p className="text-gray-200 text-xs">Aşağıdaki değişiklikler yapılacak:</p>
+                                <ul className="list-disc list-inside space-y-1 text-gray-100 text-xs">
+                                    {pendingRevision.changes.map((change, idx) => (
+                                        <li key={idx}>{change}</li>
+                                    ))}
+                                </ul>
+                                <div className="bg-yellow-900 bg-opacity-40 border border-yellow-600 rounded p-2">
+                                    <p className="text-yellow-200 text-xs">
+                                        ⚠️ Bu işlem bir revize hakkı kullanacaktır.
+                                        {site && ` Kalan hakkınız: ${site.maxRevisions - site.revisionCount - 1}`}
+                                    </p>
+                                </div>
+                                <div className="flex gap-2">
+                                    <button
+                                        onClick={handleCancelRevision}
+                                        className="flex-1 px-3 py-2 bg-gray-700 hover:bg-gray-600 text-white text-xs rounded transition-colors"
+                                    >
+                                        İptal
+                                    </button>
+                                    <button
+                                        onClick={handleConfirmRevision}
+                                        className="flex-1 px-3 py-2 bg-purple-600 hover:bg-purple-700 text-white text-xs rounded transition-colors font-semibold"
+                                    >
+                                        Onayla
+                                    </button>
+                                </div>
+                            </div>
                         )}
                     </div>
 
                     {/* Input Area */}
                     <div className="p-4 border-t border-gray-700">
-                        <div className="flex gap-2">
-                            <input
-                                type="text"
+                        <div className="space-y-2">
+                            <textarea
                                 value={inputValue}
-                                onChange={(e) => setInputValue(e.target.value)}
-                                onKeyPress={(e) => e.key === "Enter" && handleSendMessage()}
-                                placeholder="Revize talebinizi yazın..."
-                                className="flex-1 px-4 py-2 bg-gray-700 text-white rounded-lg border border-gray-600 focus:outline-none focus:border-purple-500 placeholder-gray-400"
+                                onChange={(e) => {
+                                    if (e.target.value.length <= MAX_CHAR_LIMIT) {
+                                        setInputValue(e.target.value);
+                                    }
+                                }}
+                                onKeyPress={(e) => {
+                                    if (e.key === "Enter" && !e.shiftKey) {
+                                        e.preventDefault();
+                                        handleSendMessage();
+                                    }
+                                }}
+                                placeholder="Revize talebinizi yazın... (Ör: Eğitim bölümünü kaldır, renkleri değiştir)"
+                                className="w-full px-4 py-2 bg-gray-700 text-white rounded-lg border border-gray-600 focus:outline-none focus:border-purple-500 placeholder-gray-400 resize-none"
+                                rows={3}
+                                disabled={isAnalyzing || isRevising || !site?.htmlContent}
                             />
-                            <button
-                                onClick={handleSendMessage}
-                                className="px-4 py-2 bg-purple-600 hover:bg-purple-700 text-white rounded-lg transition-colors"
-                            >
-                                Gönder
-                            </button>
+                            <div className="flex justify-between items-center">
+                                <span className={`text-xs ${inputValue.length > MAX_CHAR_LIMIT * 0.9 ? 'text-red-400' : 'text-gray-500'}`}>
+                                    {inputValue.length} / {MAX_CHAR_LIMIT}
+                                </span>
+                                <button
+                                    onClick={handleSendMessage}
+                                    disabled={!inputValue.trim() || isAnalyzing || isRevising || !site?.htmlContent}
+                                    className="px-4 py-2 bg-purple-600 hover:bg-purple-700 text-white rounded-lg transition-colors disabled:bg-gray-600 disabled:cursor-not-allowed text-sm"
+                                >
+                                    {isAnalyzing ? "Analiz Ediliyor..." : isRevising ? "Uygulanıyor..." : "Gönder"}
+                                </button>
+                            </div>
                         </div>
                     </div>
                 </div>

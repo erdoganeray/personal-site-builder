@@ -27,6 +27,9 @@
 - gemini chat i olabilir
 - burada preview gösterilecek, kullanıcı isterse en son yine bu ekrandan publish edebilecek. burayı kodlarken database deki cvContent, publishContent i nasıl işlemen gerektiğinden emin ol. yani değişiklik hemen publish e yansımamalı, mutlaka kullanıcı onayı gelmeli
 - hem preview hem de publish için rollback ui tasarımı
+- sayfa yenilenince chat mesajları kayboluyor. kaybolmasın.
+- revise sırasında html/css/js baştan komple yazılmamalı, template sistemine uygun olmalı
+- editor de tasarımı revise ettin. dashboard a dönüp bilgi değiştirip kaydet dedikten sonra revise edilmeyen tasarım üzerinden güncelleniyor. editor ile dashboard eşleşmiyor.
 
 ## AI-Less Component Template Sistemi
 - cvContent içerikleri NULL olabilir. Örneğin bir kullanıcının cv'sinin eğitim bölümünde GPA bilgisi varken, bir kullanıcının GPA bilgisi olmayabilir. cvContent, belirli bir standartta olmak zorunda olduğu için cv'de olmayan ya da çıkarılamayan bilgiler NULL olmalı.
@@ -37,6 +40,7 @@
 - portfolio olarak sadece resim ekleniyor, başlık/açıklama/link de eklenebilir olmalı.
 - bilgilerim de içerik silme gibi komple component silme de olmalı (örneğin eğitim component ini komple silme, ya da eğitimdeki tüm eğitim bilgilerini silince eğitim component i full kaldırılmalı) (kaldırılan componentler elle eklenebilmeli ya da cv'yi tekrar analiz edip cv'den ilgili component'in tekrardan analiz edilmesini sağlayabiliriz)
 - user, template leri kendi seçebilir
+- componentlerin sırasını drag and drop ile belirleyebilir
 
 # Paid Plans Options
 
@@ -86,6 +90,9 @@
     - cloudflare r2 bozuksa?
 - yeni cv eklendiğinde cloudflare'dan silinmeli, kişinin tek cv'si olmalı
 - dosya yüklemeleri için maksimum boyut kuralı ekle
+- preview da portfolio sadece fotoğrafları gösteriyordu. tasarımı değiştir dediğimde efekt ekledi, fotoğrafın üstüne gelince başlık ve içerik gözüküyor. fakat başlık ve içerikleri dil modeli kendi eklemiş. böyle bir başlık ya da içerik kullanıcı tarafından eklenmemiş.
+- revize hakkı dolunca revize isteyince uygun geri bildirimi veriyor ama next.js issue döndürüyor. döndürmesin.
+- editor de chat ile deneyim bölümünü kaldırdığımda bilgilerimde deneyimler görünüyor.
 
 # Güvenlik
 - API key'leri `.env` dosyasında (GitHub'a commit edilmemiş)
