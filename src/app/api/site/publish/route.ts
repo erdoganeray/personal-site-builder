@@ -93,8 +93,6 @@ export async function POST(req: NextRequest) {
         subdomain: deployment.subdomain,
         cloudflareUrl: deployment.url,
         publishedAt: new Date(),
-        // @ts-ignore - Prisma types not updating immediately
-        publishContent: site.previewContent ?? undefined,
       },
     });
 

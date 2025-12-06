@@ -190,6 +190,13 @@ export default function PreviewPage({ params }: { params: Promise<{ siteId: stri
 
     if (status === "authenticated") {
       fetchSite();
+      
+      // Auto-refresh site data every 3 seconds to catch updates
+      const interval = setInterval(() => {
+        fetchSite();
+      }, 3000);
+      
+      return () => clearInterval(interval);
     }
   }, [status, siteId]);
 

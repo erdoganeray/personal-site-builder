@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from "next/server";
 import { getServerSession } from "next-auth";
 import { authOptions } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
+import { regeneratePreviewContent } from "@/lib/regenerate-preview";
 
 export async function PATCH(req: NextRequest) {
     try {
@@ -82,6 +83,22 @@ export async function PATCH(req: NextRequest) {
                 updatedAt: new Date(),
             },
         });
+
+        // Auto-regenerate preview ONLY if site has been generated (status != "draft" and designPlan exists)
+        if (updatedSite.status !== "draft" && updatedSite.designPlan) {
+            console.log(`Auto-regenerating preview for site ${siteId} after info update...`);
+            
+            const result = await regeneratePreviewContent(siteId);
+            
+            if (!result.success) {
+                console.error('Failed to auto-regenerate preview:', result.error);
+                // Don't fail the request - just log the error
+            } else {
+                console.log('✅ Preview auto-regenerated successfully');
+            }
+        } else {
+            console.log(`Skipping preview regeneration: status=${updatedSite.status}, hasDesignPlan=${!!updatedSite.designPlan}`);
+        }
 
         return NextResponse.json({
             message: "Site info updated successfully",

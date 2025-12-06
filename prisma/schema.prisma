@@ -36,8 +36,6 @@ model Site {
   publishedAt    DateTime?
   cloudflareUrl  String?
   subdomain      String?   @unique
-  previewContent Json?
-  publishContent Json?
   user           User      @relation(fields: [userId], references: [id], onDelete: Cascade)
 
   @@index([userId])

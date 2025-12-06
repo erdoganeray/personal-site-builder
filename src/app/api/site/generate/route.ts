@@ -68,7 +68,7 @@ export async function POST(req: NextRequest) {
     // 6. CV verisi zaten JSON formatında
     let cvData: CVData;
     try {
-      cvData = site.cvContent as CVData;
+      cvData = site.cvContent as unknown as CVData;
     } catch (parseError) {
       console.error("Failed to parse CV data:", parseError);
 
@@ -228,11 +228,7 @@ ${finalJs}
         title: `${cvData.personalInfo.name} - Kişisel Web Sitesi`,
         status: "previewed",
         updatedAt: new Date(),
-        designPlan: designPlan, // Tasarım planını kaydet
-        previewContent: {
-          cvData: site.cvContent,
-          designPlan: designPlan
-        },
+        designPlan: designPlan as any, // Tasarım planını kaydet
       },
     });
 
