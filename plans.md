@@ -29,15 +29,14 @@
 - hem preview hem de publish için rollback ui tasarımı
 
 ## AI-Less Component Template Sistemi
-- cvContent içeriğine profil fotoğrafı (link), portfolio fotoğrafları (link, açıklama), facebook linki, twitter linki, instagram linki alanları ekle.
 - cvContent içerikleri NULL olabilir. Örneğin bir kullanıcının cv'sinin eğitim bölümünde GPA bilgisi varken, bir kullanıcının GPA bilgisi olmayabilir. cvContent, belirli bir standartta olmak zorunda olduğu için cv'de olmayan ya da çıkarılamayan bilgiler NULL olmalı.
-- bilgilerim sayfasında profil fotoğrafı yükleme alanı, portfoloio fotoğrafları yükleme alanı, facebook, twitter, instagram linki ekleme alanı ekle.
 - template önizleme sistemi
 - kullanıcıların custom css ekleyebilmesi
 - template marketplace
 - hazır icon'lar güncellenecek
 - portfolio olarak sadece resim ekleniyor, başlık/açıklama/link de eklenebilir olmalı.
-- bilgilerim de içerik silme gibi komple component silme de olmalı (örneğin eğitim component ini komple silme)
+- bilgilerim de içerik silme gibi komple component silme de olmalı (örneğin eğitim component ini komple silme, ya da eğitimdeki tüm eğitim bilgilerini silince eğitim component i full kaldırılmalı)
+- user, template leri kendi seçebilir
 
 # Paid Plans Options
 
