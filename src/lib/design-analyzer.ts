@@ -32,6 +32,7 @@ Konum: ${cvData.personalInfo.location || "Belirtilmemiş"}
 
 İş Deneyimleri: ${cvData.experience.length} adet
 Eğitim: ${cvData.education.length} adet
+Portfolio Fotoğrafları: ${cvData.portfolio?.length || 0} adet
 Yetenekler: ${cvData.skills.join(", ")}
 Diller: ${cvData.languages.join(", ")}
 `;
@@ -66,6 +67,11 @@ EDUCATION SECTION:
 2. education-cards: Kart grid düzeni, modern ve tıklanabilir görünüm
 3. education-modern: Modern gradient tasarım, header düzeni, hover efektli
 
+PORTFOLIO SECTION (OPTIONAL - sadece portfolio fotoğrafları varsa ekle):
+1. portfolio-grid: Grid düzeninde portfolio, hover efekti, lightbox ile büyütme
+2. portfolio-masonry: Masonry (pinterest tarzı) düzen, asimetrik görünüm, lightbox
+3. portfolio-carousel: Carousel/slider düzeni, otomatik geçiş, ok tuşları, lightbox
+
 SKILLS SECTION:
 1. skills-progress-bars: İlerleme çubukları ile yetenek gösterimi
 2. skills-card-grid: Kart grid düzeni, ikon ve isimle yetenek gösterimi
@@ -97,6 +103,7 @@ Component Seçimi Kriterleri:
 - Hero: Kişinin deneyim seviyesi (çok deneyimli için timeline, az için cards)
 - Experience: CV'deki iş deneyimi sayısına göre
 - Education: CV'deki eğitim bilgisi sayısına göre (varsa mutlaka ekle)
+- Portfolio: SADECE portfolio fotoğrafları varsa ekle (${cvData.portfolio?.length || 0} adet var). Education ve Skills arasına yerleştir. Yoksa hiç ekleme!
 - Skills: Yetenek sayısına ve görsel tercihine göre
 - Contact: Site stiline uygun (modern site için form, minimal site için minimal-centered)
 - Footer: Her zaman ekle, site stiline uygun template seç
@@ -118,6 +125,7 @@ Component Seçimi Kriterleri:
     { "category": "hero", "templateId": "hero-modern-centered" },
     { "category": "experience", "templateId": "experience-timeline" },
     { "category": "education", "templateId": "education-timeline" },
+    // Portfolio burada (eğer fotoğraf varsa) - { "category": "portfolio", "templateId": "portfolio-grid" }
     { "category": "skills", "templateId": "skills-card-grid" },
     { "category": "contact", "templateId": "contact-modern-form" },
     { "category": "footer", "templateId": "footer-modern-centered" }

@@ -35,6 +35,8 @@ export default function MyInfo({ site, cvData, onDelete, onCVAnalyzed, deleting 
     const [languages, setLanguages] = useState<string[]>([]);
     const [profilePhotoUrl, setProfilePhotoUrl] = useState("");
     const [uploadingPhoto, setUploadingPhoto] = useState(false);
+    const [portfolio, setPortfolio] = useState<Array<{ imageUrl: string }>>([]);
+    const [uploadingPortfolio, setUploadingPortfolio] = useState(false);
 
     // Load data from site or cvData
     useEffect(() => {
@@ -52,6 +54,7 @@ export default function MyInfo({ site, cvData, onDelete, onCVAnalyzed, deleting 
             setWebsiteUrl(site.cvContent?.personalInfo?.website || cvData?.personalInfo?.website || "");
             setSummary(site.summary || cvData?.summary || "");
             setProfilePhotoUrl(site.cvContent?.personalInfo?.profilePhotoUrl || "");
+            setPortfolio(site.cvContent?.portfolio || cvData?.portfolio || []);
 
             // Parse JSON fields
             try {
@@ -105,6 +108,7 @@ export default function MyInfo({ site, cvData, onDelete, onCVAnalyzed, deleting 
                     summary,
                     experience,
                     education,
+                    portfolio,
                     skills,
                     languages,
                     profilePhotoUrl,
@@ -254,6 +258,82 @@ export default function MyInfo({ site, cvData, onDelete, onCVAnalyzed, deleting 
         const updated = [...languages];
         updated[index] = value;
         setLanguages(updated);
+    };
+
+    const handlePortfolioUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
+        const file = e.target.files?.[0];
+        if (!file) return;
+
+        // Check max limit
+        if (portfolio.length >= 5) {
+            alert("Maksimum 5 adet portfolio fotoğrafı ekleyebilirsiniz");
+            return;
+        }
+
+        // Validate file type
+        const allowedTypes = ["image/jpeg", "image/jpg", "image/png", "image/webp"];
+        if (!allowedTypes.includes(file.type)) {
+            alert("Sadece JPEG, PNG ve WebP formatları desteklenmektedir");
+            return;
+        }
+
+        // Validate file size (5MB)
+        if (file.size > 5 * 1024 * 1024) {
+            alert("Dosya boyutu 5MB'dan küçük olmalıdır");
+            return;
+        }
+
+        setUploadingPortfolio(true);
+        try {
+            const formData = new FormData();
+            formData.append("file", file);
+
+            const response = await fetch("/api/upload/portfolio", {
+                method: "POST",
+                body: formData,
+            });
+
+            const data = await response.json();
+
+            if (response.ok) {
+                setPortfolio([...portfolio, { imageUrl: data.url }]);
+                alert("Portfolio fotoğrafı yüklendi! Değişiklikleri kaydetmeyi unutmayın.");
+            } else {
+                alert(data.error || "Fotoğraf yüklenemedi");
+            }
+        } catch (error) {
+            console.error("Error uploading portfolio image:", error);
+            alert("Bir hata oluştu");
+        } finally {
+            setUploadingPortfolio(false);
+        }
+    };
+
+    const handlePortfolioDelete = async (imageUrl: string, index: number) => {
+        if (!confirm("Bu portfolio fotoğrafını silmek istediğinizden emin misiniz?")) {
+            return;
+        }
+
+        setUploadingPortfolio(true);
+        try {
+            const response = await fetch(`/api/upload/portfolio?url=${encodeURIComponent(imageUrl)}`, {
+                method: "DELETE",
+            });
+
+            const data = await response.json();
+
+            if (response.ok) {
+                setPortfolio(portfolio.filter((_, i) => i !== index));
+                alert("Portfolio fotoğrafı silindi! Değişiklikleri kaydetmeyi unutmayın.");
+            } else {
+                alert(data.error || "Fotoğraf silinemedi");
+            }
+        } catch (error) {
+            console.error("Error deleting portfolio image:", error);
+            alert("Bir hata oluştu");
+        } finally {
+            setUploadingPortfolio(false);
+        }
     };
 
     return (
@@ -720,6 +800,62 @@ export default function MyInfo({ site, cvData, onDelete, onCVAnalyzed, deleting 
                                     </div>
                                 ))}
                                 {education.length === 0 && <p className="text-gray-400 text-sm">Henüz eğitim bilgisi eklenmemiş</p>}
+                            </div>
+                        </div>
+
+                        {/* Portfolio */}
+                        <div className="bg-gray-700/50 rounded-lg p-4">
+                            <div className="flex justify-between items-center mb-3">
+                                <h4 className="text-lg font-semibold text-white">
+                                    Portfolio ({portfolio.length}/5)
+                                </h4>
+                                {isEditing && portfolio.length < 5 && (
+                                    <label className="cursor-pointer">
+                                        <input
+                                            type="file"
+                                            accept="image/jpeg,image/jpg,image/png,image/webp"
+                                            onChange={handlePortfolioUpload}
+                                            disabled={uploadingPortfolio}
+                                            className="hidden"
+                                        />
+                                        <span className={`inline-flex items-center gap-2 px-3 py-1 rounded text-sm font-medium transition-colors ${
+                                            uploadingPortfolio 
+                                                ? 'bg-gray-600 text-gray-400 cursor-not-allowed' 
+                                                : 'bg-blue-600 hover:bg-blue-700 text-white'
+                                        }`}>
+                                            {uploadingPortfolio ? 'Yükleniyor...' : '+ Ekle'}
+                                        </span>
+                                    </label>
+                                )}
+                            </div>
+                            <div className="grid grid-cols-2 md:grid-cols-3 gap-3">
+                                {portfolio.map((item, index) => (
+                                    <div key={index} className="relative group aspect-square rounded-lg overflow-hidden bg-gray-600">
+                                        <img 
+                                            src={item.imageUrl} 
+                                            alt={`Portfolio ${index + 1}`}
+                                            className="w-full h-full object-cover"
+                                        />
+                                        {isEditing && !uploadingPortfolio && (
+                                            <button
+                                                onClick={() => handlePortfolioDelete(item.imageUrl, index)}
+                                                className="absolute top-2 right-2 p-2 bg-red-600 hover:bg-red-700 text-white rounded-full opacity-0 group-hover:opacity-100 transition-opacity"
+                                            >
+                                                <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
+                                                </svg>
+                                            </button>
+                                        )}
+                                    </div>
+                                ))}
+                                {portfolio.length === 0 && (
+                                    <div className="col-span-2 md:col-span-3 text-center py-8">
+                                        <p className="text-gray-400 text-sm">Henüz portfolio fotoğrafı eklenmemiş</p>
+                                        {isEditing && (
+                                            <p className="text-gray-500 text-xs mt-2">Maksimum 5 adet fotoğraf ekleyebilirsiniz</p>
+                                        )}
+                                    </div>
+                                )}
                             </div>
                         </div>
 

@@ -29,11 +29,16 @@ export interface CVEducation {
   year: string;
 }
 
+export interface CVPortfolioItem {
+  imageUrl: string;
+}
+
 export interface CVData {
   personalInfo: CVPersonalInfo;
   summary?: string;
   experience: CVExperience[];
   education: CVEducation[];
+  portfolio: CVPortfolioItem[];
   skills: string[];
   languages: string[];
 }

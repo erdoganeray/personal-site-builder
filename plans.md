@@ -36,6 +36,8 @@
 - kullanıcıların custom css ekleyebilmesi
 - template marketplace
 - hazır icon'lar güncellenecek
+- portfolio olarak sadece resim ekleniyor, başlık/açıklama/link de eklenebilir olmalı.
+- bilgilerim de içerik silme gibi komple component silme de olmalı (örneğin eğitim component ini komple silme)
 
 # Paid Plans Options
 
@@ -48,6 +50,7 @@
 - 7 gün domain rezervasyonu
 - Otomatik version temizliği için cron job (30/90 gün sonra)
 - one page tasarım
+- portfolio da sadece fotoğraf
 
 ## Paid Plan 
 - react, vue ya da next.js gibi daha komplike teknolojiler ile web sitesi oluşturma
@@ -59,6 +62,7 @@
 - more domain rezervasyonu
 - Otomatik version temizliği için cron job (30/90 gün sonra)
 - multiple pages tasarım
+- portfolioda video
 
 # Hata Yönetimi
 - ai ile siteniz oluşturuluyor animation eklenecek
@@ -82,6 +86,7 @@
     - gemini hata verirse?
     - cloudflare r2 bozuksa?
 - yeni cv eklendiğinde cloudflare'dan silinmeli, kişinin tek cv'si olmalı
+- dosya yüklemeleri için maksimum boyut kuralı ekle
 
 # Güvenlik
 - API key'leri `.env` dosyasında (GitHub'a commit edilmemiş)

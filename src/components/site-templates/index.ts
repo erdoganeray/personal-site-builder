@@ -4,6 +4,7 @@ import { experienceTemplates } from "./experience-templates";
 import { skillsTemplates } from "./skills-templates";
 import { navigationTemplates } from "./navigation-templates";
 import { educationTemplates } from "./education-templates";
+import { portfolioTemplates } from "./portfolio-templates";
 import { contactTemplates } from "./contact-templates";
 import { footerTemplates } from "./footer-templates";
 
@@ -15,6 +16,7 @@ export const allTemplates: ComponentTemplate[] = [
   ...heroTemplates,
   ...experienceTemplates,
   ...educationTemplates,
+  ...portfolioTemplates,
   ...skillsTemplates,
   ...navigationTemplates,
   ...contactTemplates,

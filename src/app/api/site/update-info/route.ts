@@ -42,6 +42,7 @@ export async function PATCH(req: NextRequest) {
             summary,
             experience,
             education,
+            portfolio,
             skills,
             languages,
             profilePhotoUrl,
@@ -72,6 +73,7 @@ export async function PATCH(req: NextRequest) {
             summary: "",
             experience: [],
             education: [],
+            portfolio: [],
             skills: [],
             languages: [],
         };
@@ -92,6 +94,7 @@ export async function PATCH(req: NextRequest) {
         if (summary !== undefined) cvContent.summary = summary;
         if (experience !== undefined) cvContent.experience = experience;
         if (education !== undefined) cvContent.education = education;
+        if (portfolio !== undefined) cvContent.portfolio = portfolio;
         if (skills !== undefined) cvContent.skills = skills;
         if (languages !== undefined) cvContent.languages = languages;
 

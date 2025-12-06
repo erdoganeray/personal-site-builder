@@ -224,6 +224,71 @@ export function getSkillsReplacements(
 }
 
 /**
+ * CV verilerinden portfolio section için HTML items oluşturur
+ */
+export function generatePortfolioItems(
+  cvData: CVData,
+  templateId: string
+): string {
+  if (!cvData.portfolio || cvData.portfolio.length === 0) {
+    return '';
+  }
+
+  if (templateId === 'portfolio-grid') {
+    return cvData.portfolio.map((item, index) => `
+      <div class="portfolio-item" data-index="${index}">
+        <img src="${item.imageUrl}" alt="Portfolio ${index + 1}" loading="lazy" />
+      </div>
+    `).join('\n');
+  } else if (templateId === 'portfolio-masonry') {
+    return cvData.portfolio.map((item, index) => `
+      <div class="portfolio-item-masonry" data-index="${index}">
+        <img src="${item.imageUrl}" alt="Portfolio ${index + 1}" loading="lazy" />
+      </div>
+    `).join('\n');
+  } else if (templateId === 'portfolio-carousel') {
+    return cvData.portfolio.map((item, index) => `
+      <div class="portfolio-item-carousel" data-index="${index}">
+        <img src="${item.imageUrl}" alt="Portfolio ${index + 1}" loading="lazy" />
+      </div>
+    `).join('\n');
+  }
+  
+  return '';
+}
+
+/**
+ * CV verilerinden portfolio section için placeholder değerleri oluşturur
+ */
+export function getPortfolioReplacements(
+  cvData: CVData,
+  themeColors: ThemeColors,
+  templateId: string
+): PlaceholderReplacements {
+  const portfolioItems = generatePortfolioItems(cvData, templateId);
+  
+  // Add lightbox HTML structure
+  const lightboxHtml = `
+    <div class="lightbox" id="portfolio-lightbox">
+      <div class="lightbox-content">
+        <button class="lightbox-close" id="lightbox-close">×</button>
+        <img id="lightbox-img" src="" alt="Portfolio" />
+      </div>
+    </div>
+  `;
+
+  return {
+    '{{PORTFOLIO_ITEMS}}': portfolioItems + lightboxHtml,
+    '{{COLOR_PRIMARY}}': themeColors.primary,
+    '{{COLOR_SECONDARY}}': themeColors.secondary,
+    '{{COLOR_ACCENT}}': themeColors.accent,
+    '{{COLOR_BACKGROUND}}': themeColors.background,
+    '{{COLOR_TEXT}}': themeColors.text,
+    '{{COLOR_TEXT_SECONDARY}}': themeColors.textSecondary,
+  };
+}
+
+/**
  * CV verilerinden contact section için placeholder değerleri oluşturur
  */
 export function getContactReplacements(
@@ -339,6 +404,8 @@ export function getReplacementsForComponent(
       return getExperienceReplacements(cvData, themeColors, component.id);
     case 'education':
       return getEducationReplacements(cvData, themeColors, component.id);
+    case 'portfolio':
+      return getPortfolioReplacements(cvData, themeColors, component.id);
     case 'skills':
       return getSkillsReplacements(cvData, themeColors, component.id);
     case 'contact':
