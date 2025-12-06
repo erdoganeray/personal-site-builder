@@ -30,7 +30,7 @@
 ## "Yayınlanmamış Değişiklikler Mevcut hatası"
 - kaldırılacak (belki sadece publish zamanı bir değişiklik olursa gösterilir)
 
-## AI-Less Preview Reload
+## AI-Less Component Template Sistemi
 - previewContent, publishContent içeriklerini projeden kaldıracağız.
 - bilgilerim'deki tüm bilgiler cvContent json olarak saklansın.
 - cvContent içeriğine profil fotoğrafı (link), portfolio fotoğrafları (link, açıklama), facebook linki, twitter linki, instagram linki alanları ekle.
@@ -42,6 +42,9 @@
 - kullanıcının girdiği prompt'tan uygun tema renkleri, hangi componentlerin kullanılacağı (örneğin bir kişinin portfolio component i olmak zorunda değil), kullanılacak componentleri hangi template'leri kullanılacağı bilgileri output edilir.
 - ilgili template içerikleri ile gemini api'dan çıkan tasarım kararları ve cvContent içeriği birleştirilir. böylece web page ortaya çıkmış olur.
 - ayrıca, bilgilerim'de bir değişiklik kaydedildiğinde, cvContent değişecek. preview sayfa cvContent'ten yansıtıldığı için, bilgilerim de yapılan herhangi bir info change direkt olarak preview'a yansımış olacak. sabit template'ler ile çalıştığımız için de ui hatası olmayacak.
+- template önizleme sistemi
+- kullanıcıların custom css ekleyebilmesi
+- template marketplace
 
 # Paid Plans Options
 
