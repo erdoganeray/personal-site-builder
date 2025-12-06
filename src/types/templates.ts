@@ -14,11 +14,18 @@ export interface ThemeColors {
 export interface ComponentTemplate {
   id: string;
   name: string;
-  category: 'hero' | 'about' | 'experience' | 'education' | 'skills' | 'contact' | 'footer';
+  category: 'navigation' | 'hero' | 'about' | 'experience' | 'education' | 'skills' | 'contact' | 'footer';
   htmlTemplate: string;
   cssTemplate: string;
   jsTemplate?: string;
-  placeholders: string[]; // Örn: {{NAME}}, {{TITLE}}, {{COLOR_PRIMARY}}
+  dataSchema?: {
+    [key: string]: {
+      type: string;
+      required: boolean;
+      description: string;
+    };
+  };
+  designNotes?: string;
 }
 
 export interface SelectedComponent {

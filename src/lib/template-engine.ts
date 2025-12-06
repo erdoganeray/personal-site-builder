@@ -1,4 +1,4 @@
-import { ComponentTemplate, ThemeColors } from "@/types/templates";
+import { ComponentTemplate, ThemeColors, SelectedComponent } from "@/types/templates";
 import { CVData } from "./gemini-pdf-parser";
 
 /**
@@ -42,6 +42,7 @@ export function getHeroReplacements(
 
   return {
     '{{NAME}}': cvData.personalInfo.name,
+    '{{INITIALS}}': initials,
     '{{TITLE}}': cvData.personalInfo.title || 'Professional',
     '{{SUMMARY}}': cvData.summary || cvData.personalInfo.name + ' - Professional Profile',
     '{{PROFILE_IMAGE}}': initials, // İlk harfler profil resmi yerine
@@ -155,14 +156,52 @@ export function getSkillsReplacements(
 }
 
 /**
+ * Navigation menu için placeholder değerleri oluşturur
+ * Sayfadaki componentlere göre dinamik menu linkleri oluşturur
+ */
+export function getNavigationReplacements(
+  cvData: CVData,
+  themeColors: ThemeColors,
+  selectedComponents: SelectedComponent[]
+): PlaceholderReplacements {
+  const initials = cvData.personalInfo.name
+    .split(' ')
+    .map(n => n[0])
+    .join('')
+    .toUpperCase()
+    .slice(0, 2);
+
+  // Sosyal medya linklerini oluştur (eğer varsa)
+  const socialLinks = `
+    <a href="mailto:${cvData.personalInfo.email || '#'}" title="Email">📧</a>
+    ${cvData.personalInfo.phone ? `<a href="tel:${cvData.personalInfo.phone}" title="Phone">📱</a>` : ''}
+  `.trim();
+
+  return {
+    '{{NAME}}': cvData.personalInfo.name,
+    '{{INITIALS}}': initials,
+    '{{SOCIAL_LINKS}}': socialLinks,
+    '{{COLOR_PRIMARY}}': themeColors.primary,
+    '{{COLOR_SECONDARY}}': themeColors.secondary,
+    '{{COLOR_ACCENT}}': themeColors.accent,
+    '{{COLOR_BACKGROUND}}': themeColors.background,
+    '{{COLOR_TEXT}}': themeColors.text,
+    '{{COLOR_TEXT_SECONDARY}}': themeColors.textSecondary,
+  };
+}
+
+/**
  * Component kategorisine göre doğru replacement fonksiyonunu çağırır
  */
 export function getReplacementsForComponent(
   component: ComponentTemplate,
   cvData: CVData,
-  themeColors: ThemeColors
+  themeColors: ThemeColors,
+  selectedComponents?: SelectedComponent[]
 ): PlaceholderReplacements {
   switch (component.category) {
+    case 'navigation':
+      return getNavigationReplacements(cvData, themeColors, selectedComponents || []);
     case 'hero':
       return getHeroReplacements(cvData, themeColors);
     case 'experience':
@@ -180,9 +219,10 @@ export function getReplacementsForComponent(
 export function populateTemplate(
   component: ComponentTemplate,
   cvData: CVData,
-  themeColors: ThemeColors
+  themeColors: ThemeColors,
+  selectedComponents?: SelectedComponent[]
 ): { html: string; css: string; js?: string } {
-  const replacements = getReplacementsForComponent(component, cvData, themeColors);
+  const replacements = getReplacementsForComponent(component, cvData, themeColors, selectedComponents);
   
   return {
     html: replacePlaceholders(component.htmlTemplate, replacements),

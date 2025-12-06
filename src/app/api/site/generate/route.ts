@@ -136,7 +136,7 @@ export async function POST(req: NextRequest) {
           continue;
         }
 
-        const populated = populateTemplate(template, cvData, designPlan.themeColors);
+        const populated = populateTemplate(template, cvData, designPlan.themeColors, designPlan.selectedComponents);
         
         finalHtml += populated.html + '\n';
         finalCss += populated.css + '\n\n';

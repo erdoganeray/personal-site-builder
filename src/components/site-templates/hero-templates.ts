@@ -9,7 +9,7 @@ export const heroTemplate1: ComponentTemplate = {
   name: "Modern Centered Hero",
   category: "hero",
   htmlTemplate: `
-    <section class="hero-section">
+    <section id="hero" class="hero-section">
       <div class="hero-container">
         <div class="hero-image-wrapper">
           <div class="hero-image">{{PROFILE_IMAGE}}</div>
@@ -121,7 +121,7 @@ export const heroTemplate2: ComponentTemplate = {
   name: "Split Screen Hero",
   category: "hero",
   htmlTemplate: `
-    <section class="hero-section-split">
+    <section id="hero" class="hero-section-split">
       <div class="hero-content">
         <h1 class="hero-name">{{NAME}}</h1>
         <p class="hero-title">{{TITLE}}</p>

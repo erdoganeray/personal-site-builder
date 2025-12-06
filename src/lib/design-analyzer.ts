@@ -47,6 +47,12 @@ ${customPrompt ? `\nKullanıcının Özel İstekleri:\n${customPrompt}\n` : ''}
 
 Mevcut Component Template'ler:
 
+NAVIGATION MENU:
+1. nav-classic-horizontal: Klasik yatay navigasyon, mobilde hamburger menü
+2. nav-minimal-centered: Minimal tasarım, logo ortada, linkler iki yanda
+3. nav-sidebar-modern: Sol tarafta sabit sidebar, gradient arka plan, iconlu
+4. nav-floating-dot: Sağda floating dot navigasyon, minimal
+
 HERO SECTION:
 1. hero-modern-centered: Modern, merkezi düzen, profil fotoğrafı üstte, CTA butonları
 2. hero-split-screen: İki kolonlu düzen, sol taraf içerik, sağ taraf görsel
@@ -62,7 +68,8 @@ SKILLS SECTION:
 Görevin:
 1. CV'ye ve kullanıcı isteğine en uygun tema renklerini belirle (hex kodları)
 2. Yukarıdaki template'lerden hangilerinin kullanılacağına karar ver
-3. Genel stil anlayışını belirle (modern/minimal/creative/professional)
+3. Her kategoriden (navigation, hero, experience, skills) bir template seç
+4. Genel stil anlayışını belirle (modern/minimal/creative/professional)
 
 Renk Seçimi Kriterleri:
 - Kişinin mesleğine uygun (örn: teknoloji için mavi/mor, tasarım için canlı renkler)
@@ -71,8 +78,10 @@ Renk Seçimi Kriterleri:
 - Kullanıcının özel isteklerini dikkate al
 
 Component Seçimi Kriterleri:
-- Kişinin deneyim seviyesi (çok deneyimli için timeline, az için cards)
-- CV'deki bilgi yoğunluğu
+- Navigation: Sayfanın genel stiline uygun (minimal site için minimal nav, creative site için sidebar)
+- Hero: Kişinin deneyim seviyesi (çok deneyimli için timeline, az için cards)
+- Experience: CV'deki iş deneyimi sayısına göre
+- Skills: Yetenek sayısına ve görsel tercihine göre
 - Mesleğe uygunluk
 - Kullanıcının özel isteklerini dikkate al
 
@@ -87,6 +96,7 @@ Component Seçimi Kriterleri:
     "textSecondary": "#hex"
   },
   "selectedComponents": [
+    { "category": "navigation", "templateId": "nav-classic-horizontal" },
     { "category": "hero", "templateId": "hero-modern-centered" },
     { "category": "experience", "templateId": "experience-timeline" },
     { "category": "skills", "templateId": "skills-card-grid" }

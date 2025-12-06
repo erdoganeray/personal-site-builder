@@ -2,6 +2,7 @@ import { ComponentTemplate } from "@/types/templates";
 import { heroTemplates } from "./hero-templates";
 import { experienceTemplates } from "./experience-templates";
 import { skillsTemplates } from "./skills-templates";
+import { navigationTemplates } from "./navigation-templates";
 
 /**
  * Tüm template'lerin merkezi kaydı
@@ -11,6 +12,7 @@ export const allTemplates: ComponentTemplate[] = [
   ...heroTemplates,
   ...experienceTemplates,
   ...skillsTemplates,
+  ...navigationTemplates,
 ];
 
 export function getTemplateById(id: string): ComponentTemplate | undefined {
