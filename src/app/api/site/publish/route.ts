@@ -105,7 +105,7 @@ export async function POST(req: NextRequest) {
     return NextResponse.json({
       success: true,
       message: "Site published successfully!",
-      deployedUrl: deployment.url,
+      cloudflareUrl: deployment.url,
       subdomain: deployment.subdomain,
       site: updatedSite,
     });

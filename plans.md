@@ -34,6 +34,9 @@
 - componentlerin sırasını drag and drop ile belirleyebilir
 - preview/publish sync olduğunda warning çıkıyor, warning içeriği düzgün şekilde gösterilmeli
 
+## Subdomain - Custom Domain
+- Subdomain çakışması kontrolü eklenmeli
+
 # Paid Plans Options
 
 ## Free Plan (MVP)

@@ -356,7 +356,7 @@ export default function EditorPage() {
                                                 });
                                                 const data = await response.json();
                                                 if (response.ok) {
-                                                    alert(`Site başarıyla yeniden yayınlandı!\nURL: ${data.deployedUrl}`);
+                                                    alert(`Site başarıyla yeniden yayınlandı!\nURL: ${data.cloudflareUrl}`);
                                                     fetchSite();
                                                 } else {
                                                     alert(data.error || "Site yayınlanamadı");

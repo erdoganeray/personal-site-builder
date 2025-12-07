@@ -127,9 +127,9 @@ export default function MySite({ site, onRefresh }: MySiteProps) {
             const data = await response.json();
 
             if (response.ok) {
-                alert(`Site başarıyla yayınlandı!\nURL: ${data.deployedUrl}`);
+                alert(`Site başarıyla yayınlandı!\nURL: ${data.cloudflareUrl}`);
                 onRefresh();
-                window.open(data.deployedUrl, "_blank");
+                window.open(data.cloudflareUrl, "_blank");
             } else {
                 alert(data.error || "Site yayınlanamadı");
             }
@@ -280,16 +280,16 @@ export default function MySite({ site, onRefresh }: MySiteProps) {
                     </div>
                 )}
 
-                {site.status === "published" && (site.deployedUrl || site.cloudflareUrl) && (
+                {site.status === "published" && site.cloudflareUrl && (
                     <div className="bg-green-900/30 border border-green-700 rounded-lg p-4 mb-4">
                         <p className="text-sm font-medium text-green-300 mb-2">Site URL:</p>
                         <a
-                            href={site.deployedUrl || site.cloudflareUrl}
+                            href={site.cloudflareUrl}
                             target="_blank"
                             rel="noopener noreferrer"
                             className="text-green-400 hover:text-green-300 underline break-all"
                         >
-                            {site.deployedUrl || site.cloudflareUrl}
+                            {site.cloudflareUrl}
                         </a>
                     </div>
                 )}
