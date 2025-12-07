@@ -69,6 +69,8 @@ export async function POST(req: NextRequest) {
       })
     );
 
+    // Return R2 public URL for dashboard/preview use
+    // Template engine will convert this to relative path for published sites
     const fileUrl = `${process.env.R2_PUBLIC_URL}/users/${session.user.id}/profile/${fileName}`;
 
     console.log("Profile photo uploaded to R2:", fileUrl);
@@ -108,10 +110,18 @@ export async function DELETE(req: NextRequest) {
     }
 
     // Extract the key from the URL
-    // URL format: https://pub-xxx.r2.dev/users/{userId}/profile/profile-photo-xxx.jpg
-    const urlParts = photoUrl.split("/");
-    const keyParts = urlParts.slice(urlParts.indexOf("users"));
-    const key = keyParts.join("/");
+    // Support both old R2 URL format and new relative path format
+    let key: string;
+    if (photoUrl.startsWith('/_assets/profile/')) {
+      // New format: /_assets/profile/profile-photo-xxx.jpg
+      const fileName = photoUrl.replace('/_assets/profile/', '');
+      key = `users/${session.user.id}/profile/${fileName}`;
+    } else {
+      // Old format: https://pub-xxx.r2.dev/users/{userId}/profile/profile-photo-xxx.jpg
+      const urlParts = photoUrl.split("/");
+      const keyParts = urlParts.slice(urlParts.indexOf("users"));
+      key = keyParts.join("/");
+    }
 
     // Verify the key belongs to the current user
     if (!key.startsWith(`users/${session.user.id}/profile/`)) {

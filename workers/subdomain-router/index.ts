@@ -41,11 +41,24 @@ export default {
     
     // 3. URL path'ini belirle (/, /styles.css, /script.js)
     let filePath = url.pathname;
-    if (filePath === '/' || filePath === '') {
-      filePath = '/index.html';
-    }
+    let r2Key: string;
     
-    const r2Key = `users/${userId}/site/${siteId}${filePath}`;
+    // Check if this is an asset request (profile photo or portfolio image)
+    if (filePath.startsWith('/_assets/profile/')) {
+      // Profile photo: /_assets/profile/photo.jpg -> users/{userId}/profile/photo.jpg
+      const fileName = filePath.replace('/_assets/profile/', '');
+      r2Key = `users/${userId}/profile/${fileName}`;
+    } else if (filePath.startsWith('/_assets/portfolio/')) {
+      // Portfolio image: /_assets/portfolio/image.jpg -> users/{userId}/portfolio/image.jpg
+      const fileName = filePath.replace('/_assets/portfolio/', '');
+      r2Key = `users/${userId}/portfolio/${fileName}`;
+    } else {
+      // Regular site files (HTML, CSS, JS)
+      if (filePath === '/' || filePath === '') {
+        filePath = '/index.html';
+      }
+      r2Key = `users/${userId}/site/${siteId}${filePath}`;
+    }
     
     console.log(`Fetching: ${r2Key}`);
     

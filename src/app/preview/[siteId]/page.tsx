@@ -138,12 +138,22 @@ export default function PreviewPage({ params }: { params: Promise<{ siteId: stri
   // Unwrap params Promise
   const { siteId } = use(params);
 
-  // Blob URL oluştur - site htmlContent, cssContent, jsContent değiştiğinde güncellenir
-  const iframeUrl = useMemo(() => {
+  // HTML içeriğini hazırla - site htmlContent, cssContent, jsContent değiştiğinde güncellenir
+  const iframeContent = useMemo(() => {
     if (!site?.htmlContent) return '';
     
     // HTML'in içine CSS ve JS'i inject et
     let fullHtml = site.htmlContent;
+    
+    // Preview için: /_assets/* -> /assets/* (Next.js API route)
+    // Published sitede /_assets/* Worker proxy tarafından handle edilir
+    fullHtml = fullHtml.replace(/\/_assets\//g, '/assets/');
+    
+    // R2 public URL'leri varsa onları da /assets/ path'ine çevir
+    const r2UrlPattern = /https:\/\/pub-[a-f0-9]+\.r2\.dev\/users\/[^/]+\/(profile|portfolio)\/([^\s"']+\.(jpg|jpeg|png|webp|gif))/gi;
+    fullHtml = fullHtml.replace(r2UrlPattern, (match, folder, fileName) => {
+      return `/assets/${folder}/${fileName}`;
+    });
     
     // CSS'i <head> içine ekle (eğer varsa)
     if (site.cssContent) {
@@ -169,18 +179,8 @@ export default function PreviewPage({ params }: { params: Promise<{ siteId: stri
       }
     }
     
-    const blob = new Blob([fullHtml], { type: 'text/html' });
-    return URL.createObjectURL(blob);
+    return fullHtml;
   }, [site?.htmlContent, site?.cssContent, site?.jsContent]);
-
-  // Cleanup - component unmount olduğunda blob URL'i temizle
-  useEffect(() => {
-    return () => {
-      if (iframeUrl) {
-        URL.revokeObjectURL(iframeUrl);
-      }
-    };
-  }, [iframeUrl]);
 
   useEffect(() => {
     if (status === "unauthenticated") {
@@ -623,7 +623,7 @@ export default function PreviewPage({ params }: { params: Promise<{ siteId: stri
               }}
             >
               <iframe
-                src={iframeUrl}
+                srcDoc={iframeContent}
                 className="w-full h-full border-0"
                 title="Site Preview"
                 sandbox="allow-same-origin allow-scripts allow-forms allow-popups"

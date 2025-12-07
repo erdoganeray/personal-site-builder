@@ -1,4 +1,5 @@
 import { S3Client, PutObjectCommand } from "@aws-sdk/client-s3";
+import { convertHtmlAssetsToRelativePaths } from "./template-engine";
 
 // R2 Client (S3-compatible)
 const r2Client = new S3Client({
@@ -52,18 +53,21 @@ export async function deployToCloudflare(
     
     const bucketName = process.env.R2_BUCKET_NAME || "user-sites";
     
-    // 2. R2'ye HTML dosyasını yükle
+    // 2. HTML içeriğindeki R2 URL'lerini relative path'e çevir (published site için)
+    const processedHtml = convertHtmlAssetsToRelativePaths(htmlContent);
+    
+    // 3. R2'ye HTML dosyasını yükle
     await r2Client.send(
       new PutObjectCommand({
         Bucket: bucketName,
         Key: `users/${userId}/site/${siteId}/index.html`,
-        Body: htmlContent,
+        Body: processedHtml,
         ContentType: "text/html; charset=utf-8",
         CacheControl: "public, max-age=3600",
       })
     );
 
-    // 3. CSS dosyasını yükle
+    // 4. CSS dosyasını yükle
     await r2Client.send(
       new PutObjectCommand({
         Bucket: bucketName,
@@ -74,7 +78,7 @@ export async function deployToCloudflare(
       })
     );
 
-    // 4. JS dosyasını yükle
+    // 5. JS dosyasını yükle
     await r2Client.send(
       new PutObjectCommand({
         Bucket: bucketName,

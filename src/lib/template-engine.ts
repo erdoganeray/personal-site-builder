@@ -10,6 +10,48 @@ interface PlaceholderReplacements {
 }
 
 /**
+ * R2 public URL'lerini subdomain relative path'lere dönüştürür
+ * Eski format: https://pub-xxx.r2.dev/users/{userId}/profile/photo.jpg
+ * Yeni format: /assets/profile/photo.jpg (localhost preview için)
+ * Yeni format: /_assets/profile/photo.jpg (published site için - Worker proxy)
+ */
+export function convertR2UrlToRelativePath(url: string, forPublish: boolean = true): string {
+  if (!url) return url;
+  
+  // Zaten relative path ise dokunma
+  if (url.startsWith('/_assets/') || url.startsWith('/assets/')) {
+    return url;
+  }
+  
+  // R2 public URL'i mi kontrol et
+  const r2PublicUrlPattern = /https?:\/\/pub-[a-f0-9]+\.r2\.dev\/users\/[^/]+\/(profile|portfolio)\/(.+)/;
+  const match = url.match(r2PublicUrlPattern);
+  
+  if (match) {
+    const [, folder, fileName] = match;
+    // Published site için /_assets (Worker proxy)
+    // Preview için /assets (Next.js API route)
+    const prefix = forPublish ? '/_assets' : '/assets';
+    return `${prefix}/${folder}/${fileName}`;
+  }
+  
+  // Başka bir URL formatı ise olduğu gibi döndür
+  return url;
+}
+
+/**
+ * HTML içeriğindeki tüm R2 URL'lerini relative path'e çevirir (published siteler için)
+ */
+export function convertHtmlAssetsToRelativePaths(html: string): string {
+  // Tüm R2 public URL'lerini bul ve değiştir
+  const r2UrlPattern = /https?:\/\/pub-[a-f0-9]+\.r2\.dev\/users\/[^/]+\/(profile|portfolio)\/([^"'\s>]+)/g;
+  
+  return html.replace(r2UrlPattern, (match, folder, fileName) => {
+    return `/_assets/${folder}/${fileName}`;
+  });
+}
+
+/**
  * Template'deki tüm placeholder'ları değiştirir
  */
 export function replacePlaceholders(
@@ -42,8 +84,10 @@ export function getHeroReplacements(
 
   // Generate profile image content - either <img> tag or initials
   const profilePhotoUrl = cvData.personalInfo.profilePhotoUrl;
-  const profileImageContent = profilePhotoUrl
-    ? `<img src="${profilePhotoUrl}" alt="${cvData.personalInfo.name}" style="width: 100%; height: 100%; object-fit: cover; border-radius: inherit;" />`
+  // Convert old R2 URLs to new relative paths
+  const convertedPhotoUrl = convertR2UrlToRelativePath(profilePhotoUrl || '');
+  const profileImageContent = convertedPhotoUrl
+    ? `<img src="${convertedPhotoUrl}" alt="${cvData.personalInfo.name}" style="width: 100%; height: 100%; object-fit: cover; border-radius: inherit;" />`
     : initials;
 
   return {
@@ -237,19 +281,19 @@ export function generatePortfolioItems(
   if (templateId === 'portfolio-grid') {
     return cvData.portfolio.map((item, index) => `
       <div class="portfolio-item" data-index="${index}">
-        <img src="${item.imageUrl}" alt="Portfolio ${index + 1}" loading="lazy" />
+        <img src="${convertR2UrlToRelativePath(item.imageUrl)}" alt="Portfolio ${index + 1}" loading="lazy" />
       </div>
     `).join('\n');
   } else if (templateId === 'portfolio-masonry') {
     return cvData.portfolio.map((item, index) => `
       <div class="portfolio-item-masonry" data-index="${index}">
-        <img src="${item.imageUrl}" alt="Portfolio ${index + 1}" loading="lazy" />
+        <img src="${convertR2UrlToRelativePath(item.imageUrl)}" alt="Portfolio ${index + 1}" loading="lazy" />
       </div>
     `).join('\n');
   } else if (templateId === 'portfolio-carousel') {
     return cvData.portfolio.map((item, index) => `
       <div class="portfolio-item-carousel" data-index="${index}">
-        <img src="${item.imageUrl}" alt="Portfolio ${index + 1}" loading="lazy" />
+        <img src="${convertR2UrlToRelativePath(item.imageUrl)}" alt="Portfolio ${index + 1}" loading="lazy" />
       </div>
     `).join('\n');
   }
