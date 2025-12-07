@@ -3,6 +3,8 @@
 import { useState, useMemo, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import { hasUnpublishedChanges } from "@/lib/change-detection";
+import { convertRelativeAssetsToAbsolute } from "@/lib/iframe-utils";
+
 
 interface MySiteProps {
     site: any;
@@ -52,9 +54,13 @@ export default function MySite({ site, onRefresh }: MySiteProps) {
             }
         }
 
+        // Relative asset path'lerini absolute URL'lere çevir (blob iframe için gerekli)
+        fullHtml = convertRelativeAssetsToAbsolute(fullHtml);
+
         const blob = new Blob([fullHtml], { type: 'text/html' });
         return URL.createObjectURL(blob);
     }, [site?.htmlContent, site?.cssContent, site?.jsContent]);
+
 
     // Cleanup - component unmount olduğunda blob URL'i temizle
     useEffect(() => {
@@ -229,7 +235,7 @@ export default function MySite({ site, onRefresh }: MySiteProps) {
             {/* Site Status */}
             <div className="bg-gray-800 rounded-xl border border-gray-700 p-6">
                 <h3 className="text-xl font-bold text-white mb-4">Site Durumu</h3>
-                
+
                 <div className="flex items-center gap-3 mb-4 flex-wrap">
                     <div
                         className={`px-4 py-2 rounded-full font-semibold ${site.status === "published"
@@ -256,7 +262,7 @@ export default function MySite({ site, onRefresh }: MySiteProps) {
                         </>
                     )}
                 </div>
-                
+
                 {/* Unpublished Changes Warning */}
                 {hasChanges && (
                     <div className="bg-yellow-900/30 border border-yellow-700 rounded-lg p-4 mb-4">
@@ -402,7 +408,7 @@ export default function MySite({ site, onRefresh }: MySiteProps) {
                         rows={4}
                         className="w-full px-4 py-3 bg-gray-700 border border-gray-600 text-white rounded-lg focus:ring-2 focus:ring-blue-500 resize-none"
                     />
-                    
+
                     {/* Generate Button */}
                     <button
                         onClick={handleGenerateSite}

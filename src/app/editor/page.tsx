@@ -5,6 +5,8 @@ import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useEffect, useState, useMemo } from "react";
 import { hasUnpublishedChanges } from "@/lib/change-detection";
+import { convertRelativeAssetsToAbsolute } from "@/lib/iframe-utils";
+
 
 export default function EditorPage() {
     const { data: session, status } = useSession();
@@ -19,7 +21,7 @@ export default function EditorPage() {
     const [showConfirmModal, setShowConfirmModal] = useState(false);
     const [pendingRevision, setPendingRevision] = useState<{ changes: string[]; originalMessage: string } | null>(null);
     const [publishing, setPublishing] = useState(false);
-    
+
     const MAX_CHAR_LIMIT = 500;
 
     // Check for unpublished changes
@@ -41,9 +43,9 @@ export default function EditorPage() {
         try {
             const response = await fetch("/api/site/list");
             const data = await response.json();
-            
+
             console.log("Editor - API Response:", data);
-            
+
             if (response.ok && data.sites && data.sites.length > 0) {
                 const userSite = data.sites[0];
                 console.log("Editor - Site data:", userSite);
@@ -88,9 +90,13 @@ export default function EditorPage() {
             }
         }
 
+        // Relative asset path'lerini absolute URL'lere çevir (blob iframe için gerekli)
+        fullHtml = convertRelativeAssetsToAbsolute(fullHtml);
+
         const blob = new Blob([fullHtml], { type: 'text/html' });
         return URL.createObjectURL(blob);
     }, [site?.htmlContent, site?.cssContent, site?.jsContent]);
+
 
     // Cleanup - component unmount olduğunda blob URL'i temizle
     useEffect(() => {
@@ -232,17 +238,16 @@ export default function EditorPage() {
                         ← Geri
                     </Link>
                     <h1 className="text-xl font-bold text-white">Site Editörü</h1>
-                    
+
                     {/* Device Selector in Navigation - Only show if there's content */}
                     {hasPreviewContent && (
                         <div className="flex items-center gap-2 bg-gray-700 rounded-lg p-1">
                             <button
                                 onClick={() => setSelectedDevice("computer")}
-                                className={`px-3 py-1 rounded transition-colors ${
-                                    selectedDevice === "computer"
-                                        ? "bg-blue-600 text-white"
-                                        : "text-gray-400 hover:text-white"
-                                }`}
+                                className={`px-3 py-1 rounded transition-colors ${selectedDevice === "computer"
+                                    ? "bg-blue-600 text-white"
+                                    : "text-gray-400 hover:text-white"
+                                    }`}
                             >
                                 <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9.75 17L9 20l-1 1h8l-1-1-.75-3M3 13h18M5 17h14a2 2 0 002-2V5a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" />
@@ -250,11 +255,10 @@ export default function EditorPage() {
                             </button>
                             <button
                                 onClick={() => setSelectedDevice("tablet")}
-                                className={`px-3 py-1 rounded transition-colors ${
-                                    selectedDevice === "tablet"
-                                        ? "bg-blue-600 text-white"
-                                        : "text-gray-400 hover:text-white"
-                                }`}
+                                className={`px-3 py-1 rounded transition-colors ${selectedDevice === "tablet"
+                                    ? "bg-blue-600 text-white"
+                                    : "text-gray-400 hover:text-white"
+                                    }`}
                             >
                                 <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 18h.01M7 21h10a2 2 0 002-2V5a2 2 0 00-2-2H7a2 2 0 00-2 2v14a2 2 0 002 2z" />
@@ -262,11 +266,10 @@ export default function EditorPage() {
                             </button>
                             <button
                                 onClick={() => setSelectedDevice("phone")}
-                                className={`px-3 py-1 rounded transition-colors ${
-                                    selectedDevice === "phone"
-                                        ? "bg-blue-600 text-white"
-                                        : "text-gray-400 hover:text-white"
-                                }`}
+                                className={`px-3 py-1 rounded transition-colors ${selectedDevice === "phone"
+                                    ? "bg-blue-600 text-white"
+                                    : "text-gray-400 hover:text-white"
+                                    }`}
                             >
                                 <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 18h.01M8 21h8a2 2 0 002-2V5a2 2 0 00-2-2H8a2 2 0 00-2 2v14a2 2 0 002 2z" />
@@ -275,7 +278,7 @@ export default function EditorPage() {
                         </div>
                     )}
                 </div>
-                
+
                 <div className="flex items-center gap-6">
                     <div className="flex items-center gap-2">
                         <span className="text-gray-400 text-sm">Kalan Revize Hakkı:</span>
@@ -402,11 +405,10 @@ export default function EditorPage() {
                             messages.map((message, index) => (
                                 <div
                                     key={index}
-                                    className={`p-3 rounded-lg ${
-                                        message.role === "user"
-                                            ? "bg-purple-600 text-white ml-4"
-                                            : "bg-gray-700 text-gray-200 mr-4"
-                                    }`}
+                                    className={`p-3 rounded-lg ${message.role === "user"
+                                        ? "bg-purple-600 text-white ml-4"
+                                        : "bg-gray-700 text-gray-200 mr-4"
+                                        }`}
                                 >
                                     <p className="text-sm whitespace-pre-line">{message.content}</p>
                                 </div>
@@ -417,7 +419,7 @@ export default function EditorPage() {
                                 <p className="text-sm">Analiz ediliyor...</p>
                             </div>
                         )}
-                        
+
                         {/* Inline Confirmation Card */}
                         {showConfirmModal && pendingRevision && (
                             <div className="bg-gradient-to-br from-blue-900 to-purple-900 border border-purple-500 rounded-lg p-4 mr-4 space-y-3">
