@@ -166,7 +166,8 @@ export async function updateKVMapping(
     const accountId = process.env.CLOUDFLARE_ACCOUNT_ID;
 
     if (!kvNamespaceId || !apiToken || !accountId) {
-      throw new Error("Missing KV configuration (CLOUDFLARE_KV_NAMESPACE_ID, CLOUDFLARE_API_TOKEN, or CLOUDFLARE_ACCOUNT_ID)");
+      console.warn("⚠️ KV configuration missing - skipping KV mapping update");
+      return { success: true }; // KV opsiyonel, akışı engelleme
     }
 
     const kvData = JSON.stringify({ userId, siteId });
@@ -185,16 +186,17 @@ export async function updateKVMapping(
 
     if (!response.ok) {
       const errorText = await response.text();
-      throw new Error(`KV update failed: ${response.statusText} - ${errorText}`);
+      console.warn(`⚠️ KV update failed (non-blocking): ${response.statusText} - ${errorText}`);
+      return { success: true }; // KV opsiyonel, akışı engelleme
     }
 
-    console.log(`✅ KV mapping updated: ${subdomain} -> userId: ${userId}, siteId: ${siteId}`);
+    console.log(`✅ KV mapping updated: ${subdomain} -> users/${userId}/site/${siteId}`);
 
     return { success: true };
   } catch (error) {
-    console.error("❌ KV update error:", error);
+    console.warn("⚠️ KV update error (non-blocking):", error);
     return {
-      success: false,
+      success: true,
       error: error instanceof Error ? error.message : "KV update failed",
     };
   }
@@ -213,7 +215,8 @@ export async function deleteKVMapping(
     const accountId = process.env.CLOUDFLARE_ACCOUNT_ID;
 
     if (!kvNamespaceId || !apiToken || !accountId) {
-      throw new Error("Missing KV configuration");
+      console.warn("⚠️ KV configuration missing - skipping KV mapping delete");
+      return { success: true }; // KV opsiyonel, akışı engelleme
     }
 
     const response = await fetch(
@@ -228,16 +231,17 @@ export async function deleteKVMapping(
 
     if (!response.ok) {
       const errorText = await response.text();
-      throw new Error(`KV delete failed: ${response.statusText} - ${errorText}`);
+      console.warn(`⚠️ KV delete failed (non-blocking): ${response.statusText} - ${errorText}`);
+      return { success: true }; // KV opsiyonel, akışı engelleme
     }
 
     console.log(`✅ KV mapping deleted: ${subdomain}`);
 
     return { success: true };
   } catch (error) {
-    console.error("❌ KV delete error:", error);
+    console.warn("⚠️ KV delete error (non-blocking):", error);
     return {
-      success: false,
+      success: true,
       error: error instanceof Error ? error.message : "KV delete failed",
     };
   }

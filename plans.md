@@ -36,6 +36,7 @@
 
 ## Subdomain - Custom Domain
 - Subdomain çakışması kontrolü eklenmeli
+- subdomain ile site yayınlanınca sim internetine bağlı telefondan siteye girince erişebiliriyorum ama profil fotosu gözükmüyor
 
 # Paid Plans Options
 
