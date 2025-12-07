@@ -87,9 +87,9 @@ export async function deployToCloudflare(
 
     console.log(`✅ Site deployed to R2: users/${userId}/site/${siteId}/`);
 
-    // 5. R2 public URL oluştur
-    const r2PublicDomain = process.env.R2_PUBLIC_DOMAIN || `${bucketName}.${process.env.CLOUDFLARE_ACCOUNT_ID}.r2.cloudflarestorage.com`;
-    const fullUrl = `https://${r2PublicDomain}/users/${userId}/site/${siteId}/index.html`;
+    // 5. Subdomain URL oluştur (Worker üzerinden serve edilecek)
+    const baseDomain = process.env.NEXT_PUBLIC_BASE_DOMAIN || "personalweb.info";
+    const fullUrl = `https://${subdomain}.${baseDomain}`;
 
     // 6. Başarılı yanıt döndür
     return {
@@ -145,6 +145,100 @@ export async function unpublishFromCloudflare(
     return {
       success: false,
       error: error instanceof Error ? error.message : "Unpublish failed",
+    };
+  }
+}
+
+/**
+ * KV store'a subdomain mapping ekler
+ * @param subdomain - Subdomain adı
+ * @param userId - Kullanıcı ID
+ * @param siteId - Site ID
+ */
+export async function updateKVMapping(
+  subdomain: string,
+  userId: string,
+  siteId: string
+): Promise<{ success: boolean; error?: string }> {
+  try {
+    const kvNamespaceId = process.env.CLOUDFLARE_KV_NAMESPACE_ID;
+    const apiToken = process.env.CLOUDFLARE_API_TOKEN;
+    const accountId = process.env.CLOUDFLARE_ACCOUNT_ID;
+
+    if (!kvNamespaceId || !apiToken || !accountId) {
+      throw new Error("Missing KV configuration (CLOUDFLARE_KV_NAMESPACE_ID, CLOUDFLARE_API_TOKEN, or CLOUDFLARE_ACCOUNT_ID)");
+    }
+
+    const kvData = JSON.stringify({ userId, siteId });
+
+    const response = await fetch(
+      `https://api.cloudflare.com/client/v4/accounts/${accountId}/storage/kv/namespaces/${kvNamespaceId}/values/${subdomain}`,
+      {
+        method: "PUT",
+        headers: {
+          "Authorization": `Bearer ${apiToken}`,
+          "Content-Type": "text/plain",
+        },
+        body: kvData,
+      }
+    );
+
+    if (!response.ok) {
+      const errorText = await response.text();
+      throw new Error(`KV update failed: ${response.statusText} - ${errorText}`);
+    }
+
+    console.log(`✅ KV mapping updated: ${subdomain} -> userId: ${userId}, siteId: ${siteId}`);
+
+    return { success: true };
+  } catch (error) {
+    console.error("❌ KV update error:", error);
+    return {
+      success: false,
+      error: error instanceof Error ? error.message : "KV update failed",
+    };
+  }
+}
+
+/**
+ * KV store'dan subdomain mapping siler
+ * @param subdomain - Silinecek subdomain adı
+ */
+export async function deleteKVMapping(
+  subdomain: string
+): Promise<{ success: boolean; error?: string }> {
+  try {
+    const kvNamespaceId = process.env.CLOUDFLARE_KV_NAMESPACE_ID;
+    const apiToken = process.env.CLOUDFLARE_API_TOKEN;
+    const accountId = process.env.CLOUDFLARE_ACCOUNT_ID;
+
+    if (!kvNamespaceId || !apiToken || !accountId) {
+      throw new Error("Missing KV configuration");
+    }
+
+    const response = await fetch(
+      `https://api.cloudflare.com/client/v4/accounts/${accountId}/storage/kv/namespaces/${kvNamespaceId}/values/${subdomain}`,
+      {
+        method: "DELETE",
+        headers: {
+          "Authorization": `Bearer ${apiToken}`,
+        },
+      }
+    );
+
+    if (!response.ok) {
+      const errorText = await response.text();
+      throw new Error(`KV delete failed: ${response.statusText} - ${errorText}`);
+    }
+
+    console.log(`✅ KV mapping deleted: ${subdomain}`);
+
+    return { success: true };
+  } catch (error) {
+    console.error("❌ KV delete error:", error);
+    return {
+      success: false,
+      error: error instanceof Error ? error.message : "KV delete failed",
     };
   }
 }

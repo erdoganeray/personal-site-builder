@@ -1,0 +1,15 @@
+name = "personalweb-subdomain-router"
+main = "index.ts"
+compatibility_date = "2025-01-01"
+account_id = "7697ae48d8bf487483876bcb6b5c7cf5"
+
+[env.production]
+route = "*.personalweb.info/*"
+
+[[r2_buckets]]
+binding = "USER_SITES"
+bucket_name = "user-sites"
+
+[[kv_namespaces]]
+binding = "SITE_MAPPINGS"
+id = "ddef70b87d2e4655b7ce32f1a0d9f4f4"

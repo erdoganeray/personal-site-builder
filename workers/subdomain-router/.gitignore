@@ -1,0 +1,18 @@
+# Wrangler
+.wrangler/
+.dev.vars
+.mf/
+
+# Dependencies
+node_modules/
+
+# Build outputs
+dist/
+worker/
+
+# Logs
+*.log
+
+# OS
+.DS_Store
+Thumbs.db

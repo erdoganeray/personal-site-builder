@@ -2,7 +2,7 @@ import { NextRequest, NextResponse } from "next/server";
 import { getServerSession } from "next-auth";
 import { authOptions } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
-import { deployToCloudflare } from "@/lib/cloudflare-deploy";
+import { deployToCloudflare, updateKVMapping } from "@/lib/cloudflare-deploy";
 
 export async function POST(req: NextRequest) {
   try {
@@ -85,6 +85,19 @@ export async function POST(req: NextRequest) {
       );
     }
 
+    // 7.5. KV store'a subdomain mapping ekle (Worker için)
+    const kvUpdate = await updateKVMapping(
+      deployment.subdomain!,
+      site.user.id,
+      siteId
+    );
+
+    if (!kvUpdate.success) {
+      console.warn("⚠️ KV update failed:", kvUpdate.error);
+      console.log(`📝 Manual KV sync command:\ncd workers/subdomain-router && wrangler kv key put --remote --binding=SITE_MAPPINGS "${deployment.subdomain}" '{"userId":"${site.user.id}","siteId":"${siteId}"}'`);
+      // KV update başarısız olsa bile devam et
+    }
+
     // 8. Veritabanını güncelle ve published snapshot'ları kaydet
     const updatedSite = await prisma.site.update({
       where: { id: siteId },
@@ -108,6 +121,8 @@ export async function POST(req: NextRequest) {
       cloudflareUrl: deployment.url,
       subdomain: deployment.subdomain,
       site: updatedSite,
+      kvSynced: kvUpdate.success,
+      manualKvCommand: !kvUpdate.success ? `wrangler kv key put --remote --binding=SITE_MAPPINGS "${deployment.subdomain}" '{"userId":"${site.user.id}","siteId":"${siteId}"}'` : undefined,
     });
   } catch (error) {
     console.error("❌ Publish error:", error);

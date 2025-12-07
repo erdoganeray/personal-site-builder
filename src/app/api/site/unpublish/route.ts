@@ -2,7 +2,7 @@ import { NextRequest, NextResponse } from "next/server";
 import { getServerSession } from "next-auth";
 import { authOptions } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
-import { unpublishFromCloudflare } from "@/lib/cloudflare-deploy";
+import { unpublishFromCloudflare, deleteKVMapping } from "@/lib/cloudflare-deploy";
 
 export async function POST(req: NextRequest) {
   try {
@@ -60,7 +60,16 @@ export async function POST(req: NextRequest) {
 
     if (!unpublishResult.success) {
       console.warn("⚠️ R2'den silme başarısız:", unpublishResult.error);
-      // R2'den silme başarısız olsa bile veritabanını güncelle
+      // R2'den silme başarısız olsa bile devam et
+    }
+
+    // 6.5. KV store'dan subdomain mapping'i sil
+    if (site.subdomain) {
+      const kvDelete = await deleteKVMapping(site.subdomain);
+      if (!kvDelete.success) {
+        console.warn("⚠️ KV delete failed:", kvDelete.error);
+        // KV delete başarısız olsa bile devam et
+      }
     }
 
     // 7. Veritabanını güncelle - yayın durumunu kaldır

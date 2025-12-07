@@ -1,0 +1,21 @@
+{
+  "name": "personalweb-subdomain-router",
+  "version": "1.0.0",
+  "description": "Cloudflare Worker for routing wildcard subdomains to R2-hosted sites",
+  "main": "index.ts",
+  "scripts": {
+    "deploy": "wrangler deploy",
+    "dev": "wrangler dev",
+    "tail": "wrangler tail"
+  },
+  "keywords": [
+    "cloudflare-workers",
+    "r2",
+    "subdomain-routing"
+  ],
+  "author": "",
+  "license": "MIT",
+  "devDependencies": {
+    "@cloudflare/workers-types": "^4.20251205.0"
+  }
+}
