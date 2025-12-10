@@ -12,7 +12,7 @@ export async function analyzeSiteDesign(
 ): Promise<SiteGenerationPlan> {
   try {
     const apiKey = process.env.GEMINI_API_KEY;
-    
+
     if (!apiKey) {
       throw new Error("GEMINI_API_KEY environment variable is not set");
     }
@@ -58,6 +58,8 @@ NAVIGATION MENU:
 HERO SECTION:
 1. hero-modern-centered: Modern, merkezi düzen, profil fotoğrafı üstte, CTA butonları
 2. hero-split-screen: İki kolonlu düzen, sol taraf içerik, sağ taraf görsel
+3. hero-minimal-text: Minimal, büyük tipografi odaklı, profil fotoğrafı yok, typing effect animasyonu
+4. hero-animated-gradient: Animasyonlu gradient background, glassmorphism efekti, floating particles
 
 EXPERIENCE SECTION:
 1. experience-timeline: Zaman çizelgesi şeklinde dikey düzen
@@ -106,7 +108,11 @@ Renk Seçimi Kriterleri:
 
 Component Seçimi Kriterleri:
 - Navigation: Sayfanın genel stiline uygun (minimal site için minimal nav, creative site için sidebar)
-- Hero: Kişinin deneyim seviyesi (çok deneyimli için timeline, az için cards)
+- Hero: Mesleğe ve CV stiline göre seç:
+  * hero-modern-centered: Profesyonel/kurumsal roller (Business Analyst, Project Manager, Consultant)
+  * hero-split-screen: Yaratıcı/tasarımcı roller (Designer, Photographer, Creative Director)
+  * hero-minimal-text: Developer/Engineer/Writer roller (Software Engineer, Data Scientist, Content Writer) - text odaklı
+  * hero-animated-gradient: Modern/tech/creative roller (UI/UX Designer, Frontend Developer, Digital Marketer) - görsel odaklı
 - Experience: CV'deki iş deneyimi sayısına göre
 - Education: CV'deki eğitim bilgisi sayısına göre (varsa mutlaka ekle)
 - Portfolio: SADECE portfolio fotoğrafları varsa ekle (${cvData.portfolio?.length || 0} adet var). Education ve Skills arasına yerleştir. Yoksa hiç ekleme!
@@ -156,9 +162,9 @@ JSON'dan önce veya sonra hiçbir metin olmasın.
       cleanedText = cleanedText.replace(/^```json\s*/i, '').replace(/^```\s*/, '');
       cleanedText = cleanedText.replace(/\s*```$/g, '');
       cleanedText = cleanedText.trim();
-      
+
       const parsed = JSON.parse(cleanedText);
-      
+
       // Validasyon
       if (!parsed.themeColors || !parsed.selectedComponents) {
         throw new Error("Missing required fields in design plan");
@@ -170,23 +176,22 @@ JSON'dan önce veya sonra hiçbir metin olmasın.
         layout: parsed.layout || 'single-page',
         style: parsed.style || 'modern'
       };
-      
+
     } catch (parseError) {
       console.error("Failed to parse Gemini design analysis:", responseText);
       throw new Error(
-        `Failed to parse AI design analysis. Error: ${
-          parseError instanceof Error ? parseError.message : String(parseError)
+        `Failed to parse AI design analysis. Error: ${parseError instanceof Error ? parseError.message : String(parseError)
         }`
       );
     }
-    
+
   } catch (error) {
     console.error("Error analyzing site design:", error);
-    
+
     if (error instanceof Error) {
       throw new Error(`Design analysis failed: ${error.message}`);
     }
-    
+
     throw new Error("Design analysis failed due to an unknown error");
   }
 }

@@ -96,6 +96,8 @@ export function getHeroReplacements(
     '{{TITLE}}': cvData.personalInfo.title || 'Professional',
     '{{SUMMARY}}': cvData.summary || cvData.personalInfo.name + ' - Professional Profile',
     '{{PROFILE_IMAGE}}': profileImageContent,
+    '{{CTA_PRIMARY_TEXT}}': 'İletişime Geç',
+    '{{CTA_SECONDARY_TEXT}}': 'Hakkımda',
     '{{COLOR_PRIMARY}}': themeColors.primary,
     '{{COLOR_SECONDARY}}': themeColors.secondary,
     '{{COLOR_ACCENT}}': themeColors.accent,
