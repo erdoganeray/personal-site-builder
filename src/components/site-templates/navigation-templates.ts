@@ -9,29 +9,37 @@ export const navigationTemplate1: ComponentTemplate = {
   name: "Classic Horizontal Navigation",
   category: "navigation",
   htmlTemplate: `
-    <nav class="nav-section">
+    <nav class="nav-section" aria-label="Main navigation">
       <div class="nav-container">
         <div class="nav-logo">
-          <a href="#home">{{NAME}}</a>
+          <a href="#hero">{{NAME}}</a>
         </div>
-        <button class="nav-toggle" aria-label="Toggle menu">
+        <button class="nav-toggle" 
+                aria-label="Toggle menu" 
+                aria-expanded="false"
+                aria-controls="nav-menu">
           <span></span>
           <span></span>
           <span></span>
         </button>
         <ul class="nav-menu" id="nav-menu">
-          <!-- Menu items will be dynamically generated based on page sections -->
+          {{NAV_MENU_ITEMS}}
         </ul>
       </div>
     </nav>
   `,
   cssTemplate: `
+    /* Fixed navigation için body padding */
+    body {
+      padding-top: 70px;
+    }
+
     .nav-section {
       position: fixed;
       top: 0;
       left: 0;
       right: 0;
-      background: #ffffff;
+      background: {{COLOR_BACKGROUND}};
       box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
       z-index: 1000;
       transition: all 0.3s ease;
@@ -49,13 +57,13 @@ export const navigationTemplate1: ComponentTemplate = {
     .nav-logo a {
       font-size: 1.5rem;
       font-weight: 700;
-      color: #2c3e50;
+      color: {{COLOR_TEXT}};
       text-decoration: none;
       transition: color 0.3s ease;
     }
 
     .nav-logo a:hover {
-      color: #3498db;
+      color: {{COLOR_PRIMARY}};
     }
 
     .nav-toggle {
@@ -71,7 +79,7 @@ export const navigationTemplate1: ComponentTemplate = {
     .nav-toggle span {
       width: 25px;
       height: 3px;
-      background: #2c3e50;
+      background: {{COLOR_TEXT}};
       transition: all 0.3s ease;
     }
 
@@ -84,7 +92,7 @@ export const navigationTemplate1: ComponentTemplate = {
     }
 
     .nav-link {
-      color: #2c3e50;
+      color: {{COLOR_TEXT}};
       text-decoration: none;
       font-weight: 500;
       padding: 0.5rem 1rem;
@@ -92,9 +100,10 @@ export const navigationTemplate1: ComponentTemplate = {
       transition: all 0.3s ease;
     }
 
-    .nav-link:hover {
-      background: #f8f9fa;
-      color: #3498db;
+    .nav-link:hover,
+    .nav-link.active {
+      background: {{COLOR_ACCENT}};
+      color: {{COLOR_BACKGROUND}};
     }
 
     @media (max-width: 768px) {
@@ -109,7 +118,7 @@ export const navigationTemplate1: ComponentTemplate = {
         right: 0;
         flex-direction: column;
         gap: 0;
-        background: #ffffff;
+        background: {{COLOR_BACKGROUND}};
         box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
         max-height: 0;
         overflow: hidden;
@@ -117,92 +126,74 @@ export const navigationTemplate1: ComponentTemplate = {
       }
 
       .nav-menu.active {
-        max-height: 400px;
+        max-height: 100vh;
+        overflow-y: auto;
       }
 
       .nav-link {
         display: block;
         padding: 1rem 2rem;
-        border-bottom: 1px solid #f0f0f0;
+        border-bottom: 1px solid {{COLOR_TEXT_SECONDARY}};
       }
     }
   `,
   jsTemplate: `
-    // Dynamically generate menu items based on sections
-    const navMenu = document.getElementById('nav-menu');
-    if (navMenu) {
-      const sections = document.querySelectorAll('section[id]');
-      const menuItems = [];
-      
-      sections.forEach(section => {
-        const sectionId = section.getAttribute('id');
-        let sectionName = sectionId.charAt(0).toUpperCase() + sectionId.slice(1);
-        
-        // Türkçe isimlendirme
-        const nameMap = {
-          'hero': 'Ana Sayfa',
-          'experience': 'Deneyim',
-          'skills': 'Yetenekler',
-          'about': 'Hakkımda',
-          'contact': 'İletişim',
-          'education': 'Eğitim'
-        };
-        
-        sectionName = nameMap[sectionId] || sectionName;
-        
-        menuItems.push(\`<li><a href="#\${sectionId}" class="nav-link">\${sectionName}</a></li>\`);
-      });
-      
-      navMenu.innerHTML = menuItems.join('');
-    }
-
     // Mobile menu toggle
     const navToggle = document.querySelector('.nav-toggle');
     const navMenuEl = document.querySelector('.nav-menu');
     
     if (navToggle && navMenuEl) {
       navToggle.addEventListener('click', () => {
-        navMenuEl.classList.toggle('active');
+        const isExpanded = navMenuEl.classList.toggle('active');
+        navToggle.setAttribute('aria-expanded', isExpanded.toString());
       });
 
       // Close menu when link is clicked
       document.querySelectorAll('.nav-link').forEach(link => {
         link.addEventListener('click', () => {
           navMenuEl.classList.remove('active');
+          navToggle.setAttribute('aria-expanded', 'false');
         });
+      });
+      
+      // ESC key to close menu
+      document.addEventListener('keydown', (e) => {
+        if (e.key === 'Escape' && navMenuEl.classList.contains('active')) {
+          navMenuEl.classList.remove('active');
+          navToggle.setAttribute('aria-expanded', 'false');
+        }
       });
     }
 
-    // Smooth scrolling
-    document.querySelectorAll('a[href^="#"]').forEach(anchor => {
-      anchor.addEventListener('click', function (e) {
-        e.preventDefault();
-        const target = document.querySelector(this.getAttribute('href'));
-        if (target) {
-          target.scrollIntoView({
-            behavior: 'smooth',
-            block: 'start'
-          });
+    // Active link management
+    const navHeight = document.querySelector('nav')?.offsetHeight || 80;
+    
+    window.addEventListener('scroll', () => {
+      let current = '';
+      
+      document.querySelectorAll('section[id]').forEach(section => {
+        const sectionTop = section.offsetTop;
+        if (pageYOffset >= sectionTop - navHeight - 50) {
+          current = section.getAttribute('id');
+        }
+      });
+
+      document.querySelectorAll('.nav-link').forEach(link => {
+        link.classList.remove('active');
+        link.removeAttribute('aria-current');
+        if (link.getAttribute('href') === '#' + current) {
+          link.classList.add('active');
+          link.setAttribute('aria-current', 'page');
         }
       });
     });
-
-    // Add shadow on scroll
-    window.addEventListener('scroll', () => {
-      const nav = document.querySelector('.nav-section');
-      if (nav) {
-        if (window.scrollY > 50) {
-          nav.style.boxShadow = '0 4px 20px rgba(0, 0, 0, 0.15)';
-        } else {
-          nav.style.boxShadow = '0 2px 10px rgba(0, 0, 0, 0.1)';
-        }
-      }
-    });
   `,
-  dataSchema: {
-    NAME: { type: "text", required: true, description: "Logo/Brand ismi" },
-  },
-  designNotes: "Klasik yatay navigasyon. Mobilde hamburger menüye dönüşür. Scroll'da gölge efekti artar.",
+  placeholders: [
+    "{{NAME}}", "{{NAV_MENU_ITEMS}}",
+    "{{COLOR_PRIMARY}}", "{{COLOR_SECONDARY}}", "{{COLOR_ACCENT}}",
+    "{{COLOR_BACKGROUND}}", "{{COLOR_TEXT}}", "{{COLOR_TEXT_SECONDARY}}"
+  ],
+  designNotes: "Klasik yatay navigasyon. Mobilde hamburger menüye dönüşür. Menu item'ları server-side oluşturulur.",
 };
 
 export const navigationTemplate2: ComponentTemplate = {
@@ -210,24 +201,29 @@ export const navigationTemplate2: ComponentTemplate = {
   name: "Minimal Centered Navigation",
   category: "navigation",
   htmlTemplate: `
-    <nav class="nav-minimal">
+    <nav class="nav-minimal" aria-label="Main navigation">
       <div class="nav-minimal-container">
         <ul class="nav-minimal-menu" id="nav-minimal-menu">
+          {{NAV_MENU_ITEMS}}
           <li class="nav-minimal-logo">
             <a href="#hero">{{INITIALS}}</a>
           </li>
-          <!-- Menu items will be dynamically generated -->
         </ul>
       </div>
     </nav>
   `,
   cssTemplate: `
+    /* Fixed navigation için body padding */
+    body {
+      padding-top: 80px;
+    }
+
     .nav-minimal {
       position: fixed;
       top: 0;
       left: 0;
       right: 0;
-      background: rgba(255, 255, 255, 0.95);
+      background: {{COLOR_BACKGROUND}};
       backdrop-filter: blur(10px);
       z-index: 1000;
       border-bottom: 1px solid rgba(0, 0, 0, 0.05);
@@ -259,8 +255,8 @@ export const navigationTemplate2: ComponentTemplate = {
       display: flex;
       align-items: center;
       justify-content: center;
-      background: #2c3e50;
-      color: #ffffff;
+      background: {{COLOR_PRIMARY}};
+      color: {{COLOR_BACKGROUND}};
       border-radius: 50%;
       font-weight: 700;
       font-size: 1.2rem;
@@ -269,12 +265,12 @@ export const navigationTemplate2: ComponentTemplate = {
     }
 
     .nav-minimal-logo a:hover {
-      background: #3498db;
+      background: {{COLOR_ACCENT}};
       transform: scale(1.1);
     }
 
     .nav-minimal-link {
-      color: #2c3e50;
+      color: {{COLOR_TEXT}};
       text-decoration: none;
       font-weight: 500;
       font-size: 0.95rem;
@@ -289,13 +285,13 @@ export const navigationTemplate2: ComponentTemplate = {
       left: 0;
       width: 0;
       height: 2px;
-      background: #3498db;
+      background: {{COLOR_PRIMARY}};
       transition: width 0.3s ease;
     }
 
     .nav-minimal-link:hover,
     .nav-minimal-link.active {
-      color: #3498db;
+      color: {{COLOR_PRIMARY}};
     }
 
     .nav-minimal-link:hover::after,
@@ -318,84 +314,35 @@ export const navigationTemplate2: ComponentTemplate = {
     }
   `,
   jsTemplate: `
-    // Dynamically generate menu items
-    const navMinimalMenu = document.getElementById('nav-minimal-menu');
-    const logoItem = document.querySelector('.nav-minimal-logo');
-    
-    if (navMinimalMenu && logoItem) {
-      const sections = document.querySelectorAll('section[id]');
-      const menuItems = [];
-      const nameMap = {
-        'hero': 'Ana Sayfa',
-        'experience': 'Deneyim',
-        'skills': 'Yetenekler',
-        'about': 'Hakkımda',
-        'contact': 'İletişim',
-        'education': 'Eğitim'
-      };
-      
-      let itemsBeforeLogo = [];
-      let itemsAfterLogo = [];
-      let isBeforeLogo = true;
-      
-      sections.forEach((section, index) => {
-        const sectionId = section.getAttribute('id');
-        const sectionName = nameMap[sectionId] || sectionId.charAt(0).toUpperCase() + sectionId.slice(1);
-        const item = \`<li><a href="#\${sectionId}" class="nav-minimal-link">\${sectionName}</a></li>\`;
-        
-        // İlk yarıyı logo öncesine, ikinci yarıyı logo sonrasına koy
-        if (index < Math.floor(sections.length / 2)) {
-          itemsBeforeLogo.push(item);
-        } else {
-          itemsAfterLogo.push(item);
-        }
-      });
-      
-      // Logo'nun önüne ve arkasına itemleri ekle
-      logoItem.insertAdjacentHTML('beforebegin', itemsBeforeLogo.join(''));
-      logoItem.insertAdjacentHTML('afterend', itemsAfterLogo.join(''));
-    }
-
     // Active link management
-    const navLinks = document.querySelectorAll('.nav-minimal-link');
+    const navHeight = document.querySelector('nav')?.offsetHeight || 80;
     
     window.addEventListener('scroll', () => {
       let current = '';
       
       document.querySelectorAll('section[id]').forEach(section => {
         const sectionTop = section.offsetTop;
-        const sectionHeight = section.clientHeight;
-        if (pageYOffset >= sectionTop - 200) {
+        if (pageYOffset >= sectionTop - navHeight - 50) {
           current = section.getAttribute('id');
         }
       });
 
-      navLinks.forEach(link => {
+      document.querySelectorAll('.nav-minimal-link').forEach(link => {
         link.classList.remove('active');
+        link.removeAttribute('aria-current');
         if (link.getAttribute('href') === '#' + current) {
           link.classList.add('active');
-        }
-      });
-    });
-
-    // Smooth scrolling
-    document.querySelectorAll('a[href^="#"]').forEach(anchor => {
-      anchor.addEventListener('click', function (e) {
-        e.preventDefault();
-        const target = document.querySelector(this.getAttribute('href'));
-        if (target) {
-          target.scrollIntoView({
-            behavior: 'smooth',
-            block: 'start'
-          });
+          link.setAttribute('aria-current', 'page');
         }
       });
     });
   `,
-  dataSchema: {
-    INITIALS: { type: "text", required: true, description: "İsim baş harfleri (örn: EA)" },
-  },
-  designNotes: "Minimal tasarım. Logo ortada, linkler iki yanda. Aktif sayfa göstergesi var.",
+  placeholders: [
+    "{{INITIALS}}", "{{NAV_MENU_ITEMS}}",
+    "{{COLOR_PRIMARY}}", "{{COLOR_ACCENT}}",
+    "{{COLOR_BACKGROUND}}", "{{COLOR_TEXT}}"
+  ],
+  designNotes: "Minimal tasarım. Logo ortada, linkler çevresinde. Menu item'ları server-side oluşturulur. Aktif sayfa göstergesi var.",
 };
 
 export const navigationTemplate3: ComponentTemplate = {
@@ -403,13 +350,13 @@ export const navigationTemplate3: ComponentTemplate = {
   name: "Modern Sidebar Navigation",
   category: "navigation",
   htmlTemplate: `
-    <nav class="nav-sidebar">
+    <nav class="nav-sidebar" aria-label="Main navigation">
       <div class="nav-sidebar-header">
         <div class="nav-sidebar-logo">{{INITIALS}}</div>
         <h3 class="nav-sidebar-name">{{NAME}}</h3>
       </div>
       <ul class="nav-sidebar-menu" id="nav-sidebar-menu">
-        <!-- Menu items will be dynamically generated -->
+        {{NAV_MENU_ITEMS}}
       </ul>
       <div class="nav-sidebar-footer">
         <div class="nav-sidebar-social">
@@ -417,7 +364,10 @@ export const navigationTemplate3: ComponentTemplate = {
         </div>
       </div>
     </nav>
-    <button class="nav-sidebar-toggle" aria-label="Toggle sidebar">☰</button>
+    <button class="nav-sidebar-toggle" 
+            aria-label="Toggle sidebar"
+            aria-expanded="false"
+            aria-controls="nav-sidebar">☰</button>
   `,
   cssTemplate: `
     .nav-sidebar {
@@ -426,8 +376,8 @@ export const navigationTemplate3: ComponentTemplate = {
       left: 0;
       bottom: 0;
       width: 280px;
-      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-      color: #ffffff;
+      background: linear-gradient(135deg, {{COLOR_PRIMARY}} 0%, {{COLOR_SECONDARY}} 100%);
+      color: {{COLOR_TEXT}};
       padding: 2rem 0;
       display: flex;
       flex-direction: column;
@@ -486,7 +436,7 @@ export const navigationTemplate3: ComponentTemplate = {
       top: 0;
       bottom: 0;
       width: 4px;
-      background: #ffffff;
+      background: {{COLOR_ACCENT}};
       transform: scaleY(0);
       transition: transform 0.3s ease;
     }
@@ -537,7 +487,7 @@ export const navigationTemplate3: ComponentTemplate = {
       top: 1rem;
       left: 1rem;
       z-index: 1001;
-      background: #667eea;
+      background: {{COLOR_PRIMARY}};
       color: #ffffff;
       border: none;
       width: 50px;
@@ -574,54 +524,14 @@ export const navigationTemplate3: ComponentTemplate = {
     }
   `,
   jsTemplate: `
-    // Dynamically generate sidebar menu items
-    const sidebarMenu = document.getElementById('nav-sidebar-menu');
-    if (sidebarMenu) {
-      const sections = document.querySelectorAll('section[id]');
-      const iconMap = {
-        'hero': '🏠',
-        'experience': '💼',
-        'skills': '⚡',
-        'about': '👤',
-        'contact': '📧',
-        'education': '🎓'
-      };
-      const nameMap = {
-        'hero': 'Ana Sayfa',
-        'experience': 'Deneyim',
-        'skills': 'Yetenekler',
-        'about': 'Hakkımda',
-        'contact': 'İletişim',
-        'education': 'Eğitim'
-      };
-      
-      const menuItems = [];
-      sections.forEach((section, index) => {
-        const sectionId = section.getAttribute('id');
-        const icon = iconMap[sectionId] || '📄';
-        const name = nameMap[sectionId] || sectionId.charAt(0).toUpperCase() + sectionId.slice(1);
-        const activeClass = index === 0 ? 'active' : '';
-        
-        menuItems.push(\`
-          <li>
-            <a href="#\${sectionId}" class="nav-sidebar-link \${activeClass}">
-              <span class="nav-sidebar-icon">\${icon}</span>
-              <span class="nav-sidebar-text">\${name}</span>
-            </a>
-          </li>
-        \`);
-      });
-      
-      sidebarMenu.innerHTML = menuItems.join('');
-    }
-
     // Sidebar toggle for mobile
     const sidebarToggle = document.querySelector('.nav-sidebar-toggle');
     const sidebar = document.querySelector('.nav-sidebar');
     
     if (sidebarToggle && sidebar) {
       sidebarToggle.addEventListener('click', () => {
-        sidebar.classList.toggle('active');
+        const isExpanded = sidebar.classList.toggle('active');
+        sidebarToggle.setAttribute('aria-expanded', isExpanded.toString());
       });
 
       // Close sidebar when link is clicked on mobile
@@ -629,53 +539,40 @@ export const navigationTemplate3: ComponentTemplate = {
         document.querySelectorAll('.nav-sidebar-link').forEach(link => {
           link.addEventListener('click', () => {
             sidebar.classList.remove('active');
+            sidebarToggle.setAttribute('aria-expanded', 'false');
           });
         });
       }
     }
 
     // Active link management
-    const sidebarLinks = document.querySelectorAll('.nav-sidebar-link');
+    const navHeight = 80;
     
     window.addEventListener('scroll', () => {
       let current = '';
       
       document.querySelectorAll('section[id]').forEach(section => {
         const sectionTop = section.offsetTop;
-        const sectionHeight = section.clientHeight;
-        if (pageYOffset >= sectionTop - 300) {
+        if (pageYOffset >= sectionTop - navHeight - 50) {
           current = section.getAttribute('id');
         }
       });
 
-      sidebarLinks.forEach(link => {
+      document.querySelectorAll('.nav-sidebar-link').forEach(link => {
         link.classList.remove('active');
+        link.removeAttribute('aria-current');
         if (link.getAttribute('href') === '#' + current) {
           link.classList.add('active');
-        }
-      });
-    });
-
-    // Smooth scrolling
-    document.querySelectorAll('a[href^="#"]').forEach(anchor => {
-      anchor.addEventListener('click', function (e) {
-        e.preventDefault();
-        const target = document.querySelector(this.getAttribute('href'));
-        if (target) {
-          target.scrollIntoView({
-            behavior: 'smooth',
-            block: 'start'
-          });
+          link.setAttribute('aria-current', 'page');
         }
       });
     });
   `,
-  dataSchema: {
-    NAME: { type: "text", required: true, description: "Tam isim" },
-    INITIALS: { type: "text", required: true, description: "İsim baş harfleri" },
-    SOCIAL_LINKS: { type: "html", required: false, description: "Sosyal medya linkleri" },
-  },
-  designNotes: "Modern sidebar navigasyon. Sol tarafta sabit durur. Mobilde hamburger menü ile açılır. Gradient arka plan ve iconlu menu.",
+  placeholders: [
+    "{{NAME}}", "{{INITIALS}}", "{{NAV_MENU_ITEMS}}", "{{SOCIAL_LINKS}}",
+    "{{COLOR_PRIMARY}}", "{{COLOR_SECONDARY}}", "{{COLOR_ACCENT}}", "{{COLOR_TEXT}}"
+  ],
+  designNotes: "Modern sidebar navigasyon. Sol tarafta sabit durur. Mobilde hamburger menü ile açılır. Menu item'ları server-side oluşturulur, iconlu.",
 };
 
 export const navigationTemplate4: ComponentTemplate = {
@@ -683,9 +580,9 @@ export const navigationTemplate4: ComponentTemplate = {
   name: "Floating Dot Navigation",
   category: "navigation",
   htmlTemplate: `
-    <nav class="nav-floating">
+    <nav class="nav-floating" aria-label="Main navigation">
       <ul class="nav-floating-menu" id="nav-floating-menu">
-        <!-- Menu items will be dynamically generated -->
+        {{NAV_MENU_ITEMS}}
       </ul>
     </nav>
   `,
@@ -702,7 +599,7 @@ export const navigationTemplate4: ComponentTemplate = {
       list-style: none;
       padding: 1rem;
       margin: 0;
-      background: rgba(255, 255, 255, 0.9);
+      background: {{COLOR_BACKGROUND}};
       backdrop-filter: blur(10px);
       border-radius: 50px;
       box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
@@ -716,7 +613,7 @@ export const navigationTemplate4: ComponentTemplate = {
       width: 12px;
       height: 12px;
       border-radius: 50%;
-      background: #cbd5e0;
+      background: {{COLOR_TEXT_SECONDARY}};
       position: relative;
       transition: all 0.3s ease;
     }
@@ -727,8 +624,8 @@ export const navigationTemplate4: ComponentTemplate = {
       right: calc(100% + 1rem);
       top: 50%;
       transform: translateY(-50%);
-      background: #2c3e50;
-      color: #ffffff;
+      background: {{COLOR_PRIMARY}};
+      color: {{COLOR_BACKGROUND}};
       padding: 0.5rem 1rem;
       border-radius: 6px;
       font-size: 0.85rem;
@@ -745,7 +642,7 @@ export const navigationTemplate4: ComponentTemplate = {
       top: 50%;
       transform: translateY(-50%);
       border: 6px solid transparent;
-      border-left-color: #2c3e50;
+      border-left-color: {{COLOR_PRIMARY}};
       opacity: 0;
       pointer-events: none;
       transition: opacity 0.3s ease;
@@ -757,12 +654,12 @@ export const navigationTemplate4: ComponentTemplate = {
     }
 
     .nav-floating-dot:hover {
-      background: #3498db;
+      background: {{COLOR_PRIMARY}};
       transform: scale(1.5);
     }
 
     .nav-floating-dot.active {
-      background: #3498db;
+      background: {{COLOR_PRIMARY}};
       width: 16px;
       height: 16px;
     }
@@ -784,73 +681,34 @@ export const navigationTemplate4: ComponentTemplate = {
     }
   `,
   jsTemplate: `
-    // Dynamically generate floating dots
-    const floatingMenu = document.getElementById('nav-floating-menu');
-    if (floatingMenu) {
-      const sections = document.querySelectorAll('section[id]');
-      const nameMap = {
-        'hero': 'Ana Sayfa',
-        'experience': 'Deneyim',
-        'skills': 'Yetenekler',
-        'about': 'Hakkımda',
-        'contact': 'İletişim',
-        'education': 'Eğitim'
-      };
-      
-      const menuItems = [];
-      sections.forEach((section, index) => {
-        const sectionId = section.getAttribute('id');
-        const name = nameMap[sectionId] || sectionId.charAt(0).toUpperCase() + sectionId.slice(1);
-        const activeClass = index === 0 ? 'active' : '';
-        
-        menuItems.push(\`
-          <li>
-            <a href="#\${sectionId}" class="nav-floating-dot \${activeClass}" data-tooltip="\${name}"></a>
-          </li>
-        \`);
-      });
-      
-      floatingMenu.innerHTML = menuItems.join('');
-    }
-
     // Active dot management based on scroll
-    const floatingDots = document.querySelectorAll('.nav-floating-dot');
+    const navHeight = 80;
     
     window.addEventListener('scroll', () => {
       let current = '';
       
       document.querySelectorAll('section[id]').forEach(section => {
         const sectionTop = section.offsetTop;
-        const sectionHeight = section.clientHeight;
-        if (pageYOffset >= sectionTop - 300) {
+        if (pageYOffset >= sectionTop - navHeight - 50) {
           current = section.getAttribute('id');
         }
       });
 
-      floatingDots.forEach(dot => {
+      document.querySelectorAll('.nav-floating-dot').forEach(dot => {
         dot.classList.remove('active');
+        dot.removeAttribute('aria-current');
         if (dot.getAttribute('href') === '#' + current) {
           dot.classList.add('active');
-        }
-      });
-    });
-
-    // Smooth scrolling
-    floatingDots.forEach(dot => {
-      dot.addEventListener('click', function (e) {
-        e.preventDefault();
-        const target = document.querySelector(this.getAttribute('href'));
-        if (target) {
-          target.scrollIntoView({
-            behavior: 'smooth',
-            block: 'start'
-          });
+          dot.setAttribute('aria-current', 'page');
         }
       });
     });
   `,
-  dataSchema: {},
-  designNotes: "Minimal floating dot navigation. Sağ tarafta sabit durur. Hover'da tooltip gösterir. Aktif sayfa daha büyük gösterilir.",
+  placeholders: [
+    "{{NAV_MENU_ITEMS}}",
+    "{{COLOR_PRIMARY}}", "{{COLOR_BACKGROUND}}", "{{COLOR_TEXT_SECONDARY}}"
+  ],
+  designNotes: "Minimal floating dot navigation. Sağ tarafta sabit durur. Menu item'ları server-side oluşturulur. Hover'da tooltip gösterir. Aktif sayfa daha büyük gösterilir.",
 };
 
 export const navigationTemplates: ComponentTemplate[] = [

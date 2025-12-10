@@ -17,16 +17,16 @@ interface PlaceholderReplacements {
  */
 export function convertR2UrlToRelativePath(url: string, forPublish: boolean = true): string {
   if (!url) return url;
-  
+
   // Zaten relative path ise dokunma
   if (url.startsWith('/_assets/') || url.startsWith('/assets/')) {
     return url;
   }
-  
+
   // R2 public URL'i mi kontrol et
   const r2PublicUrlPattern = /https?:\/\/pub-[a-f0-9]+\.r2\.dev\/users\/[^/]+\/(profile|portfolio)\/(.+)/;
   const match = url.match(r2PublicUrlPattern);
-  
+
   if (match) {
     const [, folder, fileName] = match;
     // Published site için /_assets (Worker proxy)
@@ -34,7 +34,7 @@ export function convertR2UrlToRelativePath(url: string, forPublish: boolean = tr
     const prefix = forPublish ? '/_assets' : '/assets';
     return `${prefix}/${folder}/${fileName}`;
   }
-  
+
   // Başka bir URL formatı ise olduğu gibi döndür
   return url;
 }
@@ -45,7 +45,7 @@ export function convertR2UrlToRelativePath(url: string, forPublish: boolean = tr
 export function convertHtmlAssetsToRelativePaths(html: string): string {
   // Tüm R2 public URL'lerini bul ve değiştir
   const r2UrlPattern = /https?:\/\/pub-[a-f0-9]+\.r2\.dev\/users\/[^/]+\/(profile|portfolio)\/([^"'\s>]+)/g;
-  
+
   return html.replace(r2UrlPattern, (match, folder, fileName) => {
     return `/_assets/${folder}/${fileName}`;
   });
@@ -59,12 +59,12 @@ export function replacePlaceholders(
   replacements: PlaceholderReplacements
 ): string {
   let result = template;
-  
+
   for (const [placeholder, value] of Object.entries(replacements)) {
     const regex = new RegExp(placeholder.replace(/[.*+?^${}()|[\]\\]/g, '\\$&'), 'g');
     result = result.replace(regex, value);
   }
-  
+
   return result;
 }
 
@@ -131,7 +131,7 @@ export function generateExperienceItems(
       </div>
     `).join('\n');
   }
-  
+
   return '';
 }
 
@@ -193,7 +193,7 @@ export function generateEducationItems(
       </div>
     `).join('\n');
   }
-  
+
   return '';
 }
 
@@ -244,7 +244,7 @@ export function generateSkillItems(
       </div>
     `).join('\n');
   }
-  
+
   return '';
 }
 
@@ -297,7 +297,7 @@ export function generatePortfolioItems(
       </div>
     `).join('\n');
   }
-  
+
   return '';
 }
 
@@ -310,7 +310,7 @@ export function getPortfolioReplacements(
   templateId: string
 ): PlaceholderReplacements {
   const portfolioItems = generatePortfolioItems(cvData, templateId);
-  
+
   // Add lightbox HTML structure
   const lightboxHtml = `
     <div class="lightbox" id="portfolio-lightbox">
@@ -346,7 +346,7 @@ export function generateLanguageItems(
   // Dil seviyelerini belirle (Native, Fluent, Advanced, Intermediate, Basic)
   const levels = ['Native', 'Fluent', 'Advanced', 'Intermediate', 'Basic'];
   const levelPercentages = { Native: 100, Fluent: 90, Advanced: 75, Intermediate: 60, Basic: 40 };
-  
+
   const languagesWithLevels = cvData.languages.map((lang, index) => {
     // Döngüsel olarak seviye ata veya ilk dil Native, sonrakiler Fluent/Advanced
     const level = index === 0 ? 'Native' : levels[Math.min(index, levels.length - 1)];
@@ -381,7 +381,7 @@ export function generateLanguageItems(
       </div>
     `).join('\n');
   }
-  
+
   return '';
 }
 
@@ -468,7 +468,8 @@ export function getFooterReplacements(
 export function getNavigationReplacements(
   cvData: CVData,
   themeColors: ThemeColors,
-  selectedComponents: SelectedComponent[]
+  selectedComponents: SelectedComponent[],
+  templateId?: string
 ): PlaceholderReplacements {
   const initials = cvData.personalInfo.name
     .split(' ')
@@ -476,6 +477,18 @@ export function getNavigationReplacements(
     .join('')
     .toUpperCase()
     .slice(0, 2);
+
+  // Navigation template tipini belirle
+  let templateType: 'classic' | 'minimal' | 'sidebar' | 'floating' = 'classic';
+  if (templateId) {
+    if (templateId.includes('minimal')) templateType = 'minimal';
+    else if (templateId.includes('sidebar')) templateType = 'sidebar';
+    else if (templateId.includes('floating')) templateType = 'floating';
+  }
+
+  // Menu item'larını server-side oluştur
+  const { generateNavigationMenuItems } = require('./navigation-utils');
+  const navMenuItems = generateNavigationMenuItems(selectedComponents, templateType);
 
   // Sosyal medya linklerini oluştur - sadece dolu olanlar görünsün
   const socialLinks = [
@@ -492,6 +505,7 @@ export function getNavigationReplacements(
   return {
     '{{NAME}}': cvData.personalInfo.name,
     '{{INITIALS}}': initials,
+    '{{NAV_MENU_ITEMS}}': navMenuItems,
     '{{SOCIAL_LINKS}}': socialLinks,
     '{{COLOR_PRIMARY}}': themeColors.primary,
     '{{COLOR_SECONDARY}}': themeColors.secondary,
@@ -513,7 +527,7 @@ export function getReplacementsForComponent(
 ): PlaceholderReplacements {
   switch (component.category) {
     case 'navigation':
-      return getNavigationReplacements(cvData, themeColors, selectedComponents || []);
+      return getNavigationReplacements(cvData, themeColors, selectedComponents || [], component.id);
     case 'hero':
       return getHeroReplacements(cvData, themeColors);
     case 'experience':
@@ -545,11 +559,11 @@ export function populateTemplate(
   selectedComponents?: SelectedComponent[]
 ): { html: string; css: string; js?: string } {
   const replacements = getReplacementsForComponent(component, cvData, themeColors, selectedComponents);
-  
+
   return {
     html: replacePlaceholders(component.htmlTemplate, replacements),
     css: replacePlaceholders(component.cssTemplate, replacements),
-    js: component.jsTemplate 
+    js: component.jsTemplate
       ? replacePlaceholders(component.jsTemplate, replacements)
       : undefined
   };

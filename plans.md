@@ -7,6 +7,16 @@
 - blog page and blog editor
 - google analytics
 - seo özelleştirmeleri
+- hiç görsel alanlar düşünmedik, template görseller kullanılabilir. kullanıcı kendi görsellerini ekleyebilir.
+- color palette ui. kullanıcı hazır color palette seçebilir, kendi color palette ini oluşturabilir.
+- multiple pages'da page akışı için ai desteği
+- ai ile metin, görsel üretimi
+- ai metin üretimleri de tone belirleme
+- tek prompt yerine birkaç soru ile fikir alma
+- dashboard'dan domain satın alma
+- her component'i kendi içinde ui ile editleme
+- sadece cv web page değil, ürün/iş/business tanıtımı da olabilir.
+- fotolu cv'lerden fotoyu da çek
 
 ## Landing Page
 - sss eklenecek
@@ -22,6 +32,8 @@
 ## Editor Content Page
 - hem preview hem de publish için rollback ui tasarımı
 - sayfa yenilenince chat mesajları kayboluyor. kaybolmasın.
+- editor sayfasındaki preview da sitem de olmayan hatalar görülüyor. navigation menunun hero componentinin üstünde kalmasından kaynaklı profil fotoğrafının bir kısmı görülmüyor.
+- - EDIT TEN SONRA BİLGİLERİMDE KAYDET DİYİNCE İLK SEÇTİĞİ TEMPLATE LERE GERİ DÖNÜYOR. Ayrıca edit te yapılan değişiklikler çok uzun sürüyor, muhtemelen tüm kod input ediliyor ve tüm kod output ediliyor.
 
 ## AI-Less Component Template Sistemi
 - cvContent içerikleri NULL olabilir. Örneğin bir kullanıcının cv'sinin eğitim bölümünde GPA bilgisi varken, bir kullanıcının GPA bilgisi olmayabilir. cvContent, belirli bir standartta olmak zorunda olduğu için cv'de olmayan ya da çıkarılamayan bilgiler NULL olmalı.
@@ -36,12 +48,14 @@
 
 ## Subdomain - Custom Domain
 - Subdomain çakışması kontrolü eklenmeli
+- dashboard>domain sayfası işlevli hale getirilmeli
 
 # Paid Plans Options
 
 ## Free Plan (MVP)
 - static site oluşturma
 - haftalık/aylık belirli token/sayıda düzenleme hakkı
+- belirli recreate hakkı
 - subdomain
 - dosya yükleme limiti (profil fotoğrafı, portfolio)
 - 5 version history
@@ -53,6 +67,7 @@
 ## Paid Plan 
 - react, vue ya da next.js gibi daha komplike teknolojiler ile web sitesi oluşturma
 - haftalık/aylık more belirli token/sayıda düzenleme hakkı
+- more belirli recreate hakkı
 - custom domain connection
 - more dosya yükleme limiti (profil fotoğrafı, portfolio, blog images)
 - blog page and blog editor
@@ -85,9 +100,14 @@
     - cloudflare r2 bozuksa?
 - yeni cv eklendiğinde cloudflare'dan silinmeli, kişinin tek cv'si olmalı
 - dosya yüklemeleri için maksimum boyut kuralı ekle
-- preview da portfolio sadece fotoğrafları gösteriyordu. tasarımı değiştir dediğimde efekt ekledi, fotoğrafın üstüne gelince başlık ve içerik gözüküyor. fakat başlık ve içerikleri dil modeli kendi eklemiş. böyle bir başlık ya da içerik kullanıcı tarafından eklenmemiş.
 - revize hakkı dolunca revize isteyince uygun geri bildirimi veriyor ama next.js issue döndürüyor. döndürmesin.
-- editor de chat ile deneyim bölümünü kaldırdığımda bilgilerimde deneyimler görünüyor.
+- editor de chat ile deneyim bölümünü kaldırdığımda bilgilerimde deneyimler görünüyor. previewda görünmüyor ama mesela bu durumda bilgilerimden de kaldırılmalı mı?
+- About kategorisi projeden çıkarılacak (Hero component zaten about'un işlevini yapıyor, gereksiz tekrar olur)
+
+# Test
+
+## Navigation
+
 
 # Güvenlik
 - API key'leri `.env` dosyasında (GitHub'a commit edilmemiş)
