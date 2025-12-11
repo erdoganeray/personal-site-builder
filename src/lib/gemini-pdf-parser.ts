@@ -18,8 +18,12 @@ export interface CVPersonalInfo {
 export interface CVExperience {
   company: string;
   position: string;
-  duration: string;
+  duration: string; // Display format: "Jan 2020 - Dec 2023" or "2020-2023"
   description: string;
+  // Structured date fields for calculations and sorting
+  startDate?: string; // ISO format: "2020-01-01" or "2020-01"
+  endDate?: string; // ISO format: "2023-12-31" or "2023-12", null if current
+  isCurrentPosition?: boolean; // True if still working here
 }
 
 export interface CVEducation {
@@ -51,7 +55,7 @@ export interface CVData {
 export async function parseCVFromPDF(pdfBuffer: Buffer): Promise<CVData> {
   try {
     const apiKey = process.env.GEMINI_API_KEY;
-    
+
     if (!apiKey) {
       throw new Error("GEMINI_API_KEY environment variable is not set");
     }
@@ -111,25 +115,25 @@ JSON formatında yapılandırılmış olarak döndür:
     ]);
 
     const responseText = result.response.text();
-    
+
     console.log("Gemini raw response:", responseText.substring(0, 500));
-    
+
     // JSON'ı markdown kod bloklarından temizle
     let jsonText = responseText.trim();
-    
+
     // ```json veya ``` ile başlıyorsa temizle
     jsonText = jsonText.replace(/^```json\s*/i, '');
     jsonText = jsonText.replace(/^```\s*/, '');
     jsonText = jsonText.replace(/\s*```$/g, '');
     jsonText = jsonText.trim();
-    
+
     // JSON objesini bul (regex ile)
     const jsonMatch = jsonText.match(/\{[\s\S]*\}/);
     if (!jsonMatch) {
       console.error("JSON bulunamadı. Tam yanıt:", responseText);
       throw new Error("Gemini yanıtında geçerli JSON bulunamadı");
     }
-    
+
     jsonText = jsonMatch[0];
 
     // JSON parse et
@@ -156,11 +160,11 @@ JSON formatında yapılandırılmış olarak döndür:
     return cvData;
   } catch (error) {
     console.error("PDF parsing error:", error);
-    
+
     if (error instanceof SyntaxError) {
       throw new Error("Gemini'den gelen yanıt JSON formatında değil");
     }
-    
+
     throw new Error(
       `CV analizi başarısız: ${error instanceof Error ? error.message : "Bilinmeyen hata"}`
     );
@@ -175,7 +179,7 @@ JSON formatında yapılandırılmış olarak döndür:
 export async function parseCVFromURL(pdfUrl: string): Promise<CVData> {
   try {
     const response = await fetch(pdfUrl);
-    
+
     if (!response.ok) {
       throw new Error(`PDF indirilemedi: ${response.statusText}`);
     }

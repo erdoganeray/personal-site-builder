@@ -103,10 +103,17 @@
 - revize hakkı dolunca revize isteyince uygun geri bildirimi veriyor ama next.js issue döndürüyor. döndürmesin.
 - editor de chat ile deneyim bölümünü kaldırdığımda bilgilerimde deneyimler görünüyor. previewda görünmüyor ama mesela bu durumda bilgilerimden de kaldırılmalı mı?
 - About kategorisi projeden çıkarılacak (Hero component zaten about'un işlevini yapıyor, gereksiz tekrar olur)
+- Özellikle bilgilerimdeki text alanlarına eklenen textlerin içine zararlı scriptler eklenebilir, bunların önüne geçmek gerek
 
 # Test
 
 ## Navigation
+
+## Hero
+- Bilgilerime pp yükledin, site oluştururken Profil fotoğrafı olmayan hero oluştu, hero yu güncellediğinde pp doğru şekilde siteye entegre olmuyor.
+- Split screen da fotoğrafın olduğu yarı, scroll aşağı indikçe aşağı kayıyor.
+
+## Experience
 
 
 # Güvenlik

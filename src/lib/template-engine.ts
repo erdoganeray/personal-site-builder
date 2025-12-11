@@ -10,6 +10,25 @@ interface PlaceholderReplacements {
 }
 
 /**
+ * Escapes HTML special characters to prevent XSS attacks
+ * @param text - The text to escape
+ * @returns Escaped text safe for HTML insertion
+ */
+export function escapeHtml(text: string | null | undefined): string {
+  if (!text) return '';
+
+  const map: { [key: string]: string } = {
+    '&': '&amp;',
+    '<': '&lt;',
+    '>': '&gt;',
+    '"': '&quot;',
+    "'": '&#039;'
+  };
+
+  return text.replace(/[&<>"']/g, m => map[m]);
+}
+
+/**
  * R2 public URL'lerini subdomain relative path'lere dönüştürür
  * Eski format: https://pub-xxx.r2.dev/users/{userId}/profile/photo.jpg
  * Yeni format: /assets/profile/photo.jpg (localhost preview için)
@@ -87,14 +106,14 @@ export function getHeroReplacements(
   // Convert old R2 URLs to new relative paths
   const convertedPhotoUrl = convertR2UrlToRelativePath(profilePhotoUrl || '');
   const profileImageContent = convertedPhotoUrl
-    ? `<img src="${convertedPhotoUrl}" alt="${cvData.personalInfo.name}" style="width: 100%; height: 100%; object-fit: cover; border-radius: inherit;" />`
-    : initials;
+    ? `<img src="${escapeHtml(convertedPhotoUrl)}" alt="${escapeHtml(cvData.personalInfo.name)}" style="width: 100%; height: 100%; object-fit: cover; border-radius: inherit;" />`
+    : escapeHtml(initials);
 
   return {
-    '{{NAME}}': cvData.personalInfo.name,
-    '{{INITIALS}}': initials,
-    '{{TITLE}}': cvData.personalInfo.title || 'Professional',
-    '{{SUMMARY}}': cvData.summary || cvData.personalInfo.name + ' - Professional Profile',
+    '{{NAME}}': escapeHtml(cvData.personalInfo.name),
+    '{{INITIALS}}': escapeHtml(initials),
+    '{{TITLE}}': escapeHtml(cvData.personalInfo.title || 'Professional'),
+    '{{SUMMARY}}': escapeHtml(cvData.summary || cvData.personalInfo.name + ' - Professional Profile'),
     '{{PROFILE_IMAGE}}': profileImageContent,
     '{{CTA_PRIMARY_TEXT}}': 'İletişime Geç',
     '{{CTA_SECONDARY_TEXT}}': 'Hakkımda',
@@ -109,32 +128,38 @@ export function getHeroReplacements(
 
 /**
  * CV verilerinden experience section için HTML items oluşturur
+ * @param cvData - CV data containing experience information
+ * @param templateId - Template identifier (experience-timeline or experience-cards)
+ * @returns HTML string with experience items or empty state message
  */
 export function generateExperienceItems(
   cvData: CVData,
   templateId: string
 ): string {
-  if (templateId === 'experience-timeline') {
-    return cvData.experience.map(exp => `
-      <div class="timeline-item">
-        <div class="timeline-duration">${exp.duration}</div>
-        <h3 class="timeline-position">${exp.position}</h3>
-        <div class="timeline-company">${exp.company}</div>
-        <p class="timeline-description">${exp.description}</p>
-      </div>
-    `).join('\n');
-  } else if (templateId === 'experience-cards') {
-    return cvData.experience.map(exp => `
-      <div class="experience-card">
-        <div class="experience-duration">${exp.duration}</div>
-        <h3 class="experience-position">${exp.position}</h3>
-        <div class="experience-company">${exp.company}</div>
-        <p class="experience-description">${exp.description}</p>
-      </div>
-    `).join('\n');
+  // Empty data validation
+  if (!cvData.experience || cvData.experience.length === 0) {
+    return '<p class="no-experience">Henüz deneyim bilgisi eklenmemiş.</p>';
   }
 
-  return '';
+  // Template generators with XSS protection
+  const templateGenerators: Record<string, (exp: typeof cvData.experience[0]) => string> = {
+    'experience-timeline': (exp) => `<article class="timeline-item" role="listitem"><time class="timeline-duration" datetime="${escapeHtml(exp.duration)}">${escapeHtml(exp.duration)}</time><h3 class="timeline-position">${escapeHtml(exp.position)}</h3><div class="timeline-company" aria-label="Company name">${escapeHtml(exp.company)}</div><p class="timeline-description">${escapeHtml(exp.description)}</p></article>`,
+    'experience-cards': (exp) => `<article class="experience-card"><time class="experience-duration" datetime="${escapeHtml(exp.duration)}">${escapeHtml(exp.duration)}</time><h3 class="experience-position">${escapeHtml(exp.position)}</h3><div class="experience-company" aria-label="Company name">${escapeHtml(exp.company)}</div><p class="experience-description">${escapeHtml(exp.description)}</p></article>`,
+    'experience-accordion': (exp) => `<article class="accordion-item"><button class="accordion-header" aria-expanded="false" aria-controls="accordion-content-${escapeHtml(exp.position).replace(/\s+/g, '-').toLowerCase()}"><div class="accordion-header-content"><div class="accordion-position">${escapeHtml(exp.position)}</div><div class="accordion-company" aria-label="Company name">${escapeHtml(exp.company)}</div><time class="accordion-duration" datetime="${escapeHtml(exp.duration)}">${escapeHtml(exp.duration)}</time></div><span class="accordion-icon" aria-hidden="true">▼</span></button><div class="accordion-content" id="accordion-content-${escapeHtml(exp.position).replace(/\s+/g, '-').toLowerCase()}" role="region"><div class="accordion-description">${escapeHtml(exp.description)}</div></div></article>`,
+    'experience-minimal': (exp) => `<article class="experience-item-minimal"><div class="experience-header-minimal"><div class="experience-position-minimal">${escapeHtml(exp.position)}</div><time class="experience-duration-minimal" datetime="${escapeHtml(exp.duration)}">${escapeHtml(exp.duration)}</time></div><div class="experience-company-minimal">${escapeHtml(exp.company)}</div><p class="experience-description-minimal">${escapeHtml(exp.description)}</p></article>`,
+    'experience-horizontal-timeline': (exp) => `<article class="horizontal-timeline-item"><div class="horizontal-timeline-card"><time class="horizontal-timeline-duration" datetime="${escapeHtml(exp.duration)}">${escapeHtml(exp.duration)}</time><h3 class="horizontal-timeline-position">${escapeHtml(exp.position)}</h3><div class="horizontal-timeline-company">${escapeHtml(exp.company)}</div><p class="horizontal-timeline-description">${escapeHtml(exp.description)}</p></div></article>`,
+    'experience-tabs': (exp) => `<div class="tab-item" role="presentation"><button class="tab-button" role="tab" aria-expanded="false"><div class="tab-button-content"><div class="tab-company">${escapeHtml(exp.company)}</div><div class="tab-position">${escapeHtml(exp.position)}</div></div><time class="tab-duration" datetime="${escapeHtml(exp.duration)}">${escapeHtml(exp.duration)}</time><span class="tab-icon" aria-hidden="true">▶</span></button><div class="tab-content" role="tabpanel"><div class="tab-description">${escapeHtml(exp.description)}</div></div></div>`
+  };
+
+  // Template ID validation
+  const generator = templateGenerators[templateId];
+
+  if (!generator) {
+    console.error(`[generateExperienceItems] Unknown template ID: ${templateId}`);
+    throw new Error(`Experience template "${templateId}" not found. Available templates: ${Object.keys(templateGenerators).join(', ')}`);
+  }
+
+  return cvData.experience.map(generator).join('\n');
 }
 
 /**
@@ -158,45 +183,60 @@ export function getExperienceReplacements(
 
 /**
  * CV verilerinden education section için HTML items oluşturur
+ * @param cvData - CV data containing education information
+ * @param templateId - Template identifier
+ * @returns HTML string with education items or empty state message
  */
 export function generateEducationItems(
   cvData: CVData,
   templateId: string
 ): string {
-  if (templateId === 'education-timeline') {
-    return cvData.education.map(edu => `
+  // Empty data validation
+  if (!cvData.education || cvData.education.length === 0) {
+    return '<p class="no-education">Henüz eğitim bilgisi eklenmemiş.</p>';
+  }
+
+  // Template generators with XSS protection
+  const templateGenerators: Record<string, (edu: typeof cvData.education[0]) => string> = {
+    'education-timeline': (edu) => `
       <div class="education-item">
-        <div class="education-duration">${edu.year}</div>
-        <h3 class="education-degree">${edu.degree}</h3>
-        <div class="education-school">${edu.school}</div>
-        <p class="education-description">${edu.field}</p>
+        <div class="education-duration">${escapeHtml(edu.year)}</div>
+        <h3 class="education-degree">${escapeHtml(edu.degree)}</h3>
+        <div class="education-school">${escapeHtml(edu.school)}</div>
+        <p class="education-description">${escapeHtml(edu.field)}</p>
       </div>
-    `).join('\n');
-  } else if (templateId === 'education-cards') {
-    return cvData.education.map(edu => `
+    `,
+    'education-cards': (edu) => `
       <div class="education-card">
-        <div class="education-duration">${edu.year}</div>
-        <h3 class="education-degree">${edu.degree}</h3>
-        <div class="education-school">${edu.school}</div>
-        <p class="education-description">${edu.field}</p>
+        <div class="education-duration">${escapeHtml(edu.year)}</div>
+        <h3 class="education-degree">${escapeHtml(edu.degree)}</h3>
+        <div class="education-school">${escapeHtml(edu.school)}</div>
+        <p class="education-description">${escapeHtml(edu.field)}</p>
       </div>
-    `).join('\n');
-  } else if (templateId === 'education-modern') {
-    return cvData.education.map(edu => `
+    `,
+    'education-modern': (edu) => `
       <div class="education-modern-item">
         <div class="education-header">
           <div class="education-title-group">
-            <h3 class="education-degree">${edu.degree}</h3>
-            <div class="education-school">${edu.school}</div>
+            <h3 class="education-degree">${escapeHtml(edu.degree)}</h3>
+            <div class="education-school">${escapeHtml(edu.school)}</div>
           </div>
-          <div class="education-duration">${edu.year}</div>
+          <div class="education-duration">${escapeHtml(edu.year)}</div>
         </div>
-        <p class="education-description">${edu.field}</p>
+        <p class="education-description">${escapeHtml(edu.field)}</p>
       </div>
-    `).join('\n');
+    `
+  };
+
+  // Template ID validation
+  const generator = templateGenerators[templateId];
+
+  if (!generator) {
+    console.error(`[generateEducationItems] Unknown template ID: ${templateId}`);
+    throw new Error(`Education template "${templateId}" not found. Available templates: ${Object.keys(templateGenerators).join(', ')}`);
   }
 
-  return '';
+  return cvData.education.map(generator).join('\n');
 }
 
 /**
@@ -220,34 +260,49 @@ export function getEducationReplacements(
 
 /**
  * CV verilerinden skills section için HTML items oluşturur
+ * @param cvData - CV data containing skills information
+ * @param templateId - Template identifier
+ * @returns HTML string with skill items or empty state message
  */
 export function generateSkillItems(
   cvData: CVData,
   templateId: string
 ): string {
-  if (templateId === 'skills-progress-bars') {
-    // Tüm yeteneklere %80-95 arası rastgele bir yüzde atayalım
-    return cvData.skills.map(skill => {
+  // Empty data validation
+  if (!cvData.skills || cvData.skills.length === 0) {
+    return '<p class="no-skills">Henüz yetenek bilgisi eklenmemiş.</p>';
+  }
+
+  // Template generators with XSS protection
+  const templateGenerators: Record<string, (skill: string) => string> = {
+    'skills-progress-bars': (skill) => {
       const percentage = Math.floor(Math.random() * 15) + 80; // 80-95 arası
       return `
         <div class="skill-item">
-          <div class="skill-name">${skill}</div>
+          <div class="skill-name">${escapeHtml(skill)}</div>
           <div class="skill-bar">
             <div class="skill-progress" style="width: ${percentage}%"></div>
           </div>
         </div>
       `;
-    }).join('\n');
-  } else if (templateId === 'skills-card-grid') {
-    return cvData.skills.map(skill => `
+    },
+    'skills-card-grid': (skill) => `
       <div class="skill-card">
         <div class="skill-icon">💡</div>
-        <div class="skill-name">${skill}</div>
+        <div class="skill-name">${escapeHtml(skill)}</div>
       </div>
-    `).join('\n');
+    `
+  };
+
+  // Template ID validation
+  const generator = templateGenerators[templateId];
+
+  if (!generator) {
+    console.error(`[generateSkillItems] Unknown template ID: ${templateId}`);
+    throw new Error(`Skills template "${templateId}" not found. Available templates: ${Object.keys(templateGenerators).join(', ')}`);
   }
 
-  return '';
+  return cvData.skills.map(generator).join('\n');
 }
 
 /**
@@ -336,13 +391,17 @@ export function getPortfolioReplacements(
 
 /**
  * CV verilerinden languages section için HTML items oluşturur
+ * @param cvData - CV data containing languages information
+ * @param templateId - Template identifier
+ * @returns HTML string with language items or empty state message
  */
 export function generateLanguageItems(
   cvData: CVData,
   templateId: string
 ): string {
+  // Empty data validation
   if (!cvData.languages || cvData.languages.length === 0) {
-    return '';
+    return '<p class="no-languages">Henüz dil bilgisi eklenmemiş.</p>';
   }
 
   // Dil seviyelerini belirle (Native, Fluent, Advanced, Intermediate, Basic)
@@ -355,36 +414,43 @@ export function generateLanguageItems(
     return { name: lang, level, percentage: levelPercentages[level as keyof typeof levelPercentages] };
   });
 
-  if (templateId === 'languages-progress-bars') {
-    return languagesWithLevels.map(lang => `
+  // Template generators with XSS protection
+  const templateGenerators: Record<string, (lang: typeof languagesWithLevels[0]) => string> = {
+    'languages-progress-bars': (lang) => `
       <div class="language-item">
         <div class="language-name">
-          <span>${lang.name}</span>
-          <span class="language-level">${lang.level}</span>
+          <span>${escapeHtml(lang.name)}</span>
+          <span class="language-level">${escapeHtml(lang.level)}</span>
         </div>
         <div class="language-bar">
           <div class="language-progress" style="width: ${lang.percentage}%"></div>
         </div>
       </div>
-    `).join('\n');
-  } else if (templateId === 'languages-card-grid') {
-    return languagesWithLevels.map(lang => `
+    `,
+    'languages-card-grid': (lang) => `
       <div class="language-card">
         <div class="language-icon">🌍</div>
-        <div class="language-name">${lang.name}</div>
-        <div class="language-level">${lang.level}</div>
+        <div class="language-name">${escapeHtml(lang.name)}</div>
+        <div class="language-level">${escapeHtml(lang.level)}</div>
       </div>
-    `).join('\n');
-  } else if (templateId === 'languages-minimalist') {
-    return languagesWithLevels.map(lang => `
+    `,
+    'languages-minimalist': (lang) => `
       <div class="language-item-minimal">
-        <div class="language-name-minimal">${lang.name}</div>
-        <div class="language-level-minimal">${lang.level}</div>
+        <div class="language-name-minimal">${escapeHtml(lang.name)}</div>
+        <div class="language-level-minimal">${escapeHtml(lang.level)}</div>
       </div>
-    `).join('\n');
+    `
+  };
+
+  // Template ID validation
+  const generator = templateGenerators[templateId];
+
+  if (!generator) {
+    console.error(`[generateLanguageItems] Unknown template ID: ${templateId}`);
+    throw new Error(`Languages template "${templateId}" not found. Available templates: ${Object.keys(templateGenerators).join(', ')}`);
   }
 
-  return '';
+  return languagesWithLevels.map(generator).join('\n');
 }
 
 /**
@@ -414,9 +480,9 @@ export function getContactReplacements(
   themeColors: ThemeColors
 ): PlaceholderReplacements {
   return {
-    '{{EMAIL}}': cvData.personalInfo.email || 'Email bulunamadı',
-    '{{PHONE}}': cvData.personalInfo.phone || 'Telefon bulunamadı',
-    '{{LOCATION}}': cvData.personalInfo.location || 'Konum belirtilmemiş',
+    '{{EMAIL}}': escapeHtml(cvData.personalInfo.email || 'Email bulunamadı'),
+    '{{PHONE}}': escapeHtml(cvData.personalInfo.phone || 'Telefon bulunamadı'),
+    '{{LOCATION}}': escapeHtml(cvData.personalInfo.location || 'Konum belirtilmemiş'),
     '{{COLOR_PRIMARY}}': themeColors.primary,
     '{{COLOR_SECONDARY}}': themeColors.secondary,
     '{{COLOR_ACCENT}}': themeColors.accent,
@@ -446,12 +512,12 @@ export function getFooterReplacements(
   ].filter(link => link !== '').join('\n    ');
 
   return {
-    '{{NAME}}': cvData.personalInfo.name,
-    '{{TITLE}}': cvData.personalInfo.title || 'Professional',
-    '{{EMAIL}}': cvData.personalInfo.email || 'Email bulunamadı',
-    '{{PHONE}}': cvData.personalInfo.phone || 'Telefon bulunamadı',
-    '{{LOCATION}}': cvData.personalInfo.location || 'Konum belirtilmemiş',
-    '{{SUMMARY}}': cvData.summary || cvData.personalInfo.name + ' - Professional Profile',
+    '{{NAME}}': escapeHtml(cvData.personalInfo.name),
+    '{{TITLE}}': escapeHtml(cvData.personalInfo.title || 'Professional'),
+    '{{EMAIL}}': escapeHtml(cvData.personalInfo.email || 'Email bulunamadı'),
+    '{{PHONE}}': escapeHtml(cvData.personalInfo.phone || 'Telefon bulunamadı'),
+    '{{LOCATION}}': escapeHtml(cvData.personalInfo.location || 'Konum belirtilmemiş'),
+    '{{SUMMARY}}': escapeHtml(cvData.summary || cvData.personalInfo.name + ' - Professional Profile'),
     '{{SOCIAL_LINKS}}': socialLinks,
     '{{CURRENT_YEAR}}': new Date().getFullYear().toString(),
     '{{COLOR_PRIMARY}}': themeColors.primary,

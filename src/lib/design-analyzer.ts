@@ -62,8 +62,12 @@ HERO SECTION:
 4. hero-animated-gradient: Animasyonlu gradient background, glassmorphism efekti, floating particles
 
 EXPERIENCE SECTION:
-1. experience-timeline: Zaman çizelgesi şeklinde dikey düzen
-2. experience-cards: Kart grid düzeni, modern ve tıklanabilir görünüm
+1. experience-timeline: Zaman çizelgesi şeklinde dikey düzen, sol tarafta çizgi ve noktalar
+2. experience-cards: Kart grid düzeni, modern ve tıklanabilir görünüm, hover efektleri
+3. experience-accordion: Açılır/kapanır (collapsible) liste, space-efficient, tek seferde bir deneyim açık
+4. experience-minimal: Minimal liste düzeni, typography odaklı, sade ve temiz görünüm
+5. experience-horizontal-timeline: Yatay akan timeline, scroll ile gezinme, modern ve dinamik
+6. experience-tabs: Tab bazlı navigasyon, şirket adına göre organize, kompakt görünüm
 
 EDUCATION SECTION:
 1. education-timeline: Zaman çizelgesi şeklinde eğitim gösterimi, emoji ikonlu
