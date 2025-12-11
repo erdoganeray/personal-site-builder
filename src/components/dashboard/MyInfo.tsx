@@ -1,9 +1,11 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, useCallback } from "react";
 import CVUploader from "@/components/CVUploader";
-import type { CVData } from "@/lib/gemini-pdf-parser";
+import type { CVData, CVPortfolioItem } from "@/lib/gemini-pdf-parser";
 import { hasUnpublishedChanges } from "@/lib/change-detection";
+import PortfolioUploader from "@/components/dashboard/PortfolioUploader";
+import PortfolioMetadataEditor from "@/components/dashboard/PortfolioMetadataEditor";
 
 interface MyInfoProps {
     site: any;
@@ -37,12 +39,18 @@ export default function MyInfo({ site, cvData, onDelete, onCVAnalyzed, deleting 
     const [languages, setLanguages] = useState<string[]>([]);
     const [profilePhotoUrl, setProfilePhotoUrl] = useState("");
     const [uploadingPhoto, setUploadingPhoto] = useState(false);
-    const [portfolio, setPortfolio] = useState<Array<{ imageUrl: string }>>([]);
+    const [portfolio, setPortfolio] = useState<CVPortfolioItem[]>([]);
     const [uploadingPortfolio, setUploadingPortfolio] = useState(false);
+    const [editingPortfolioIndex, setEditingPortfolioIndex] = useState<number | null>(null);
 
     // Load data from site or cvData
     useEffect(() => {
         if (site) {
+            console.log('Loading site data:', site);
+            console.log('site.cvContent:', site.cvContent);
+            console.log('site.cvContent?.portfolio:', site.cvContent?.portfolio);
+            console.log('cvData?.portfolio:', cvData?.portfolio);
+
             setName(site.name || cvData?.personalInfo?.name || "");
             setJobTitle(site.jobTitle || cvData?.personalInfo?.title || "");
             setEmail(site.email || cvData?.personalInfo?.email || "");
@@ -57,6 +65,8 @@ export default function MyInfo({ site, cvData, onDelete, onCVAnalyzed, deleting 
             setSummary(site.summary || cvData?.summary || "");
             setProfilePhotoUrl(site.cvContent?.personalInfo?.profilePhotoUrl || "");
             setPortfolio(site.cvContent?.portfolio || cvData?.portfolio || []);
+
+            console.log('Portfolio set to:', site.cvContent?.portfolio || cvData?.portfolio || []);
 
             // Parse JSON fields
             try {
@@ -89,6 +99,11 @@ export default function MyInfo({ site, cvData, onDelete, onCVAnalyzed, deleting 
 
         setSaving(true);
         try {
+            // Debug: Check portfolio state before filtering
+            console.log('Portfolio before filter:', portfolio);
+            const filteredPortfolio = portfolio.filter(item => item?.imageUrl);
+            console.log('Portfolio after filter:', filteredPortfolio);
+
             const response = await fetch("/api/site/update-info", {
                 method: "PATCH",
                 headers: {
@@ -110,7 +125,7 @@ export default function MyInfo({ site, cvData, onDelete, onCVAnalyzed, deleting 
                     summary,
                     experience,
                     education,
-                    portfolio,
+                    portfolio: filteredPortfolio,
                     skills,
                     languages,
                     profilePhotoUrl,
@@ -221,7 +236,7 @@ export default function MyInfo({ site, cvData, onDelete, onCVAnalyzed, deleting 
 
     const handlePhotoDelete = async () => {
         if (!profilePhotoUrl) return;
-        
+
         if (!confirm("Profil fotoğrafını silmek istediğinizden emin misiniz?")) {
             return;
         }
@@ -262,53 +277,23 @@ export default function MyInfo({ site, cvData, onDelete, onCVAnalyzed, deleting 
         setLanguages(updated);
     };
 
-    const handlePortfolioUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
-        const file = e.target.files?.[0];
-        if (!file) return;
+    const handlePortfolioUploadComplete = useCallback((urls: string[]) => {
+        console.log('handlePortfolioUploadComplete called with URLs:', urls);
+        console.log('Current portfolio state:', portfolio);
+        const newItems: CVPortfolioItem[] = urls.map(url => ({ imageUrl: url }));
+        console.log('New items to add:', newItems);
+        setPortfolio(prev => {
+            const updatedPortfolio = [...prev, ...newItems];
+            console.log('Updated portfolio:', updatedPortfolio);
+            return updatedPortfolio;
+        });
+    }, []);
 
-        // Check max limit
-        if (portfolio.length >= 5) {
-            alert("Maksimum 5 adet portfolio fotoğrafı ekleyebilirsiniz");
-            return;
-        }
-
-        // Validate file type
-        const allowedTypes = ["image/jpeg", "image/jpg", "image/png", "image/webp"];
-        if (!allowedTypes.includes(file.type)) {
-            alert("Sadece JPEG, PNG ve WebP formatları desteklenmektedir");
-            return;
-        }
-
-        // Validate file size (5MB)
-        if (file.size > 5 * 1024 * 1024) {
-            alert("Dosya boyutu 5MB'dan küçük olmalıdır");
-            return;
-        }
-
-        setUploadingPortfolio(true);
-        try {
-            const formData = new FormData();
-            formData.append("file", file);
-
-            const response = await fetch("/api/upload/portfolio", {
-                method: "POST",
-                body: formData,
-            });
-
-            const data = await response.json();
-
-            if (response.ok) {
-                setPortfolio([...portfolio, { imageUrl: data.url }]);
-                alert("Portfolio fotoğrafı yüklendi! Değişiklikleri kaydetmeyi unutmayın.");
-            } else {
-                alert(data.error || "Fotoğraf yüklenemedi");
-            }
-        } catch (error) {
-            console.error("Error uploading portfolio image:", error);
-            alert("Bir hata oluştu");
-        } finally {
-            setUploadingPortfolio(false);
-        }
+    const handlePortfolioMetadataSave = (index: number, updatedItem: CVPortfolioItem) => {
+        const updated = [...portfolio];
+        updated[index] = updatedItem;
+        setPortfolio(updated);
+        setEditingPortfolioIndex(null);
     };
 
     const handlePortfolioDelete = async (imageUrl: string, index: number) => {
@@ -492,14 +477,14 @@ export default function MyInfo({ site, cvData, onDelete, onCVAnalyzed, deleting 
                         {/* Personal Info */}
                         <div className="bg-gray-700/50 rounded-lg p-4">
                             <h4 className="text-lg font-semibold text-white mb-3">Kişisel Bilgiler</h4>
-                            
+
                             {/* Profile Photo Section */}
                             <div className="mb-6 flex flex-col items-center">
                                 <div className="w-32 h-32 rounded-full bg-gray-600 flex items-center justify-center mb-3 overflow-hidden border-4 border-gray-500">
                                     {profilePhotoUrl ? (
-                                        <img 
-                                            src={profilePhotoUrl} 
-                                            alt="Profile" 
+                                        <img
+                                            src={profilePhotoUrl}
+                                            alt="Profile"
                                             className="w-full h-full object-cover"
                                         />
                                     ) : (
@@ -518,11 +503,10 @@ export default function MyInfo({ site, cvData, onDelete, onCVAnalyzed, deleting 
                                                 disabled={uploadingPhoto}
                                                 className="hidden"
                                             />
-                                            <span className={`inline-flex items-center gap-2 px-4 py-2 rounded-lg text-sm font-medium transition-colors ${
-                                                uploadingPhoto 
-                                                    ? 'bg-gray-600 text-gray-400 cursor-not-allowed' 
-                                                    : 'bg-blue-600 hover:bg-blue-700 text-white'
-                                            }`}>
+                                            <span className={`inline-flex items-center gap-2 px-4 py-2 rounded-lg text-sm font-medium transition-colors ${uploadingPhoto
+                                                ? 'bg-gray-600 text-gray-400 cursor-not-allowed'
+                                                : 'bg-blue-600 hover:bg-blue-700 text-white'
+                                                }`}>
                                                 {uploadingPhoto ? (
                                                     <>
                                                         <svg className="animate-spin h-4 w-4" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
@@ -875,44 +859,72 @@ export default function MyInfo({ site, cvData, onDelete, onCVAnalyzed, deleting 
                         <div className="bg-gray-700/50 rounded-lg p-4">
                             <div className="flex justify-between items-center mb-3">
                                 <h4 className="text-lg font-semibold text-white">
-                                    Portfolio ({portfolio.length}/5)
+                                    Portfolio ({portfolio.length}/10)
                                 </h4>
-                                {isEditing && portfolio.length < 5 && (
-                                    <label className="cursor-pointer">
-                                        <input
-                                            type="file"
-                                            accept="image/jpeg,image/jpg,image/png,image/webp"
-                                            onChange={handlePortfolioUpload}
-                                            disabled={uploadingPortfolio}
-                                            className="hidden"
-                                        />
-                                        <span className={`inline-flex items-center gap-2 px-3 py-1 rounded text-sm font-medium transition-colors ${
-                                            uploadingPortfolio 
-                                                ? 'bg-gray-600 text-gray-400 cursor-not-allowed' 
-                                                : 'bg-blue-600 hover:bg-blue-700 text-white'
-                                        }`}>
-                                            {uploadingPortfolio ? 'Yükleniyor...' : '+ Ekle'}
-                                        </span>
-                                    </label>
-                                )}
                             </div>
+
+                            {/* Portfolio Uploader - Only show in edit mode */}
+                            {isEditing && (
+                                <div className="mb-4">
+                                    <PortfolioUploader
+                                        currentCount={portfolio.length}
+                                        maxCount={10}
+                                        onUploadComplete={handlePortfolioUploadComplete}
+                                        disabled={uploadingPortfolio}
+                                        existingFiles={portfolio
+                                            .filter(item => item?.imageUrl)
+                                            .map(item => ({
+                                                fileName: item.imageUrl.split('/').pop() || '',
+                                                fileSize: 0 // We don't have size info, but name check is still useful
+                                            }))}
+                                    />
+                                </div>
+                            )}
+
+                            {/* Portfolio Grid */}
                             <div className="grid grid-cols-2 md:grid-cols-3 gap-3">
                                 {portfolio.map((item, index) => (
                                     <div key={index} className="relative group aspect-square rounded-lg overflow-hidden bg-gray-600">
-                                        <img 
-                                            src={item.imageUrl} 
-                                            alt={`Portfolio ${index + 1}`}
+                                        <img
+                                            src={item.imageUrl}
+                                            alt={item.title || `Portfolio ${index + 1}`}
                                             className="w-full h-full object-cover"
                                         />
+
+                                        {/* Metadata Overlay */}
+                                        {(item.title || item.category) && (
+                                            <div className="absolute bottom-0 left-0 right-0 bg-gradient-to-t from-black/80 to-transparent p-2">
+                                                {item.title && (
+                                                    <p className="text-white text-xs font-semibold truncate">{item.title}</p>
+                                                )}
+                                                {item.category && (
+                                                    <p className="text-gray-300 text-xs truncate">{item.category}</p>
+                                                )}
+                                            </div>
+                                        )}
+
+                                        {/* Action Buttons */}
                                         {isEditing && !uploadingPortfolio && (
-                                            <button
-                                                onClick={() => handlePortfolioDelete(item.imageUrl, index)}
-                                                className="absolute top-2 right-2 p-2 bg-red-600 hover:bg-red-700 text-white rounded-full opacity-0 group-hover:opacity-100 transition-opacity"
-                                            >
-                                                <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
-                                                </svg>
-                                            </button>
+                                            <div className="absolute top-2 right-2 flex gap-2 opacity-0 group-hover:opacity-100 transition-opacity">
+                                                <button
+                                                    onClick={() => setEditingPortfolioIndex(index)}
+                                                    className="p-2 bg-blue-600 hover:bg-blue-700 text-white rounded-full"
+                                                    title="Detayları düzenle"
+                                                >
+                                                    <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
+                                                    </svg>
+                                                </button>
+                                                <button
+                                                    onClick={() => handlePortfolioDelete(item.imageUrl, index)}
+                                                    className="p-2 bg-red-600 hover:bg-red-700 text-white rounded-full"
+                                                    title="Sil"
+                                                >
+                                                    <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
+                                                    </svg>
+                                                </button>
+                                            </div>
                                         )}
                                     </div>
                                 ))}
@@ -920,12 +932,22 @@ export default function MyInfo({ site, cvData, onDelete, onCVAnalyzed, deleting 
                                     <div className="col-span-2 md:col-span-3 text-center py-8">
                                         <p className="text-gray-400 text-sm">Henüz portfolio fotoğrafı eklenmemiş</p>
                                         {isEditing && (
-                                            <p className="text-gray-500 text-xs mt-2">Maksimum 5 adet fotoğraf ekleyebilirsiniz</p>
+                                            <p className="text-gray-500 text-xs mt-2">Maksimum 10 adet fotoğraf ekleyebilirsiniz</p>
                                         )}
                                     </div>
                                 )}
                             </div>
                         </div>
+
+                        {/* Portfolio Metadata Editor Modal */}
+                        {editingPortfolioIndex !== null && (
+                            <PortfolioMetadataEditor
+                                item={portfolio[editingPortfolioIndex]}
+                                index={editingPortfolioIndex}
+                                onSave={handlePortfolioMetadataSave}
+                                onCancel={() => setEditingPortfolioIndex(null)}
+                            />
+                        )}
 
                         {/* Skills */}
                         <div className="bg-gray-700/50 rounded-lg p-4">

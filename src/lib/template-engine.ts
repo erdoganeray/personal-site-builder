@@ -459,21 +459,44 @@ export function generatePortfolioItems(
   if (templateId === 'portfolio-grid') {
     return cvData.portfolio.map((item, index) => `
       <div class="portfolio-item" data-index="${index}">
-        <img src="${convertR2UrlToRelativePath(item.imageUrl)}" alt="Portfolio ${index + 1}" loading="lazy" />
+        <img src="${convertR2UrlToRelativePath(item.imageUrl)}" alt="${escapeHtml(item.title || `Portfolio ${index + 1}`)}" loading="lazy" />
       </div>
     `).join('\n');
   } else if (templateId === 'portfolio-masonry') {
     return cvData.portfolio.map((item, index) => `
       <div class="portfolio-item-masonry" data-index="${index}">
-        <img src="${convertR2UrlToRelativePath(item.imageUrl)}" alt="Portfolio ${index + 1}" loading="lazy" />
+        <img src="${convertR2UrlToRelativePath(item.imageUrl)}" alt="${escapeHtml(item.title || `Portfolio ${index + 1}`)}" loading="lazy" />
       </div>
     `).join('\n');
   } else if (templateId === 'portfolio-carousel') {
     return cvData.portfolio.map((item, index) => `
       <div class="portfolio-item-carousel" data-index="${index}">
-        <img src="${convertR2UrlToRelativePath(item.imageUrl)}" alt="Portfolio ${index + 1}" loading="lazy" />
+        <img src="${convertR2UrlToRelativePath(item.imageUrl)}" alt="${escapeHtml(item.title || `Portfolio ${index + 1}`)}" loading="lazy" />
       </div>
     `).join('\n');
+  } else if (templateId === 'portfolio-bento-grid') {
+    return cvData.portfolio.map((item, index) => {
+      const hasMetadata = item.title || item.description || item.category || (item.tags && item.tags.length > 0);
+
+      return `
+      <div class="portfolio-item-bento" data-index="${index}">
+        <img src="${convertR2UrlToRelativePath(item.imageUrl)}" alt="${escapeHtml(item.title || `Portfolio ${index + 1}`)}" loading="lazy" />
+        ${item.projectUrl ? `<a href="${escapeHtml(item.projectUrl)}" target="_blank" rel="noopener noreferrer" class="portfolio-item-link" title="View Project">🔗</a>` : ''}
+        ${hasMetadata ? `
+        <div class="portfolio-item-metadata">
+          ${item.category ? `<div class="portfolio-item-category">${escapeHtml(item.category)}</div>` : ''}
+          ${item.title ? `<h3 class="portfolio-item-title">${escapeHtml(item.title)}</h3>` : ''}
+          ${item.description ? `<p class="portfolio-item-description">${escapeHtml(item.description)}</p>` : ''}
+          ${item.tags && item.tags.length > 0 ? `
+          <div class="portfolio-item-tags">
+            ${item.tags.map(tag => `<span class="portfolio-item-tag">${escapeHtml(tag)}</span>`).join('')}
+          </div>
+          ` : ''}
+        </div>
+        ` : ''}
+      </div>
+    `;
+    }).join('\n');
   }
 
   return '';

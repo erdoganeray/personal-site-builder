@@ -97,8 +97,23 @@ EDUCATION SECTION:
 
 PORTFOLIO SECTION (OPTIONAL - sadece portfolio fotoğrafları varsa ekle):
 1. portfolio-grid: Grid düzeninde portfolio, hover efekti, lightbox ile büyütme
+   - 1-6 fotoğraf varsa tercih et
+   - Basit ve temiz görünüm isteniyorsa
+   - Metadata (başlık, açıklama) yoksa
 2. portfolio-masonry: Masonry (pinterest tarzı) düzen, asimetrik görünüm, lightbox
+   - 4+ fotoğraf varsa tercih et
+   - Yaratıcı ve dinamik görünüm isteniyorsa
+   - Görsel çeşitlilik önemliyse
 3. portfolio-carousel: Carousel/slider düzeni, otomatik geçiş, ok tuşları, lightbox
+   - 3-8 fotoğraf varsa tercih et
+   - Sıralı gösterim isteniyorsa
+   - Minimal alan kullanımı gerekiyorsa
+4. portfolio-bento-grid: Modern Bento Grid (Pinterest-style) düzen, ilk item 2x2 featured, metadata overlay
+   - 4-10 fotoğraf varsa tercih et
+   - Portfolio metadata'sı varsa (başlık, açıklama, kategori, tags) MUTLAKA BU TEMPLATE'İ SEÇ
+   - Modern ve premium görünüm isteniyorsa
+   - Tasarımcı, developer, yaratıcı roller için ideal (UI/UX Designer, Frontend Developer, Photographer, Graphic Designer)
+   - Projeler hakkında detaylı bilgi gösterilmek isteniyorsa
 
 SKILLS SECTION:
 1. skills-progress-bars: İlerleme çubukları ile yetenek gösterimi

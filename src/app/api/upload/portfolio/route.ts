@@ -14,7 +14,7 @@ const s3Client = new S3Client({
 
 const ALLOWED_IMAGE_TYPES = ["image/jpeg", "image/jpg", "image/png", "image/webp"];
 const MAX_FILE_SIZE = 5 * 1024 * 1024; // 5MB
-const MAX_PORTFOLIO_IMAGES = 5;
+const MAX_PORTFOLIO_IMAGES = 10; // Increased from 5 to 10 for MVP
 
 export async function POST(req: NextRequest) {
   try {
@@ -36,65 +36,116 @@ export async function POST(req: NextRequest) {
     );
 
     const currentCount = listResult.Contents?.length || 0;
-    if (currentCount >= MAX_PORTFOLIO_IMAGES) {
-      return NextResponse.json(
-        { error: `Maximum ${MAX_PORTFOLIO_IMAGES} portfolio images allowed` },
-        { status: 400 }
-      );
-    }
 
     const formData = await req.formData();
-    const file = formData.get("file") as File;
+    const files = formData.getAll("files") as File[];
 
-    if (!file) {
+    // Support both single file ("file") and multiple files ("files")
+    if (files.length === 0) {
+      const singleFile = formData.get("file") as File;
+      if (singleFile) {
+        files.push(singleFile);
+      }
+    }
+
+    if (files.length === 0) {
       return NextResponse.json(
-        { error: "No file provided" },
+        { error: "No files provided" },
         { status: 400 }
       );
     }
 
-    if (!ALLOWED_IMAGE_TYPES.includes(file.type)) {
+    // Check if adding these files would exceed the limit
+    if (currentCount + files.length > MAX_PORTFOLIO_IMAGES) {
       return NextResponse.json(
-        { error: "Only JPEG, PNG, and WebP images are allowed" },
+        {
+          error: `Maximum ${MAX_PORTFOLIO_IMAGES} portfolio images allowed. You currently have ${currentCount} images. You can upload ${MAX_PORTFOLIO_IMAGES - currentCount} more.`
+        },
         { status: 400 }
       );
     }
 
-    if (file.size > MAX_FILE_SIZE) {
-      return NextResponse.json(
-        { error: "File size must be less than 5MB" },
-        { status: 400 }
-      );
+    // Process each file
+    const uploadResults = [];
+    const errors = [];
+
+    for (let i = 0; i < files.length; i++) {
+      const file = files[i];
+
+      try {
+        // Validate file type
+        if (!ALLOWED_IMAGE_TYPES.includes(file.type)) {
+          errors.push({
+            fileName: file.name,
+            error: "Only JPEG, PNG, and WebP images are allowed"
+          });
+          continue;
+        }
+
+        // Validate file size
+        if (file.size > MAX_FILE_SIZE) {
+          errors.push({
+            fileName: file.name,
+            error: "File size must be less than 5MB"
+          });
+          continue;
+        }
+
+        // Generate unique filename with timestamp and index
+        const fileExt = file.name.split(".").pop() || "jpg";
+        const timestamp = Date.now();
+        const fileName = `portfolio-${timestamp}-${i}.${fileExt}`;
+
+        // Convert file to buffer
+        const buffer = Buffer.from(await file.arrayBuffer());
+
+        // Upload to R2
+        await s3Client.send(
+          new PutObjectCommand({
+            Bucket: process.env.R2_BUCKET_NAME!,
+            Key: `users/${session.user.id}/portfolio/${fileName}`,
+            Body: buffer,
+            ContentType: file.type,
+            CacheControl: "public, max-age=31536000", // Cache for 1 year
+          })
+        );
+
+        // Return R2 public URL
+        const fileUrl = `${process.env.R2_PUBLIC_URL}/users/${session.user.id}/portfolio/${fileName}`;
+
+        uploadResults.push({
+          success: true,
+          url: fileUrl,
+          fileName: file.name,
+          originalIndex: i
+        });
+
+        console.log(`Portfolio image uploaded to R2: ${fileUrl}`);
+      } catch (error) {
+        console.error(`Error uploading file ${file.name}:`, error);
+        errors.push({
+          fileName: file.name,
+          error: "Upload failed"
+        });
+      }
     }
 
-    // Generate unique filename with timestamp
-    const fileExt = file.name.split(".").pop() || "jpg";
-    const timestamp = Date.now();
-    const fileName = `portfolio-${timestamp}.${fileExt}`;
-
-    // Convert file to buffer
-    const buffer = Buffer.from(await file.arrayBuffer());
-
-    // Upload to R2 - users/[userId]/portfolio/ folder
-    await s3Client.send(
-      new PutObjectCommand({
-        Bucket: process.env.R2_BUCKET_NAME!,
-        Key: `users/${session.user.id}/portfolio/${fileName}`,
-        Body: buffer,
-        ContentType: file.type,
-        CacheControl: "public, max-age=31536000", // Cache for 1 year
-      })
-    );
-
-    // Return R2 public URL for dashboard/preview use
-    // Template engine will convert this to relative path for published sites
-    const fileUrl = `${process.env.R2_PUBLIC_URL}/users/${session.user.id}/portfolio/${fileName}`;
-
-    console.log("Portfolio image uploaded to R2:", fileUrl);
+    // Return results
+    if (uploadResults.length === 0) {
+      return NextResponse.json(
+        {
+          error: "All uploads failed",
+          errors
+        },
+        { status: 500 }
+      );
+    }
 
     return NextResponse.json({
       success: true,
-      url: fileUrl,
+      uploads: uploadResults,
+      errors: errors.length > 0 ? errors : undefined,
+      message: `Successfully uploaded ${uploadResults.length} of ${files.length} files`
     });
   } catch (error) {
     console.error("Portfolio image upload error:", error);

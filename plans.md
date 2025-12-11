@@ -33,7 +33,8 @@
 - hem preview hem de publish için rollback ui tasarımı
 - sayfa yenilenince chat mesajları kayboluyor. kaybolmasın.
 - editor sayfasındaki preview da sitem de olmayan hatalar görülüyor. navigation menunun hero componentinin üstünde kalmasından kaynaklı profil fotoğrafının bir kısmı görülmüyor.
-- - EDIT TEN SONRA BİLGİLERİMDE KAYDET DİYİNCE İLK SEÇTİĞİ TEMPLATE LERE GERİ DÖNÜYOR. Ayrıca edit te yapılan değişiklikler çok uzun sürüyor, muhtemelen tüm kod input ediliyor ve tüm kod output ediliyor.
+- EDIT TEN SONRA BİLGİLERİMDE KAYDET DİYİNCE İLK SEÇTİĞİ TEMPLATE LERE GERİ DÖNÜYOR. Ayrıca edit te yapılan değişiklikler çok uzun sürüyor, muhtemelen tüm kod input ediliyor ve tüm kod output ediliyor.
+- Revise tamamen yanlış çalışıyor, baştan aşağı test edilmeli ve güncellenmeli
 
 ## AI-Less Component Template Sistemi
 - cvContent içerikleri NULL olabilir. Örneğin bir kullanıcının cv'sinin eğitim bölümünde GPA bilgisi varken, bir kullanıcının GPA bilgisi olmayabilir. cvContent, belirli bir standartta olmak zorunda olduğu için cv'de olmayan ya da çıkarılamayan bilgiler NULL olmalı.
@@ -63,6 +64,7 @@
 - Otomatik version temizliği için cron job (30/90 gün sonra)
 - one page tasarım
 - portfolio da sadece fotoğraf
+- belki belirli mb storage
 
 ## Paid Plan 
 - react, vue ya da next.js gibi daha komplike teknolojiler ile web sitesi oluşturma
@@ -76,6 +78,7 @@
 - Otomatik version temizliği için cron job (30/90 gün sonra)
 - multiple pages tasarım
 - portfolioda video
+- belki more belirli mb storage
 
 # Hata Yönetimi
 - ai ile siteniz oluşturuluyor animation eklenecek
@@ -104,6 +107,7 @@
 - editor de chat ile deneyim bölümünü kaldırdığımda bilgilerimde deneyimler görünüyor. previewda görünmüyor ama mesela bu durumda bilgilerimden de kaldırılmalı mı?
 - About kategorisi projeden çıkarılacak (Hero component zaten about'un işlevini yapıyor, gereksiz tekrar olur)
 - Özellikle bilgilerimdeki text alanlarına eklenen textlerin içine zararlı scriptler eklenebilir, bunların önüne geçmek gerek
+- birden fazla profil fotoğrafı yükleniyor, yüklenememeli
 
 # Test
 
@@ -119,6 +123,14 @@
 ## Education
 - gpa ekle
 - okul logosu bulunabilir internette?
+
+## Portfolio
+- cv'den otomatik parse
+- drag and drop ile sıralama değiştirilecek
+- farklı boyutlarda görsellere uygunluk
+- görsel crop/resize
+- video support
+- AI-generated metadata from images
 
 
 # Güvenlik

@@ -35,6 +35,11 @@ export interface CVEducation {
 
 export interface CVPortfolioItem {
   imageUrl: string;
+  title?: string;
+  description?: string;
+  category?: string;
+  projectUrl?: string;
+  tags?: string[];
 }
 
 export interface CVData {
