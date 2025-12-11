@@ -132,6 +132,9 @@
 - video support
 - AI-generated metadata from images
 
+## Skills
+- cv'de skillerin intermediate gibi seviyeleri yoksa default seviye yerine bu bilginin olmadığı componentler seçilmeli
+
 
 # Güvenlik
 - API key'leri `.env` dosyasında (GitHub'a commit edilmemiş)

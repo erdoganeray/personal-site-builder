@@ -116,8 +116,50 @@ PORTFOLIO SECTION (OPTIONAL - sadece portfolio fotoğrafları varsa ekle):
    - Projeler hakkında detaylı bilgi gösterilmek isteniyorsa
 
 SKILLS SECTION:
+Skill sayısına, mesleğe ve stil tercihine göre en uygun template'i seç:
+
 1. skills-progress-bars: İlerleme çubukları ile yetenek gösterimi
+   - Seviye vurgusu önemli olduğunda tercih et
+   - Görsel ilerleme gösterimi isteniyorsa
+   - Skill sayısı: 3-10 (ideal: 5-8)
+   - Meslekler: Developer, Engineer, Technical roles
+   - Stil: Professional, Traditional
+
 2. skills-card-grid: Kart grid düzeni, ikon ve isimle yetenek gösterimi
+   - Modern ve görsel görünüm isteniyorsa tercih et
+   - Skill sayısı: 3-10 (ideal: 6-9)
+   - Meslekler: Designer, Creative roles, Marketing
+   - Stil: Modern, Visual, Clean
+
+3. skills-categorized: Kategorilere göre gruplandırılmış yetenek gösterimi
+   - ⭐ ÖNCELIK: Skill'lerde kategori bilgisi varsa MUTLAKA BU TEMPLATE'İ SEÇ
+   - Çok sayıda skill (8+) varsa tercih et
+   - Organize ve düzenli görünüm isteniyorsa
+   - Frontend/Backend/Tools gibi kategoriler varsa ideal
+   - Skill sayısı: 8-20+ (ideal: 10-15)
+   - Meslekler: Full-stack Developer, Multi-disciplinary roles
+   - Stil: Organized, Professional, Comprehensive
+
+4. skills-minimal-list: Minimal liste düzeni, typography odaklı
+   - Minimal ve temiz tasarım isteniyorsa tercih et
+   - Profesyonel ve sade görünüm gerekiyorsa
+   - Skill sayısı: 3-8 (ideal: 4-6)
+   - Meslekler: Executive, Manager, Consultant, Academic
+   - Stil: Minimal, Clean, Professional, Elegant
+
+5. skills-tag-cloud: Tag/badge cloud düzeni, dinamik boyutlandırma
+   - Yaratıcı ve modern görünüm isteniyorsa tercih et
+   - Seviyeye göre dinamik boyutlandırma (expert skills daha büyük)
+   - Skill sayısı: 6-15 (ideal: 8-12)
+   - Meslekler: Designer, Creative Director, Artist, Startup founder
+   - Stil: Creative, Dynamic, Modern, Playful
+
+SEÇİM KURALLARI:
+- Kategori bilgisi varsa → skills-categorized (en yüksek öncelik)
+- 10+ skill varsa → skills-categorized veya skills-tag-cloud
+- Minimal/sade isteniyorsa → skills-minimal-list
+- Yaratıcı/modern isteniyorsa → skills-tag-cloud veya skills-card-grid
+- Geleneksel/profesyonel isteniyorsa → skills-progress-bars veya skills-minimal-list
 
 LANGUAGES SECTION (OPTIONAL - sadece diller varsa ekle):
 1. languages-progress-bars: İlerleme çubukları ile dil seviyesi gösterimi

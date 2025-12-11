@@ -2,7 +2,7 @@
 
 import { useState, useEffect, useCallback } from "react";
 import CVUploader from "@/components/CVUploader";
-import type { CVData, CVPortfolioItem } from "@/lib/gemini-pdf-parser";
+import type { CVData, CVPortfolioItem, CVSkill } from "@/lib/gemini-pdf-parser";
 import { hasUnpublishedChanges } from "@/lib/change-detection";
 import PortfolioUploader from "@/components/dashboard/PortfolioUploader";
 import PortfolioMetadataEditor from "@/components/dashboard/PortfolioMetadataEditor";
@@ -35,13 +35,48 @@ export default function MyInfo({ site, cvData, onDelete, onCVAnalyzed, deleting 
     const [summary, setSummary] = useState("");
     const [experience, setExperience] = useState<any[]>([]);
     const [education, setEducation] = useState<any[]>([]);
-    const [skills, setSkills] = useState<string[]>([]);
+    const [skills, setSkills] = useState<(string | CVSkill)[]>([]); // Support both formats
     const [languages, setLanguages] = useState<string[]>([]);
     const [profilePhotoUrl, setProfilePhotoUrl] = useState("");
     const [uploadingPhoto, setUploadingPhoto] = useState(false);
     const [portfolio, setPortfolio] = useState<CVPortfolioItem[]>([]);
     const [uploadingPortfolio, setUploadingPortfolio] = useState(false);
     const [editingPortfolioIndex, setEditingPortfolioIndex] = useState<number | null>(null);
+
+
+    // Helper function to normalize skills array - converts all strings to CVSkill objects
+    const normalizeSkillsArray = (skills: (string | CVSkill)[]): CVSkill[] => {
+        const levelPercentages: Record<string, number> = {
+            'beginner': 40,
+            'intermediate': 70,
+            'advanced': 85,
+            'expert': 95
+        };
+
+        return skills.map(skill => {
+            if (typeof skill === 'string') {
+                return {
+                    name: skill,
+                    level: 'intermediate' as const,
+                    percentage: 70,
+                    category: ''
+                };
+            }
+
+            // Ensure percentage matches level
+            const level = skill.level || 'intermediate';
+            const percentage = skill.percentage !== undefined
+                ? skill.percentage
+                : levelPercentages[level];
+
+            return {
+                name: skill.name,
+                level: level,
+                percentage: percentage,
+                category: skill.category || ''
+            };
+        });
+    };
 
     // Load data from site or cvData
     useEffect(() => {
@@ -68,17 +103,21 @@ export default function MyInfo({ site, cvData, onDelete, onCVAnalyzed, deleting 
 
             console.log('Portfolio set to:', site.cvContent?.portfolio || cvData?.portfolio || []);
 
-            // Parse JSON fields
+            // Parse JSON fields and normalize skills
             try {
                 setExperience(site.experience ? JSON.parse(site.experience) : cvData?.experience || []);
                 setEducation(site.education ? JSON.parse(site.education) : cvData?.education || []);
-                setSkills(site.skills ? JSON.parse(site.skills) : cvData?.skills || []);
+
+                // Normalize skills to ensure consistent format
+                const rawSkills = site.skills ? JSON.parse(site.skills) : cvData?.skills || [];
+                setSkills(normalizeSkillsArray(rawSkills));
+
                 setLanguages(site.languages ? JSON.parse(site.languages) : cvData?.languages || []);
             } catch (error) {
                 console.error("Error parsing JSON fields:", error);
                 setExperience(cvData?.experience || []);
                 setEducation(cvData?.education || []);
-                setSkills(cvData?.skills || []);
+                setSkills(normalizeSkillsArray(cvData?.skills || []));
                 setLanguages(cvData?.languages || []);
             }
         }
@@ -104,6 +143,9 @@ export default function MyInfo({ site, cvData, onDelete, onCVAnalyzed, deleting 
             const filteredPortfolio = portfolio.filter(item => item?.imageUrl);
             console.log('Portfolio after filter:', filteredPortfolio);
 
+            // Normalize skills to ensure consistent CVSkill format
+            const normalizedSkills = normalizeSkillsArray(skills);
+
             const response = await fetch("/api/site/update-info", {
                 method: "PATCH",
                 headers: {
@@ -126,7 +168,7 @@ export default function MyInfo({ site, cvData, onDelete, onCVAnalyzed, deleting 
                     experience,
                     education,
                     portfolio: filteredPortfolio,
-                    skills,
+                    skills: normalizedSkills, // Use normalized skills
                     languages,
                     profilePhotoUrl,
                 }),
@@ -178,16 +220,50 @@ export default function MyInfo({ site, cvData, onDelete, onCVAnalyzed, deleting 
     };
 
     const addSkill = () => {
-        setSkills([...skills, ""]);
+        // Add new skill as CVSkill object with defaults
+        setSkills([...skills, {
+            name: "",
+            level: "intermediate",
+            percentage: 70,
+            category: ""
+        }]);
     };
 
     const removeSkill = (index: number) => {
         setSkills(skills.filter((_, i) => i !== index));
     };
 
-    const updateSkill = (index: number, value: string) => {
+    const updateSkill = (index: number, field: keyof CVSkill, value: any) => {
         const updated = [...skills];
-        updated[index] = value;
+        const currentSkill = updated[index];
+
+        // Level to percentage mapping
+        const levelPercentages: Record<CVSkill['level'] & string, number> = {
+            'beginner': 40,
+            'intermediate': 70,
+            'advanced': 85,
+            'expert': 95
+        };
+
+        // Convert string to CVSkill if needed
+        if (typeof currentSkill === 'string') {
+            updated[index] = {
+                name: currentSkill,
+                level: "intermediate",
+                percentage: 70,
+                category: ""
+            };
+        }
+
+        // Update the field
+        const updatedSkill = { ...(updated[index] as CVSkill), [field]: value };
+
+        // If level changed, update percentage automatically
+        if (field === 'level' && value) {
+            updatedSkill.percentage = levelPercentages[value as CVSkill['level'] & string];
+        }
+
+        updated[index] = updatedSkill;
         setSkills(updated);
     };
 
@@ -964,34 +1040,102 @@ export default function MyInfo({ site, cvData, onDelete, onCVAnalyzed, deleting 
                             </div>
                             {isEditing ? (
                                 <div className="space-y-2">
-                                    {skills.map((skill, index) => (
-                                        <div key={index} className="flex gap-2">
-                                            <input
-                                                type="text"
-                                                value={skill}
-                                                onChange={(e) => updateSkill(index, e.target.value)}
-                                                className="flex-1 px-2 py-1 bg-gray-600 border border-gray-500 text-white rounded text-sm"
-                                            />
-                                            <button
-                                                onClick={() => removeSkill(index)}
-                                                className="px-2 text-red-400 hover:text-red-300"
-                                            >
-                                                Sil
-                                            </button>
-                                        </div>
-                                    ))}
+                                    {skills.map((skill, index) => {
+                                        const skillObj = typeof skill === 'string'
+                                            ? { name: skill, level: 'intermediate' as const, percentage: 70, category: '' }
+                                            : skill;
+
+                                        return (
+                                            <div key={index} className="bg-gray-600/30 rounded p-3 space-y-2">
+                                                {/* Row 1: Name and Level */}
+                                                <div className="flex gap-2 items-center">
+                                                    <input
+                                                        type="text"
+                                                        value={skillObj.name}
+                                                        onChange={(e) => updateSkill(index, 'name', e.target.value)}
+                                                        placeholder="Yetenek adı"
+                                                        className="flex-1 px-2 py-1.5 bg-gray-700 border border-gray-600 text-white rounded text-sm focus:ring-1 focus:ring-blue-500"
+                                                    />
+                                                    <select
+                                                        value={skillObj.level || 'intermediate'}
+                                                        onChange={(e) => updateSkill(index, 'level', e.target.value as CVSkill['level'])}
+                                                        className="px-2 py-1.5 bg-gray-700 border border-gray-600 text-white rounded text-sm focus:ring-1 focus:ring-blue-500"
+                                                    >
+                                                        <option value="beginner">Başlangıç</option>
+                                                        <option value="intermediate">Orta</option>
+                                                        <option value="advanced">İleri</option>
+                                                        <option value="expert">Uzman</option>
+                                                    </select>
+                                                    <button
+                                                        onClick={() => removeSkill(index)}
+                                                        className="px-2 py-1.5 text-red-400 hover:text-red-300 text-sm"
+                                                        title="Sil"
+                                                    >
+                                                        ✕
+                                                    </button>
+                                                </div>
+
+                                                {/* Row 2: Category */}
+                                                <div>
+                                                    <input
+                                                        type="text"
+                                                        value={skillObj.category || ''}
+                                                        onChange={(e) => updateSkill(index, 'category', e.target.value)}
+                                                        placeholder="Kategori (örn: Frontend, Backend, Tools)"
+                                                        className="w-full px-2 py-1.5 bg-gray-700 border border-gray-600 text-white rounded text-sm focus:ring-1 focus:ring-blue-500 placeholder-gray-500"
+                                                    />
+                                                </div>
+                                            </div>
+                                        );
+                                    })}
                                     {skills.length === 0 && <p className="text-gray-400 text-sm">Yetenek ekleyin</p>}
                                 </div>
                             ) : (
-                                <div className="flex flex-wrap gap-2">
-                                    {skills.map((skill, index) => (
-                                        <span
-                                            key={index}
-                                            className="px-3 py-1 text-sm bg-blue-600 text-white rounded-full"
-                                        >
-                                            {skill}
-                                        </span>
-                                    ))}
+                                <div className="space-y-2">
+                                    {skills.map((skill, index) => {
+                                        const skillObj = typeof skill === 'string'
+                                            ? { name: skill, level: 'intermediate' as const, percentage: 70, category: '' }
+                                            : skill;
+
+                                        // Level to percentage mapping for display
+                                        const levelPercentages: Record<string, number> = {
+                                            'beginner': 40,
+                                            'intermediate': 70,
+                                            'advanced': 85,
+                                            'expert': 95
+                                        };
+
+                                        const displayPercentage = skillObj.percentage || levelPercentages[skillObj.level || 'intermediate'];
+
+                                        return (
+                                            <div key={index} className="bg-gray-600/30 rounded-lg p-3">
+                                                <div className="flex items-start gap-3">
+                                                    <div className="flex-1">
+                                                        <div className="flex items-center gap-2 mb-1">
+                                                            <span className="font-medium text-white">{skillObj.name}</span>
+                                                            {skillObj.category && (
+                                                                <span className="px-2 py-0.5 text-xs bg-blue-600/30 text-blue-300 rounded-full">
+                                                                    {skillObj.category}
+                                                                </span>
+                                                            )}
+                                                        </div>
+                                                        <div className="flex items-center gap-3 text-sm text-gray-400">
+                                                            <span className="capitalize">{skillObj.level || 'intermediate'}</span>
+                                                            <span>•</span>
+                                                            <span>{displayPercentage}%</span>
+                                                        </div>
+                                                        {/* Progress bar */}
+                                                        <div className="mt-2 h-1.5 bg-gray-700 rounded-full overflow-hidden">
+                                                            <div
+                                                                className="h-full bg-blue-500 rounded-full transition-all"
+                                                                style={{ width: `${displayPercentage}%` }}
+                                                            />
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        );
+                                    })}
                                     {skills.length === 0 && <p className="text-gray-400 text-sm">Henüz yetenek eklenmemiş</p>}
                                 </div>
                             )}

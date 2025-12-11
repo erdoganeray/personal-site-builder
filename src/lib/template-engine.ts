@@ -380,6 +380,45 @@ export function getEducationReplacements(
 }
 
 /**
+ * Helper function to normalize skill to CVSkill format
+ * Supports both legacy string format and new CVSkill object format
+ */
+function normalizeSkill(skill: string | import('./gemini-pdf-parser').CVSkill): import('./gemini-pdf-parser').CVSkill {
+  // Level to percentage mapping
+  const levelPercentages = {
+    'beginner': 40,
+    'intermediate': 70,
+    'advanced': 85,
+    'expert': 95
+  };
+
+  if (typeof skill === 'string') {
+    // Legacy format: convert string to CVSkill object with defaults
+    return {
+      name: skill,
+      level: 'intermediate',
+      percentage: 70,
+      category: undefined,
+      yearsOfExperience: undefined
+    };
+  }
+
+  // New format: ensure all optional fields have defaults
+  const level = skill.level || 'intermediate';
+  const percentage = skill.percentage !== undefined
+    ? skill.percentage
+    : levelPercentages[level as keyof typeof levelPercentages];
+
+  return {
+    name: skill.name,
+    level: level,
+    percentage: percentage,
+    category: skill.category,
+    yearsOfExperience: skill.yearsOfExperience
+  };
+}
+
+/**
  * CV verilerinden skills section için HTML items oluşturur
  * @param cvData - CV data containing skills information
  * @param templateId - Template identifier
@@ -395,25 +434,98 @@ export function generateSkillItems(
   }
 
   // Template generators with XSS protection
-  const templateGenerators: Record<string, (skill: string) => string> = {
+  const templateGenerators: Record<string, (skill: string | import('./gemini-pdf-parser').CVSkill) => string> = {
     'skills-progress-bars': (skill) => {
-      const percentage = Math.floor(Math.random() * 15) + 80; // 80-95 arası
+      const normalized = normalizeSkill(skill);
+      const percentage = normalized.percentage || 70; // Default to 70% if not specified
+
       return `
         <div class="skill-item">
-          <div class="skill-name">${escapeHtml(skill)}</div>
+          <div class="skill-name">${escapeHtml(normalized.name)}</div>
           <div class="skill-bar">
             <div class="skill-progress" style="width: ${percentage}%"></div>
           </div>
         </div>
       `;
     },
-    'skills-card-grid': (skill) => `
-      <div class="skill-card">
-        <div class="skill-icon">💡</div>
-        <div class="skill-name">${escapeHtml(skill)}</div>
-      </div>
-    `
+    'skills-card-grid': (skill) => {
+      const normalized = normalizeSkill(skill);
+
+      return `
+        <div class="skill-card">
+          <div class="skill-icon">💡</div>
+          <div class="skill-name">${escapeHtml(normalized.name)}</div>
+          ${normalized.category ? `<div class="skill-category">${escapeHtml(normalized.category)}</div>` : ''}
+        </div>
+      `;
+    },
+    'skills-categorized': (skill) => {
+      // This template handles grouping differently, so we return empty here
+      // The actual grouping logic is below
+      return '';
+    },
+    'skills-minimal-list': (skill) => {
+      const normalized = normalizeSkill(skill);
+
+      return `
+        <div class="skill-item-minimal">
+          <span class="skill-name-minimal">${escapeHtml(normalized.name)}</span>
+          <span class="skill-level-minimal">${normalized.level || 'intermediate'}</span>
+        </div>
+      `;
+    },
+    'skills-tag-cloud': (skill) => {
+      const normalized = normalizeSkill(skill);
+      const level = normalized.level || 'intermediate';
+
+      return `
+        <span class="skill-tag" data-level="${level}">
+          ${escapeHtml(normalized.name)}
+        </span>
+      `;
+    }
   };
+
+  // Special handling for categorized template
+  if (templateId === 'skills-categorized') {
+    // Normalize all skills first
+    const normalizedSkills = cvData.skills.map(normalizeSkill);
+
+    // Group skills by category
+    const skillsByCategory: Record<string, typeof normalizedSkills> = {};
+
+    normalizedSkills.forEach(skill => {
+      const category = skill.category && skill.category.trim() !== ''
+        ? skill.category
+        : 'Genel';
+
+      if (!skillsByCategory[category]) {
+        skillsByCategory[category] = [];
+      }
+      skillsByCategory[category].push(skill);
+    });
+
+    // Generate HTML for each category
+    const categoryHtml = Object.entries(skillsByCategory).map(([category, skills]) => {
+      const skillBadges = skills.map(skill => `
+        <div class="skill-badge">
+          <span>${escapeHtml(skill.name)}</span>
+          <span class="skill-level">${skill.level || 'intermediate'}</span>
+        </div>
+      `).join('');
+
+      return `
+        <div class="skill-category-group">
+          <div class="skill-category-header">${escapeHtml(category)}</div>
+          <div class="skill-category-items">
+            ${skillBadges}
+          </div>
+        </div>
+      `;
+    }).join('');
+
+    return categoryHtml;
+  }
 
   // Template ID validation
   const generator = templateGenerators[templateId];

@@ -42,13 +42,25 @@ export interface CVPortfolioItem {
   tags?: string[];
 }
 
+/**
+ * Skill with rich metadata support
+ * Supports both simple string format (legacy) and detailed object format
+ */
+export interface CVSkill {
+  name: string;
+  level?: 'beginner' | 'intermediate' | 'advanced' | 'expert';
+  percentage?: number; // 0-100, used for progress bars
+  category?: string; // e.g., 'Frontend', 'Backend', 'Tools', 'Soft Skills'
+  yearsOfExperience?: number; // Years of experience with this skill
+}
+
 export interface CVData {
   personalInfo: CVPersonalInfo;
   summary?: string;
   experience: CVExperience[];
   education: CVEducation[];
   portfolio: CVPortfolioItem[];
-  skills: string[];
+  skills: (string | CVSkill)[]; // Support both legacy string[] and new CVSkill[] format
   languages: string[];
 }
 
