@@ -29,6 +29,20 @@ export function escapeHtml(text: string | null | undefined): string {
 }
 
 /**
+ * Normalizes education year/date format
+ * @param year - The year/date string to format
+ * @returns Normalized year string or fallback message
+ */
+export function formatEducationYear(year: string | null | undefined): string {
+  if (!year) return 'Tarih belirtilmemiş';
+
+  const trimmed = year.trim();
+  if (!trimmed) return 'Tarih belirtilmemiş';
+
+  return trimmed;
+}
+
+/**
  * R2 public URL'lerini subdomain relative path'lere dönüştürür
  * Eski format: https://pub-xxx.r2.dev/users/{userId}/profile/photo.jpg
  * Yeni format: /assets/profile/photo.jpg (localhost preview için)
@@ -191,39 +205,146 @@ export function generateEducationItems(
   cvData: CVData,
   templateId: string
 ): string {
-  // Empty data validation
+  // Import EDUCATION_TEMPLATE_IDS from education-templates
+  const EDUCATION_TEMPLATE_IDS = {
+    TIMELINE: 'education-timeline',
+    CARDS: 'education-cards',
+    MODERN: 'education-modern',
+    ACCORDION: 'education-accordion',
+    HORIZONTAL_TIMELINE: 'education-horizontal-timeline',
+    TABS: 'education-tabs'
+  } as const;
+
+  // Empty data validation - Template-specific empty states
   if (!cvData.education || cvData.education.length === 0) {
-    return '<p class="no-education">Henüz eğitim bilgisi eklenmemiş.</p>';
+    const emptyStates: Record<string, string> = {
+      [EDUCATION_TEMPLATE_IDS.TIMELINE]: `
+        <div class="education-empty-state">
+          <div class="empty-icon">🎓</div>
+          <p class="empty-message">Henüz eğitim bilgisi eklenmemiş. Eğitim geçmişinizi ekleyerek profilinizi tamamlayın.</p>
+          <a href="/dashboard?tab=my-info" class="empty-action">Eğitim Ekle</a>
+        </div>
+      `,
+      [EDUCATION_TEMPLATE_IDS.CARDS]: `
+        <div class="education-empty-state">
+          <div class="empty-icon">🎓</div>
+          <p class="empty-message">Henüz eğitim bilgisi eklenmemiş. Eğitim geçmişinizi ekleyerek profilinizi tamamlayın.</p>
+          <a href="/dashboard?tab=my-info" class="empty-action">Eğitim Ekle</a>
+        </div>
+      `,
+      [EDUCATION_TEMPLATE_IDS.MODERN]: `
+        <div class="education-empty-state">
+          <div class="empty-icon">🎓</div>
+          <p class="empty-message">Henüz eğitim bilgisi eklenmemiş. Eğitim geçmişinizi ekleyerek profilinizi tamamlayın.</p>
+          <a href="/dashboard?tab=my-info" class="empty-action">Eğitim Ekle</a>
+        </div>
+      `,
+      [EDUCATION_TEMPLATE_IDS.ACCORDION]: `
+        <div class="education-empty-state">
+          <div class="empty-icon">🎓</div>
+          <p class="empty-message">Henüz eğitim bilgisi eklenmemiş. Eğitim geçmişinizi ekleyerek profilinizi tamamlayın.</p>
+          <a href="/dashboard?tab=my-info" class="empty-action">Eğitim Ekle</a>
+        </div>
+      `,
+      [EDUCATION_TEMPLATE_IDS.HORIZONTAL_TIMELINE]: `
+        <div class="education-empty-state">
+          <div class="empty-icon">🎓</div>
+          <p class="empty-message">Henüz eğitim bilgisi eklenmemiş. Eğitim geçmişinizi ekleyerek profilinizi tamamlayın.</p>
+          <a href="/dashboard?tab=my-info" class="empty-action">Eğitim Ekle</a>
+        </div>
+      `,
+      [EDUCATION_TEMPLATE_IDS.TABS]: `
+        <div class="education-empty-state">
+          <div class="empty-icon">🎓</div>
+          <p class="empty-message">Henüz eğitim bilgisi eklenmemiş. Eğitim geçmişinizi ekleyerek profilinizi tamamlayın.</p>
+          <a href="/dashboard?tab=my-info" class="empty-action">Eğitim Ekle</a>
+        </div>
+      `
+    };
+
+    return emptyStates[templateId] || emptyStates[EDUCATION_TEMPLATE_IDS.TIMELINE];
   }
 
-  // Template generators with XSS protection
+  // Template generators with XSS protection and field validation
   const templateGenerators: Record<string, (edu: typeof cvData.education[0]) => string> = {
-    'education-timeline': (edu) => `
-      <div class="education-item">
-        <div class="education-duration">${escapeHtml(edu.year)}</div>
+    [EDUCATION_TEMPLATE_IDS.TIMELINE]: (edu) => `
+      <article class="education-item" role="listitem">
+        <time class="education-duration" datetime="${escapeHtml(edu.year)}">${escapeHtml(formatEducationYear(edu.year))}</time>
         <h3 class="education-degree">${escapeHtml(edu.degree)}</h3>
         <div class="education-school">${escapeHtml(edu.school)}</div>
-        <p class="education-description">${escapeHtml(edu.field)}</p>
-      </div>
+        ${edu.field && edu.field.trim() && edu.field !== edu.degree
+        ? `<p class="education-description">${escapeHtml(edu.field)}</p>`
+        : ''}
+      </article>
     `,
-    'education-cards': (edu) => `
-      <div class="education-card">
-        <div class="education-duration">${escapeHtml(edu.year)}</div>
+    [EDUCATION_TEMPLATE_IDS.CARDS]: (edu) => `
+      <article class="education-card" role="listitem">
+        <time class="education-duration" datetime="${escapeHtml(edu.year)}">${escapeHtml(formatEducationYear(edu.year))}</time>
         <h3 class="education-degree">${escapeHtml(edu.degree)}</h3>
         <div class="education-school">${escapeHtml(edu.school)}</div>
-        <p class="education-description">${escapeHtml(edu.field)}</p>
-      </div>
+        ${edu.field && edu.field.trim() && edu.field !== edu.degree
+        ? `<p class="education-description">${escapeHtml(edu.field)}</p>`
+        : ''}
+      </article>
     `,
-    'education-modern': (edu) => `
-      <div class="education-modern-item">
+    [EDUCATION_TEMPLATE_IDS.MODERN]: (edu) => `
+      <article class="education-modern-item" role="listitem">
         <div class="education-header">
           <div class="education-title-group">
             <h3 class="education-degree">${escapeHtml(edu.degree)}</h3>
             <div class="education-school">${escapeHtml(edu.school)}</div>
           </div>
-          <div class="education-duration">${escapeHtml(edu.year)}</div>
+          <time class="education-duration" datetime="${escapeHtml(edu.year)}">${escapeHtml(formatEducationYear(edu.year))}</time>
         </div>
-        <p class="education-description">${escapeHtml(edu.field)}</p>
+        ${edu.field && edu.field.trim() && edu.field !== edu.degree
+        ? `<p class="education-description">${escapeHtml(edu.field)}</p>`
+        : ''}
+      </article>
+    `,
+    [EDUCATION_TEMPLATE_IDS.ACCORDION]: (edu) => `
+      <article class="accordion-item-edu" role="listitem">
+        <button class="accordion-header-edu" aria-expanded="false">
+          <div class="accordion-header-content-edu">
+            <div class="accordion-degree-edu">${escapeHtml(edu.degree)}</div>
+            <div class="accordion-school-edu">${escapeHtml(edu.school)}</div>
+            <time class="accordion-year-edu" datetime="${escapeHtml(edu.year)}">${escapeHtml(formatEducationYear(edu.year))}</time>
+          </div>
+          <span class="accordion-icon-edu">▼</span>
+        </button>
+        ${edu.field && edu.field.trim() && edu.field !== edu.degree
+        ? `<div class="accordion-content-edu">
+             <p class="accordion-description-edu">${escapeHtml(edu.field)}</p>
+           </div>`
+        : '<div class="accordion-content-edu"></div>'}
+      </article>
+    `,
+    [EDUCATION_TEMPLATE_IDS.HORIZONTAL_TIMELINE]: (edu) => `
+      <article class="horizontal-timeline-item-edu" role="listitem">
+        <div class="horizontal-timeline-card-edu">
+          <time class="horizontal-timeline-year-edu" datetime="${escapeHtml(edu.year)}">${escapeHtml(formatEducationYear(edu.year))}</time>
+          <h3 class="horizontal-timeline-degree-edu">${escapeHtml(edu.degree)}</h3>
+          <div class="horizontal-timeline-school-edu">${escapeHtml(edu.school)}</div>
+          ${edu.field && edu.field.trim() && edu.field !== edu.degree
+        ? `<p class="horizontal-timeline-description-edu">${escapeHtml(edu.field)}</p>`
+        : ''}
+        </div>
+      </article>
+    `,
+    [EDUCATION_TEMPLATE_IDS.TABS]: (edu) => `
+      <div class="tab-item-edu">
+        <button class="tab-button-edu" aria-expanded="false" role="tab">
+          <div class="tab-button-content-edu">
+            <div class="tab-degree-edu">${escapeHtml(edu.degree)}</div>
+            <div class="tab-school-edu">${escapeHtml(edu.school)}</div>
+          </div>
+          <time class="tab-year-edu" datetime="${escapeHtml(edu.year)}">${escapeHtml(formatEducationYear(edu.year))}</time>
+          <span class="tab-icon-edu">▶</span>
+        </button>
+        ${edu.field && edu.field.trim() && edu.field !== edu.degree
+        ? `<div class="tab-content-edu" role="tabpanel">
+             <p class="tab-description-edu">${escapeHtml(edu.field)}</p>
+           </div>`
+        : '<div class="tab-content-edu" role="tabpanel"></div>'}
       </div>
     `
   };

@@ -112,8 +112,13 @@
 ## Hero
 - Bilgilerime pp yükledin, site oluştururken Profil fotoğrafı olmayan hero oluştu, hero yu güncellediğinde pp doğru şekilde siteye entegre olmuyor.
 - Split screen da fotoğrafın olduğu yarı, scroll aşağı indikçe aşağı kayıyor.
+- Hero Modern Centered'daki Hakkımda kısmı #about a götürüyor ama about component i yok
 
 ## Experience
+
+## Education
+- gpa ekle
+- okul logosu bulunabilir internette?
 
 
 # Güvenlik

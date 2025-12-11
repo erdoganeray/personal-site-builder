@@ -70,9 +70,30 @@ EXPERIENCE SECTION:
 6. experience-tabs: Tab bazlı navigasyon, şirket adına göre organize, kompakt görünüm
 
 EDUCATION SECTION:
-1. education-timeline: Zaman çizelgesi şeklinde eğitim gösterimi, emoji ikonlu
-2. education-cards: Kart grid düzeni, modern ve tıklanabilir görünüm
-3. education-modern: Modern gradient tasarım, header düzeni, hover efektli
+1. education-timeline: Zaman çizelgesi şeklinde eğitim gösterimi, emoji ikonlu, sol tarafta dikey çizgi
+   - 3+ eğitim varsa tercih et
+   - Kronolojik sıralama önemliyse (Akademisyenler, araştırmacılar, öğretmenler)
+   - Eğitim geçmişi zengin olan profiller için ideal
+2. education-cards: Kart grid düzeni, modern ve tıklanabilir görünüm, hover efektleri
+   - 2-4 eğitim varsa tercih et
+   - Görsel vurgu önemliyse (Tasarımcılar, yaratıcı roller, pazarlamacılar)
+   - Modern ve dinamik bir görünüm isteniyorsa
+3. education-modern: Modern gradient tasarım, header düzeni, hover efektli, pill badge tarih
+   - 1-3 eğitim varsa tercih et
+   - Minimal ve profesyonel görünüm isteniyorsa (Yöneticiler, danışmanlar, C-level)
+   - Premium ve şık bir tasarım tercih ediliyorsa
+4. education-accordion: Accordion/katlanabilir tasarım, tıklanabilir başlıklar, detaylı içerik
+   - 4+ eğitim varsa tercih et
+   - Detaylı eğitim bilgisi varsa (field alanı dolu)
+   - Kompakt görünüm isteniyorsa (Çok sayıda eğitim olan profiller)
+5. education-horizontal-timeline: Yatay kaydırmalı timeline, scroll-snap, staggered animasyonlar
+   - 3-5 eğitim varsa tercih et
+   - Görsel showcase isteniyorsa (Portfolyo ağırlıklı profiller)
+   - İnteraktif ve dinamik bir deneyim isteniyorsa
+6. education-tabs: Tab/sekme tasarım, tıklanabilir başlıklar, katlanabilir içerik
+   - 3-6 eğitim varsa tercih et
+   - Organize ve düzenli görünüm isteniyorsa
+   - Detaylı bilgi gösterimi gerekiyorsa
 
 PORTFOLIO SECTION (OPTIONAL - sadece portfolio fotoğrafları varsa ekle):
 1. portfolio-grid: Grid düzeninde portfolio, hover efekti, lightbox ile büyütme
