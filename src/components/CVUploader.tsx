@@ -353,7 +353,7 @@ export default function CVUploader({ onAnalyzed }: CVUploaderProps) {
                       key={index}
                       className="px-3 py-1 text-sm bg-blue-100 dark:bg-blue-900 text-blue-800 dark:text-blue-200 rounded-full"
                     >
-                      {skill}
+                      {typeof skill === 'string' ? skill : skill.name}
                     </span>
                   ))}
                 </div>
@@ -372,7 +372,7 @@ export default function CVUploader({ onAnalyzed }: CVUploaderProps) {
                       key={index}
                       className="px-3 py-1 text-sm bg-green-100 dark:bg-green-900 text-green-800 dark:text-green-200 rounded-full"
                     >
-                      {lang}
+                      {typeof lang === 'string' ? lang : lang.name}
                     </span>
                   ))}
                 </div>
