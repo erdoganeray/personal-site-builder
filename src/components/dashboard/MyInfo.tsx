@@ -246,7 +246,7 @@ export default function MyInfo({ site, cvData, onDelete, onCVAnalyzed, deleting 
     };
 
     const addEducation = () => {
-        setEducation([...education, { school: "", degree: "", field: "", year: "" }]);
+        setEducation([...education, { school: "", degree: "", field: "", year: "", gpa: "" }]);
     };
 
     const removeEducation = (index: number) => {
@@ -1017,6 +1017,13 @@ export default function MyInfo({ site, cvData, onDelete, onCVAnalyzed, deleting 
                                                     onChange={(e) => updateEducation(index, "year", e.target.value)}
                                                     className="w-full px-2 py-1 bg-gray-700 border border-gray-600 text-white rounded text-sm"
                                                 />
+                                                <input
+                                                    type="text"
+                                                    placeholder="GPA (opsiyonel, ör: 3.8/4.0, 85/100)"
+                                                    value={edu.gpa || ""}
+                                                    onChange={(e) => updateEducation(index, "gpa", e.target.value)}
+                                                    className="w-full px-2 py-1 bg-gray-700 border border-gray-600 text-white rounded text-sm"
+                                                />
                                             </div>
                                         ) : (
                                             <div className="text-sm">
@@ -1025,6 +1032,7 @@ export default function MyInfo({ site, cvData, onDelete, onCVAnalyzed, deleting 
                                                 </p>
                                                 <p className="text-gray-400">
                                                     {edu.school} ({edu.year})
+                                                    {edu.gpa && <span className="ml-2 text-green-400">• GPA: {edu.gpa}</span>}
                                                 </p>
                                             </div>
                                         )}

@@ -93,7 +93,14 @@ export const educationTemplate1: ComponentTemplate = {
     .education-school {
       font-size: 1.1rem;
       color: {{COLOR_PRIMARY}};
-      margin-bottom: 1rem;
+      margin-bottom: 0.5rem;
+    }
+
+    .education-gpa {
+      font-size: 0.9rem;
+      color: {{COLOR_ACCENT}};
+      font-weight: 500;
+      margin-bottom: 0.75rem;
     }
 
     .education-description {
@@ -310,8 +317,15 @@ export const educationTemplate2: ComponentTemplate = {
     .education-school {
       font-size: 1.1rem;
       color: {{COLOR_PRIMARY}};
-      margin-bottom: 1rem;
+      margin-bottom: 0.5rem;
       font-weight: 500;
+    }
+
+    .education-gpa {
+      font-size: 0.9rem;
+      color: {{COLOR_ACCENT}};
+      font-weight: 500;
+      margin-bottom: 0.75rem;
     }
 
     .education-description {
@@ -537,6 +551,13 @@ export const educationTemplate3: ComponentTemplate = {
       font-size: 1.2rem;
       color: {{COLOR_PRIMARY}};
       font-weight: 500;
+    }
+
+    .education-gpa {
+      font-size: 0.95rem;
+      color: {{COLOR_ACCENT}};
+      font-weight: 500;
+      margin-top: 0.5rem;
     }
 
     .education-duration {
@@ -792,6 +813,13 @@ export const educationTemplate4: ComponentTemplate = {
     .accordion-year-edu {
       font-size: 0.85rem;
       color: {{COLOR_TEXT_SECONDARY}};
+      margin-top: 0.25rem;
+    }
+
+    .accordion-gpa-edu {
+      font-size: 0.85rem;
+      color: {{COLOR_ACCENT}};
+      font-weight: 500;
       margin-top: 0.25rem;
     }
 
@@ -1172,8 +1200,15 @@ export const educationTemplate5: ComponentTemplate = {
     .horizontal-timeline-school-edu {
       font-size: 1rem;
       color: {{COLOR_PRIMARY}};
-      margin-bottom: 1rem;
+      margin-bottom: 0.5rem;
       font-weight: 500;
+    }
+
+    .horizontal-timeline-gpa-edu {
+      font-size: 0.85rem;
+      color: {{COLOR_ACCENT}};
+      font-weight: 500;
+      margin-bottom: 0.75rem;
     }
 
     .horizontal-timeline-description-edu {
@@ -1473,6 +1508,13 @@ export const educationTemplate6: ComponentTemplate = {
     .tab-school-edu {
       font-size: 0.95rem;
       color: {{COLOR_TEXT_SECONDARY}};
+    }
+
+    .tab-gpa-edu {
+      font-size: 0.85rem;
+      color: {{COLOR_ACCENT}};
+      font-weight: 500;
+      margin-top: 0.25rem;
     }
 
     .tab-year-edu {

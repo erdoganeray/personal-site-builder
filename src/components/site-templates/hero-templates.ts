@@ -19,7 +19,7 @@ export const heroTemplate1: ComponentTemplate = {
         <p class="hero-summary">{{SUMMARY}}</p>
         <nav class="hero-cta" aria-label="Primary actions">
           <a href="#contact" class="btn-primary" aria-label="Navigate to contact section">{{CTA_PRIMARY_TEXT}}</a>
-          <a href="#about" class="btn-secondary" aria-label="Navigate to about section">{{CTA_SECONDARY_TEXT}}</a>
+          <a href="#experience" class="btn-secondary" aria-label="Navigate to experience section">{{CTA_SECONDARY_TEXT}}</a>
         </nav>
       </div>
     </section>
@@ -546,23 +546,6 @@ export const heroTemplate2: ComponentTemplate = {
       observer.observe(heroSection);
     }
 
-    // Parallax effect on scroll (subtle movement)
-    let ticking = false;
-    window.addEventListener('scroll', () => {
-      if (!ticking) {
-        window.requestAnimationFrame(() => {
-          const heroVisual = document.querySelector('.hero-visual');
-          if (heroVisual) {
-            const scrolled = window.pageYOffset;
-            const rate = scrolled * 0.3;
-            heroVisual.style.transform = \`translateY(\${rate}px)\`;
-          }
-          ticking = false;
-        });
-        ticking = true;
-      }
-    });
-
     // Ripple effect on button click
     document.querySelectorAll('.hero-section-split .btn-primary').forEach(button => {
       button.addEventListener('click', function(e) {
@@ -959,7 +942,7 @@ export const heroTemplate4: ComponentTemplate = {
           <p class="hero-gradient-summary">{{SUMMARY}}</p>
           <nav class="hero-gradient-cta" aria-label="Primary actions">
             <a href="#contact" class="btn-gradient-primary" aria-label="Navigate to contact section">{{CTA_PRIMARY_TEXT}}</a>
-            <a href="#about" class="btn-gradient-secondary" aria-label="Navigate to about section">{{CTA_SECONDARY_TEXT}}</a>
+            <a href="#experience" class="btn-gradient-secondary" aria-label="Navigate to experience section">{{CTA_SECONDARY_TEXT}}</a>
           </nav>
         </div>
       </div>

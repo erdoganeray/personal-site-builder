@@ -272,6 +272,9 @@ export function generateEducationItems(
         <time class="education-duration" datetime="${escapeHtml(edu.year)}">${escapeHtml(formatEducationYear(edu.year))}</time>
         <h3 class="education-degree">${escapeHtml(edu.degree)}</h3>
         <div class="education-school">${escapeHtml(edu.school)}</div>
+        ${edu.gpa && edu.gpa.trim()
+        ? `<p class="education-gpa">GPA: ${escapeHtml(edu.gpa)}</p>`
+        : ''}
         ${edu.field && edu.field.trim() && edu.field !== edu.degree
         ? `<p class="education-description">${escapeHtml(edu.field)}</p>`
         : ''}
@@ -282,6 +285,9 @@ export function generateEducationItems(
         <time class="education-duration" datetime="${escapeHtml(edu.year)}">${escapeHtml(formatEducationYear(edu.year))}</time>
         <h3 class="education-degree">${escapeHtml(edu.degree)}</h3>
         <div class="education-school">${escapeHtml(edu.school)}</div>
+        ${edu.gpa && edu.gpa.trim()
+        ? `<p class="education-gpa">GPA: ${escapeHtml(edu.gpa)}</p>`
+        : ''}
         ${edu.field && edu.field.trim() && edu.field !== edu.degree
         ? `<p class="education-description">${escapeHtml(edu.field)}</p>`
         : ''}
@@ -293,6 +299,9 @@ export function generateEducationItems(
           <div class="education-title-group">
             <h3 class="education-degree">${escapeHtml(edu.degree)}</h3>
             <div class="education-school">${escapeHtml(edu.school)}</div>
+            ${edu.gpa && edu.gpa.trim()
+        ? `<p class="education-gpa">GPA: ${escapeHtml(edu.gpa)}</p>`
+        : ''}
           </div>
           <time class="education-duration" datetime="${escapeHtml(edu.year)}">${escapeHtml(formatEducationYear(edu.year))}</time>
         </div>
@@ -308,6 +317,9 @@ export function generateEducationItems(
             <div class="accordion-degree-edu">${escapeHtml(edu.degree)}</div>
             <div class="accordion-school-edu">${escapeHtml(edu.school)}</div>
             <time class="accordion-year-edu" datetime="${escapeHtml(edu.year)}">${escapeHtml(formatEducationYear(edu.year))}</time>
+            ${edu.gpa && edu.gpa.trim()
+        ? `<div class="accordion-gpa-edu">GPA: ${escapeHtml(edu.gpa)}</div>`
+        : ''}
           </div>
           <span class="accordion-icon-edu">▼</span>
         </button>
@@ -324,6 +336,9 @@ export function generateEducationItems(
           <time class="horizontal-timeline-year-edu" datetime="${escapeHtml(edu.year)}">${escapeHtml(formatEducationYear(edu.year))}</time>
           <h3 class="horizontal-timeline-degree-edu">${escapeHtml(edu.degree)}</h3>
           <div class="horizontal-timeline-school-edu">${escapeHtml(edu.school)}</div>
+          ${edu.gpa && edu.gpa.trim()
+        ? `<p class="horizontal-timeline-gpa-edu">GPA: ${escapeHtml(edu.gpa)}</p>`
+        : ''}
           ${edu.field && edu.field.trim() && edu.field !== edu.degree
         ? `<p class="horizontal-timeline-description-edu">${escapeHtml(edu.field)}</p>`
         : ''}
@@ -336,6 +351,9 @@ export function generateEducationItems(
           <div class="tab-button-content-edu">
             <div class="tab-degree-edu">${escapeHtml(edu.degree)}</div>
             <div class="tab-school-edu">${escapeHtml(edu.school)}</div>
+            ${edu.gpa && edu.gpa.trim()
+        ? `<div class="tab-gpa-edu">GPA: ${escapeHtml(edu.gpa)}</div>`
+        : ''}
           </div>
           <time class="tab-year-edu" datetime="${escapeHtml(edu.year)}">${escapeHtml(formatEducationYear(edu.year))}</time>
           <span class="tab-icon-edu">▶</span>
@@ -987,7 +1005,7 @@ export function getFooterReplacements(
     const menuableComponents = selectedComponents.filter(
       comp => comp.category !== 'navigation' && comp.category !== 'footer'
     );
-    
+
     footerLinks = menuableComponents.map(comp => {
       const name = SECTION_NAME_MAP[comp.category] || comp.category;
       const ariaLabel = `${name} bölümüne git`;

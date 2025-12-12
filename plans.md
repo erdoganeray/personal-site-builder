@@ -1,9 +1,8 @@
 # Ideas
 
 ## Project Features for Users
-- contact
-- day/night mode
-- multi languages
+- day/night mode (optional olmalı, chat özelliğini bekle)
+- multi languages (optional olmalı, chat özelliğini bekle)
 - blog page and blog editor
 - google analytics
 - seo özelleştirmeleri
@@ -16,7 +15,9 @@
 - dashboard'dan domain satın alma
 - her component'i kendi içinde ui ile editleme
 - sadece cv web page değil, ürün/iş/business tanıtımı da olabilir.
-- fotolu cv'lerden fotoyu da çek
+- user, template leri kendi seçebilir
+- custom css
+- component marketplace
 
 ## Landing Page
 - sss eklenecek
@@ -30,26 +31,7 @@
 - billing/domain/settings bölümleri aktif hale getirilmeli
 
 ## Editor Content Page
-- hem preview hem de publish için rollback ui tasarımı
-- sayfa yenilenince chat mesajları kayboluyor. kaybolmasın.
 - editor sayfasındaki preview da sitem de olmayan hatalar görülüyor. navigation menunun hero componentinin üstünde kalmasından kaynaklı profil fotoğrafının bir kısmı görülmüyor.
-- EDIT TEN SONRA BİLGİLERİMDE KAYDET DİYİNCE İLK SEÇTİĞİ TEMPLATE LERE GERİ DÖNÜYOR. Ayrıca edit te yapılan değişiklikler çok uzun sürüyor, muhtemelen tüm kod input ediliyor ve tüm kod output ediliyor.
-- Revise tamamen yanlış çalışıyor, baştan aşağı test edilmeli ve güncellenmeli
-
-## AI-Less Component Template Sistemi
-- cvContent içerikleri NULL olabilir. Örneğin bir kullanıcının cv'sinin eğitim bölümünde GPA bilgisi varken, bir kullanıcının GPA bilgisi olmayabilir. cvContent, belirli bir standartta olmak zorunda olduğu için cv'de olmayan ya da çıkarılamayan bilgiler NULL olmalı.
-- template önizleme sistemi
-- kullanıcıların custom css ekleyebilmesi
-- template marketplace
-- hazır icon'lar güncellenecek
-- portfolio olarak sadece resim ekleniyor, başlık/açıklama/link de eklenebilir olmalı.
-- user, template leri kendi seçebilir
-- componentlerin sırasını drag and drop ile belirleyebilir
-- preview/publish sync olduğunda warning çıkıyor, warning içeriği düzgün şekilde gösterilmeli
-
-## Subdomain - Custom Domain
-- Subdomain çakışması kontrolü eklenmeli
-- dashboard>domain sayfası işlevli hale getirilmeli
 
 # Paid Plans Options
 
@@ -81,17 +63,14 @@
 - belki more belirli mb storage
 
 # Hata Yönetimi
-- ai ile siteniz oluşturuluyor animation eklenecek
-- ai ile siteniz oluşturuluyor sırasında dasboard menüde başka bir yere gidip "Sitem" e girince ai ile siteniz oluşturuluyor animation ı gidiyor ama arkada süreç işliyor, kısaca ui hatası var
 - unpublish durumunda bazı kritik problemler:
     - version history yok,
     - rollback yapılamıyor, son publish siteye geri dönüş yok,
     - subdomain null olunca, başkası aynı subdomain'İ alabilir
-- bilgilerim sayfasındaki herhangi bir içerik NULL olduğunda bu doğru şekilde handle edilmiyor.
 - ui/ux iyileştirmeleri
-- Loading state'leri ekle (spinner'lar)
-- Error handling iyileştir (hata mesajları)
-- Responsive tasarımı kontrol et (mobil uyumlu mu?)
+    - Loading state'leri ekle (spinner'lar)
+    - Error handling iyileştir (hata mesajları)
+    - Responsive tasarımı kontrol et (mobil uyumlu mu?)
 - Kullanıcı arayüzünü güzelleştir
     - Tailwind CSS ile modern görünüm
     - İkonlar ekle (Lucide React)
@@ -101,27 +80,16 @@
     - bozuk pdf
     - gemini hata verirse?
     - cloudflare r2 bozuksa?
-- yeni cv eklendiğinde cloudflare'dan silinmeli, kişinin tek cv'si olmalı
-- dosya yüklemeleri için maksimum boyut kuralı ekle
-- revize hakkı dolunca revize isteyince uygun geri bildirimi veriyor ama next.js issue döndürüyor. döndürmesin.
-- editor de chat ile deneyim bölümünü kaldırdığımda bilgilerimde deneyimler görünüyor. previewda görünmüyor ama mesela bu durumda bilgilerimden de kaldırılmalı mı?
-- About kategorisi projeden çıkarılacak (Hero component zaten about'un işlevini yapıyor, gereksiz tekrar olur)
-- Özellikle bilgilerimdeki text alanlarına eklenen textlerin içine zararlı scriptler eklenebilir, bunların önüne geçmek gerek
-- birden fazla profil fotoğrafı yükleniyor, yüklenememeli
 
 # Test
 
 ## Navigation
 
 ## Hero
-- Bilgilerime pp yükledin, site oluştururken Profil fotoğrafı olmayan hero oluştu, hero yu güncellediğinde pp doğru şekilde siteye entegre olmuyor.
-- Split screen da fotoğrafın olduğu yarı, scroll aşağı indikçe aşağı kayıyor.
-- Hero Modern Centered'daki Hakkımda kısmı #about a götürüyor ama about component i yok
 
 ## Experience
 
 ## Education
-- gpa ekle
 - okul logosu bulunabilir internette?
 
 ## Portfolio
@@ -133,12 +101,10 @@
 - AI-generated metadata from images
 
 ## Skills
-- cv'de skillerin intermediate gibi seviyeleri yoksa default seviye yerine bu bilginin olmadığı componentler seçilmeli
 
 ## Languages
 
 ## Contact
-- mail gönderme işleminde sadece site sahinine mail gönderiliyor. herhangi bir supabase işlemi yok, bundan dolayı da kullanıcı dashboard'unda herhangi bir bildirim sistemi yok. dashboard'ı bildirim sistemine beğlayalım. şu anda preview sayfası içinde bir bilgilendirme mesajı çıkıyor ama bunu kullanıcının oluşutrduğu preview site içinde göstermek mantıksız
 - **Email Sender Domain (Future Enhancement):** Şu an `onboarding@resend.dev` test domain'i kullanılıyor. İleride profesyonel görünüm için custom domain eklenebilir:
   - Resend Dashboard → Add Domain
   - DNS kayıtları ekle (TXT, CNAME records)
@@ -151,7 +117,42 @@
 - Production environment variables Vercel'de ayarlı
 - Şifre hash'leme çalışıyor (bcrypt/argon2)
 - SQL injection koruması var (Prisma otomatik yapıyor)
+- Özellikle bilgilerimdeki text alanlarına eklenen textlerin içine zararlı scriptler eklenebilir, bunların önüne geçmek gerek
 
 # Domain Fikirleri
 - profilly.me
 - profilly.io
+
+# Geliştime Planı
+
+## Genel İyileştirmeler
+- Fotoğraflı cv'lerde cv parse edilirken fotoğraf profil fotoğrafı olarak çekilebilir
+- dosya yükleme aşamalarına ekstra kontroller eklenmeli. cv, profil fotoğrafı ve portfolio görselleri; her dashboard yenilendiğinde (kullanıcı giriş yaparsa, bilgilerimde bir şey kaydedilirse vb.) dosya yükleme kontrolleri tekrar kontrol edilmeli. cv, profil fotoğrafı, portfolio görselleri kaldırıldığı/silindiği aşamalarda mutlaka cloudflareden de silinmeli.
+- tüm dosya yüklemelerine boyut sınır getirilmeli.
+- kullanıcının cloudflare da harcadağı mb boyutu bilgisi supabase'de saklanmalı. bu kontrolü her dosya yükleme ve silme aşamasında kontrol edilmeli (cv yükleme silme, site publish etme unpublish, profil foto yükleme kaldırma, portfolio fotoğrafı yükleme kaldırma)
+- componentlerin sırasını drag and drop ile belirleyebilir
+- preview/publish sync olduğunda warning çıkıyor, warning içeriği düzgün şekilde gösterilmeli
+- Loading state kontrolleri arttırılmalı
+- cv yükleme aşaması, ai ile siteniz oluşturuluyor aşaması, revize edilme aşamaları.. dashboarda örneğin cv analiz edilirken başka bir dashboard sayfasına gidip tekrar bilgilerim e girince cv analiz ediliyor aşaması kayboluyor ve yine cv yüklenme ekranı görünüyor anlık olarak, arkadaki analiz işlemi bitince yine olması gerektiği sayfayı yeniliyor.
+
+## Revise
+- Bilgilerime pp yükledin, site oluştururken Profil fotoğrafı olmayan hero oluştu, hero yu güncellediğinde pp doğru şekilde siteye entegre olmuyor.
+- revize hakkı dolunca revize isteyince uygun geri bildirimi veriyor ama next.js issue döndürüyor. döndürmesin.
+- Component kaldırma, component ekleme konusu üzerine çalışılmalı. Örneğin portfolio fotosu yokken site oluşturulunca portfolio fotoğrafı eklenince uyarı olmalı: "editöre gidin ve portfolio oluşturun".
+- Editördeki revizede tüm site yapay zekaya yazdırılıyor, bu hem işlemin çok uzun sürmesine hem de template sisteminin getirdiği standartlaşma kuralını bozuyor. 
+- Siteyi oluşturdun, editörden revize yaptın, bilgilerimden bir bilgiyi değiştirdin ve kaydettin, revize ile oluşturulmuş yeni site tasarımı korunmuyor. Bunun yerine ilk başta kendi oluşturduğu tasarıma geri dönüyor.
+- revise işleminde içerik değişimi yapılmamalı. herhangi içerik değişimi isteğinde kullanıcı bilgilerim e yönlendirilmeli.
+
+## Aboneliklerim
+- dashboard aboneliklerim sayfası aktif hale getirilmeli
+
+## Subdomain - Custom Domain
+- Subdomain çakışması kontrolü eklenmeli
+- dashboard>domain sayfası işlevli hale getirilmeli
+
+## Rollback
+- hem preview hem de publish için rollback sistemi ve ui tasarımı
+
+## Icon, Font, Color Palette
+- site oluşturma aşamasına hazır icon, font desteği ekle
+- gemini api color sistemi bazen renklerin birbiri ile karışmasına sebep oluyor. color palette sistemi ekle

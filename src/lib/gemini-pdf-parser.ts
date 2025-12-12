@@ -31,6 +31,7 @@ export interface CVEducation {
   degree: string;
   field: string;
   year: string;
+  gpa?: string; // Optional GPA field (e.g., "3.8/4.0", "85/100", "First Class")
 }
 
 export interface CVPortfolioItem {
@@ -119,7 +120,8 @@ JSON formatında yapılandırılmış olarak döndür:
       "school": "okul adı",
       "degree": "derece",
       "field": "bölüm",
-      "year": "yıl"
+      "year": "yıl",
+      "gpa": "not ortalaması (opsiyonel, ör: 3.8/4.0, 85/100)"
     }
   ],
   "skills": ["skill1", "skill2"],
@@ -147,6 +149,11 @@ Diller için özel kurallar:
 - Eğer TOEFL, IELTS, CEFR gibi sertifikalar varsa bunları "certifications" array'ine ekle
 - CEFR seviyeleri: A1, A2, B1, B2, C1, C2
 - Seviye belirtilmemişse sadece dil adını string olarak döndür
+
+Eğitim için özel kurallar:
+- Eğer CV'de GPA/not ortalaması belirtilmişse "gpa" alanına ekle
+- GPA formatını olduğu gibi koru (ör: "3.8/4.0", "85/100", "First Class Honours")
+- GPA belirtilmemişse bu alanı boş bırak veya dahil etme
 `;
 
     const result = await model.generateContent([
