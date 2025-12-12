@@ -231,9 +231,28 @@ CONTACT SECTION:
 
 
 FOOTER SECTION:
-1. footer-modern-centered: Modern merkezi düzen, grid yapısı, sosyal medya linkleri ve bağlantılar
-2. footer-minimal-simple: Minimal ve sade tasarım, merkezi hizalı, temel bilgiler ve sosyal medya
-3. footer-split-columns: Kolon bazlı profesyonel tasarım, detaylı bilgi ve linkler, gradient arka plan
+1. footer-modern-centered: Modern merkezi düzen, responsive tasarım, sosyal medya linkleri, back to top butonu
+   - Modern ve profesyonel görünüm isteniyorsa
+   - Merkezi hizalama tercih ediliyorsa
+   - Minimal içerik yeterli ise
+2. footer-minimal-simple: Ultra minimal ve sade tasarım, merkezi hizalı, temel bilgiler, sosyal medya ve back to top
+   - En sade ve temiz görünüm isteniyorsa
+   - Minimal içerik gösterilecekse
+   - Hızlı yükleme ve basitlik öncelikli ise
+3. footer-split-columns: İki kolonlu profesyonel tasarım, hakkımda + iletişim bölümleri, gradient arka plan, back to top
+   - Detaylı bilgi sunulacaksa
+   - Gradient arka plan kullanılacaksa
+   - Profesyonel ve göz alıcı tasarım isteniyorsa
+4. footer-wave-sticky: Wave SVG divider ile modern tasarım, 3 kolonlu layout, gradient background, dinamik back to top
+   - Yaratıcı ve göz alıcı görünüm isteniyorsa
+   - Wave/curved tasarım elementleri tercih ediliyorsa
+   - Modern ve dinamik bir footer gerekiyorsa
+   - Orta düzeyde içerik gösterilecekse
+5. footer-mega-columns: Kapsamlı 4 kolonlu mega footer, About/Quick Links/Contact/Info bölümleri, mobile'da daralan
+   - En detaylı footer gerekiyorsa
+   - Çok sayıda link ve bilgi sunulacaksa
+   - Kurumsal ve profesyonel görünüm öncelikli ise
+   - Kullanıcıya maksimum bilgi ve navigasyon sunulacaksa
 
 Görevin:
 1. CV'ye ve kullanıcı isteğine en uygun tema renklerini belirle (hex kodları)

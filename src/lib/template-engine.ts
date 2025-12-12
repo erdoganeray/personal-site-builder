@@ -965,7 +965,8 @@ export function getContactReplacements(
  */
 export function getFooterReplacements(
   cvData: CVData,
-  themeColors: ThemeColors
+  themeColors: ThemeColors,
+  selectedComponents?: SelectedComponent[]
 ): PlaceholderReplacements {
   // Sosyal medya linklerini oluştur - sadece dolu olanlar görünsün
   const socialLinks = [
@@ -979,6 +980,21 @@ export function getFooterReplacements(
     cvData.personalInfo.phone ? `<a href="tel:${cvData.personalInfo.phone}" title="Telefon" aria-label="Telefon">📱</a>` : '',
   ].filter(link => link !== '').join('\n    ');
 
+  // Footer navigation linklerini oluştur (navigation ve footer hariç tüm section'lar)
+  let footerLinks = '';
+  if (selectedComponents && selectedComponents.length > 0) {
+    const { SECTION_NAME_MAP } = require('./navigation-utils');
+    const menuableComponents = selectedComponents.filter(
+      comp => comp.category !== 'navigation' && comp.category !== 'footer'
+    );
+    
+    footerLinks = menuableComponents.map(comp => {
+      const name = SECTION_NAME_MAP[comp.category] || comp.category;
+      const ariaLabel = `${name} bölümüne git`;
+      return `<li><a href="#${comp.category}" aria-label="${ariaLabel}">${name}</a></li>`;
+    }).join('\n              ');
+  }
+
   return {
     '{{NAME}}': escapeHtml(cvData.personalInfo.name),
     '{{TITLE}}': escapeHtml(cvData.personalInfo.title || 'Professional'),
@@ -987,6 +1003,7 @@ export function getFooterReplacements(
     '{{LOCATION}}': escapeHtml(cvData.personalInfo.location || 'Konum belirtilmemiş'),
     '{{SUMMARY}}': escapeHtml(cvData.summary || cvData.personalInfo.name + ' - Professional Profile'),
     '{{SOCIAL_LINKS}}': socialLinks,
+    '{{FOOTER_LINKS}}': footerLinks,
     '{{CURRENT_YEAR}}': new Date().getFullYear().toString(),
     '{{COLOR_PRIMARY}}': themeColors.primary,
     '{{COLOR_SECONDARY}}': themeColors.secondary,
@@ -1079,7 +1096,7 @@ export function getReplacementsForComponent(
     case 'contact':
       return getContactReplacements(cvData, themeColors);
     case 'footer':
-      return getFooterReplacements(cvData, themeColors);
+      return getFooterReplacements(cvData, themeColors, selectedComponents);
     default:
       return {};
   }
