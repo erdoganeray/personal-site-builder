@@ -9,104 +9,144 @@ export const contactTemplate1: ComponentTemplate = {
   name: "Modern Contact Form",
   category: "contact",
   htmlTemplate: `
-    <section id="contact" class="contact-section">
-      <div class="contact-container">
-        <div class="contact-header">
-          <h2 class="contact-title">İletişime Geçin</h2>
-          <p class="contact-subtitle">Projeleriniz için benimle iletişime geçmekten çekinmeyin</p>
+    <section id="contact" class="contact-modern-section">
+      <div class="contact-modern-container">
+        <div class="contact-modern-header">
+          <h2 class="contact-modern-title">İletişime Geçin</h2>
+          <p class="contact-modern-subtitle">Projeleriniz için benimle iletişime geçmekten çekinmeyin</p>
         </div>
         
-        <div class="contact-content">
-          <div class="contact-info">
-            <div class="info-item">
-              <div class="info-icon">📧</div>
-              <div class="info-details">
+        <div class="contact-modern-content">
+          <div class="contact-modern-info">
+            <div class="contact-modern-info-item">
+              <div class="contact-modern-info-icon">📧</div>
+              <div class="contact-modern-info-details">
                 <h3>Email</h3>
                 <a href="mailto:{{EMAIL}}">{{EMAIL}}</a>
               </div>
             </div>
             
-            <div class="info-item">
-              <div class="info-icon">📱</div>
-              <div class="info-details">
+            <div class="contact-modern-info-item">
+              <div class="contact-modern-info-icon">📱</div>
+              <div class="contact-modern-info-details">
                 <h3>Telefon</h3>
                 <a href="tel:{{PHONE}}">{{PHONE}}</a>
               </div>
             </div>
             
-            <div class="info-item">
-              <div class="info-icon">📍</div>
-              <div class="info-details">
+            <div class="contact-modern-info-item">
+              <div class="contact-modern-info-icon">📍</div>
+              <div class="contact-modern-info-details">
                 <h3>Konum</h3>
                 <p>{{LOCATION}}</p>
               </div>
             </div>
           </div>
           
-          <form class="contact-form">
-            <div class="form-group">
+          <form class="contact-modern-form">
+            <!-- Honeypot field (hidden from users, visible to bots) -->
+            <input type="text" name="honeypot" style="display:none" tabindex="-1" autocomplete="off">
+            
+            <!-- Hidden field for site owner email -->
+            <input type="hidden" name="siteOwnerEmail" value="{{SITE_OWNER_EMAIL}}">
+            
+            <div class="contact-modern-form-group">
               <label for="name">İsim</label>
-              <input type="text" id="name" name="name" required>
+              <input 
+                type="text" 
+                id="name" 
+                name="name" 
+                required 
+                aria-required="true"
+                aria-invalid="false"
+                aria-describedby="name-error"
+              >
+              <span id="name-error" class="contact-modern-error-message" role="alert"></span>
             </div>
             
-            <div class="form-group">
+            <div class="contact-modern-form-group">
               <label for="email">Email</label>
-              <input type="email" id="email" name="email" required>
+              <input 
+                type="email" 
+                id="email" 
+                name="email" 
+                required 
+                aria-required="true"
+                aria-invalid="false"
+                aria-describedby="email-error"
+              >
+              <span id="email-error" class="contact-modern-error-message" role="alert"></span>
             </div>
             
-            <div class="form-group">
+            <div class="contact-modern-form-group">
               <label for="message">Mesaj</label>
-              <textarea id="message" name="message" rows="5" required></textarea>
+              <textarea 
+                id="message" 
+                name="message" 
+                rows="5" 
+                required 
+                aria-required="true"
+                aria-invalid="false"
+                aria-describedby="message-error"
+                maxlength="5000"
+              ></textarea>
+              <span id="message-error" class="contact-modern-error-message" role="alert"></span>
             </div>
             
-            <button type="submit" class="submit-btn">Gönder</button>
+            <button type="submit" class="contact-modern-submit-btn">
+              <span class="contact-modern-btn-text">Gönder</span>
+              <span class="contact-modern-btn-spinner" style="display:none;">⏳</span>
+            </button>
+            
+            <!-- Success/Error messages -->
+            <div class="contact-modern-form-message" style="display:none;"></div>
           </form>
         </div>
       </div>
     </section>
   `,
   cssTemplate: `
-    .contact-section {
+    .contact-modern-section {
       padding: 80px 20px;
       background: {{COLOR_BACKGROUND}};
     }
 
-    .contact-container {
+    .contact-modern-container {
       max-width: 1200px;
       margin: 0 auto;
     }
 
-    .contact-header {
+    .contact-modern-header {
       text-align: center;
       margin-bottom: 60px;
     }
 
-    .contact-title {
+    .contact-modern-title {
       font-size: 2.5rem;
       font-weight: 700;
       color: {{COLOR_TEXT}};
       margin-bottom: 1rem;
     }
 
-    .contact-subtitle {
+    .contact-modern-subtitle {
       font-size: 1.2rem;
       color: {{COLOR_TEXT_SECONDARY}};
     }
 
-    .contact-content {
+    .contact-modern-content {
       display: grid;
       grid-template-columns: 1fr 1fr;
       gap: 60px;
       align-items: start;
     }
 
-    .contact-info {
+    .contact-modern-info {
       display: flex;
       flex-direction: column;
       gap: 30px;
     }
 
-    .info-item {
+    .contact-modern-info-item {
       display: flex;
       gap: 20px;
       align-items: start;
@@ -117,12 +157,12 @@ export const contactTemplate1: ComponentTemplate = {
       transition: transform 0.3s, box-shadow 0.3s;
     }
 
-    .info-item:hover {
+    .contact-modern-info-item:hover {
       transform: translateY(-5px);
       box-shadow: 0 5px 20px rgba(0,0,0,0.15);
     }
 
-    .info-icon {
+    .contact-modern-info-icon {
       font-size: 2rem;
       width: 60px;
       height: 60px;
@@ -134,43 +174,43 @@ export const contactTemplate1: ComponentTemplate = {
       flex-shrink: 0;
     }
 
-    .info-details h3 {
+    .contact-modern-info-details h3 {
       font-size: 1.1rem;
       color: {{COLOR_TEXT}};
       margin-bottom: 0.5rem;
     }
 
-    .info-details a,
-    .info-details p {
+    .contact-modern-info-details a,
+    .contact-modern-info-details p {
       color: {{COLOR_TEXT_SECONDARY}};
       text-decoration: none;
       transition: color 0.3s;
     }
 
-    .info-details a:hover {
+    .contact-modern-info-details a:hover {
       color: {{COLOR_PRIMARY}};
     }
 
-    .contact-form {
+    .contact-modern-form {
       display: flex;
       flex-direction: column;
       gap: 25px;
     }
 
-    .form-group {
+    .contact-modern-form-group {
       display: flex;
       flex-direction: column;
       gap: 8px;
     }
 
-    .form-group label {
+    .contact-modern-form-group label {
       font-weight: 600;
       color: {{COLOR_TEXT}};
       font-size: 1rem;
     }
 
-    .form-group input,
-    .form-group textarea {
+    .contact-modern-form-group input,
+    .contact-modern-form-group textarea {
       padding: 12px 16px;
       border: 2px solid #e0e0e0;
       border-radius: 8px;
@@ -179,13 +219,33 @@ export const contactTemplate1: ComponentTemplate = {
       transition: border-color 0.3s;
     }
 
-    .form-group input:focus,
-    .form-group textarea:focus {
+    .contact-modern-form-group input:focus,
+    .contact-modern-form-group textarea:focus {
       outline: none;
       border-color: {{COLOR_PRIMARY}};
     }
 
-    .submit-btn {
+    /* Error states */
+    .contact-modern-form-group input[aria-invalid="true"],
+    .contact-modern-form-group textarea[aria-invalid="true"] {
+      border-color: #dc3545;
+      background-color: #fff5f5;
+    }
+
+    .contact-modern-error-message {
+      display: none;
+      color: #dc3545;
+      font-size: 0.875rem;
+      margin-top: 4px;
+    }
+
+    .contact-modern-error-message:not(:empty) {
+      display: block;
+    }
+
+
+    .contact-modern-submit-btn {
+      position: relative;
       padding: 15px 40px;
       background: linear-gradient(135deg, {{COLOR_PRIMARY}}, {{COLOR_SECONDARY}});
       color: white;
@@ -197,34 +257,212 @@ export const contactTemplate1: ComponentTemplate = {
       transition: transform 0.3s, box-shadow 0.3s;
     }
 
-    .submit-btn:hover {
+    .contact-modern-submit-btn:disabled {
+      opacity: 0.6;
+      cursor: not-allowed;
+      transform: none;
+    }
+
+    .contact-modern-submit-btn:hover:not(:disabled) {
       transform: translateY(-2px);
       box-shadow: 0 5px 20px rgba(0,0,0,0.2);
     }
 
+    .contact-modern-btn-spinner {
+      margin-left: 8px;
+    }
+
+    .contact-modern-form-message {
+      margin-top: 20px;
+      padding: 15px;
+      border-radius: 8px;
+      text-align: center;
+      font-weight: 500;
+    }
+
+    .contact-modern-form-message.success {
+      background: #d4edda;
+      color: #155724;
+      border: 1px solid #c3e6cb;
+    }
+
+    .contact-modern-form-message.error {
+      background: #f8d7da;
+      color: #721c24;
+      border: 1px solid #f5c6cb;
+    }
+
     @media (max-width: 768px) {
-      .contact-content {
+      .contact-modern-content {
         grid-template-columns: 1fr;
         gap: 40px;
       }
 
-      .contact-title {
+      .contact-modern-title {
         font-size: 2rem;
       }
     }
   `,
   jsTemplate: `
+    // Validation functions
+    function validateName(name) {
+      if (!name || name.trim().length === 0) {
+        return 'İsim gereklidir';
+      }
+      if (name.trim().length < 2) {
+        return 'İsim en az 2 karakter olmalıdır';
+      }
+      return '';
+    }
+
+    function validateEmail(email) {
+      if (!email || email.trim().length === 0) {
+        return 'Email gereklidir';
+      }
+      const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+      if (!emailRegex.test(email)) {
+        return 'Geçerli bir email adresi giriniz';
+      }
+      return '';
+    }
+
+    function validateMessage(message) {
+      if (!message || message.trim().length === 0) {
+        return 'Mesaj gereklidir';
+      }
+      if (message.trim().length < 10) {
+        return 'Mesaj en az 10 karakter olmalıdır';
+      }
+      if (message.length > 5000) {
+        return 'Mesaj en fazla 5000 karakter olabilir';
+      }
+      return '';
+    }
+
+    function showError(inputId, errorMessage) {
+      const input = document.getElementById(inputId);
+      const errorSpan = document.getElementById(inputId + '-error');
+      
+      if (input && errorSpan) {
+        input.setAttribute('aria-invalid', 'true');
+        errorSpan.textContent = errorMessage;
+      }
+    }
+
+    function clearError(inputId) {
+      const input = document.getElementById(inputId);
+      const errorSpan = document.getElementById(inputId + '-error');
+      
+      if (input && errorSpan) {
+        input.setAttribute('aria-invalid', 'false');
+        errorSpan.textContent = '';
+      }
+    }
+
+    function validateField(inputId, validator, value) {
+      const error = validator(value);
+      if (error) {
+        showError(inputId, error);
+        return false;
+      } else {
+        clearError(inputId);
+        return true;
+      }
+    }
+
+    // Real-time validation on blur
+    document.getElementById('name')?.addEventListener('blur', function(e) {
+      validateField('name', validateName, e.target.value);
+    });
+
+    document.getElementById('email')?.addEventListener('blur', function(e) {
+      validateField('email', validateEmail, e.target.value);
+    });
+
+    document.getElementById('message')?.addEventListener('blur', function(e) {
+      validateField('message', validateMessage, e.target.value);
+    });
+
     // Contact form submission handler
-    document.querySelector('.contact-form')?.addEventListener('submit', function(e) {
+    document.querySelector('.contact-modern-form')?.addEventListener('submit', async function(e) {
       e.preventDefault();
       
-      const formData = new FormData(e.target);
-      const data = Object.fromEntries(formData);
+
+      const form = e.target;
+      const submitBtn = form.querySelector('.contact-modern-submit-btn');
+      const btnText = submitBtn.querySelector('.contact-modern-btn-text');
+      const btnSpinner = submitBtn.querySelector('.contact-modern-btn-spinner');
+      const messageDiv = form.querySelector('.contact-modern-form-message');
       
-      // Form submission logic here
-      console.log('Form submitted:', data);
-      alert('Mesajınız alındı! En kısa sürede dönüş yapacağım.');
-      e.target.reset();
+      // Validate all fields before submission
+      const formData = new FormData(form);
+      const nameValid = validateField('name', validateName, formData.get('name'));
+      const emailValid = validateField('email', validateEmail, formData.get('email'));
+      const messageValid = validateField('message', validateMessage, formData.get('message'));
+      
+      if (!nameValid || !emailValid || !messageValid) {
+        // Focus on first invalid field
+        if (!nameValid) document.getElementById('name')?.focus();
+        else if (!emailValid) document.getElementById('email')?.focus();
+        else if (!messageValid) document.getElementById('message')?.focus();
+        return;
+      }
+      
+      // Disable form during submission
+      submitBtn.disabled = true;
+      btnText.style.display = 'none';
+      btnSpinner.style.display = 'inline';
+      messageDiv.style.display = 'none';
+      
+      try {
+        const data = Object.fromEntries(formData);
+        
+        // Check if we're in preview mode (localhost or blob URL)
+        const isPreview = window.location.hostname === 'localhost' || 
+                         window.location.protocol === 'blob:' ||
+                         window.location.href.includes('blob:');
+        
+        if (isPreview) {
+          // Preview mode: Show info message instead of sending
+          await new Promise(resolve => setTimeout(resolve, 1000)); // Simulate delay
+          messageDiv.textContent = 'ℹ️ Önizleme modunda mesaj gönderimi devre dışıdır. Site yayınlandığında contact formu çalışacaktır.';
+          messageDiv.className = 'form-message success';
+          messageDiv.style.display = 'block';
+          form.reset();
+        } else {
+          // Published site: Send real email
+          const apiUrl = window.location.origin + '/api/contact';
+          
+          const response = await fetch(apiUrl, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(data)
+          });
+          
+          const result = await response.json();
+          
+          if (!response.ok) {
+            throw new Error(result.error || 'Gönderim başarısız');
+          }
+          
+          // Success
+          messageDiv.textContent = '✅ Mesajınız başarıyla gönderildi! En kısa sürede dönüş yapacağım.';
+          messageDiv.className = 'form-message success';
+          messageDiv.style.display = 'block';
+          form.reset();
+        }
+        
+      } catch (error) {
+        // Error
+        messageDiv.textContent = '❌ ' + (error.message || 'Bir hata oluştu. Lütfen tekrar deneyin.');
+        messageDiv.className = 'form-message error';
+        messageDiv.style.display = 'block';
+      } finally {
+        // Re-enable form
+        submitBtn.disabled = false;
+        btnText.style.display = 'inline';
+        btnSpinner.style.display = 'none';
+      }
     });
   `,
   placeholders: [
@@ -398,13 +636,61 @@ export const contactTemplate3: ComponentTemplate = {
       
       <div class="contact-split-right">
         <form class="split-form">
+          <!-- Honeypot field (hidden from users, visible to bots) -->
+          <input type="text" name="honeypot" style="display:none" tabindex="-1" autocomplete="off">
+          
+          <!-- Hidden field for site owner email -->
+          <input type="hidden" name="siteOwnerEmail" value="{{SITE_OWNER_EMAIL}}">
+          
           <h3 class="split-form-title">Mesaj Gönderin</h3>
           
-          <input type="text" placeholder="İsim" name="name" required class="split-input">
-          <input type="email" placeholder="Email" name="email" required class="split-input">
-          <textarea placeholder="Mesajınız" name="message" rows="6" required class="split-input"></textarea>
+          <input 
+            type="text" 
+            id="split-name"
+            placeholder="İsim" 
+            name="name" 
+            required 
+            class="split-input"
+            aria-required="true"
+            aria-invalid="false"
+            aria-describedby="split-name-error"
+          >
+          <span id="split-name-error" class="error-message" role="alert"></span>
           
-          <button type="submit" class="split-submit">Gönder</button>
+          <input 
+            type="email" 
+            id="split-email"
+            placeholder="Email" 
+            name="email" 
+            required 
+            class="split-input"
+            aria-required="true"
+            aria-invalid="false"
+            aria-describedby="split-email-error"
+          >
+          <span id="split-email-error" class="error-message" role="alert"></span>
+          
+          <textarea 
+            id="split-message"
+            placeholder="Mesajınız" 
+            name="message" 
+            rows="6" 
+            required 
+            class="split-input"
+            aria-required="true"
+            aria-invalid="false"
+            aria-describedby="split-message-error"
+            maxlength="5000"
+          ></textarea>
+          <span id="split-message-error" class="error-message" role="alert"></span>
+          
+          <button type="submit" class="split-submit">
+            <span class="btn-text">Gönder</span>
+            <span class="btn-spinner" style="display:none;">⏳</span>
+          </button>
+          
+          <!-- Success/Error messages -->
+          <div class="form-message-split" style="display:none;"></div>
         </form>
       </div>
     </section>
@@ -516,6 +802,13 @@ export const contactTemplate3: ComponentTemplate = {
       border-color: {{COLOR_PRIMARY}};
     }
 
+    /* Error states */
+    .split-input[aria-invalid="true"] {
+      border-color: #dc3545;
+      background-color: #fff5f5;
+    }
+
+
     .split-submit {
       padding: 15px 40px;
       background: {{COLOR_ACCENT}};
@@ -528,12 +821,42 @@ export const contactTemplate3: ComponentTemplate = {
       transition: transform 0.3s, box-shadow 0.3s;
     }
 
-    .split-submit:hover {
+    .split-submit:disabled {
+      opacity: 0.6;
+      cursor: not-allowed;
+      transform: none;
+    }
+
+    .split-submit:hover:not(:disabled) {
       transform: translateY(-2px);
       box-shadow: 0 5px 20px rgba(0,0,0,0.2);
     }
 
-    @media (max-width: 968px) {
+    .btn-spinner {
+      margin-left: 8px;
+    }
+
+    .form-message-split {
+      margin-top: 20px;
+      padding: 15px;
+      border-radius: 8px;
+      text-align: center;
+      font-weight: 500;
+    }
+
+    .form-message-split.success {
+      background: #d4edda;
+      color: #155724;
+      border: 1px solid #c3e6cb;
+    }
+
+    .form-message-split.error {
+      background: #f8d7da;
+      color: #721c24;
+      border: 1px solid #f5c6cb;
+    }
+
+    @media (max-width: 768px) {
       .contact-section-split {
         grid-template-columns: 1fr;
       }
@@ -550,16 +873,164 @@ export const contactTemplate3: ComponentTemplate = {
     }
   `,
   jsTemplate: `
+    // Validation functions (same as Template 1)
+    function validateName(name) {
+      if (!name || name.trim().length === 0) {
+        return 'İsim gereklidir';
+      }
+      if (name.trim().length < 2) {
+        return 'İsim en az 2 karakter olmalıdır';
+      }
+      return '';
+    }
+
+    function validateEmail(email) {
+      if (!email || email.trim().length === 0) {
+        return 'Email gereklidir';
+      }
+      const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+      if (!emailRegex.test(email)) {
+        return 'Geçerli bir email adresi giriniz';
+      }
+      return '';
+    }
+
+    function validateMessage(message) {
+      if (!message || message.trim().length === 0) {
+        return 'Mesaj gereklidir';
+      }
+      if (message.trim().length < 10) {
+        return 'Mesaj en az 10 karakter olmalıdır';
+      }
+      if (message.length > 5000) {
+        return 'Mesaj en fazla 5000 karakter olabilir';
+      }
+      return '';
+    }
+
+    function showError(inputId, errorMessage) {
+      const input = document.getElementById(inputId);
+      const errorSpan = document.getElementById(inputId + '-error');
+      
+      if (input && errorSpan) {
+        input.setAttribute('aria-invalid', 'true');
+        errorSpan.textContent = errorMessage;
+      }
+    }
+
+    function clearError(inputId) {
+      const input = document.getElementById(inputId);
+      const errorSpan = document.getElementById(inputId + '-error');
+      
+      if (input && errorSpan) {
+        input.setAttribute('aria-invalid', 'false');
+        errorSpan.textContent = '';
+      }
+    }
+
+    function validateField(inputId, validator, value) {
+      const error = validator(value);
+      if (error) {
+        showError(inputId, error);
+        return false;
+      } else {
+        clearError(inputId);
+        return true;
+      }
+    }
+
+    // Real-time validation on blur
+    document.getElementById('split-name')?.addEventListener('blur', function(e) {
+      validateField('split-name', validateName, e.target.value);
+    });
+
+    document.getElementById('split-email')?.addEventListener('blur', function(e) {
+      validateField('split-email', validateEmail, e.target.value);
+    });
+
+    document.getElementById('split-message')?.addEventListener('blur', function(e) {
+      validateField('split-message', validateMessage, e.target.value);
+    });
+
     // Split contact form handler
-    document.querySelector('.split-form')?.addEventListener('submit', function(e) {
+    document.querySelector('.split-form')?.addEventListener('submit', async function(e) {
       e.preventDefault();
       
-      const formData = new FormData(e.target);
-      const data = Object.fromEntries(formData);
+      const form = e.target;
+      const submitBtn = form.querySelector('.split-submit');
+      const btnText = submitBtn.querySelector('.btn-text');
+      const btnSpinner = submitBtn.querySelector('.btn-spinner');
+      const messageDiv = form.querySelector('.form-message-split');
       
-      console.log('Contact form submitted:', data);
-      alert('Teşekkürler! Mesajınız alındı.');
-      e.target.reset();
+      // Validate all fields before submission
+      const formData = new FormData(form);
+      const nameValid = validateField('split-name', validateName, formData.get('name'));
+      const emailValid = validateField('split-email', validateEmail, formData.get('email'));
+      const messageValid = validateField('split-message', validateMessage, formData.get('message'));
+      
+      if (!nameValid || !emailValid || !messageValid) {
+        // Focus on first invalid field
+        if (!nameValid) document.getElementById('split-name')?.focus();
+        else if (!emailValid) document.getElementById('split-email')?.focus();
+        else if (!messageValid) document.getElementById('split-message')?.focus();
+        return;
+      }
+      
+      // Disable form during submission
+      submitBtn.disabled = true;
+      btnText.style.display = 'none';
+      btnSpinner.style.display = 'inline';
+      messageDiv.style.display = 'none';
+      
+      try {
+        const data = Object.fromEntries(formData);
+        
+        // Check if we're in preview mode (localhost or blob URL)
+        const isPreview = window.location.hostname === 'localhost' || 
+                         window.location.protocol === 'blob:' ||
+                         window.location.href.includes('blob:');
+        
+        if (isPreview) {
+          // Preview mode: Show info message instead of sending
+          await new Promise(resolve => setTimeout(resolve, 1000)); // Simulate delay
+          messageDiv.textContent = 'ℹ️ Önizleme modunda mesaj gönderimi devre dışıdır. Site yayınlandığında contact formu çalışacaktır.';
+          messageDiv.className = 'form-message-split success';
+          messageDiv.style.display = 'block';
+          form.reset();
+        } else {
+          // Published site: Send real email
+          const apiUrl = window.location.origin + '/api/contact';
+          
+          const response = await fetch(apiUrl, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(data)
+          });
+          
+          const result = await response.json();
+          
+          if (!response.ok) {
+            throw new Error(result.error || 'Gönderim başarısız');
+          }
+          
+          // Success
+          messageDiv.textContent = '✅ Teşekkürler! Mesajınız başarıyla gönderildi.';
+          messageDiv.className = 'form-message-split success';
+          messageDiv.style.display = 'block';
+          form.reset();
+        }
+        
+      } catch (error) {
+        // Error
+        messageDiv.textContent = '❌ ' + (error.message || 'Bir hata oluştu. Lütfen tekrar deneyin.');
+        messageDiv.className = 'form-message-split error';
+        messageDiv.style.display = 'block';
+      } finally {
+        // Re-enable form
+        submitBtn.disabled = false;
+        btnText.style.display = 'inline';
+        btnSpinner.style.display = 'none';
+      }
     });
   `,
   placeholders: [

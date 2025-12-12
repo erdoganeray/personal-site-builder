@@ -950,6 +950,7 @@ export function getContactReplacements(
     '{{EMAIL}}': escapeHtml(cvData.personalInfo.email || 'Email bulunamadı'),
     '{{PHONE}}': escapeHtml(cvData.personalInfo.phone || 'Telefon bulunamadı'),
     '{{LOCATION}}': escapeHtml(cvData.personalInfo.location || 'Konum belirtilmemiş'),
+    '{{SITE_OWNER_EMAIL}}': escapeHtml(cvData.personalInfo.email || ''),
     '{{COLOR_PRIMARY}}': themeColors.primary,
     '{{COLOR_SECONDARY}}': themeColors.secondary,
     '{{COLOR_ACCENT}}': themeColors.accent,

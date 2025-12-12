@@ -13,3 +13,7 @@ bucket_name = "user-sites"
 [[kv_namespaces]]
 binding = "SITE_MAPPINGS"
 id = "ddef70b87d2e4655b7ce32f1a0d9f4f4"
+
+[[kv_namespaces]]
+binding = "RATE_LIMIT"
+id = "8332d3f5dfb049b0a4008d406cea2793"

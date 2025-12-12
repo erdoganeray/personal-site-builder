@@ -7,22 +7,22 @@ import { GoogleGenerativeAI } from "@google/generative-ai";
  * hangi component'lerin kullanılacağını ve tema renklerini belirler
  */
 export async function analyzeSiteDesign(
-  cvData: CVData,
-  customPrompt?: string
+   cvData: CVData,
+   customPrompt?: string
 ): Promise<SiteGenerationPlan> {
-  try {
-    const apiKey = process.env.GEMINI_API_KEY;
+   try {
+      const apiKey = process.env.GEMINI_API_KEY;
 
-    if (!apiKey) {
-      throw new Error("GEMINI_API_KEY environment variable is not set");
-    }
+      if (!apiKey) {
+         throw new Error("GEMINI_API_KEY environment variable is not set");
+      }
 
-    const modelName = process.env.GEMINI_MODEL || "gemini-2.5-flash";
-    const genAI = new GoogleGenerativeAI(apiKey);
-    const model = genAI.getGenerativeModel({ model: modelName });
+      const modelName = process.env.GEMINI_MODEL || "gemini-2.5-flash";
+      const genAI = new GoogleGenerativeAI(apiKey);
+      const model = genAI.getGenerativeModel({ model: modelName });
 
-    // CV verilerini formatla
-    const cvSummary = `
+      // CV verilerini formatla
+      const cvSummary = `
 İsim: ${cvData.personalInfo.name}
 Email: ${cvData.personalInfo.email || "Belirtilmemiş"}
 Telefon: ${cvData.personalInfo.phone || "Belirtilmemiş"}
@@ -38,7 +38,7 @@ Yetenekler: ${cvData.skills.join(", ")}
 Diller: ${cvData.languages.join(", ")}
 `;
 
-    const prompt = `
+      const prompt = `
 Sen profesyonel bir web tasarım danışmanısın. Aşağıdaki CV bilgilerini ve kullanıcı isteklerini analiz ederek, 
 kişisel web sitesi için en uygun tasarım planını oluştur.
 
@@ -214,8 +214,21 @@ SEÇİM KURALLARI:
 
 CONTACT SECTION:
 1. contact-modern-form: Modern iletişim formu ve bilgi kartları, iki kolonlu düzen
+   - Profesyonel ve dengeli görünüm isteniyorsa
+   - Form ve bilgi eşit önemde gösterilecekse
+   - Modern, temiz tasarım tercih ediliyorsa
+   - İletişim bilgileri ve form yan yana olmalıysa
 2. contact-minimal-centered: Minimal merkezi tasarım, iletişim bilgileri kartları
+   - Minimal ve sade görünüm isteniyorsa
+   - Form yerine sadece iletişim bilgileri gösterilecekse
+   - Merkezi hizalama tercih ediliyorsa
+   - Basit ve odaklanmış tasarım gerekiyorsa
 3. contact-split-info: Split layout, sol taraf gradient bilgi, sağ taraf form
+   - Yaratıcı ve dinamik görünüm isteniyorsa
+   - Gradient arka plan kullanılacaksa
+   - Form ve bilgi ayrı vurgulanmalıysa
+   - Modern ve göz alıcı tasarım tercih ediliyorsa
+
 
 FOOTER SECTION:
 1. footer-modern-centered: Modern merkezi düzen, grid yapısı, sosyal medya linkleri ve bağlantılar
@@ -281,45 +294,45 @@ Component Seçimi Kriterleri:
 JSON'dan önce veya sonra hiçbir metin olmasın.
 `;
 
-    const result = await model.generateContent(prompt);
-    const responseText = result.response.text();
+      const result = await model.generateContent(prompt);
+      const responseText = result.response.text();
 
-    try {
-      // JSON bloğunu temizle
-      let cleanedText = responseText.trim();
-      cleanedText = cleanedText.replace(/^```json\s*/i, '').replace(/^```\s*/, '');
-      cleanedText = cleanedText.replace(/\s*```$/g, '');
-      cleanedText = cleanedText.trim();
+      try {
+         // JSON bloğunu temizle
+         let cleanedText = responseText.trim();
+         cleanedText = cleanedText.replace(/^```json\s*/i, '').replace(/^```\s*/, '');
+         cleanedText = cleanedText.replace(/\s*```$/g, '');
+         cleanedText = cleanedText.trim();
 
-      const parsed = JSON.parse(cleanedText);
+         const parsed = JSON.parse(cleanedText);
 
-      // Validasyon
-      if (!parsed.themeColors || !parsed.selectedComponents) {
-        throw new Error("Missing required fields in design plan");
+         // Validasyon
+         if (!parsed.themeColors || !parsed.selectedComponents) {
+            throw new Error("Missing required fields in design plan");
+         }
+
+         return {
+            themeColors: parsed.themeColors,
+            selectedComponents: parsed.selectedComponents,
+            layout: parsed.layout || 'single-page',
+            style: parsed.style || 'modern'
+         };
+
+      } catch (parseError) {
+         console.error("Failed to parse Gemini design analysis:", responseText);
+         throw new Error(
+            `Failed to parse AI design analysis. Error: ${parseError instanceof Error ? parseError.message : String(parseError)
+            }`
+         );
       }
 
-      return {
-        themeColors: parsed.themeColors,
-        selectedComponents: parsed.selectedComponents,
-        layout: parsed.layout || 'single-page',
-        style: parsed.style || 'modern'
-      };
+   } catch (error) {
+      console.error("Error analyzing site design:", error);
 
-    } catch (parseError) {
-      console.error("Failed to parse Gemini design analysis:", responseText);
-      throw new Error(
-        `Failed to parse AI design analysis. Error: ${parseError instanceof Error ? parseError.message : String(parseError)
-        }`
-      );
-    }
+      if (error instanceof Error) {
+         throw new Error(`Design analysis failed: ${error.message}`);
+      }
 
-  } catch (error) {
-    console.error("Error analyzing site design:", error);
-
-    if (error instanceof Error) {
-      throw new Error(`Design analysis failed: ${error.message}`);
-    }
-
-    throw new Error("Design analysis failed due to an unknown error");
-  }
+      throw new Error("Design analysis failed due to an unknown error");
+   }
 }

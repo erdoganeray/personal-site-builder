@@ -135,6 +135,16 @@
 ## Skills
 - cv'de skillerin intermediate gibi seviyeleri yoksa default seviye yerine bu bilginin olmadığı componentler seçilmeli
 
+## Languages
+
+## Contact
+- mail gönderme işleminde sadece site sahinine mail gönderiliyor. herhangi bir supabase işlemi yok, bundan dolayı da kullanıcı dashboard'unda herhangi bir bildirim sistemi yok. dashboard'ı bildirim sistemine beğlayalım. şu anda preview sayfası içinde bir bilgilendirme mesajı çıkıyor ama bunu kullanıcının oluşutrduğu preview site içinde göstermek mantıksız
+- **Email Sender Domain (Future Enhancement):** Şu an `onboarding@resend.dev` test domain'i kullanılıyor. İleride profesyonel görünüm için custom domain eklenebilir:
+  - Resend Dashboard → Add Domain
+  - DNS kayıtları ekle (TXT, CNAME records)
+  - Verify domain
+  - Kodda `from: 'contact@yourdomain.com'` olarak güncelle
+
 
 # Güvenlik
 - API key'leri `.env` dosyasında (GitHub'a commit edilmemiş)
