@@ -18,6 +18,7 @@
 - user, template leri kendi seçebilir
 - custom css
 - component marketplace
+- Fotoğraflı cv'lerde cv parse edilirken fotoğraf profil fotoğrafı olarak çekilebilir (word vs gibi eklentilerden sonra handle edilmeli)
 
 ## Landing Page
 - sss eklenecek
@@ -126,7 +127,6 @@
 # Geliştime Planı
 
 ## Genel İyileştirmeler
-- Fotoğraflı cv'lerde cv parse edilirken fotoğraf profil fotoğrafı olarak çekilebilir
 - dosya yükleme aşamalarına ekstra kontroller eklenmeli. cv, profil fotoğrafı ve portfolio görselleri; her dashboard yenilendiğinde (kullanıcı giriş yaparsa, bilgilerimde bir şey kaydedilirse vb.) dosya yükleme kontrolleri tekrar kontrol edilmeli. cv, profil fotoğrafı, portfolio görselleri kaldırıldığı/silindiği aşamalarda mutlaka cloudflareden de silinmeli.
 - tüm dosya yüklemelerine boyut sınır getirilmeli.
 - kullanıcının cloudflare da harcadağı mb boyutu bilgisi supabase'de saklanmalı. bu kontrolü her dosya yükleme ve silme aşamasında kontrol edilmeli (cv yükleme silme, site publish etme unpublish, profil foto yükleme kaldırma, portfolio fotoğrafı yükleme kaldırma)
