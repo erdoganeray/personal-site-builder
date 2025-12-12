@@ -2,7 +2,7 @@ import { NextRequest, NextResponse } from "next/server";
 import { getServerSession } from "next-auth";
 import { authOptions } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
-import { S3Client, DeleteObjectCommand } from "@aws-sdk/client-s3";
+import { S3Client, DeleteObjectCommand, ListObjectsV2Command, ListObjectsV2CommandOutput } from "@aws-sdk/client-s3";
 
 const s3Client = new S3Client({
   region: "auto",
@@ -41,27 +41,61 @@ export async function DELETE(request: NextRequest) {
       return NextResponse.json({ error: "Bu siteyi silme yetkiniz yok" }, { status: 403 });
     }
 
-    // R2'den dosyayı sil
-    if (site.cvUrl) {
-      try {
-        // URL'den file key'i çıkar
-        // Örnek URL: https://pub-bf529b02842d4bcf8be2282dc9efb2a6.r2.dev/cvs/cv-123.pdf
-        const url = new URL(site.cvUrl);
-        const fileKey = url.pathname.substring(1); // "/cvs/cv-123.pdf" -> "cvs/cv-123.pdf"
-        
-        if (fileKey) {
-          await s3Client.send(
-            new DeleteObjectCommand({
-              Bucket: process.env.R2_BUCKET_NAME!,
-              Key: fileKey,
-            })
-          );
-          console.log("R2'den dosya silindi:", fileKey);
+    // Delete ALL user files from R2 (CV, profile photo, portfolio images)
+    try {
+      console.log(`🗑️ Deleting all files for user: ${session.user.id}`);
+
+      let deletedCount = 0;
+      let continuationToken: string | undefined = undefined;
+
+      // List and delete all objects under users/{userId}/
+      do {
+        const listCommand: ListObjectsV2Command = new ListObjectsV2Command({
+          Bucket: process.env.R2_BUCKET_NAME!,
+          Prefix: `users/${session.user.id}/`,
+          ContinuationToken: continuationToken,
+        });
+
+        const listResponse: ListObjectsV2CommandOutput = await s3Client.send(listCommand);
+
+        if (listResponse.Contents && listResponse.Contents.length > 0) {
+          // Delete each file
+          for (const object of listResponse.Contents) {
+            if (object.Key) {
+              try {
+                await s3Client.send(
+                  new DeleteObjectCommand({
+                    Bucket: process.env.R2_BUCKET_NAME!,
+                    Key: object.Key,
+                  })
+                );
+                deletedCount++;
+                console.log(`✅ Deleted: ${object.Key}`);
+              } catch (deleteError) {
+                console.error(`❌ Failed to delete ${object.Key}:`, deleteError);
+              }
+            }
+          }
         }
-      } catch (deleteError) {
-        console.error("R2 silme hatası:", deleteError);
-        // Dosya silme hatası olsa bile devam et
-      }
+
+        continuationToken = listResponse.NextContinuationToken;
+      } while (continuationToken);
+
+      console.log(`✅ Deleted ${deletedCount} files from R2 for user ${session.user.id}`);
+    } catch (deleteError) {
+      console.error("R2 deletion error:", deleteError);
+      // Continue even if file deletion fails
+    }
+
+    // Reset user's storage to 0
+    try {
+      await prisma.user.update({
+        where: { id: session.user.id },
+        data: { storageUsed: BigInt(0) },
+      });
+      console.log(`✅ Reset storage to 0 for user ${session.user.id}`);
+    } catch (storageError) {
+      console.error("Failed to reset storage:", storageError);
     }
 
     // Veritabanından site'ı sil
@@ -69,9 +103,9 @@ export async function DELETE(request: NextRequest) {
       where: { id: siteId },
     });
 
-    return NextResponse.json({ 
-      success: true, 
-      message: "Site başarıyla silindi" 
+    return NextResponse.json({
+      success: true,
+      message: "Site başarıyla silindi"
     });
   } catch (error) {
     console.error("Site silme hatası:", error);

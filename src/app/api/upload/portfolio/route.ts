@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from "next/server";
 import { getServerSession } from "next-auth";
 import { authOptions } from "@/lib/auth";
 import { S3Client, PutObjectCommand, DeleteObjectCommand, ListObjectsV2Command } from "@aws-sdk/client-s3";
+import { recalculateUserStorage } from "@/lib/storage-calculator";
 
 const s3Client = new S3Client({
   region: "auto",
@@ -130,6 +131,14 @@ export async function POST(req: NextRequest) {
       }
     }
 
+    // Recalculate user's storage after upload
+    try {
+      await recalculateUserStorage(session.user.id);
+    } catch (storageError) {
+      console.error("Failed to recalculate storage:", storageError);
+      // Don't fail the request if storage calculation fails
+    }
+
     // Return results
     if (uploadResults.length === 0) {
       return NextResponse.json(
@@ -208,6 +217,14 @@ export async function DELETE(req: NextRequest) {
     );
 
     console.log("Portfolio image deleted from R2:", key);
+
+    // Recalculate user's storage after deletion
+    try {
+      await recalculateUserStorage(session.user.id);
+    } catch (storageError) {
+      console.error("Failed to recalculate storage:", storageError);
+      // Don't fail the request if storage calculation fails
+    }
 
     return NextResponse.json({
       success: true,

@@ -27,7 +27,7 @@ export default function DashboardPage() {
         if (status === "unauthenticated") {
             router.push("/login");
         }
-        
+
         if (status === "authenticated") {
             fetchUserSite();
         }
@@ -40,7 +40,7 @@ export default function DashboardPage() {
                 const data = await response.json();
                 const userSite = data.sites?.[0] || null;
                 setSite(userSite);
-                
+
                 // Eğer site varsa ve CV data'sı varsa, parse et
                 if (userSite?.cvContent) {
                     try {
@@ -59,7 +59,7 @@ export default function DashboardPage() {
 
     const handleDelete = async () => {
         if (!site) return;
-        
+
         if (!confirm("CV'nizi ve site bilgilerinizi silmek istediğinizden emin misiniz?")) {
             return;
         }
@@ -238,8 +238,8 @@ export default function DashboardPage() {
                 <div className="flex gap-4">
                     {/* Left Menu */}
                     <div className={`transition-all duration-300 ${isMenuCollapsed ? 'w-16' : 'w-64'}`}>
-                        <DashboardMenu 
-                            activeTab={activeTab} 
+                        <DashboardMenu
+                            activeTab={activeTab}
                             onTabChange={setActiveTab}
                             isCollapsed={isMenuCollapsed}
                             onToggleCollapse={() => setIsMenuCollapsed(!isMenuCollapsed)}

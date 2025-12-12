@@ -15,15 +15,19 @@ interface UploadProgress {
 interface PortfolioUploaderProps {
     currentCount: number;
     maxCount?: number;
-    onUploadComplete: (urls: string[]) => void;
+    onUploadComplete?: (urls: string[]) => void; // Optional for deferred mode
+    onFilesSelected?: (files: File[]) => void; // NEW: For deferred mode
+    deferredMode?: boolean; // NEW: Enable deferred uploads
     disabled?: boolean;
-    existingFiles?: Array<{ fileName: string; fileSize: number }>;  // NEW: For duplicate detection
+    existingFiles?: Array<{ fileName: string; fileSize: number }>;  // For duplicate detection
 }
 
 export default function PortfolioUploader({
     currentCount,
     maxCount = 10,
     onUploadComplete,
+    onFilesSelected,
+    deferredMode = false,
     disabled = false,
     existingFiles = []
 }: PortfolioUploaderProps) {
@@ -94,7 +98,14 @@ export default function PortfolioUploader({
         }
 
         if (validFiles.length > 0) {
-            uploadFiles(validFiles);
+            // DEFERRED MODE: Just pass files to parent, don't upload
+            if (deferredMode && onFilesSelected) {
+                onFilesSelected(validFiles);
+                alert(`${validFiles.length} dosya seçildi. Değişiklikleri kaydetmeyi unutmayın!`);
+            } else {
+                // IMMEDIATE MODE: Upload files now
+                uploadFiles(validFiles);
+            }
         } else if (duplicates.length > 0 && errors.length === 0) {
             // Only duplicates, inform user
             alert('Seçilen tüm dosyalar zaten yüklenmiş.');
@@ -127,14 +138,14 @@ export default function PortfolioUploader({
                         // API returns batch format: { uploads: [{ url: "..." }] }
                         // Extract URL from either batch format or single format
                         const url = data.uploads?.[0]?.url || data.url;
-                        
+
                         console.log('Upload response:', data);
                         console.log('Extracted URL:', url);
-                        
+
                         if (!url) {
                             throw new Error('No URL in response');
                         }
-                        
+
                         setUploads(prev => prev.map(p =>
                             p.fileName === file.name
                                 ? { ...p, progress: 100, status: 'success', url: url, xhr: undefined }
@@ -233,7 +244,7 @@ export default function PortfolioUploader({
         console.log('successfulUrls.length:', successfulUrls.length);
 
         // Notify parent component of successful uploads
-        if (successfulUrls.length > 0) {
+        if (successfulUrls.length > 0 && onUploadComplete) {
             console.log('Calling onUploadComplete with:', successfulUrls);
             onUploadComplete(successfulUrls);
 

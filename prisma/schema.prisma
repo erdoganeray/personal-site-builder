@@ -8,14 +8,16 @@ datasource db {
 }
 
 model User {
-  id        String   @id @default(cuid())
-  email     String   @unique
-  password  String
-  name      String?
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
-  username  String?  @unique
-  sites     Site[]
+  id           String   @id @default(cuid())
+  email        String   @unique
+  password     String
+  name         String?
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
+  username     String?  @unique
+  storageUsed  BigInt   @default(0) // Storage used in bytes
+  storageLimit BigInt   @default(104857600) // 100MB default limit (100 * 1024 * 1024)
+  sites        Site[]
 }
 
 model Site {

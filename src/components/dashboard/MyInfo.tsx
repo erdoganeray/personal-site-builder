@@ -1,11 +1,12 @@
 "use client";
 
-import { useState, useEffect, useCallback } from "react";
+import { useState, useEffect, useCallback, useRef } from "react";
 import CVUploader from "@/components/CVUploader";
 import type { CVData, CVPortfolioItem, CVSkill, CVLanguage } from "@/lib/gemini-pdf-parser";
 import { hasUnpublishedChanges } from "@/lib/change-detection";
 import PortfolioUploader from "@/components/dashboard/PortfolioUploader";
 import PortfolioMetadataEditor from "@/components/dashboard/PortfolioMetadataEditor";
+import StorageIndicator from "@/components/dashboard/StorageIndicator";
 
 interface MyInfoProps {
     site: any;
@@ -19,6 +20,9 @@ export default function MyInfo({ site, cvData, onDelete, onCVAnalyzed, deleting 
     const [isEditing, setIsEditing] = useState(false);
     const [saving, setSaving] = useState(false);
     const [publishing, setPublishing] = useState(false);
+
+    // Original state backup for cancel functionality
+    const originalStateRef = useRef<any>(null);
 
     // Form state
     const [name, setName] = useState("");
@@ -42,6 +46,15 @@ export default function MyInfo({ site, cvData, onDelete, onCVAnalyzed, deleting 
     const [portfolio, setPortfolio] = useState<CVPortfolioItem[]>([]);
     const [uploadingPortfolio, setUploadingPortfolio] = useState(false);
     const [editingPortfolioIndex, setEditingPortfolioIndex] = useState<number | null>(null);
+
+    // Deferred upload state - files held in memory until save
+    const [pendingProfilePhoto, setPendingProfilePhoto] = useState<File | null>(null);
+    const [profilePhotoPreview, setProfilePhotoPreview] = useState<string>("");
+    const [pendingPortfolio, setPendingPortfolio] = useState<Array<{ file: File; preview: string }>>([]);
+
+    // Storage refresh key - increment to force StorageIndicator to refresh
+    const [storageRefreshKey, setStorageRefreshKey] = useState(0);
+    const refreshStorage = () => setStorageRefreshKey(prev => prev + 1);
 
 
     // Helper function to normalize skills array - converts all strings to CVSkill objects
@@ -175,9 +188,86 @@ export default function MyInfo({ site, cvData, onDelete, onCVAnalyzed, deleting 
 
         setSaving(true);
         try {
-            // Debug: Check portfolio state before filtering
-            console.log('Portfolio before filter:', portfolio);
-            const filteredPortfolio = portfolio.filter(item => item?.imageUrl);
+            // STEP 1: Upload pending profile photo if exists
+            let finalProfilePhotoUrl = profilePhotoUrl;
+            if (pendingProfilePhoto) {
+                setUploadingPhoto(true);
+                try {
+                    const formData = new FormData();
+                    formData.append("file", pendingProfilePhoto);
+
+                    const photoResponse = await fetch("/api/upload/profile-photo", {
+                        method: "POST",
+                        body: formData,
+                    });
+
+                    const photoData = await photoResponse.json();
+
+                    if (photoResponse.ok) {
+                        finalProfilePhotoUrl = photoData.url;
+                        console.log("✅ Profile photo uploaded:", finalProfilePhotoUrl);
+                    } else {
+                        throw new Error(photoData.error || "Profil fotoğrafı yüklenemedi");
+                    }
+                } catch (error) {
+                    console.error("Profile photo upload error:", error);
+                    alert("Profil fotoğrafı yüklenirken hata oluştu: " + (error instanceof Error ? error.message : "Bilinmeyen hata"));
+                    setSaving(false);
+                    setUploadingPhoto(false);
+                    return; // Don't proceed with save if photo upload fails
+                } finally {
+                    setUploadingPhoto(false);
+                }
+            }
+
+            // STEP 2: Upload pending portfolio files if exist
+            let finalPortfolio = [...portfolio];
+            if (pendingPortfolio.length > 0) {
+                setUploadingPortfolio(true);
+                try {
+                    const uploadedUrls: string[] = [];
+
+                    for (let i = 0; i < pendingPortfolio.length; i++) {
+                        const { file } = pendingPortfolio[i];
+                        const formData = new FormData();
+                        formData.append("file", file);
+
+                        const portfolioResponse = await fetch("/api/upload/portfolio", {
+                            method: "POST",
+                            body: formData,
+                        });
+
+                        const portfolioData = await portfolioResponse.json();
+
+                        if (portfolioResponse.ok) {
+                            // API returns batch format: { uploads: [{ url: "..." }] }
+                            const url = portfolioData.uploads?.[0]?.url || portfolioData.url;
+                            if (url) {
+                                uploadedUrls.push(url);
+                                console.log(`✅ Portfolio image ${i + 1}/${pendingPortfolio.length} uploaded:`, url);
+                            }
+                        } else {
+                            console.error(`Portfolio image ${i + 1} upload failed:`, portfolioData.error);
+                            // Continue with other files even if one fails
+                        }
+                    }
+
+                    // Add uploaded URLs to portfolio
+                    const newPortfolioItems: CVPortfolioItem[] = uploadedUrls.map(url => ({ imageUrl: url }));
+                    finalPortfolio = [...finalPortfolio, ...newPortfolioItems];
+                    console.log(`✅ ${uploadedUrls.length}/${pendingPortfolio.length} portfolio images uploaded`);
+                } catch (error) {
+                    console.error("Portfolio upload error:", error);
+                    alert("Portfolio fotoğrafları yüklenirken hata oluştu. Bazı fotoğraflar yüklenmemiş olabilir.");
+                    // Don't return - continue with save even if some portfolio uploads failed
+                } finally {
+                    setUploadingPortfolio(false);
+                }
+            }
+
+            // STEP 3: Prepare data for database save
+            console.log('Portfolio before filter:', finalPortfolio);
+            const filteredPortfolio = finalPortfolio.filter(item => item?.imageUrl);
             console.log('Portfolio after filter:', filteredPortfolio);
 
             // Normalize skills to ensure consistent CVSkill format
@@ -186,6 +276,7 @@ export default function MyInfo({ site, cvData, onDelete, onCVAnalyzed, deleting 
             // Normalize languages to ensure consistent CVLanguage format
             const normalizedLanguages = normalizeLanguagesArray(languages);
 
+            // STEP 4: Save to database
             const response = await fetch("/api/site/update-info", {
                 method: "PATCH",
                 headers: {
@@ -208,15 +299,28 @@ export default function MyInfo({ site, cvData, onDelete, onCVAnalyzed, deleting 
                     experience,
                     education,
                     portfolio: filteredPortfolio,
-                    skills: normalizedSkills, // Use normalized skills
-                    languages: normalizedLanguages, // Use normalized languages
-                    profilePhotoUrl,
+                    skills: normalizedSkills,
+                    languages: normalizedLanguages,
+                    profilePhotoUrl: finalProfilePhotoUrl, // Use uploaded URL
                 }),
             });
 
             const data = await response.json();
 
             if (response.ok) {
+                // STEP 5: Clear pending state after successful save
+                setPendingProfilePhoto(null);
+                if (profilePhotoPreview) {
+                    URL.revokeObjectURL(profilePhotoPreview); // Clean up object URL
+                }
+                setProfilePhotoPreview("");
+
+                // Clear pending portfolio
+                pendingPortfolio.forEach(item => {
+                    URL.revokeObjectURL(item.preview);
+                });
+                setPendingPortfolio([]);
+
                 alert("Bilgileriniz başarıyla kaydedildi!");
                 setIsEditing(false);
                 window.location.reload(); // Refresh to show updated data
@@ -229,6 +333,56 @@ export default function MyInfo({ site, cvData, onDelete, onCVAnalyzed, deleting 
         } finally {
             setSaving(false);
         }
+    };
+
+    // Handle entering edit mode - backup current state
+    const handleEdit = () => {
+        originalStateRef.current = {
+            name, jobTitle, email, phone, location,
+            linkedinUrl, githubUrl, facebookUrl, instagramUrl, xUrl, websiteUrl,
+            summary, experience, education, skills, languages,
+            profilePhotoUrl, portfolio
+        };
+        setIsEditing(true);
+    };
+
+    // Handle cancel - restore original state
+    const handleCancel = () => {
+        if (originalStateRef.current) {
+            setName(originalStateRef.current.name);
+            setJobTitle(originalStateRef.current.jobTitle);
+            setEmail(originalStateRef.current.email);
+            setPhone(originalStateRef.current.phone);
+            setLocation(originalStateRef.current.location);
+            setLinkedinUrl(originalStateRef.current.linkedinUrl);
+            setGithubUrl(originalStateRef.current.githubUrl);
+            setFacebookUrl(originalStateRef.current.facebookUrl);
+            setInstagramUrl(originalStateRef.current.instagramUrl);
+            setXUrl(originalStateRef.current.xUrl);
+            setWebsiteUrl(originalStateRef.current.websiteUrl);
+            setSummary(originalStateRef.current.summary);
+            setExperience(originalStateRef.current.experience);
+            setEducation(originalStateRef.current.education);
+            setSkills(originalStateRef.current.skills);
+            setLanguages(originalStateRef.current.languages);
+            setProfilePhotoUrl(originalStateRef.current.profilePhotoUrl);
+            setPortfolio(originalStateRef.current.portfolio);
+        }
+
+        // Clear pending uploads
+        setPendingProfilePhoto(null);
+        if (profilePhotoPreview) {
+            URL.revokeObjectURL(profilePhotoPreview);
+        }
+        setProfilePhotoPreview("");
+
+        // Clear pending portfolio
+        pendingPortfolio.forEach(item => {
+            URL.revokeObjectURL(item.preview);
+        });
+        setPendingPortfolio([]);
+
+        setIsEditing(false);
     };
 
     const addExperience = () => {
@@ -324,33 +478,29 @@ export default function MyInfo({ site, cvData, onDelete, onCVAnalyzed, deleting 
             return;
         }
 
-        setUploadingPhoto(true);
-        try {
-            const formData = new FormData();
-            formData.append("file", file);
+        // DEFERRED UPLOAD: Store file in memory, don't upload to Cloudflare yet
+        setPendingProfilePhoto(file);
+        setProfilePhotoPreview(URL.createObjectURL(file));
 
-            const response = await fetch("/api/upload/profile-photo", {
-                method: "POST",
-                body: formData,
-            });
-
-            const data = await response.json();
-
-            if (response.ok) {
-                setProfilePhotoUrl(data.url);
-                alert("Profil fotoğrafı yüklendi! Değişiklikleri kaydetmeyi unutmayın.");
-            } else {
-                alert(data.error || "Fotoğraf yüklenemedi");
-            }
-        } catch (error) {
-            console.error("Error uploading photo:", error);
-            alert("Bir hata oluştu");
-        } finally {
-            setUploadingPhoto(false);
-        }
+        // Show info message
+        alert("Profil fotoğrafı seçildi. Değişiklikleri kaydetmeyi unutmayın!");
     };
 
     const handlePhotoDelete = async () => {
+        // If there's a pending photo, just clear it from memory
+        if (pendingProfilePhoto) {
+            if (!confirm("Seçilen fotoğrafı kaldırmak istediğinizden emin misiniz?")) {
+                return;
+            }
+            setPendingProfilePhoto(null);
+            if (profilePhotoPreview) {
+                URL.revokeObjectURL(profilePhotoPreview);
+            }
+            setProfilePhotoPreview("");
+            return;
+        }
+
+        // If there's a saved photo, delete it from Cloudflare
         if (!profilePhotoUrl) return;
 
         if (!confirm("Profil fotoğrafını silmek istediğinizden emin misiniz?")) {
@@ -367,6 +517,7 @@ export default function MyInfo({ site, cvData, onDelete, onCVAnalyzed, deleting 
 
             if (response.ok) {
                 setProfilePhotoUrl("");
+                refreshStorage(); // Refresh storage indicator
                 alert("Profil fotoğrafı silindi! Değişiklikleri kaydetmeyi unutmayın.");
             } else {
                 alert(data.error || "Fotoğraf silinemedi");
@@ -456,16 +607,18 @@ export default function MyInfo({ site, cvData, onDelete, onCVAnalyzed, deleting 
         setLanguages(updated);
     };
 
-    const handlePortfolioUploadComplete = useCallback((urls: string[]) => {
-        console.log('handlePortfolioUploadComplete called with URLs:', urls);
-        console.log('Current portfolio state:', portfolio);
-        const newItems: CVPortfolioItem[] = urls.map(url => ({ imageUrl: url }));
-        console.log('New items to add:', newItems);
-        setPortfolio(prev => {
-            const updatedPortfolio = [...prev, ...newItems];
-            console.log('Updated portfolio:', updatedPortfolio);
-            return updatedPortfolio;
-        });
+    // DEFERRED UPLOAD: Store files in memory instead of uploading immediately
+    const handlePortfolioFilesSelected = useCallback((files: File[]) => {
+        console.log('handlePortfolioFilesSelected called with files:', files);
+
+        // Create preview URLs for the files
+        const newPendingItems = files.map(file => ({
+            file,
+            preview: URL.createObjectURL(file)
+        }));
+
+        setPendingPortfolio(prev => [...prev, ...newPendingItems]);
+        console.log('Added to pending portfolio:', newPendingItems.length, 'files');
     }, []);
 
     const handlePortfolioMetadataSave = (index: number, updatedItem: CVPortfolioItem) => {
@@ -490,6 +643,7 @@ export default function MyInfo({ site, cvData, onDelete, onCVAnalyzed, deleting 
 
             if (response.ok) {
                 setPortfolio(portfolio.filter((_, i) => i !== index));
+                refreshStorage(); // Refresh storage indicator
                 alert("Portfolio fotoğrafı silindi! Değişiklikleri kaydetmeyi unutmayın.");
             } else {
                 alert(data.error || "Fotoğraf silinemedi");
@@ -510,6 +664,9 @@ export default function MyInfo({ site, cvData, onDelete, onCVAnalyzed, deleting 
                     CV'nizi yükleyin veya mevcut CV bilgilerinizi görüntüleyin/düzenleyin
                 </p>
             </div>
+
+            {/* Storage Indicator - Always show at top */}
+            <StorageIndicator key={storageRefreshKey} />
 
             {/* Unpublished Changes Warning - Always show at top if published and has changes */}
             {site && site.status === "published" && hasUnpublishedChanges(site) && (
@@ -586,7 +743,7 @@ export default function MyInfo({ site, cvData, onDelete, onCVAnalyzed, deleting 
                         <div className="flex gap-2">
                             {!isEditing ? (
                                 <button
-                                    onClick={() => setIsEditing(true)}
+                                    onClick={handleEdit}
                                     className="flex items-center gap-2 px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-lg transition-colors duration-200"
                                 >
                                     <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -619,7 +776,7 @@ export default function MyInfo({ site, cvData, onDelete, onCVAnalyzed, deleting 
                                         )}
                                     </button>
                                     <button
-                                        onClick={() => setIsEditing(false)}
+                                        onClick={handleCancel}
                                         disabled={saving}
                                         className="flex items-center gap-2 px-4 py-2 bg-gray-600 hover:bg-gray-700 disabled:bg-gray-400 text-white rounded-lg transition-colors duration-200"
                                     >
@@ -660,9 +817,10 @@ export default function MyInfo({ site, cvData, onDelete, onCVAnalyzed, deleting 
                             {/* Profile Photo Section */}
                             <div className="mb-6 flex flex-col items-center">
                                 <div className="w-32 h-32 rounded-full bg-gray-600 flex items-center justify-center mb-3 overflow-hidden border-4 border-gray-500">
-                                    {profilePhotoUrl ? (
+                                    {/* Show preview if pending photo exists, otherwise show saved photo */}
+                                    {profilePhotoPreview || profilePhotoUrl ? (
                                         <img
-                                            src={profilePhotoUrl}
+                                            src={profilePhotoPreview || profilePhotoUrl}
                                             alt="Profile"
                                             className="w-full h-full object-cover"
                                         />
@@ -704,7 +862,8 @@ export default function MyInfo({ site, cvData, onDelete, onCVAnalyzed, deleting 
                                                 )}
                                             </span>
                                         </label>
-                                        {profilePhotoUrl && !uploadingPhoto && (
+                                        {/* Show delete button if there's a saved photo OR a pending photo */}
+                                        {(profilePhotoUrl || pendingProfilePhoto) && !uploadingPhoto && (
                                             <button
                                                 onClick={handlePhotoDelete}
                                                 className="inline-flex items-center gap-2 px-4 py-2 bg-red-600 hover:bg-red-700 text-white rounded-lg text-sm font-medium transition-colors"
@@ -1054,9 +1213,10 @@ export default function MyInfo({ site, cvData, onDelete, onCVAnalyzed, deleting 
                             {isEditing && (
                                 <div className="mb-4">
                                     <PortfolioUploader
-                                        currentCount={portfolio.length}
+                                        currentCount={portfolio.length + pendingPortfolio.length}
                                         maxCount={10}
-                                        onUploadComplete={handlePortfolioUploadComplete}
+                                        onFilesSelected={handlePortfolioFilesSelected}
+                                        deferredMode={true}
                                         disabled={uploadingPortfolio}
                                         existingFiles={portfolio
                                             .filter(item => item?.imageUrl)
@@ -1070,6 +1230,7 @@ export default function MyInfo({ site, cvData, onDelete, onCVAnalyzed, deleting 
 
                             {/* Portfolio Grid */}
                             <div className="grid grid-cols-2 md:grid-cols-3 gap-3">
+                                {/* Show saved portfolio items */}
                                 {portfolio.map((item, index) => (
                                     <div key={index} className="relative group aspect-square rounded-lg overflow-hidden bg-gray-600">
                                         <img
@@ -1115,8 +1276,44 @@ export default function MyInfo({ site, cvData, onDelete, onCVAnalyzed, deleting 
                                         )}
                                     </div>
                                 ))}
-                                {portfolio.length === 0 && (
-                                    <div className="col-span-2 md:col-span-3 text-center py-8">
+
+                                {/* Show pending portfolio items (previews) */}
+                                {pendingPortfolio.map((item, index) => (
+                                    <div key={`pending-${index}`} className="relative group aspect-square rounded-lg overflow-hidden bg-gray-600 border-2 border-yellow-500">
+                                        <img
+                                            src={item.preview}
+                                            alt={`Pending ${index + 1}`}
+                                            className="w-full h-full object-cover"
+                                        />
+
+                                        {/* Pending indicator */}
+                                        <div className="absolute top-2 left-2 bg-yellow-500 text-black text-xs px-2 py-1 rounded font-semibold">
+                                            Kaydedilmedi
+                                        </div>
+
+                                        {/* Delete button for pending items */}
+                                        {isEditing && (
+                                            <div className="absolute inset-0 bg-black/50 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center gap-2">
+                                                <button
+                                                    onClick={() => {
+                                                        // Remove from pending
+                                                        URL.revokeObjectURL(item.preview);
+                                                        setPendingPortfolio(prev => prev.filter((_, i) => i !== index));
+                                                    }}
+                                                    className="bg-red-600 hover:bg-red-700 text-white p-2 rounded-lg transition-colors"
+                                                    title="Kaldır"
+                                                >
+                                                    <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
+                                                    </svg>
+                                                </button>
+                                            </div>
+                                        )}
+                                    </div>
+                                ))}
+
+                                {portfolio.length === 0 && pendingPortfolio.length === 0 && (
+                                    <div className="col-span-2 md:grid-cols-3 text-center py-8">
                                         <p className="text-gray-400 text-sm">Henüz portfolio fotoğrafı eklenmemiş</p>
                                         {isEditing && (
                                             <p className="text-gray-500 text-xs mt-2">Maksimum 10 adet fotoğraf ekleyebilirsiniz</p>

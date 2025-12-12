@@ -1,8 +1,9 @@
 import { NextRequest, NextResponse } from "next/server";
 import { getServerSession } from "next-auth";
 import { authOptions } from "@/lib/auth";
-import { S3Client, PutObjectCommand } from "@aws-sdk/client-s3";
+import { S3Client, PutObjectCommand, DeleteObjectCommand } from "@aws-sdk/client-s3";
 import { randomUUID } from "crypto";
+import { recalculateUserStorage } from "@/lib/storage-calculator";
 
 const s3Client = new S3Client({
   region: "auto",
@@ -69,6 +70,14 @@ export async function POST(req: NextRequest) {
 
     console.log("File uploaded to R2:", fileUrl);
 
+    // Recalculate user's storage after upload
+    try {
+      await recalculateUserStorage(session.user.id);
+    } catch (storageError) {
+      console.error("Failed to recalculate storage:", storageError);
+      // Don't fail the request if storage calculation fails
+    }
+
     return NextResponse.json({
       success: true,
       url: fileUrl,
@@ -77,6 +86,72 @@ export async function POST(req: NextRequest) {
     console.error("Upload error:", error);
     return NextResponse.json(
       { error: "Upload failed" },
+      { status: 500 }
+    );
+  }
+}
+
+export async function DELETE(req: NextRequest) {
+  try {
+    const session = await getServerSession(authOptions);
+
+    if (!session?.user?.id) {
+      return NextResponse.json(
+        { error: "Unauthorized" },
+        { status: 401 }
+      );
+    }
+
+    const { searchParams } = new URL(req.url);
+    const cvUrl = searchParams.get("url");
+
+    if (!cvUrl) {
+      return NextResponse.json(
+        { error: "No CV URL provided" },
+        { status: 400 }
+      );
+    }
+
+    // Extract the key from the URL
+    // URL format: https://pub-xxx.r2.dev/users/{userId}/cv/cv-xxx.pdf
+    const urlParts = cvUrl.split("/");
+    const keyParts = urlParts.slice(urlParts.indexOf("users"));
+    const key = keyParts.join("/");
+
+    // Verify the key belongs to the current user
+    if (!key.startsWith(`users/${session.user.id}/cv/`)) {
+      return NextResponse.json(
+        { error: "Unauthorized to delete this file" },
+        { status: 403 }
+      );
+    }
+
+    // Delete from R2
+    await s3Client.send(
+      new DeleteObjectCommand({
+        Bucket: process.env.R2_BUCKET_NAME!,
+        Key: key,
+      })
+    );
+
+    console.log("CV deleted from R2:", key);
+
+    // Recalculate user's storage after deletion
+    try {
+      await recalculateUserStorage(session.user.id);
+    } catch (storageError) {
+      console.error("Failed to recalculate storage:", storageError);
+      // Don't fail the request if storage calculation fails
+    }
+
+    return NextResponse.json({
+      success: true,
+      message: "CV deleted successfully",
+    });
+  } catch (error) {
+    console.error("CV delete error:", error);
+    return NextResponse.json(
+      { error: "Delete failed" },
       { status: 500 }
     );
   }
