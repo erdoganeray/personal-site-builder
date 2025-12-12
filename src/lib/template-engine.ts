@@ -419,6 +419,46 @@ function normalizeSkill(skill: string | import('./gemini-pdf-parser').CVSkill): 
 }
 
 /**
+ * Helper function to normalize language to CVLanguage format
+ * Supports both legacy string format and new CVLanguage object format
+ */
+function normalizeLanguage(language: string | import('./gemini-pdf-parser').CVLanguage): import('./gemini-pdf-parser').CVLanguage {
+  // Level to percentage mapping
+  const levelPercentages = {
+    'native': 100,
+    'fluent': 90,
+    'advanced': 75,
+    'intermediate': 60,
+    'basic': 40
+  };
+
+  if (typeof language === 'string') {
+    // Legacy format: convert string to CVLanguage object with defaults
+    return {
+      name: language,
+      level: 'intermediate',
+      percentage: 60,
+      certifications: undefined,
+      cefr: undefined
+    };
+  }
+
+  // New format: ensure all optional fields have defaults
+  const level = language.level || 'intermediate';
+  const percentage = language.percentage !== undefined
+    ? language.percentage
+    : levelPercentages[level as keyof typeof levelPercentages];
+
+  return {
+    name: language.name,
+    level: level,
+    percentage: percentage,
+    certifications: language.certifications,
+    cefr: language.cefr
+  };
+}
+
+/**
  * CV verilerinden skills section için HTML items oluşturur
  * @param cvData - CV data containing skills information
  * @param templateId - Template identifier
@@ -655,47 +695,212 @@ export function generateLanguageItems(
   cvData: CVData,
   templateId: string
 ): string {
-  // Empty data validation
+  // Empty data validation - Template-specific empty states
   if (!cvData.languages || cvData.languages.length === 0) {
-    return '<p class="no-languages">Henüz dil bilgisi eklenmemiş.</p>';
+    const emptyStates: Record<string, string> = {
+      'languages-progress-bars': `
+        <div class="languages-empty-state">
+          <div class="empty-icon">🌍</div>
+          <p class="empty-message">No language information added yet. Add your language skills to complete your profile.</p>
+          <a href="/dashboard?tab=my-info" class="empty-action">Add Language</a>
+        </div>
+      `,
+      'languages-card-grid': `
+        <div class="languages-empty-state">
+          <div class="empty-icon">🌍</div>
+          <p class="empty-message">No language information added yet. Add your language skills to complete your profile.</p>
+          <a href="/dashboard?tab=my-info" class="empty-action">Add Language</a>
+        </div>
+      `,
+      'languages-minimalist': `
+        <div class="languages-empty-state">
+          <div class="empty-icon">🌍</div>
+          <p class="empty-message">No language information added yet. Add your language skills to complete your profile.</p>
+          <a href="/dashboard?tab=my-info" class="empty-action">Add Language</a>
+        </div>
+      `,
+      'languages-certification': `
+        <div class="languages-empty-state">
+          <div class="empty-icon">🌍</div>
+          <p class="empty-message">No language information added yet. Add your language skills and certifications to complete your profile.</p>
+          <a href="/dashboard?tab=my-info" class="empty-action">Add Language</a>
+        </div>
+      `,
+      'languages-accordion': `
+        <div class="languages-empty-state">
+          <div class="empty-icon">🌍</div>
+          <p class="empty-message">No language information added yet. Add your language skills to complete your profile.</p>
+          <a href="/dashboard?tab=my-info" class="empty-action">Add Language</a>
+        </div>
+      `,
+      'languages-badge-cloud': `
+        <div class="languages-empty-state">
+          <div class="empty-icon">🌍</div>
+          <p class="empty-message">No language information added yet. Add your language skills to complete your profile.</p>
+          <a href="/dashboard?tab=my-info" class="empty-action">Add Language</a>
+        </div>
+      `
+    };
+
+    return emptyStates[templateId] || emptyStates['languages-progress-bars'];
   }
 
-  // Dil seviyelerini belirle (Native, Fluent, Advanced, Intermediate, Basic)
-  const levels = ['Native', 'Fluent', 'Advanced', 'Intermediate', 'Basic'];
-  const levelPercentages = { Native: 100, Fluent: 90, Advanced: 75, Intermediate: 60, Basic: 40 };
+  // Normalize all languages to CVLanguage format
+  const normalizedLanguages = cvData.languages.map(normalizeLanguage);
 
-  const languagesWithLevels = cvData.languages.map((lang, index) => {
-    // Döngüsel olarak seviye ata veya ilk dil Native, sonrakiler Fluent/Advanced
-    const level = index === 0 ? 'Native' : levels[Math.min(index, levels.length - 1)];
-    return { name: lang, level, percentage: levelPercentages[level as keyof typeof levelPercentages] };
-  });
+  // Template generators with XSS protection and accessibility
+  const templateGenerators: Record<string, (lang: import('./gemini-pdf-parser').CVLanguage, index: number) => string> = {
+    'languages-progress-bars': (lang, index) => {
+      const percentage = lang.percentage || 60;
+      const level = lang.level || 'intermediate';
 
-  // Template generators with XSS protection
-  const templateGenerators: Record<string, (lang: typeof languagesWithLevels[0]) => string> = {
-    'languages-progress-bars': (lang) => `
-      <div class="language-item">
+      return `
+      <article class="language-item" role="listitem">
         <div class="language-name">
-          <span>${escapeHtml(lang.name)}</span>
-          <span class="language-level">${escapeHtml(lang.level)}</span>
+          <span id="lang-${index}">${escapeHtml(lang.name)}</span>
+          <span class="language-level" aria-label="Proficiency level">${escapeHtml(level)}</span>
         </div>
-        <div class="language-bar">
-          <div class="language-progress" style="width: ${lang.percentage}%"></div>
+        <div class="language-bar" 
+             role="progressbar" 
+             aria-labelledby="lang-${index}"
+             aria-valuenow="${percentage}" 
+             aria-valuemin="0" 
+             aria-valuemax="100">
+          <div class="language-progress" style="width: ${percentage}%"></div>
         </div>
+      </article>
+    `;
+    },
+    'languages-card-grid': (lang, index) => {
+      const level = lang.level || 'intermediate';
+
+      return `
+      <article class="language-card" role="listitem" aria-labelledby="lang-card-${index}">
+        <div class="language-icon" aria-hidden="true">🌍</div>
+        <div class="language-name" id="lang-card-${index}">${escapeHtml(lang.name)}</div>
+        <div class="language-level" aria-label="Proficiency level">${escapeHtml(level)}</div>
+      </article>
+    `;
+    },
+    'languages-minimalist': (lang, index) => {
+      const level = lang.level || 'intermediate';
+
+      return `
+      <article class="language-item-minimal" role="listitem" aria-labelledby="lang-min-${index}">
+        <div class="language-name-minimal" id="lang-min-${index}">${escapeHtml(lang.name)}</div>
+        <div class="language-level-minimal" aria-label="Proficiency level">${escapeHtml(level)}</div>
+      </article>
+    `;
+    },
+    'languages-certification': (lang, index) => {
+      const level = lang.level || 'intermediate';
+      const hasCertifications = lang.certifications && lang.certifications.length > 0;
+      const hasCefr = lang.cefr && lang.cefr.trim() !== '';
+
+      // Generate certification badges HTML
+      const certificationsHtml = hasCertifications
+        ? lang.certifications!.map(cert => `
+            <div class="language-cert-badge">
+              <span class="language-cert-badge-icon">🏆</span>
+              <span>${escapeHtml(cert)}</span>
+            </div>
+          `).join('')
+        : '<div class="language-cert-no-badges">No certifications yet</div>';
+
+      return `
+      <article class="language-cert-card" role="listitem" aria-labelledby="lang-cert-${index}">
+        <div class="language-cert-header">
+          <div>
+            <div class="language-cert-name" id="lang-cert-${index}">${escapeHtml(lang.name)}</div>
+            ${hasCefr ? `
+              <div class="language-cert-cefr">
+                CEFR Level:
+                <span class="language-cert-cefr-badge">${escapeHtml(lang.cefr!)}</span>
+              </div>
+            ` : ''}
+          </div>
+          <div class="language-cert-level" aria-label="Proficiency level">${escapeHtml(level)}</div>
+        </div>
+        <div class="language-cert-badges">
+          <div class="language-cert-badges-title">Certifications</div>
+          <div class="language-cert-badge-list">
+            ${certificationsHtml}
+          </div>
+        </div>
+      </article>
+    `;
+    },
+    'languages-accordion': (lang, index) => {
+      const level = lang.level || 'intermediate';
+      const hasCertifications = lang.certifications && lang.certifications.length > 0;
+      const hasCefr = lang.cefr && lang.cefr.trim() !== '';
+      const percentage = lang.percentage || 60;
+
+      // Generate certifications HTML
+      const certificationsHtml = hasCertifications
+        ? lang.certifications!.map(cert => `
+            <div class="language-accordion-cert-badge">
+              <span>🏆</span>
+              <span>${escapeHtml(cert)}</span>
+            </div>
+          `).join('')
+        : '<div class="language-accordion-no-certs">No certifications</div>';
+
+      return `
+      <article class="language-accordion-item" role="listitem">
+        <button class="language-accordion-header" 
+                aria-expanded="false" 
+                aria-controls="accordion-content-${index}"
+                id="accordion-header-${index}">
+          <div class="language-accordion-header-content">
+            <div class="language-accordion-name">${escapeHtml(lang.name)}</div>
+            <div class="language-accordion-level" aria-label="Proficiency level">${escapeHtml(level)}</div>
+          </div>
+          <span class="language-accordion-icon" aria-hidden="true">▼</span>
+        </button>
+        <div class="language-accordion-content" 
+             id="accordion-content-${index}" 
+             role="region" 
+             aria-labelledby="accordion-header-${index}">
+          <div class="language-accordion-details">
+            <div class="language-accordion-detail-row">
+              <span class="language-accordion-detail-label">Proficiency</span>
+              <span class="language-accordion-detail-value">${percentage}%</span>
+            </div>
+            ${hasCefr ? `
+              <div class="language-accordion-detail-row">
+                <span class="language-accordion-detail-label">CEFR Level</span>
+                <span class="language-accordion-cefr-badge">${escapeHtml(lang.cefr!)}</span>
+              </div>
+            ` : ''}
+            <div class="language-accordion-detail-row">
+              <span class="language-accordion-detail-label">Certifications</span>
+              <div class="language-accordion-certifications">
+                ${certificationsHtml}
+              </div>
+            </div>
+          </div>
+        </div>
+      </article>
+    `;
+    },
+    'languages-badge-cloud': (lang, index) => {
+      const level = lang.level || 'intermediate';
+      const percentage = lang.percentage || 60;
+      const hasCefr = lang.cefr && lang.cefr.trim() !== '';
+
+      return `
+      <div class="language-badge-item" 
+           role="listitem" 
+           data-level="${escapeHtml(level)}"
+           ${hasCefr ? `data-cefr="${escapeHtml(lang.cefr!)}"` : ''}
+           aria-label="${escapeHtml(lang.name)} - ${escapeHtml(level)} level">
+        <span class="language-badge-name">${escapeHtml(lang.name)}</span>
+        <span class="language-badge-level">${escapeHtml(level)}</span>
+        <span class="language-badge-percentage">${percentage}%</span>
       </div>
-    `,
-    'languages-card-grid': (lang) => `
-      <div class="language-card">
-        <div class="language-icon">🌍</div>
-        <div class="language-name">${escapeHtml(lang.name)}</div>
-        <div class="language-level">${escapeHtml(lang.level)}</div>
-      </div>
-    `,
-    'languages-minimalist': (lang) => `
-      <div class="language-item-minimal">
-        <div class="language-name-minimal">${escapeHtml(lang.name)}</div>
-        <div class="language-level-minimal">${escapeHtml(lang.level)}</div>
-      </div>
-    `
+    `;
+    }
   };
 
   // Template ID validation
@@ -706,7 +911,7 @@ export function generateLanguageItems(
     throw new Error(`Languages template "${templateId}" not found. Available templates: ${Object.keys(templateGenerators).join(', ')}`);
   }
 
-  return languagesWithLevels.map(generator).join('\n');
+  return normalizedLanguages.map((lang, index) => generator(lang, index)).join('\n');
 }
 
 /**
@@ -719,12 +924,18 @@ export function getLanguagesReplacements(
 ): PlaceholderReplacements {
   return {
     '{{LANGUAGE_ITEMS}}': generateLanguageItems(cvData, templateId),
+    '{{SECTION_TITLE}}': 'Languages', // Can be made dynamic/translatable later
     '{{COLOR_PRIMARY}}': themeColors.primary,
     '{{COLOR_SECONDARY}}': themeColors.secondary,
     '{{COLOR_ACCENT}}': themeColors.accent,
     '{{COLOR_BACKGROUND}}': themeColors.background,
     '{{COLOR_TEXT}}': themeColors.text,
     '{{COLOR_TEXT_SECONDARY}}': themeColors.textSecondary,
+    '{{COLOR_BORDER}}': 'rgba(0, 0, 0, 0.1)', // Light border for progress bars
+    '{{COLOR_CARD_BG}}': 'rgba(255, 255, 255, 0.1)', // Semi-transparent card background
+    '{{COLOR_CARD_BG_HOVER}}': 'rgba(255, 255, 255, 0.15)', // Hover state for cards
+    '{{COLOR_BADGE_BG}}': 'rgba(0, 0, 0, 0.05)', // Badge background
+    '{{COLOR_SHADOW}}': 'rgba(0, 0, 0, 0.1)', // Shadow color
   };
 }
 

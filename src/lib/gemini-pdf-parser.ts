@@ -54,6 +54,18 @@ export interface CVSkill {
   yearsOfExperience?: number; // Years of experience with this skill
 }
 
+/**
+ * Language with rich metadata support
+ * Supports both simple string format (legacy) and detailed object format
+ */
+export interface CVLanguage {
+  name: string;
+  level?: 'native' | 'fluent' | 'advanced' | 'intermediate' | 'basic';
+  percentage?: number; // 0-100, used for progress bars
+  certifications?: string[]; // e.g., 'TOEFL 110/120', 'IELTS 8.5', 'CEFR C2'
+  cefr?: 'A1' | 'A2' | 'B1' | 'B2' | 'C1' | 'C2'; // Common European Framework of Reference
+}
+
 export interface CVData {
   personalInfo: CVPersonalInfo;
   summary?: string;
@@ -61,7 +73,7 @@ export interface CVData {
   education: CVEducation[];
   portfolio: CVPortfolioItem[];
   skills: (string | CVSkill)[]; // Support both legacy string[] and new CVSkill[] format
-  languages: string[];
+  languages: (string | CVLanguage)[]; // Support both legacy string[] and new CVLanguage[] format
 }
 
 /**
@@ -111,7 +123,16 @@ JSON formatında yapılandırılmış olarak döndür:
     }
   ],
   "skills": ["skill1", "skill2"],
-  "languages": ["dil1", "dil2"]
+  "languages": [
+    "dil1",
+    "dil2",
+    {
+      "name": "İngilizce",
+      "level": "fluent",
+      "certifications": ["TOEFL 110/120"],
+      "cefr": "C2"
+    }
+  ]
 }
 
 Önemli kurallar:
@@ -119,6 +140,13 @@ JSON formatında yapılandırılmış olarak döndür:
 - Eğer bir alan bulunamazsa boş string ("") veya boş array ([]) kullan
 - Tüm alanları doldur
 - JSON'ın dışında hiçbir metin ekleme
+
+Diller için özel kurallar:
+- Diller basit string olarak veya obje olarak döndürülebilir
+- Eğer CV'de dil seviyesi belirtilmişse (Native, Fluent, Advanced, Intermediate, Basic), obje formatını kullan
+- Eğer TOEFL, IELTS, CEFR gibi sertifikalar varsa bunları "certifications" array'ine ekle
+- CEFR seviyeleri: A1, A2, B1, B2, C1, C2
+- Seviye belirtilmemişse sadece dil adını string olarak döndür
 `;
 
     const result = await model.generateContent([

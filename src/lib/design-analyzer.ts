@@ -162,9 +162,55 @@ SEÇİM KURALLARI:
 - Geleneksel/profesyonel isteniyorsa → skills-progress-bars veya skills-minimal-list
 
 LANGUAGES SECTION (OPTIONAL - sadece diller varsa ekle):
+
 1. languages-progress-bars: İlerleme çubukları ile dil seviyesi gösterimi
+   - Seviye vurgusu önemli olduğunda tercih et
+   - Görsel ilerleme gösterimi isteniyorsa
+   - Dil sayısı: 2-6 (ideal: 3-5)
+   - Meslekler: Developer, Engineer, Technical roles
+   - Stil: Professional, Traditional
+
 2. languages-card-grid: Kart grid düzeni, ikon ve dil seviyesi
+   - Modern ve görsel görünüm isteniyorsa tercih et
+   - Dil sayısı: 2-8 (ideal: 4-6)
+   - Meslekler: Designer, Creative roles, Marketing
+   - Stil: Modern, Visual, Clean
+
 3. languages-minimalist: Minimal liste düzeni, dil ve seviye
+   - Minimal ve temiz tasarım isteniyorsa tercih et
+   - Profesyonel ve sade görünüm gerekiyorsa
+   - Dil sayısı: 2-5 (ideal: 2-4)
+   - Meslekler: Executive, Manager, Consultant, Academic
+   - Stil: Minimal, Clean, Professional, Elegant
+
+4. languages-certification: Sertifika odaklı kart düzeni, TOEFL/IELTS/CEFR skorları, badge gösterimi
+   - ⭐ ÖNCELIK: Sertifika bilgisi (TOEFL, IELTS, CEFR) varsa MUTLAKA BU TEMPLATE'İ SEÇ
+   - CEFR seviyeleri varsa tercih et
+   - Dil yeterliliği belgesi önemliyse
+   - Dil sayısı: 1-6 (ideal: 2-4)
+   - Meslekler: Academic, International roles, Translators, Language teachers
+   - Stil: Professional, Detailed, Certificate-focused
+
+5. languages-accordion: Accordion/katlanabilir tasarım, detaylı bilgi gösterimi, expand/collapse
+   - Detaylı dil bilgisi varsa (sertifikalar + CEFR + seviye)
+   - Kompakt görünüm isteniyorsa
+   - Dil sayısı: 3-8 (ideal: 4-6)
+   - Stil: Organized, Detailed, Space-efficient
+
+6. languages-badge-cloud: Tag/badge cloud düzeni, renk kodlamalı seviyeler (native=yeşil, fluent=mavi, advanced=mor)
+   - Yaratıcı ve modern görünüm isteniyorsa tercih et
+   - Seviyeye göre renk kodlaması ve tooltip
+   - Dil sayısı: 3-10 (ideal: 5-8)
+   - Meslekler: Designer, Creative roles, Multilingual professionals
+   - Stil: Creative, Dynamic, Modern, Colorful
+
+SEÇİM KURALLARI:
+- Sertifika bilgisi varsa → languages-certification (en yüksek öncelik)
+- 6+ dil varsa → languages-badge-cloud veya languages-accordion
+- Minimal/sade isteniyorsa → languages-minimalist
+- Yaratıcı/modern isteniyorsa → languages-badge-cloud veya languages-card-grid
+- Geleneksel/profesyonel isteniyorsa → languages-progress-bars veya languages-certification
+- Detaylı bilgi varsa → languages-accordion veya languages-certification
 
 CONTACT SECTION:
 1. contact-modern-form: Modern iletişim formu ve bilgi kartları, iki kolonlu düzen

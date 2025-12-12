@@ -2,7 +2,7 @@
 
 import { useState, useEffect, useCallback } from "react";
 import CVUploader from "@/components/CVUploader";
-import type { CVData, CVPortfolioItem, CVSkill } from "@/lib/gemini-pdf-parser";
+import type { CVData, CVPortfolioItem, CVSkill, CVLanguage } from "@/lib/gemini-pdf-parser";
 import { hasUnpublishedChanges } from "@/lib/change-detection";
 import PortfolioUploader from "@/components/dashboard/PortfolioUploader";
 import PortfolioMetadataEditor from "@/components/dashboard/PortfolioMetadataEditor";
@@ -36,7 +36,7 @@ export default function MyInfo({ site, cvData, onDelete, onCVAnalyzed, deleting 
     const [experience, setExperience] = useState<any[]>([]);
     const [education, setEducation] = useState<any[]>([]);
     const [skills, setSkills] = useState<(string | CVSkill)[]>([]); // Support both formats
-    const [languages, setLanguages] = useState<string[]>([]);
+    const [languages, setLanguages] = useState<(string | CVLanguage)[]>([]);
     const [profilePhotoUrl, setProfilePhotoUrl] = useState("");
     const [uploadingPhoto, setUploadingPhoto] = useState(false);
     const [portfolio, setPortfolio] = useState<CVPortfolioItem[]>([]);
@@ -74,6 +74,43 @@ export default function MyInfo({ site, cvData, onDelete, onCVAnalyzed, deleting 
                 level: level,
                 percentage: percentage,
                 category: skill.category || ''
+            };
+        });
+    };
+
+    // Helper function to normalize languages array - converts all strings to CVLanguage objects
+    const normalizeLanguagesArray = (languages: (string | CVLanguage)[]): CVLanguage[] => {
+        const levelPercentages: Record<string, number> = {
+            'native': 100,
+            'fluent': 90,
+            'advanced': 75,
+            'intermediate': 60,
+            'basic': 40
+        };
+
+        return languages.map(lang => {
+            if (typeof lang === 'string') {
+                return {
+                    name: lang,
+                    level: 'intermediate',
+                    percentage: 60,
+                    certifications: undefined,
+                    cefr: undefined
+                };
+            }
+
+            // Ensure percentage matches level
+            const level = lang.level || 'intermediate';
+            const percentage = lang.percentage !== undefined
+                ? lang.percentage
+                : levelPercentages[level];
+
+            return {
+                name: lang.name,
+                level: level,
+                percentage: percentage,
+                certifications: lang.certifications,
+                cefr: lang.cefr
             };
         });
     };
@@ -146,6 +183,9 @@ export default function MyInfo({ site, cvData, onDelete, onCVAnalyzed, deleting 
             // Normalize skills to ensure consistent CVSkill format
             const normalizedSkills = normalizeSkillsArray(skills);
 
+            // Normalize languages to ensure consistent CVLanguage format
+            const normalizedLanguages = normalizeLanguagesArray(languages);
+
             const response = await fetch("/api/site/update-info", {
                 method: "PATCH",
                 headers: {
@@ -169,7 +209,7 @@ export default function MyInfo({ site, cvData, onDelete, onCVAnalyzed, deleting 
                     education,
                     portfolio: filteredPortfolio,
                     skills: normalizedSkills, // Use normalized skills
-                    languages,
+                    languages: normalizedLanguages, // Use normalized languages
                     profilePhotoUrl,
                 }),
             });
@@ -340,16 +380,79 @@ export default function MyInfo({ site, cvData, onDelete, onCVAnalyzed, deleting 
     };
 
     const addLanguage = () => {
-        setLanguages([...languages, ""]);
+        // Add new language as CVLanguage object with defaults
+        setLanguages([...languages, {
+            name: "",
+            level: "intermediate",
+            percentage: 60,
+            certifications: undefined,
+            cefr: undefined
+        }]);
     };
 
     const removeLanguage = (index: number) => {
         setLanguages(languages.filter((_, i) => i !== index));
     };
 
-    const updateLanguage = (index: number, value: string) => {
+    const updateLanguage = (index: number, field: keyof CVLanguage, value: any) => {
         const updated = [...languages];
-        updated[index] = value;
+        const currentLang = updated[index];
+
+        // Level to percentage mapping
+        const levelPercentages: Record<CVLanguage['level'] & string, number> = {
+            'native': 100,
+            'fluent': 90,
+            'advanced': 75,
+            'intermediate': 60,
+            'basic': 40
+        };
+
+        // Convert string to CVLanguage if needed
+        if (typeof currentLang === 'string') {
+            updated[index] = {
+                name: currentLang,
+                level: "intermediate",
+                percentage: 60,
+                certifications: undefined,
+                cefr: undefined
+            };
+        }
+
+        // Update the field
+        const updatedLang = { ...(updated[index] as CVLanguage), [field]: value };
+
+        // If level changed, update percentage automatically
+        if (field === 'level' && value) {
+            updatedLang.percentage = levelPercentages[value as CVLanguage['level'] & string];
+        }
+
+        updated[index] = updatedLang;
+        setLanguages(updated);
+    };
+
+    const addCertification = (langIndex: number) => {
+        const updated = [...languages];
+        const lang = updated[langIndex] as CVLanguage;
+        const certs = lang.certifications || [];
+        lang.certifications = [...certs, ""];
+        setLanguages(updated);
+    };
+
+    const removeCertification = (langIndex: number, certIndex: number) => {
+        const updated = [...languages];
+        const lang = updated[langIndex] as CVLanguage;
+        if (lang.certifications) {
+            lang.certifications = lang.certifications.filter((_, i) => i !== certIndex);
+        }
+        setLanguages(updated);
+    };
+
+    const updateCertification = (langIndex: number, certIndex: number, value: string) => {
+        const updated = [...languages];
+        const lang = updated[langIndex] as CVLanguage;
+        if (lang.certifications) {
+            lang.certifications[certIndex] = value;
+        }
         setLanguages(updated);
     };
 
@@ -1144,7 +1247,9 @@ export default function MyInfo({ site, cvData, onDelete, onCVAnalyzed, deleting 
                         {/* Languages */}
                         <div className="bg-gray-700/50 rounded-lg p-4">
                             <div className="flex justify-between items-center mb-3">
-                                <h4 className="text-lg font-semibold text-white">Diller</h4>
+                                <h4 className="text-lg font-semibold text-white">
+                                    Diller ({languages.length})
+                                </h4>
                                 {isEditing && (
                                     <button
                                         onClick={addLanguage}
@@ -1155,35 +1260,134 @@ export default function MyInfo({ site, cvData, onDelete, onCVAnalyzed, deleting 
                                 )}
                             </div>
                             {isEditing ? (
-                                <div className="space-y-2">
-                                    {languages.map((lang, index) => (
-                                        <div key={index} className="flex gap-2">
-                                            <input
-                                                type="text"
-                                                value={lang}
-                                                onChange={(e) => updateLanguage(index, e.target.value)}
-                                                className="flex-1 px-2 py-1 bg-gray-600 border border-gray-500 text-white rounded text-sm"
-                                            />
-                                            <button
-                                                onClick={() => removeLanguage(index)}
-                                                className="px-2 text-red-400 hover:text-red-300"
-                                            >
-                                                Sil
-                                            </button>
-                                        </div>
-                                    ))}
+                                <div className="space-y-4">
+                                    {languages.map((lang, index) => {
+                                        const langObj = typeof lang === 'string'
+                                            ? { name: lang, level: 'intermediate' as const, percentage: 60, certifications: undefined, cefr: undefined }
+                                            : lang;
+
+                                        return (
+                                            <div key={index} className="bg-gray-600/30 rounded-lg p-3 space-y-2">
+                                                {/* Row 1: Name, Level, and Delete */}
+                                                <div className="flex gap-2 items-center">
+                                                    <input
+                                                        type="text"
+                                                        value={langObj.name}
+                                                        onChange={(e) => updateLanguage(index, 'name', e.target.value)}
+                                                        placeholder="Dil adı (örn: İngilizce)"
+                                                        className="flex-1 px-2 py-1.5 bg-gray-700 border border-gray-600 text-white rounded text-sm focus:ring-1 focus:ring-blue-500"
+                                                    />
+                                                    <select
+                                                        value={langObj.level || 'intermediate'}
+                                                        onChange={(e) => updateLanguage(index, 'level', e.target.value as CVLanguage['level'])}
+                                                        className="px-2 py-1.5 bg-gray-700 border border-gray-600 text-white rounded text-sm focus:ring-1 focus:ring-blue-500"
+                                                    >
+                                                        <option value="native">Ana Dil</option>
+                                                        <option value="fluent">Akıcı</option>
+                                                        <option value="advanced">İleri</option>
+                                                        <option value="intermediate">Orta</option>
+                                                        <option value="basic">Başlangıç</option>
+                                                    </select>
+                                                    <button
+                                                        onClick={() => removeLanguage(index)}
+                                                        className="px-2 py-1.5 text-red-400 hover:text-red-300 text-sm"
+                                                        title="Sil"
+                                                    >
+                                                        ✕
+                                                    </button>
+                                                </div>
+
+                                                {/* Row 2: CEFR Level */}
+                                                <div>
+                                                    <select
+                                                        value={langObj.cefr || ''}
+                                                        onChange={(e) => updateLanguage(index, 'cefr', e.target.value || undefined)}
+                                                        className="w-full px-2 py-1.5 bg-gray-700 border border-gray-600 text-white rounded text-sm focus:ring-1 focus:ring-blue-500"
+                                                    >
+                                                        <option value="">CEFR Seviyesi (Opsiyonel)</option>
+                                                        <option value="A1">A1 - Başlangıç</option>
+                                                        <option value="A2">A2 - Temel</option>
+                                                        <option value="B1">B1 - Orta Seviye</option>
+                                                        <option value="B2">B2 - Orta-İleri Seviye</option>
+                                                        <option value="C1">C1 - İleri Seviye</option>
+                                                        <option value="C2">C2 - Üst Düzey</option>
+                                                    </select>
+                                                </div>
+
+                                                {/* Row 3: Certifications */}
+                                                <div>
+                                                    <div className="flex items-center justify-between mb-1">
+                                                        <label className="text-xs text-gray-400">Sertifikalar (Opsiyonel)</label>
+                                                        <button
+                                                            onClick={() => addCertification(index)}
+                                                            className="text-xs text-blue-400 hover:text-blue-300"
+                                                        >
+                                                            + Sertifika Ekle
+                                                        </button>
+                                                    </div>
+                                                    {langObj.certifications && langObj.certifications.length > 0 && (
+                                                        <div className="space-y-1">
+                                                            {langObj.certifications.map((cert, certIndex) => (
+                                                                <div key={certIndex} className="flex gap-1">
+                                                                    <input
+                                                                        type="text"
+                                                                        value={cert}
+                                                                        onChange={(e) => updateCertification(index, certIndex, e.target.value)}
+                                                                        placeholder="örn: TOEFL 110/120, IELTS 8.5"
+                                                                        className="flex-1 px-2 py-1 bg-gray-700 border border-gray-600 text-white rounded text-xs focus:ring-1 focus:ring-blue-500 placeholder-gray-500"
+                                                                    />
+                                                                    <button
+                                                                        onClick={() => removeCertification(index, certIndex)}
+                                                                        className="px-2 text-red-400 hover:text-red-300 text-xs"
+                                                                    >
+                                                                        ✕
+                                                                    </button>
+                                                                </div>
+                                                            ))}
+                                                        </div>
+                                                    )}
+                                                </div>
+                                            </div>
+                                        );
+                                    })}
                                     {languages.length === 0 && <p className="text-gray-400 text-sm">Dil ekleyin</p>}
                                 </div>
                             ) : (
-                                <div className="flex flex-wrap gap-2">
-                                    {languages.map((lang, index) => (
-                                        <span
-                                            key={index}
-                                            className="px-3 py-1 text-sm bg-green-600 text-white rounded-full"
-                                        >
-                                            {lang}
-                                        </span>
-                                    ))}
+                                <div className="space-y-2">
+                                    {languages.map((lang, index) => {
+                                        const langObj = typeof lang === 'string'
+                                            ? { name: lang, level: 'intermediate' as const, percentage: 60, certifications: undefined, cefr: undefined }
+                                            : lang;
+
+                                        return (
+                                            <div key={index} className="bg-gray-600/30 rounded-lg p-3">
+                                                <div className="flex items-start gap-3">
+                                                    <div className="flex-1">
+                                                        <div className="flex items-center gap-2 mb-1">
+                                                            <span className="font-medium text-white">{langObj.name}</span>
+                                                            {langObj.cefr && (
+                                                                <span className="px-2 py-0.5 text-xs bg-purple-600/30 text-purple-300 rounded-full">
+                                                                    CEFR: {langObj.cefr}
+                                                                </span>
+                                                            )}
+                                                        </div>
+                                                        <div className="flex items-center gap-3 text-sm text-gray-400">
+                                                            <span className="capitalize">{langObj.level || 'intermediate'}</span>
+                                                        </div>
+                                                        {langObj.certifications && langObj.certifications.length > 0 && (
+                                                            <div className="mt-2 flex flex-wrap gap-1">
+                                                                {langObj.certifications.map((cert, certIndex) => (
+                                                                    <span key={certIndex} className="px-2 py-0.5 text-xs bg-green-600/30 text-green-300 rounded">
+                                                                        🏆 {cert}
+                                                                    </span>
+                                                                ))}
+                                                            </div>
+                                                        )}
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        );
+                                    })}
                                     {languages.length === 0 && <p className="text-gray-400 text-sm">Henüz dil eklenmemiş</p>}
                                 </div>
                             )}
