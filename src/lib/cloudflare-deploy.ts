@@ -50,12 +50,12 @@ export async function deployToCloudflare(
   try {
     // 1. Username'den subdomain oluştur
     const subdomain = createUsernameSlug(username);
-    
+
     const bucketName = process.env.R2_BUCKET_NAME || "user-sites";
-    
+
     // 2. HTML içeriğindeki R2 URL'lerini relative path'e çevir (published site için)
     const processedHtml = convertHtmlAssetsToRelativePaths(htmlContent);
-    
+
     // 3. R2'ye HTML dosyasını yükle
     await r2Client.send(
       new PutObjectCommand({
@@ -63,7 +63,7 @@ export async function deployToCloudflare(
         Key: `users/${userId}/site/${siteId}/index.html`,
         Body: processedHtml,
         ContentType: "text/html; charset=utf-8",
-        CacheControl: "public, max-age=3600",
+        CacheControl: "public, max-age=60", // 1 minute cache
       })
     );
 
@@ -74,7 +74,7 @@ export async function deployToCloudflare(
         Key: `users/${userId}/site/${siteId}/styles.css`,
         Body: cssContent,
         ContentType: "text/css; charset=utf-8",
-        CacheControl: "public, max-age=3600",
+        CacheControl: "public, max-age=60", // 1 minute cache
       })
     );
 
@@ -85,7 +85,7 @@ export async function deployToCloudflare(
         Key: `users/${userId}/site/${siteId}/script.js`,
         Body: jsContent,
         ContentType: "application/javascript; charset=utf-8",
-        CacheControl: "public, max-age=3600",
+        CacheControl: "public, max-age=60", // 1 minute cache
       })
     );
 
@@ -122,7 +122,7 @@ export async function unpublishFromCloudflare(
   try {
     const { DeleteObjectCommand } = await import("@aws-sdk/client-s3");
     const bucketName = process.env.R2_BUCKET_NAME || "user-sites";
-    
+
     // HTML, CSS ve JS dosyalarını sil
     const filesToDelete = [
       `users/${userId}/site/${siteId}/index.html`,

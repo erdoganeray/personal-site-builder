@@ -694,7 +694,7 @@ export default function MyInfo({ site, cvData, onDelete, onCVAnalyzed, deleting 
                                         });
                                         const data = await response.json();
                                         if (response.ok) {
-                                            alert(`Site başarıyla yeniden yayınlandı!\nURL: ${data.deployedUrl}`);
+                                            alert(`Site başarıyla yeniden yayınlandı!\nURL: ${data.cloudflareUrl}`);
                                             window.location.reload();
                                         } else {
                                             alert(data.error || "Site yayınlanamadı");

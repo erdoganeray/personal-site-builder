@@ -127,18 +127,9 @@
 # Geliştime Planı
 
 ## Genel İyileştirmeler
-- componentlerin sırasını drag and drop ile belirleyebilir
+- bilgilerimde foto eklerken iptal et i test ettiğimizde problem yoktu, ama foto silerken iptal et işlemi doğru çalışmıyor
 - preview/publish sync olduğunda warning çıkıyor, warning içeriği düzgün şekilde gösterilmeli
-- Loading state kontrolleri arttırılmalı
-- cv yükleme aşaması, ai ile siteniz oluşturuluyor aşaması, revize edilme aşamaları.. dashboarda örneğin cv analiz edilirken başka bir dashboard sayfasına gidip tekrar bilgilerim e girince cv analiz ediliyor aşaması kayboluyor ve yine cv yüklenme ekranı görünüyor anlık olarak, arkadaki analiz işlemi bitince yine olması gerektiği sayfayı yeniliyor.
-
-## Revise
-- Bilgilerime pp yükledin, site oluştururken Profil fotoğrafı olmayan hero oluştu, hero yu güncellediğinde pp doğru şekilde siteye entegre olmuyor.
-- revize hakkı dolunca revize isteyince uygun geri bildirimi veriyor ama next.js issue döndürüyor. döndürmesin.
-- Component kaldırma, component ekleme konusu üzerine çalışılmalı. Örneğin portfolio fotosu yokken site oluşturulunca portfolio fotoğrafı eklenince uyarı olmalı: "editöre gidin ve portfolio oluşturun".
-- Editördeki revizede tüm site yapay zekaya yazdırılıyor, bu hem işlemin çok uzun sürmesine hem de template sisteminin getirdiği standartlaşma kuralını bozuyor. 
-- Siteyi oluşturdun, editörden revize yaptın, bilgilerimden bir bilgiyi değiştirdin ve kaydettin, revize ile oluşturulmuş yeni site tasarımı korunmuyor. Bunun yerine ilk başta kendi oluşturduğu tasarıma geri dönüyor.
-- revise işleminde içerik değişimi yapılmamalı. herhangi içerik değişimi isteğinde kullanıcı bilgilerim e yönlendirilmeli.
+- Loading state kontrolleri arttırılmalı. cv yükleme aşaması, ai ile siteniz oluşturuluyor aşaması, revize edilme aşamaları.. dashboarda örneğin cv analiz edilirken başka bir dashboard sayfasına gidip tekrar bilgilerim e girince cv analiz ediliyor aşaması kayboluyor ve yine cv yüklenme ekranı görünüyor anlık olarak, arkadaki analiz işlemi bitince yine olması gerektiği sayfayı yeniliyor.
 
 ## Aboneliklerim
 - dashboard aboneliklerim sayfası aktif hale getirilmeli
@@ -147,9 +138,23 @@
 - Subdomain çakışması kontrolü eklenmeli
 - dashboard>domain sayfası işlevli hale getirilmeli
 
+## Revise
+- Bilgilerime pp yükledin, site oluştururken Profil fotoğrafı olmayan hero oluştu, hero yu güncellediğinde pp doğru şekilde siteye entegre olmuyor.
+- revize hakkı dolunca revize isteyince uygun geri bildirimi veriyor ama next.js issue döndürüyor. döndürmesin.
+- Component kaldırma, component ekleme konusu üzerine çalışılmalı. Örneğin portfolio fotosu yokken site oluşturulunca portfolio fotoğrafı eklenince uyarı olmalı: "editöre gidin ve portfolio oluşturun".
+- Editördeki revizede tüm site yapay zekaya yazdırılıyor, bu hem işlemin çok uzun sürmesine hem de template sisteminin getirdiği standartlaşma kuralını bozuyor. 
+- Siteyi oluşturdun, editörden revize yaptın, bilgilerimden bir bilgiyi değiştirdin ve kaydettin, revize ile oluşturulmuş yeni site tasarımı korunmuyor. Bunun yerine ilk başta kendi oluşturduğu tasarıma geri dönüyor.
+- revise işleminde içerik değişimi yapılmamalı. herhangi içerik değişimi isteğinde kullanıcı bilgilerim e yönlendirilmeli.
+- componentlerin sırası, component kaldırma, component ekleme, component tasarımını değiştirme
+
 ## Rollback
 - hem preview hem de publish için rollback sistemi ve ui tasarımı
 
-## Icon, Font, Color Palette
+## Icon, Font, Color Palette, Stock Image
 - site oluşturma aşamasına hazır icon, font desteği ekle
 - gemini api color sistemi bazen renklerin birbiri ile karışmasına sebep oluyor. color palette sistemi ekle
+- icon, font, color palette, stock image revise si doğru çalışmalı
+
+## UI Güncellemeleri
+- landing sitenin tüm makyajını güncelle
+- yeniden yayınla ui nın tasarımını unutma
