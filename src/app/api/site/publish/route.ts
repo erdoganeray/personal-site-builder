@@ -56,22 +56,17 @@ export async function POST(req: NextRequest) {
       );
     }
 
-    // 6. Username var mı kontrol et, yoksa email'den oluştur
-    let username = site.user.username;
-    if (!username) {
-      // Username yoksa email'den oluştur
-      username = site.user.email.split("@")[0];
-
-      // Veritabanına kaydet
-      await prisma.user.update({
-        where: { id: site.user.id },
-        data: { username },
-      });
+    // 6. Subdomain kontrolü - site'da subdomain var mı?
+    if (!site.subdomain) {
+      return NextResponse.json(
+        { error: "Lütfen önce Domain Yönetimi sayfasından bir subdomain belirleyin" },
+        { status: 400 }
+      );
     }
 
     // 7. Cloudflare'e deploy et (HTML, CSS, JS)
     const deployment = await deployToCloudflare(
-      username,
+      site.subdomain, // Use the subdomain from site record
       site.user.id,
       siteId,
       site.htmlContent,
@@ -107,6 +102,7 @@ export async function POST(req: NextRequest) {
         subdomain: deployment.subdomain,
         cloudflareUrl: deployment.url,
         publishedAt: new Date(),
+        subdomainReservationExpiresAt: null, // Clear reservation when published
         // Save published content snapshots for change detection
         publishedHtmlContent: site.htmlContent,
         publishedCssContent: site.cssContent,

@@ -73,15 +73,31 @@ export async function POST(req: NextRequest) {
       }
     }
 
-    // 7. Veritabanını güncelle - yayın durumunu kaldır
+    // 7. Calculate reservation expiration based on user's plan
+    const user = await prisma.user.findUnique({
+      where: { id: site.user.id },
+      select: { planType: true },
+    });
+
+    const reservationDays = user?.planType === "PAID" ? 30 : 7; // 30 days for PAID, 7 days for FREE
+    const reservationExpiresAt = new Date();
+    reservationExpiresAt.setDate(reservationExpiresAt.getDate() + reservationDays);
+
+    // 8. Veritabanını güncelle - yayın durumunu kaldır ama subdomain'i rezerve et
+    const updateData: any = {
+      status: "previewed",
+      cloudflareUrl: null,
+      publishedAt: null,
+    };
+
+    // If subdomain exists, set/reset reservation timer
+    if (site.subdomain) {
+      updateData.subdomainReservationExpiresAt = reservationExpiresAt;
+    }
+
     const updatedSite = await prisma.site.update({
       where: { id: siteId },
-      data: {
-        status: "previewed",
-        subdomain: null,
-        cloudflareUrl: null,
-        publishedAt: null,
-      },
+      data: updateData,
     });
 
     // 7.5. Recalculate storage to remove HTML, CSS, JS file sizes

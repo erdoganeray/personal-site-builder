@@ -14,7 +14,6 @@ model User {
   name         String?
   createdAt    DateTime @default(now())
   updatedAt    DateTime @updatedAt
-  username     String?  @unique
   storageUsed  BigInt   @default(0) // Storage used in bytes
   storageLimit BigInt   @default(104857600) // 100MB default limit (100 * 1024 * 1024)
   
@@ -44,6 +43,7 @@ model Site {
   publishedAt    DateTime?
   cloudflareUrl  String?
   subdomain      String?   @unique
+  subdomainReservationExpiresAt DateTime? // When subdomain reservation expires after unpublish
   
   // Published content snapshots - used for change detection
   publishedHtmlContent  String?

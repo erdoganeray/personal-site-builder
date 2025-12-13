@@ -129,8 +129,9 @@
 ## Genel İyileştirmeler
 
 ## Subdomain - Custom Domain
-- Subdomain çakışması kontrolü eklenmeli
-- dashboard>domain sayfası işlevli hale getirilmeli
+- aylık hakların ya da subdomain rezervasyonunun süresi nasıl kontrol edilmeli? kullanıcıların aksiyonlarından ziyade projenin dakika başı bu kontrolü yapması ne kadar yük olur?
+
+- kalan düzenleme hakkı ui databaseden veriyi çekebildikten sonra yükleniyor, storage ui gibi ui olsun veri yüklenince veri gösterilmeye başlansın.
 
 ## Revise
 - Bilgilerime pp yükledin, site oluştururken Profil fotoğrafı olmayan hero oluştu, hero yu güncellediğinde pp doğru şekilde siteye entegre olmuyor.

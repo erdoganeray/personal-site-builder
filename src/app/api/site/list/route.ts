@@ -33,6 +33,7 @@ export async function GET(request: NextRequest) {
         publishedAt: true,
         cloudflareUrl: true,
         subdomain: true,
+        subdomainReservationExpiresAt: true,
         publishedHtmlContent: true,
         publishedCssContent: true,
         publishedJsContent: true,
