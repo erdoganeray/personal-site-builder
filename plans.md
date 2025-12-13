@@ -129,9 +129,6 @@
 ## Genel İyileştirmeler
 
 ## Subdomain - Custom Domain
-- aylık hakların ya da subdomain rezervasyonunun süresi nasıl kontrol edilmeli? kullanıcıların aksiyonlarından ziyade projenin dakika başı bu kontrolü yapması ne kadar yük olur?
-
-- kalan düzenleme hakkı ui databaseden veriyi çekebildikten sonra yükleniyor, storage ui gibi ui olsun veri yüklenince veri gösterilmeye başlansın.
 
 ## Revise
 - Bilgilerime pp yükledin, site oluştururken Profil fotoğrafı olmayan hero oluştu, hero yu güncellediğinde pp doğru şekilde siteye entegre olmuyor.
@@ -165,3 +162,10 @@
 - landing page
 - free plan
 - paid plan
+
+## Versel Cron Job
+- landing page i vercel e deploy ettikten sonra yapılacak
+- /api/cron/cleanup-reservations/route.ts endpoint'i oluştur (süresi dolmuş subdomain rezervasyonlarını temizler)
+- vercel.json dosyasına cron job ekle (her 6 saatte bir çalışacak şekilde)
+- CRON_SECRET environment variable'ı Vercel'e ekle (güvenlik için)
+- Deploy sonrası Vercel Dashboard'dan manuel test et

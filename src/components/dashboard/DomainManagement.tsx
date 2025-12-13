@@ -268,7 +268,33 @@ export default function DomainManagement() {
             <div className="space-y-6">
                 <div>
                     <h2 className="text-2xl font-bold text-white mb-2">Domain Yönetimi</h2>
-                    <p className="text-gray-400">Yükleniyor...</p>
+                    <p className="text-gray-400">
+                        Subdomain ve yayınlama ayarlarınızı buradan yönetebilirsiniz
+                    </p>
+                </div>
+
+                {/* Skeleton for Subdomain Settings Card */}
+                <div className="bg-gray-800 rounded-xl border border-gray-700 p-6 animate-pulse">
+                    <div className="h-7 bg-gray-700 rounded w-48 mb-4"></div>
+                    <div className="space-y-4">
+                        <div>
+                            <div className="h-4 bg-gray-700 rounded w-24 mb-2"></div>
+                            <div className="flex gap-2">
+                                <div className="flex-1 h-12 bg-gray-700 rounded-lg"></div>
+                                <div className="h-12 bg-gray-700 rounded-lg w-48"></div>
+                            </div>
+                        </div>
+                        <div className="h-12 bg-gray-700 rounded-lg w-full"></div>
+                    </div>
+                </div>
+
+                {/* Skeleton for Site Status Card */}
+                <div className="bg-gray-800 rounded-xl border border-gray-700 p-6 animate-pulse">
+                    <div className="h-7 bg-gray-700 rounded w-32 mb-4"></div>
+                    <div className="space-y-4">
+                        <div className="h-10 bg-gray-700 rounded-full w-32"></div>
+                        <div className="h-12 bg-gray-700 rounded-lg w-full"></div>
+                    </div>
                 </div>
             </div>
         );

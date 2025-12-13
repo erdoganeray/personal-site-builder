@@ -151,7 +151,75 @@ export default function Subscriptions() {
             <div className="space-y-6">
                 <div>
                     <h2 className="text-2xl font-bold text-white mb-2">Aboneliklerim</h2>
-                    <p className="text-gray-400">Yükleniyor...</p>
+                    <p className="text-gray-400">Plan bilgilerinizi ve kullanım durumunuzu görüntüleyin</p>
+                </div>
+
+                {/* Skeleton for Current Plan Card */}
+                <div className="bg-gradient-to-br from-blue-900/50 to-purple-900/50 rounded-xl border border-blue-700 p-6 animate-pulse">
+                    <div className="flex items-center justify-between mb-4">
+                        <div>
+                            <div className="h-8 bg-gray-700 rounded w-32 mb-2"></div>
+                            <div className="h-5 bg-gray-700 rounded w-20"></div>
+                        </div>
+                        <div className="h-10 bg-gray-700 rounded-full w-32"></div>
+                    </div>
+
+                    {/* Skeleton for Usage Stats */}
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-6">
+                        <div className="bg-gray-800/50 rounded-lg p-4">
+                            <div className="h-4 bg-gray-700 rounded w-32 mb-2"></div>
+                            <div className="h-10 bg-gray-700 rounded w-24 mb-2"></div>
+                            <div className="h-2 bg-gray-700 rounded mb-2"></div>
+                            <div className="h-3 bg-gray-700 rounded w-40"></div>
+                        </div>
+                        <div className="bg-gray-800/50 rounded-lg p-4">
+                            <div className="h-4 bg-gray-700 rounded w-32 mb-2"></div>
+                            <div className="h-10 bg-gray-700 rounded w-24 mb-2"></div>
+                            <div className="h-2 bg-gray-700 rounded mb-2"></div>
+                            <div className="h-3 bg-gray-700 rounded w-40"></div>
+                        </div>
+                        <div className="bg-gray-800/50 rounded-lg p-4">
+                            <div className="h-4 bg-gray-700 rounded w-32 mb-2"></div>
+                            <div className="h-10 bg-gray-700 rounded w-24 mb-2"></div>
+                            <div className="h-3 bg-gray-700 rounded w-40 mt-2"></div>
+                        </div>
+                        <div className="bg-gray-800/50 rounded-lg p-4 md:col-span-2">
+                            <div className="h-4 bg-gray-700 rounded w-32 mb-2"></div>
+                            <div className="h-8 bg-gray-700 rounded w-24 mb-2"></div>
+                            <div className="h-3 bg-gray-700 rounded w-48"></div>
+                        </div>
+                    </div>
+                </div>
+
+                {/* Skeleton for Plan Comparison */}
+                <div>
+                    <div className="h-7 bg-gray-700 rounded w-48 mb-4"></div>
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                        <div className="bg-gray-800 rounded-xl border border-gray-700 p-6">
+                            <div className="h-6 bg-gray-700 rounded w-24 mb-2"></div>
+                            <div className="h-10 bg-gray-700 rounded w-20 mb-4"></div>
+                        </div>
+                        <div className="bg-gray-800 rounded-xl border border-gray-700 p-6">
+                            <div className="h-6 bg-gray-700 rounded w-24 mb-2"></div>
+                            <div className="h-10 bg-gray-700 rounded w-20 mb-4"></div>
+                        </div>
+                    </div>
+
+                    {/* Skeleton for Feature Table */}
+                    <div className="mt-6 bg-gray-800 rounded-xl border border-gray-700 overflow-hidden">
+                        <div className="bg-gray-700 p-4">
+                            <div className="h-5 bg-gray-600 rounded w-32"></div>
+                        </div>
+                        <div className="divide-y divide-gray-700">
+                            {[1, 2, 3, 4, 5].map((i) => (
+                                <div key={i} className="p-4 flex gap-4">
+                                    <div className="h-4 bg-gray-700 rounded flex-1"></div>
+                                    <div className="h-4 bg-gray-700 rounded w-20"></div>
+                                    <div className="h-4 bg-gray-700 rounded w-20"></div>
+                                </div>
+                            ))}
+                        </div>
+                    </div>
                 </div>
             </div>
         );
