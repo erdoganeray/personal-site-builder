@@ -127,7 +127,7 @@
 # Geliştime Planı
 
 ## Genel İyileştirmeler
-- bilgilerimde foto eklerken iptal et i test ettiğimizde problem yoktu, ama foto silerken iptal et işlemi doğru çalışmıyor
+- cv yükle, site oluştur, foto eklemeden publish et, sadece cv boyutu calculate ediliyor, html css js dosyaları calculate edilmiyor
 - preview/publish sync olduğunda warning çıkıyor, warning içeriği düzgün şekilde gösterilmeli
 - Loading state kontrolleri arttırılmalı. cv yükleme aşaması, ai ile siteniz oluşturuluyor aşaması, revize edilme aşamaları.. dashboarda örneğin cv analiz edilirken başka bir dashboard sayfasına gidip tekrar bilgilerim e girince cv analiz ediliyor aşaması kayboluyor ve yine cv yüklenme ekranı görünüyor anlık olarak, arkadaki analiz işlemi bitince yine olması gerektiği sayfayı yeniliyor.
 
@@ -154,6 +154,7 @@
 - site oluşturma aşamasına hazır icon, font desteği ekle
 - gemini api color sistemi bazen renklerin birbiri ile karışmasına sebep oluyor. color palette sistemi ekle
 - icon, font, color palette, stock image revise si doğru çalışmalı
+- site oluşturulunca tarayıcı tab inde görünen isim logo ne olacak?
 
 ## UI Güncellemeleri
 - landing sitenin tüm makyajını güncelle

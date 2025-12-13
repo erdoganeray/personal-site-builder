@@ -52,6 +52,11 @@ export default function MyInfo({ site, cvData, onDelete, onCVAnalyzed, deleting 
     const [profilePhotoPreview, setProfilePhotoPreview] = useState<string>("");
     const [pendingPortfolio, setPendingPortfolio] = useState<Array<{ file: File; preview: string }>>([]);
 
+    // Deferred deletion state - mark for deletion, actual delete happens on save
+    const [photoMarkedForDeletion, setPhotoMarkedForDeletion] = useState(false);
+    const [portfolioMarkedForDeletion, setPortfolioMarkedForDeletion] = useState<string[]>([]); // Array of imageUrls to delete
+
+
     // Storage refresh key - increment to force StorageIndicator to refresh
     const [storageRefreshKey, setStorageRefreshKey] = useState(0);
     const refreshStorage = () => setStorageRefreshKey(prev => prev + 1);
@@ -188,6 +193,31 @@ export default function MyInfo({ site, cvData, onDelete, onCVAnalyzed, deleting 
 
         setSaving(true);
         try {
+            // STEP 0: Delete profile photo if marked for deletion
+            if (photoMarkedForDeletion && originalStateRef.current?.profilePhotoUrl) {
+                setUploadingPhoto(true);
+                try {
+                    const response = await fetch(`/api/upload/profile-photo?url=${encodeURIComponent(originalStateRef.current.profilePhotoUrl)}`, {
+                        method: "DELETE",
+                    });
+
+                    const data = await response.json();
+
+                    if (response.ok) {
+                        console.log("✅ Profile photo deleted from Cloudflare");
+                        refreshStorage(); // Refresh storage indicator
+                    } else {
+                        console.error("Profile photo deletion failed:", data.error);
+                        // Continue with save even if deletion fails
+                    }
+                } catch (error) {
+                    console.error("Profile photo deletion error:", error);
+                    // Continue with save even if deletion fails
+                } finally {
+                    setUploadingPhoto(false);
+                }
+            }
+
             // STEP 1: Upload pending profile photo if exists
             let finalProfilePhotoUrl = profilePhotoUrl;
             if (pendingProfilePhoto) {
@@ -206,6 +236,25 @@ export default function MyInfo({ site, cvData, onDelete, onCVAnalyzed, deleting 
                     if (photoResponse.ok) {
                         finalProfilePhotoUrl = photoData.url;
                         console.log("✅ Profile photo uploaded:", finalProfilePhotoUrl);
+
+                        // Delete old photo from Cloudflare if it exists
+                        if (originalStateRef.current?.profilePhotoUrl) {
+                            try {
+                                const deleteResponse = await fetch(`/api/upload/profile-photo?url=${encodeURIComponent(originalStateRef.current.profilePhotoUrl)}`, {
+                                    method: "DELETE",
+                                });
+
+                                if (deleteResponse.ok) {
+                                    console.log("✅ Old profile photo deleted from Cloudflare");
+                                } else {
+                                    console.error("Old profile photo deletion failed");
+                                    // Continue with save even if old photo deletion fails
+                                }
+                            } catch (error) {
+                                console.error("Old profile photo deletion error:", error);
+                                // Continue with save even if old photo deletion fails
+                            }
+                        }
                     } else {
                         throw new Error(photoData.error || "Profil fotoğrafı yüklenemedi");
                     }
@@ -220,7 +269,35 @@ export default function MyInfo({ site, cvData, onDelete, onCVAnalyzed, deleting 
                 }
             }
 
+            // STEP 1.5: Delete portfolio images marked for deletion
+            if (portfolioMarkedForDeletion.length > 0) {
+                setUploadingPortfolio(true);
+                try {
+                    for (const imageUrl of portfolioMarkedForDeletion) {
+                        try {
+                            const response = await fetch(`/api/upload/portfolio?url=${encodeURIComponent(imageUrl)}`, {
+                                method: "DELETE",
+                            });
+
+                            if (response.ok) {
+                                console.log("✅ Portfolio image deleted from Cloudflare:", imageUrl);
+                            } else {
+                                const data = await response.json();
+                                console.error("Portfolio image deletion failed:", data.error);
+                                // Continue with other deletions even if one fails
+                            }
+                        } catch (error) {
+                            console.error("Portfolio image deletion error:", error);
+                            // Continue with other deletions even if one fails
+                        }
+                    }
+                } finally {
+                    setUploadingPortfolio(false);
+                }
+            }
+
             // STEP 2: Upload pending portfolio files if exist
+
             let finalPortfolio = [...portfolio];
             if (pendingPortfolio.length > 0) {
                 setUploadingPortfolio(true);
@@ -321,8 +398,13 @@ export default function MyInfo({ site, cvData, onDelete, onCVAnalyzed, deleting 
                 });
                 setPendingPortfolio([]);
 
+                // Clear deletion mark
+                setPhotoMarkedForDeletion(false);
+                setPortfolioMarkedForDeletion([]); // Clear portfolio deletion marks
+
                 alert("Bilgileriniz başarıyla kaydedildi!");
                 setIsEditing(false);
+
                 window.location.reload(); // Refresh to show updated data
             } else {
                 alert(data.error || "Bilgiler kaydedilemedi");
@@ -343,8 +425,11 @@ export default function MyInfo({ site, cvData, onDelete, onCVAnalyzed, deleting 
             summary, experience, education, skills, languages,
             profilePhotoUrl, portfolio
         };
+        setPhotoMarkedForDeletion(false); // Reset deletion mark
+        setPortfolioMarkedForDeletion([]); // Reset portfolio deletion marks
         setIsEditing(true);
     };
+
 
     // Handle cancel - restore original state
     const handleCancel = () => {
@@ -382,8 +467,13 @@ export default function MyInfo({ site, cvData, onDelete, onCVAnalyzed, deleting 
         });
         setPendingPortfolio([]);
 
+        // Clear deletion mark
+        setPhotoMarkedForDeletion(false);
+        setPortfolioMarkedForDeletion([]); // Clear portfolio deletion marks
+
         setIsEditing(false);
     };
+
 
     const addExperience = () => {
         setExperience([...experience, { company: "", position: "", duration: "", description: "" }]);
@@ -500,34 +590,17 @@ export default function MyInfo({ site, cvData, onDelete, onCVAnalyzed, deleting 
             return;
         }
 
-        // If there's a saved photo, delete it from Cloudflare
+        // If there's a saved photo, mark it for deletion (don't delete from Cloudflare yet)
         if (!profilePhotoUrl) return;
 
         if (!confirm("Profil fotoğrafını silmek istediğinizden emin misiniz?")) {
             return;
         }
 
-        setUploadingPhoto(true);
-        try {
-            const response = await fetch(`/api/upload/profile-photo?url=${encodeURIComponent(profilePhotoUrl)}`, {
-                method: "DELETE",
-            });
-
-            const data = await response.json();
-
-            if (response.ok) {
-                setProfilePhotoUrl("");
-                refreshStorage(); // Refresh storage indicator
-                alert("Profil fotoğrafı silindi! Değişiklikleri kaydetmeyi unutmayın.");
-            } else {
-                alert(data.error || "Fotoğraf silinemedi");
-            }
-        } catch (error) {
-            console.error("Error deleting photo:", error);
-            alert("Bir hata oluştu");
-        } finally {
-            setUploadingPhoto(false);
-        }
+        // Mark for deletion instead of deleting immediately
+        // Actual deletion will happen on save
+        setPhotoMarkedForDeletion(true);
+        setProfilePhotoUrl(""); // Clear from UI
     };
 
     const addLanguage = () => {
@@ -628,33 +701,22 @@ export default function MyInfo({ site, cvData, onDelete, onCVAnalyzed, deleting 
         setEditingPortfolioIndex(null);
     };
 
-    const handlePortfolioDelete = async (imageUrl: string, index: number) => {
+    const handlePortfolioDelete = (imageUrl: string, index: number) => {
         if (!confirm("Bu portfolio fotoğrafını silmek istediğinizden emin misiniz?")) {
             return;
         }
 
-        setUploadingPortfolio(true);
-        try {
-            const response = await fetch(`/api/upload/portfolio?url=${encodeURIComponent(imageUrl)}`, {
-                method: "DELETE",
-            });
+        // DEFERRED DELETION: Mark for deletion instead of deleting immediately
+        // Actual deletion will happen on save
+        setPortfolioMarkedForDeletion(prev => [...prev, imageUrl]);
 
-            const data = await response.json();
+        // Remove from UI state immediately (for visual feedback)
+        setPortfolio(portfolio.filter((_, i) => i !== index));
 
-            if (response.ok) {
-                setPortfolio(portfolio.filter((_, i) => i !== index));
-                refreshStorage(); // Refresh storage indicator
-                alert("Portfolio fotoğrafı silindi! Değişiklikleri kaydetmeyi unutmayın.");
-            } else {
-                alert(data.error || "Fotoğraf silinemedi");
-            }
-        } catch (error) {
-            console.error("Error deleting portfolio image:", error);
-            alert("Bir hata oluştu");
-        } finally {
-            setUploadingPortfolio(false);
-        }
+        // Show info message
+        alert("Portfolio fotoğrafı kaldırıldı. Değişiklikleri kaydetmeyi unutmayın!");
     };
+
 
     return (
         <div className="space-y-6">
@@ -817,8 +879,8 @@ export default function MyInfo({ site, cvData, onDelete, onCVAnalyzed, deleting 
                             {/* Profile Photo Section */}
                             <div className="mb-6 flex flex-col items-center">
                                 <div className="w-32 h-32 rounded-full bg-gray-600 flex items-center justify-center mb-3 overflow-hidden border-4 border-gray-500">
-                                    {/* Show preview if pending photo exists, otherwise show saved photo */}
-                                    {profilePhotoPreview || profilePhotoUrl ? (
+                                    {/* Show preview if pending photo exists, otherwise show saved photo (unless marked for deletion) */}
+                                    {profilePhotoPreview || (!photoMarkedForDeletion && profilePhotoUrl) ? (
                                         <img
                                             src={profilePhotoPreview || profilePhotoUrl}
                                             alt="Profile"
@@ -862,8 +924,8 @@ export default function MyInfo({ site, cvData, onDelete, onCVAnalyzed, deleting 
                                                 )}
                                             </span>
                                         </label>
-                                        {/* Show delete button if there's a saved photo OR a pending photo */}
-                                        {(profilePhotoUrl || pendingProfilePhoto) && !uploadingPhoto && (
+                                        {/* Show delete button if there's a saved photo (not marked for deletion) OR a pending photo */}
+                                        {((profilePhotoUrl && !photoMarkedForDeletion) || pendingProfilePhoto) && !uploadingPhoto && (
                                             <button
                                                 onClick={handlePhotoDelete}
                                                 className="inline-flex items-center gap-2 px-4 py-2 bg-red-600 hover:bg-red-700 text-white rounded-lg text-sm font-medium transition-colors"
