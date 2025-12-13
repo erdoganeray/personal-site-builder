@@ -3,6 +3,7 @@ import { getServerSession } from "next-auth";
 import { authOptions } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
 import { unpublishFromCloudflare, deleteKVMapping } from "@/lib/cloudflare-deploy";
+import { recalculateUserStorage } from "@/lib/storage-calculator";
 
 export async function POST(req: NextRequest) {
   try {
@@ -82,6 +83,15 @@ export async function POST(req: NextRequest) {
         publishedAt: null,
       },
     });
+
+    // 7.5. Recalculate storage to remove HTML, CSS, JS file sizes
+    try {
+      await recalculateUserStorage(site.user.id);
+      console.log(`✅ Storage recalculated for user ${site.user.id} after unpublish`);
+    } catch (storageError) {
+      console.error("⚠️ Storage recalculation failed (non-blocking):", storageError);
+      // Don't block unpublish flow if storage calculation fails
+    }
 
     // 8. Başarılı yanıt
     return NextResponse.json({

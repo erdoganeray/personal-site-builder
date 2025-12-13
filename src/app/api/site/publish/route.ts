@@ -3,6 +3,7 @@ import { getServerSession } from "next-auth";
 import { authOptions } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
 import { deployToCloudflare, updateKVMapping } from "@/lib/cloudflare-deploy";
+import { recalculateUserStorage } from "@/lib/storage-calculator";
 
 export async function POST(req: NextRequest) {
   try {
@@ -110,9 +111,18 @@ export async function POST(req: NextRequest) {
         publishedHtmlContent: site.htmlContent,
         publishedCssContent: site.cssContent,
         publishedJsContent: site.jsContent,
-        publishedCvContent: site.cvContent,
+        publishedCvContent: site.cvContent as any,
       },
     });
+
+    // 8.5. Recalculate storage to include HTML, CSS, JS files
+    try {
+      await recalculateUserStorage(site.user.id);
+      console.log(`✅ Storage recalculated for user ${site.user.id} after publish`);
+    } catch (storageError) {
+      console.error("⚠️ Storage recalculation failed (non-blocking):", storageError);
+      // Don't block publish flow if storage calculation fails
+    }
 
     // 9. Başarılı yanıt
     return NextResponse.json({
