@@ -5,6 +5,12 @@ import { useRouter } from "next/navigation";
 import { hasUnpublishedChanges } from "@/lib/change-detection";
 import { convertRelativeAssetsToAbsolute } from "@/lib/iframe-utils";
 
+interface SubscriptionUsage {
+    edits: {
+        remaining: number;
+        limit: number;
+    };
+}
 
 interface MySiteProps {
     site: any;
@@ -14,11 +20,31 @@ interface MySiteProps {
 export default function MySite({ site, onRefresh }: MySiteProps) {
     const router = useRouter();
     const [generating, setGenerating] = useState(false);
-    const [publishing, setPublishing] = useState(false);
-    const [unpublishing, setUnpublishing] = useState(false);
     const [deletingPreview, setDeletingPreview] = useState(false);
     const [customPrompt, setCustomPrompt] = useState("");
     const [viewMode, setViewMode] = useState<"desktop" | "tablet" | "mobile">("desktop");
+    const [subscriptionUsage, setSubscriptionUsage] = useState<SubscriptionUsage | null>(null);
+
+    // Fetch subscription usage
+    useEffect(() => {
+        const fetchSubscriptionUsage = async () => {
+            try {
+                const response = await fetch("/api/subscription/info");
+                if (response.ok) {
+                    const data = await response.json();
+                    setSubscriptionUsage({
+                        edits: {
+                            remaining: data.usage.edits.remaining,
+                            limit: data.usage.edits.limit,
+                        },
+                    });
+                }
+            } catch (error) {
+                console.error("Error fetching subscription usage:", error);
+            }
+        };
+        fetchSubscriptionUsage();
+    }, []);
 
     // Check for unpublished changes
     const hasChanges = site ? hasUnpublishedChanges(site) : false;
@@ -103,82 +129,6 @@ export default function MySite({ site, onRefresh }: MySiteProps) {
             alert("Bir hata oluştu. Lütfen tekrar deneyin.");
         } finally {
             setGenerating(false);
-        }
-    };
-
-    const handlePublish = async () => {
-        if (!site) return;
-
-        if (!site.htmlContent) {
-            alert("Lütfen önce sitenizi oluşturun!");
-            return;
-        }
-
-        if (!confirm("Sitenizi yayınlamak istediğinizden emin misiniz?")) {
-            return;
-        }
-
-        setPublishing(true);
-        try {
-            const response = await fetch("/api/site/publish", {
-                method: "POST",
-                headers: {
-                    "Content-Type": "application/json",
-                },
-                body: JSON.stringify({
-                    siteId: site.id,
-                }),
-            });
-
-            const data = await response.json();
-
-            if (response.ok) {
-                alert(`Site başarıyla yayınlandı!\nURL: ${data.cloudflareUrl}`);
-                onRefresh();
-                window.open(data.cloudflareUrl, "_blank");
-            } else {
-                alert(data.error || "Site yayınlanamadı");
-            }
-        } catch (error) {
-            console.error("Yayınlama hatası:", error);
-            alert("Bir hata oluştu. Lütfen tekrar deneyin.");
-        } finally {
-            setPublishing(false);
-        }
-    };
-
-    const handleUnpublish = async () => {
-        if (!site) return;
-
-        if (!confirm("Sitenizi yayından kaldırmak istediğinizden emin misiniz?")) {
-            return;
-        }
-
-        setUnpublishing(true);
-        try {
-            const response = await fetch("/api/site/unpublish", {
-                method: "POST",
-                headers: {
-                    "Content-Type": "application/json",
-                },
-                body: JSON.stringify({
-                    siteId: site.id,
-                }),
-            });
-
-            const data = await response.json();
-
-            if (response.ok) {
-                alert("Site yayından kaldırıldı!");
-                onRefresh();
-            } else {
-                alert(data.error || "Site yayından kaldırılamadı");
-            }
-        } catch (error) {
-            console.error("Yayından kaldırma hatası:", error);
-            alert("Bir hata oluştu. Lütfen tekrar deneyin.");
-        } finally {
-            setUnpublishing(false);
         }
     };
 
@@ -271,16 +221,12 @@ export default function MySite({ site, onRefresh }: MySiteProps) {
                                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
                             </svg>
                             <div className="flex-1">
-                                <p className="text-yellow-300 font-semibold mb-3">
+                                <p className="text-yellow-300 font-semibold mb-1">
                                     ⚠️ Yayınlanan site son değişiklikleri içermiyor
                                 </p>
-                                <button
-                                    onClick={handlePublish}
-                                    disabled={publishing}
-                                    className="bg-yellow-600 hover:bg-yellow-700 disabled:bg-gray-400 text-white font-semibold py-2 px-4 rounded-lg transition-colors duration-200 text-sm"
-                                >
-                                    {publishing ? "Yayınlanıyor..." : "Yeniden Yayınla"}
-                                </button>
+                                <p className="text-sm text-yellow-200">
+                                    Değişikliklerinizi yayınlamak için Aboneliklerim sayfasına gidin.
+                                </p>
                             </div>
                         </div>
                     </div>
@@ -300,34 +246,15 @@ export default function MySite({ site, onRefresh }: MySiteProps) {
                     </div>
                 )}
 
-                {/* Action Buttons in Site Status */}
-                <div className="space-y-3 mt-4">
-                    {site.htmlContent ? (
-                        <>
-                            {/* Site oluşturulmuş ama yayınlanmamış */}
-                            {site.status !== "published" && (
-                                <button
-                                    onClick={handlePublish}
-                                    disabled={publishing}
-                                    className="w-full bg-gradient-to-r from-green-600 to-emerald-600 hover:from-green-700 hover:to-emerald-700 disabled:from-gray-400 disabled:to-gray-500 text-white font-bold py-4 px-6 rounded-lg transition-all duration-200"
-                                >
-                                    {publishing ? "Yayınlanıyor..." : "Beğendim, Yayınla!"}
-                                </button>
-                            )}
-
-                            {/* Site yayınlanmış */}
-                            {site.status === "published" && (
-                                <button
-                                    onClick={handleUnpublish}
-                                    disabled={unpublishing}
-                                    className="w-full bg-red-600 hover:bg-red-700 disabled:bg-gray-400 text-white font-bold py-4 px-6 rounded-lg transition-colors duration-200"
-                                >
-                                    {unpublishing ? "Kaldırılıyor..." : "Yayından Kaldır"}
-                                </button>
-                            )}
-                        </>
-                    ) : null}
-                </div>
+                {/* Subscription Usage Info */}
+                {subscriptionUsage && (
+                    <div className="bg-blue-900/30 border border-blue-700 rounded-lg p-4 mt-4">
+                        <p className="text-sm text-gray-400 mb-1">Kalan Düzenleme Hakkı</p>
+                        <p className="text-2xl font-bold text-white">
+                            {subscriptionUsage.edits.remaining}/{subscriptionUsage.edits.limit}
+                        </p>
+                    </div>
+                )}
             </div>
 
             {/* Preview Section */}

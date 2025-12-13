@@ -127,10 +127,6 @@
 # Geliştime Planı
 
 ## Genel İyileştirmeler
-- Loading state kontrolleri arttırılmalı. cv yükleme aşaması, ai ile siteniz oluşturuluyor aşaması, revize edilme aşamaları (editordeki). dashboarda örneğin cv analiz edilirken başka bir dashboard sayfasına gidip tekrar bilgilerim e girince cv analiz ediliyor aşaması kayboluyor ve yine cv yüklenme ekranı görünüyor anlık olarak, arkadaki analiz işlemi bitince yine olması gerektiği sayfayı yeniliyor.
-
-## Aboneliklerim
-- dashboard aboneliklerim sayfası aktif hale getirilmeli
 
 ## Subdomain - Custom Domain
 - Subdomain çakışması kontrolü eklenmeli
@@ -147,6 +143,8 @@
 
 ## Rollback
 - hem preview hem de publish için rollback sistemi ve ui tasarımı
+- version history (aboneliklerimdeki tablodaki değerleri de işlevsel hale getir)
+- domain rezevasyonu (aboneliklerimdeki tablodaki değerleri de işlevsel hale getir)
 
 ## Icon, Font, Color Palette, Stock Image
 - site oluşturma aşamasına hazır icon, font desteği ekle
@@ -160,3 +158,9 @@
 
 ## Performans İyileştirmeleri
 - Kaydet butonunda muhtemelen çok fazla işlem oluyor ve ortalama 15 saniye sürüyor. Oldukça uzun bir süre.
+- Loading state geliştirmeleri
+
+## SEO İyileştirmeleri
+- landing page
+- free plan
+- paid plan

@@ -65,7 +65,7 @@ export async function POST(req: NextRequest) {
       data: { status: "generating" },
     });
 
-    // 6. CV verisi zaten JSON formatında
+    // 7. CV verisi zaten JSON formatında
     let cvData: CVData;
     try {
       cvData = site.cvContent as unknown as CVData;
@@ -84,7 +84,7 @@ export async function POST(req: NextRequest) {
       );
     }
 
-    // 7. Gemini ile tasarım planını oluştur (renk + component seçimi)
+    // 8. Gemini ile tasarım planını oluştur (renk + component seçimi)
     console.log("Analyzing site design with Gemini...");
     let designPlan;
     try {
@@ -107,7 +107,7 @@ export async function POST(req: NextRequest) {
       );
     }
 
-    // 8. Seçilen template'leri al ve CV verileriyle doldur
+    // 9. Seçilen template'leri al ve CV verileriyle doldur
     console.log("Populating templates with CV data...");
     let finalHtml = '';
     let finalCss = '';
@@ -130,14 +130,14 @@ export async function POST(req: NextRequest) {
       // Her component için template'i doldur
       for (const selected of designPlan.selectedComponents) {
         const template = getTemplateById(selected.templateId);
-        
+
         if (!template) {
           console.warn(`Template not found: ${selected.templateId}`);
           continue;
         }
 
         const populated = populateTemplate(template, cvData, designPlan.themeColors, designPlan.selectedComponents);
-        
+
         finalHtml += populated.html + '\n';
         finalCss += populated.css + '\n\n';
         if (populated.js) {
@@ -218,7 +218,7 @@ ${finalJs}
       );
     }
 
-    // 9. Üretilen HTML, CSS ve JS'i veritabanına kaydet
+    // 10. Üretilen HTML, CSS ve JS'i veritabanına kaydet
     const updatedSite = await prisma.site.update({
       where: { id: siteId },
       data: {
@@ -232,7 +232,7 @@ ${finalJs}
       },
     });
 
-    // 9. Başarılı response döndür
+    // 12. Başarılı response döndür
     return NextResponse.json({
       success: true,
       message: "Website generated successfully using template system",

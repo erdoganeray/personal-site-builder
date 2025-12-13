@@ -3,6 +3,13 @@ import { getServerSession } from "next-auth";
 import { authOptions } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
 import { reviseWebsite } from "@/lib/gemini";
+import {
+  checkAndResetEditCounter,
+  hasRemainingEdits,
+  incrementEditCounter,
+  getRemainingEdits,
+} from "@/lib/subscription-utils";
+import { getPlanLimits, PlanType } from "@/lib/plan-constants";
 
 /**
  * POST /api/site/revise
@@ -68,15 +75,22 @@ export async function POST(req: NextRequest) {
       );
     }
 
-    // 5. Revize hakkı kontrolü
-    if (site.revisionCount >= site.maxRevisions) {
+    // 5. Check and reset monthly edit counter if needed
+    const userWithResetCounter = await checkAndResetEditCounter(user.id);
+
+    // 6. Check if user has remaining edits this month
+    if (!hasRemainingEdits(userWithResetCounter.planType, userWithResetCounter.editsThisMonth)) {
+      const limits = getPlanLimits(userWithResetCounter.planType as PlanType);
       return NextResponse.json(
-        { error: `You have reached the maximum number of revisions (${site.maxRevisions})` },
+        {
+          error: `Bu ay için düzenleme hakkınız doldu (${limits.editsPerMonth}/${limits.editsPerMonth}). Yeni ay başında hakkınız yenilenecek.`,
+          resetDate: userWithResetCounter.editsResetDate,
+        },
         { status: 400 }
       );
     }
 
-    // 6. HTML, CSS ve JS içeriği kontrolü
+    // 7. HTML, CSS ve JS içeriği kontrolü
     if (!site.htmlContent || !site.cssContent || !site.jsContent) {
       return NextResponse.json(
         { error: "Site has missing content (HTML, CSS, or JS) to revise" },
@@ -84,14 +98,14 @@ export async function POST(req: NextRequest) {
       );
     }
 
-    // 7. Önceki status'ü sakla ve "generating" yap
+    // 8. Önceki status'ü sakla ve "generating" yap
     const previousStatus = site.status;
     await prisma.site.update({
       where: { id: siteId },
       data: { status: "generating" },
     });
 
-    // 8. Gemini ile revize yap
+    // 9. Gemini ile revize yap
     let revisedResult;
     try {
       revisedResult = await reviseWebsite(
@@ -118,7 +132,10 @@ export async function POST(req: NextRequest) {
       );
     }
 
-    // 9. Revize edilmiş HTML, CSS ve JS'i veritabanına kaydet ve revisionCount'u artır
+    // 10. Increment edit counter
+    const updatedUser = await incrementEditCounter(user.id);
+
+    // 11. Revize edilmiş HTML, CSS ve JS'i veritabanına kaydet
     // Status'ü önceki haline (previewed veya published) geri getir
     const updatedSite = await prisma.site.update({
       where: { id: siteId },
@@ -127,12 +144,15 @@ export async function POST(req: NextRequest) {
         cssContent: revisedResult.css,
         jsContent: revisedResult.js,
         status: previousStatus, // Önceki status'ü koru (previewed veya published)
-        revisionCount: site.revisionCount + 1,
+        revisionCount: site.revisionCount + 1, // Keep for backward compatibility
         updatedAt: new Date(),
       },
     });
 
-    // 10. Başarılı response döndür
+    // 12. Başarılı response döndür
+    const remainingEdits = getRemainingEdits(updatedUser.planType, updatedUser.editsThisMonth);
+    const limits = getPlanLimits(updatedUser.planType as PlanType);
+
     return NextResponse.json({
       success: true,
       message: "Website revised successfully",
@@ -143,6 +163,12 @@ export async function POST(req: NextRequest) {
         status: updatedSite.status,
         revisionCount: updatedSite.revisionCount,
         maxRevisions: updatedSite.maxRevisions,
+      },
+      subscription: {
+        editsUsed: updatedUser.editsThisMonth,
+        editsLimit: limits.editsPerMonth,
+        editsRemaining: remainingEdits,
+        resetDate: updatedUser.editsResetDate,
       },
     });
 

@@ -17,6 +17,12 @@ model User {
   username     String?  @unique
   storageUsed  BigInt   @default(0) // Storage used in bytes
   storageLimit BigInt   @default(104857600) // 100MB default limit (100 * 1024 * 1024)
+  
+  // Subscription fields
+  planType            String   @default("FREE") // FREE or PAID
+  editsThisMonth      Int      @default(0)
+  editsResetDate      DateTime @default(now())
+  
   sites        Site[]
 }
 
