@@ -22,6 +22,11 @@ model User {
   editsThisMonth      Int      @default(0)
   editsResetDate      DateTime @default(now())
   
+  // Email verification fields
+  pendingEmail          String?   // New email waiting for verification
+  emailVerificationToken String?  // Verification token (hashed)
+  emailTokenExpiresAt   DateTime? // Token expiration time
+  
   sites        Site[]
 }
 

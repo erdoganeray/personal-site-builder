@@ -126,10 +126,6 @@
 
 # Geliştime Planı
 
-## Genel İyileştirmeler
-
-## Subdomain - Custom Domain
-
 ## Revise
 - Bilgilerime pp yükledin, site oluştururken Profil fotoğrafı olmayan hero oluştu, hero yu güncellediğinde pp doğru şekilde siteye entegre olmuyor.
 - revize hakkı dolunca revize isteyince uygun geri bildirimi veriyor ama next.js issue döndürüyor. döndürmesin.
@@ -150,9 +146,44 @@
 - icon, font, color palette, stock image revise si doğru çalışmalı
 - site oluşturulunca tarayıcı tab inde görünen isim logo ne olacak?
 
-## UI Güncellemeleri
+## UI/UX Güncellemeleri
 - landing sitenin tüm makyajını güncelle
 - yeniden yayınla ui nın tasarımını unutma
+
+### Toast Notification Sistemi
+- `react-hot-toast` veya `sonner` kütüphanesini yükle
+- Tüm `alert()` çağrılarını modern toast notification'lara çevir
+- Başarı, hata, uyarı ve bilgi mesajları için farklı stiller ve ikonlar
+- Toast position ve duration ayarları (örn: top-right, 3 saniye)
+- Dismiss butonu ve auto-dismiss özelliği
+
+### Form Validasyon İyileştirmeleri
+- Gerçek zamanlı validasyon feedback'i (onChange/onBlur)
+- Input field'ların altında inline hata mesajları
+- Şifre gücü göstergesi (password strength meter)
+  - Zayıf/Orta/Güçlü gösterimi
+  - Renk kodlaması (kırmızı/sarı/yeşil)
+  - Şifre gereksinimleri checklist'i
+- E-posta format validasyonu (regex)
+- Required field'lar için görsel işaretler (*)
+- Form submit öncesi tüm validasyonların kontrolü
+
+### Loading State Animasyonları
+- Skeleton loader'lar (Settings, MyInfo, Subscriptions, vb.)
+- Smooth transition'lar (fade-in, slide-in)
+- Button loading state'leri (spinner + disabled)
+- Disabled state'lerde opacity efekti
+- Progress indicator'lar (örn: dosya yükleme için)
+- Lazy loading için placeholder'lar
+
+### Genel UI İyileştirmeleri
+- Tutarlı spacing ve padding kullanımı
+- Responsive breakpoint'leri optimize et (mobile-first)
+- Hover efektleri ve micro-interactions
+- Focus state'leri (accessibility için)
+- Empty state'ler için güzel placeholder'lar
+- Confirmation modal'ları (kritik işlemler için)
+- Tooltip'ler (bilgilendirici açıklamalar için)
 
 ## Performans İyileştirmeleri
 - Kaydet butonunda muhtemelen çok fazla işlem oluyor ve ortalama 15 saniye sürüyor. Oldukça uzun bir süre.
@@ -163,9 +194,91 @@
 - free plan
 - paid plan
 
-## Versel Cron Job
+## Güvenlik İyileştirmeleri
+
+### Rate Limiting
+- Rate limiting middleware oluştur
+  - IP bazlı rate limiting
+  - Kullanıcı bazlı rate limiting
+  - Redis veya in-memory cache kullan (örn: Upstash Redis)
+- Kritik endpoint'lere rate limiting ekle
+  - Login: 5 deneme/15 dakika
+  - Şifre güncelleme: 3 deneme/saat
+  - E-posta güncelleme: 5 deneme/gün
+  - Hesap silme: 1 deneme/gün
+  - Site oluşturma/revize: Plan bazlı limitler
+  - API endpoint'leri: 100 istek/dakika (genel)
+
+### CSRF ve XSS Koruması
+- CSRF token kontrolü (NextAuth otomatik yapıyor mu kontrol et)
+- XSS koruması için input sanitization
+  - DOMPurify veya benzeri kütüphane kullan
+  - Kullanıcı input'larını HTML render etmeden önce temizle
+  - Content Security Policy (CSP) header'ları ekle
+
+### Audit Logging Sistemi
+- Kritik işlemleri logla
+  - Şifre değişikliği
+  - E-posta değişikliği
+  - Hesap silme
+  - Login/logout işlemleri
+  - Başarısız login denemeleri
+  - Site publish/unpublish işlemleri
+- Log model'i oluştur (opsiyonel)
+  - userId, action, timestamp, ipAddress, userAgent
+- Log görüntüleme sayfası (admin için)
+- Log retention policy (30/90 gün sonra otomatik temizlik)
+
+### Hesap Güvenliği
+- Hesap silme için ek doğrulama
+  - "DELETE" yazısını yazdırma onayı
+  - Mevcut şifre girişi zorunlu (✅ yapıldı)
+  - E-posta onay kodu (opsiyonel)
+- İki faktörlü kimlik doğrulama (2FA) - gelecek için
+  - TOTP (Time-based OTP) implementasyonu
+  - QR kod oluşturma
+  - Backup kodları
+- Şüpheli aktivite tespiti
+  - Farklı IP'den login uyarısı
+  - Çok sayıda başarısız login denemesi
+  - Hesap kilitleme mekanizması
+
+### API Güvenliği
+- API key rotation sistemi
+- Environment variable'ların güvenli yönetimi
+- Sensitive data'nın loglanmaması
+- Error message'larda detay vermeme (production'da)
+- HTTPS zorunluluğu
+- Secure headers (Helmet.js)
+  - X-Frame-Options
+  - X-Content-Type-Options
+  - Strict-Transport-Security
+
+### Veri Güvenliği
+- Hassas verilerin şifrelenmesi (at-rest encryption)
+- Database backup stratejisi
+- GDPR uyumluluğu
+  - Veri dışa aktarma özelliği
+  - Veri silme hakkı (right to be forgotten)
+  - Kullanıcı onayları (consent management)
+
+## Versel Deploydan Sonra Yapılacaklar
+
+### Vercel Cron Job
 - landing page i vercel e deploy ettikten sonra yapılacak
 - /api/cron/cleanup-reservations/route.ts endpoint'i oluştur (süresi dolmuş subdomain rezervasyonlarını temizler)
 - vercel.json dosyasına cron job ekle (her 6 saatte bir çalışacak şekilde)
 - CRON_SECRET environment variable'ı Vercel'e ekle (güvenlik için)
 - Deploy sonrası Vercel Dashboard'dan manuel test et
+
+### E posta güncelleme
+- şu anda resend api üzerinden çalışıyor
+- info@personalweb.info maili entegre edilecek
+- contact componet formdaki mail de info@personalweb.info olarak güncellenecek
+- Resend test domain'i (onboarding@resend.dev) sadece kayıtlı e-posta adresine (erayerdogan3551@gmail.com) gönderim yapabilir; production'da personaweb.info domain'i eklendikten sonra tüm e-postalara gönderim yapılabilecek.
+
+# MVP'de Olmasına Gerek Var Mı?
+- Şifremi unuttum
+- E postamı unuttum
+- SMS onayı
+- 2 adımlı doğrulama

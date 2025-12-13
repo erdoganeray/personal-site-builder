@@ -37,6 +37,13 @@ export const authOptions: NextAuthOptions = {
                     id: user.id,
                     email: user.email,
                     name: user.name,
+                    planType: user.planType,
+                    storageUsed: user.storageUsed,
+                    storageLimit: user.storageLimit,
+                    createdAt: user.createdAt,
+                    updatedAt: user.updatedAt,
+                    editsThisMonth: user.editsThisMonth,
+                    editsResetDate: user.editsResetDate,
                 };
             },
         }),
@@ -51,12 +58,43 @@ export const authOptions: NextAuthOptions = {
         async jwt({ token, user }) {
             if (user) {
                 token.id = user.id;
+                token.planType = user.planType;
+                token.storageUsed = user.storageUsed?.toString();
+                token.storageLimit = user.storageLimit?.toString();
+                token.createdAt = user.createdAt?.toISOString();
+                token.updatedAt = user.updatedAt?.toISOString();
+                token.editsThisMonth = user.editsThisMonth;
+                token.editsResetDate = user.editsResetDate?.toISOString();
             }
             return token;
         },
         async session({ session, token }) {
             if (session.user) {
                 session.user.id = token.id as string;
+
+                // Fetch fresh user data from database for up-to-date info
+                const user = await prisma.user.findUnique({
+                    where: { id: token.id as string },
+                    select: {
+                        planType: true,
+                        storageUsed: true,
+                        storageLimit: true,
+                        createdAt: true,
+                        updatedAt: true,
+                        editsThisMonth: true,
+                        editsResetDate: true,
+                    },
+                });
+
+                if (user) {
+                    session.user.planType = user.planType;
+                    session.user.storageUsed = user.storageUsed.toString();
+                    session.user.storageLimit = user.storageLimit.toString();
+                    session.user.createdAt = user.createdAt.toISOString();
+                    session.user.updatedAt = user.updatedAt.toISOString();
+                    session.user.editsThisMonth = user.editsThisMonth;
+                    session.user.editsResetDate = user.editsResetDate.toISOString();
+                }
             }
             return session;
         },
