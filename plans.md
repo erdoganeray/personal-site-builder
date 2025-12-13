@@ -127,9 +127,7 @@
 # Geliştime Planı
 
 ## Genel İyileştirmeler
-- cv yükle, site oluştur, foto eklemeden publish et, sadece cv boyutu calculate ediliyor, html css js dosyaları calculate edilmiyor
-- preview/publish sync olduğunda warning çıkıyor, warning içeriği düzgün şekilde gösterilmeli
-- Loading state kontrolleri arttırılmalı. cv yükleme aşaması, ai ile siteniz oluşturuluyor aşaması, revize edilme aşamaları.. dashboarda örneğin cv analiz edilirken başka bir dashboard sayfasına gidip tekrar bilgilerim e girince cv analiz ediliyor aşaması kayboluyor ve yine cv yüklenme ekranı görünüyor anlık olarak, arkadaki analiz işlemi bitince yine olması gerektiği sayfayı yeniliyor.
+- Loading state kontrolleri arttırılmalı. cv yükleme aşaması, ai ile siteniz oluşturuluyor aşaması, revize edilme aşamaları (editordeki). dashboarda örneğin cv analiz edilirken başka bir dashboard sayfasına gidip tekrar bilgilerim e girince cv analiz ediliyor aşaması kayboluyor ve yine cv yüklenme ekranı görünüyor anlık olarak, arkadaki analiz işlemi bitince yine olması gerektiği sayfayı yeniliyor.
 
 ## Aboneliklerim
 - dashboard aboneliklerim sayfası aktif hale getirilmeli
@@ -159,3 +157,6 @@
 ## UI Güncellemeleri
 - landing sitenin tüm makyajını güncelle
 - yeniden yayınla ui nın tasarımını unutma
+
+## Performans İyileştirmeleri
+- Kaydet butonunda muhtemelen çok fazla işlem oluyor ve ortalama 15 saniye sürüyor. Oldukça uzun bir süre.

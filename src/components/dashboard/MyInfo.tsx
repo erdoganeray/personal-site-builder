@@ -7,6 +7,7 @@ import { hasUnpublishedChanges } from "@/lib/change-detection";
 import PortfolioUploader from "@/components/dashboard/PortfolioUploader";
 import PortfolioMetadataEditor from "@/components/dashboard/PortfolioMetadataEditor";
 import StorageIndicator from "@/components/dashboard/StorageIndicator";
+import ChangeDetailsPanel from "./ChangeDetailsPanel";
 
 interface MyInfoProps {
     site: any;
@@ -773,6 +774,9 @@ export default function MyInfo({ site, cvData, onDelete, onCVAnalyzed, deleting 
                             >
                                 {publishing ? "Yayınlanıyor..." : "Yeniden Yayınla"}
                             </button>
+
+                            {/* Change Details Panel */}
+                            <ChangeDetailsPanel site={site} />
                         </div>
                     </div>
                 </div>

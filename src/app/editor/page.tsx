@@ -6,6 +6,7 @@ import { useRouter } from "next/navigation";
 import { useEffect, useState, useMemo } from "react";
 import { hasUnpublishedChanges } from "@/lib/change-detection";
 import { convertRelativeAssetsToAbsolute } from "@/lib/iframe-utils";
+import ChangeDetailsPanel from "@/components/dashboard/ChangeDetailsPanel";
 
 
 export default function EditorPage() {
@@ -376,6 +377,9 @@ export default function EditorPage() {
                                     >
                                         {publishing ? "Yayınlanıyor..." : "Yeniden Yayınla"}
                                     </button>
+
+                                    {/* Change Details Panel */}
+                                    <ChangeDetailsPanel site={site} />
                                 </div>
                             </div>
                         </div>
