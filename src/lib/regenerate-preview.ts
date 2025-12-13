@@ -45,7 +45,7 @@ export async function regeneratePreviewContent(siteId: string): Promise<{
 
     // 4. Regenerate HTML, CSS, JS from templates
     console.log(`Regenerating preview for site ${siteId}...`);
-    
+
     let finalHtml = '';
     let finalCss = '';
     let finalJs = '';
@@ -64,22 +64,56 @@ export async function regeneratePreviewContent(siteId: string): Promise<{
 <body>
 `;
 
+      // Helper function to check if a component should be included based on CV data
+      const shouldIncludeComponent = (category: string): boolean => {
+        switch (category) {
+          case 'experience':
+            return cvData.experience && cvData.experience.length > 0;
+          case 'education':
+            return cvData.education && cvData.education.length > 0;
+          case 'portfolio':
+            return cvData.portfolio && cvData.portfolio.length > 0;
+          case 'skills':
+            return cvData.skills && cvData.skills.length > 0;
+          case 'languages':
+            return cvData.languages && cvData.languages.length > 0;
+          // Always include these components
+          case 'navigation':
+          case 'hero':
+          case 'about':
+          case 'contact':
+          case 'footer':
+            return true;
+          default:
+            return true;
+        }
+      };
+
+      // Filter out components that have no data
+      const componentsToRender = designPlan.selectedComponents.filter((selected: any) => {
+        const shouldInclude = shouldIncludeComponent(selected.category);
+        if (!shouldInclude) {
+          console.log(`Skipping ${selected.category} component - no data available`);
+        }
+        return shouldInclude;
+      });
+
       // Populate each component template with updated cvContent
-      for (const selected of designPlan.selectedComponents) {
+      for (const selected of componentsToRender) {
         const template = getTemplateById(selected.templateId);
-        
+
         if (!template) {
           console.warn(`Template not found: ${selected.templateId}`);
           continue;
         }
 
         const populated = populateTemplate(
-          template, 
-          cvData, 
-          designPlan.themeColors, 
-          designPlan.selectedComponents
+          template,
+          cvData,
+          designPlan.themeColors,
+          componentsToRender
         );
-        
+
         finalHtml += populated.html + '\n';
         finalCss += populated.css + '\n\n';
         if (populated.js) {

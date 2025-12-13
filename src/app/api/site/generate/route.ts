@@ -127,8 +127,42 @@ export async function POST(req: NextRequest) {
 <body>
 `;
 
+      // Helper function to check if a component should be included based on CV data
+      const shouldIncludeComponent = (category: string): boolean => {
+        switch (category) {
+          case 'experience':
+            return cvData.experience && cvData.experience.length > 0;
+          case 'education':
+            return cvData.education && cvData.education.length > 0;
+          case 'portfolio':
+            return cvData.portfolio && cvData.portfolio.length > 0;
+          case 'skills':
+            return cvData.skills && cvData.skills.length > 0;
+          case 'languages':
+            return cvData.languages && cvData.languages.length > 0;
+          // Always include these components
+          case 'navigation':
+          case 'hero':
+          case 'about':
+          case 'contact':
+          case 'footer':
+            return true;
+          default:
+            return true;
+        }
+      };
+
+      // Filter out components that have no data
+      const componentsToRender = designPlan.selectedComponents.filter(selected => {
+        const shouldInclude = shouldIncludeComponent(selected.category);
+        if (!shouldInclude) {
+          console.log(`Skipping ${selected.category} component - no data available`);
+        }
+        return shouldInclude;
+      });
+
       // Her component için template'i doldur
-      for (const selected of designPlan.selectedComponents) {
+      for (const selected of componentsToRender) {
         const template = getTemplateById(selected.templateId);
 
         if (!template) {
@@ -136,7 +170,7 @@ export async function POST(req: NextRequest) {
           continue;
         }
 
-        const populated = populateTemplate(template, cvData, designPlan.themeColors, designPlan.selectedComponents);
+        const populated = populateTemplate(template, cvData, designPlan.themeColors, componentsToRender);
 
         finalHtml += populated.html + '\n';
         finalCss += populated.css + '\n\n';
