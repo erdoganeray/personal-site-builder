@@ -54,7 +54,51 @@ export async function POST(req: NextRequest) {
             );
         }
 
-        // 6. Perform rollback - copy published content to preview
+        // 6. Extract photo URLs from published cvContent
+        const publishedCvContent = site.publishedCvContent as any;
+        const restoredPhotoKeys: string[] = [];
+
+        if (publishedCvContent) {
+            // Profile photo
+            const profilePhotoUrl = publishedCvContent.personalInfo?.profilePhotoUrl;
+            if (profilePhotoUrl) {
+                // Extract R2 key from URL
+                let key: string;
+                if (profilePhotoUrl.startsWith('/_assets/profile/')) {
+                    const fileName = profilePhotoUrl.replace('/_assets/profile/', '');
+                    key = `users/${site.userId}/profile/${fileName}`;
+                } else if (profilePhotoUrl.includes('/users/')) {
+                    const urlParts = profilePhotoUrl.split("/");
+                    const keyParts = urlParts.slice(urlParts.indexOf("users"));
+                    key = keyParts.join("/");
+                } else {
+                    key = profilePhotoUrl;
+                }
+                restoredPhotoKeys.push(key);
+            }
+
+            // Portfolio photos
+            if (Array.isArray(publishedCvContent.portfolio)) {
+                for (const item of publishedCvContent.portfolio) {
+                    if (item.imageUrl) {
+                        let key: string;
+                        if (item.imageUrl.startsWith('/_assets/portfolio/')) {
+                            const fileName = item.imageUrl.replace('/_assets/portfolio/', '');
+                            key = `users/${site.userId}/portfolio/${fileName}`;
+                        } else if (item.imageUrl.includes('/users/')) {
+                            const urlParts = item.imageUrl.split("/");
+                            const keyParts = urlParts.slice(urlParts.indexOf("users"));
+                            key = keyParts.join("/");
+                        } else {
+                            key = item.imageUrl;
+                        }
+                        restoredPhotoKeys.push(key);
+                    }
+                }
+            }
+        }
+
+        // 7. Perform rollback - copy published content to preview
         const updatedSite = await prisma.site.update({
             where: { id: siteId },
             data: {
@@ -65,9 +109,23 @@ export async function POST(req: NextRequest) {
             },
         });
 
+        // 8. Clean up DeletedAsset records for restored photos
+        if (restoredPhotoKeys.length > 0) {
+            const deletedCount = await prisma.deletedAsset.deleteMany({
+                where: {
+                    userId: site.userId,
+                    assetKey: {
+                        in: restoredPhotoKeys,
+                    },
+                },
+            });
+
+            console.log(`🗑️ Cleaned up ${deletedCount.count} DeletedAsset records for restored photos`);
+        }
+
         console.log(`✅ Rollback successful for site ${siteId}`);
 
-        // 7. Return success response
+        // 9. Return success response
         return NextResponse.json({
             success: true,
             message: "Site successfully rolled back to last published version",
