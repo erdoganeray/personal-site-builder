@@ -27,7 +27,8 @@ model User {
   emailVerificationToken String?  // Verification token (hashed)
   emailTokenExpiresAt   DateTime? // Token expiration time
   
-  sites        Site[]
+  sites         Site[]
+  deletedAssets DeletedAsset[]
 }
 
 model Site {
@@ -57,4 +58,17 @@ model Site {
   user           User      @relation(fields: [userId], references: [id], onDelete: Cascade)
 
   @@index([userId])
+}
+
+model DeletedAsset {
+  id            String   @id @default(cuid())
+  userId        String
+  assetKey      String   // R2 key: users/{userId}/profile/photo.jpg
+  assetType     String   // "profile" or "portfolio"
+  deletedAt     DateTime @default(now())
+  
+  user          User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  
+  @@index([userId])
+  @@index([deletedAt])
 }

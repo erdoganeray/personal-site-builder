@@ -140,17 +140,25 @@ export async function DELETE(req: NextRequest) {
       );
     }
 
-    // Delete from R2
-    await s3Client.send(
-      new DeleteObjectCommand({
-        Bucket: process.env.R2_BUCKET_NAME!,
-        Key: key,
-      })
-    );
+    // SOFT DELETE: Mark for deletion instead of deleting immediately
+    // This allows rollback to restore the photo
+    const { prisma } = await import("@/lib/prisma");
+    
+    await prisma.deletedAsset.create({
+      data: {
+        userId: session.user.id,
+        assetKey: key,
+        assetType: "profile",
+      },
+    });
 
-    console.log("Profile photo deleted from R2:", key);
+    console.log("Profile photo marked for deletion (soft delete):", key);
 
-    // Recalculate user's storage after deletion
+    // Note: Photo remains in R2 for 30 days
+    // Cron job will clean up after 30 days
+
+    // Recalculate user's storage after marking deletion
+    // (Storage calculation should exclude soft-deleted assets)
     try {
       await recalculateUserStorage(session.user.id);
     } catch (storageError) {
@@ -160,10 +168,10 @@ export async function DELETE(req: NextRequest) {
 
     return NextResponse.json({
       success: true,
-      message: "Photo deleted successfully",
+      message: "Photo marked for deletion successfully",
     });
   } catch (error) {
-    console.error("Profile photo delete error:", error);
+    console.error("Profile photo soft delete error:", error);
     return NextResponse.json(
       { error: "Delete failed" },
       { status: 500 }

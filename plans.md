@@ -257,9 +257,18 @@
 
 ### Vercel Cron Job
 - landing page i vercel e deploy ettikten sonra yapılacak
+
+#### Subdomain Rezervasyon Temizliği
 - /api/cron/cleanup-reservations/route.ts endpoint'i oluştur (süresi dolmuş subdomain rezervasyonlarını temizler)
 - vercel.json dosyasına cron job ekle (her 6 saatte bir çalışacak şekilde)
 - CRON_SECRET environment variable'ı Vercel'e ekle (güvenlik için)
+- Deploy sonrası Vercel Dashboard'dan manuel test et
+
+#### Soft Delete Fotoğraf Temizliği (Rollback Sistemi)
+- /api/cron/cleanup-deleted-assets/route.ts endpoint'i oluştur (30 günden eski soft-deleted fotoğrafları temizler)
+- vercel.json dosyasına cron job ekle (her gece saat 02:00'de çalışacak şekilde: "0 2 * * *")
+- CRON_SECRET environment variable'ı kullan (aynı secret her iki cron job için kullanılabilir)
+- DeletedAsset tablosundan 30 günden eski kayıtları bul ve ilgili R2 dosyalarını sil
 - Deploy sonrası Vercel Dashboard'dan manuel test et
 
 ### E posta güncelleme
@@ -273,3 +282,4 @@
 - E postamı unuttum
 - SMS onayı
 - 2 adımlı doğrulama
+- Chatte hafıza özelliği yok

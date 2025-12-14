@@ -229,6 +229,12 @@ export async function POST(req: NextRequest) {
           });
         }
 
+        // Debug: Log component addition
+        console.log("\n➕ COMPONENT ADD DEBUG:");
+        console.log(`   Category: ${operation.category}`);
+        console.log(`   Template: ${operation.templateId}`);
+        console.log(`   Position: ${operation.position ?? 'end'}\n`);
+
         updatedDesignPlan = addComponent(
           updatedDesignPlan,
           operation.category,
@@ -256,6 +262,14 @@ export async function POST(req: NextRequest) {
             { status: 400 }
           );
         }
+        // Debug: Log component removal
+        const removedComponent = updatedDesignPlan.selectedComponents.find(
+          (c) => c.category === operation.category
+        );
+        console.log("\n➖ COMPONENT REMOVE DEBUG:");
+        console.log(`   Category: ${operation.category}`);
+        console.log(`   Template: ${removedComponent?.templateId || 'NOT FOUND'}\n`);
+
         updatedDesignPlan = removeComponent(
           updatedDesignPlan,
           operation.category
@@ -281,6 +295,12 @@ export async function POST(req: NextRequest) {
             { status: 400 }
           );
         }
+        // Debug: Log component reordering
+        const currentOrder = updatedDesignPlan.selectedComponents.map(c => c.category).join(', ');
+        console.log("\n⇅ COMPONENT REORDER DEBUG:");
+        console.log(`   Old Order: ${currentOrder}`);
+        console.log(`   New Order: ${operation.newOrder.join(', ')}\n`);
+
         updatedDesignPlan = reorderComponents(
           updatedDesignPlan,
           operation.newOrder
@@ -306,11 +326,28 @@ export async function POST(req: NextRequest) {
             { status: 400 }
           );
         }
+
+        // Debug: Log old template before change
+        const oldComponent = updatedDesignPlan.selectedComponents.find(
+          (c) => c.category === operation.category
+        );
+        console.log("\n🔄 TEMPLATE CHANGE DEBUG:");
+        console.log(`   Category: ${operation.category}`);
+        console.log(`   Old Template: ${oldComponent?.templateId || 'NOT FOUND'}`);
+        console.log(`   New Template: ${operation.newTemplateId}`);
+
         updatedDesignPlan = changeComponentTemplate(
           updatedDesignPlan,
           operation.category,
           operation.newTemplateId
         );
+
+        // Debug: Verify change was applied
+        const newComponent = updatedDesignPlan.selectedComponents.find(
+          (c) => c.category === operation.category
+        );
+        console.log(`   ✅ Verified New Template: ${newComponent?.templateId}\n`);
+
         shouldRegeneratePreview = true;
         responseMessage = `✅ ${operation.category} template'i değiştirildi`;
         break;
@@ -332,10 +369,19 @@ export async function POST(req: NextRequest) {
             { status: 400 }
           );
         }
+        // Debug: Log theme color update
+        console.log("\n🎨 THEME UPDATE DEBUG:");
+        console.log(`   Old Colors:`, updatedDesignPlan.themeColors);
+        console.log(`   New Colors:`, operation.colors);
+
         updatedDesignPlan = updateThemeColors(
           updatedDesignPlan,
           operation.colors
         );
+
+        console.log(`   ✅ Merged Colors:`, updatedDesignPlan.themeColors);
+        console.log("");
+
         shouldRegeneratePreview = true;
         responseMessage = `✅ Tema renkleri güncellendi`;
         break;

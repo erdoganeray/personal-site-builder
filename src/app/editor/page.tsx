@@ -239,7 +239,6 @@ export default function EditorPage() {
 
         setShowConfirmModal(false);
         setIsRevising(true);
-        setMessages((prev) => [...prev, { role: "assistant", content: "İşleniyor..." }]);
 
         try {
             // Get the stored analysis result
@@ -256,7 +255,7 @@ export default function EditorPage() {
 
             const remainingText = `\n\nKalan düzenleme hakkınız: ${reviseData.subscription.editsRemaining}/${reviseData.subscription.editsLimit}`;
             setMessages((prev) => [
-                ...prev.slice(0, -1),
+                ...prev,
                 {
                     role: "assistant",
                     content: reviseData.message + remainingText,
@@ -265,7 +264,7 @@ export default function EditorPage() {
         } catch (error) {
             console.error("Revize hatası:", error);
             setMessages((prev) => [
-                ...prev.slice(0, -1),
+                ...prev,
                 {
                     role: "assistant",
                     content: `❌ Bir hata oluştu: ${error instanceof Error ? error.message : "Bilinmeyen hata"}`,
@@ -424,9 +423,34 @@ export default function EditorPage() {
                                             }
                                         }}
                                         disabled={publishing}
-                                        className="w-full bg-yellow-600 hover:bg-yellow-700 disabled:bg-gray-600 text-white font-semibold py-2 px-3 rounded-lg transition-colors duration-200 text-xs"
+                                        className="w-full bg-yellow-600 hover:bg-yellow-700 disabled:bg-gray-600 text-white font-semibold py-2 px-3 rounded-lg transition-colors duration-200 text-xs mb-2"
                                     >
                                         {publishing ? "Yayınlanıyor..." : "Yeniden Yayınla"}
+                                    </button>
+                                    <button
+                                        onClick={async () => {
+                                            if (!confirm("Değişiklikleri geri almak istediğinizden emin misiniz? Bu işlem geri alınamaz.")) return;
+                                            try {
+                                                const response = await fetch("/api/site/rollback", {
+                                                    method: "POST",
+                                                    headers: { "Content-Type": "application/json" },
+                                                    body: JSON.stringify({ siteId: site.id }),
+                                                });
+                                                const data = await response.json();
+                                                if (response.ok) {
+                                                    alert("Değişiklikler başarıyla geri alındı!");
+                                                    fetchSite();
+                                                } else {
+                                                    alert(data.error || "Geri alma işlemi başarısız oldu");
+                                                }
+                                            } catch (error) {
+                                                console.error("Rollback hatası:", error);
+                                                alert("Bir hata oluştu. Lütfen tekrar deneyin.");
+                                            }
+                                        }}
+                                        className="w-full bg-gray-600 hover:bg-gray-700 text-white font-semibold py-2 px-3 rounded-lg transition-colors duration-200 text-xs"
+                                    >
+                                        ← Geri Dön
                                     </button>
                                     <ChangeDetailsPanel site={site} />
                                 </div>

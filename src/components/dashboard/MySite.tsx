@@ -193,9 +193,36 @@ export default function MySite({ site, onRefresh }: MySiteProps) {
                             <p className="text-yellow-300 font-semibold mb-1">
                                 ⚠️ Yayınlanan site son değişiklikleri içermiyor
                             </p>
-                            <p className="text-sm text-yellow-200">
-                                Değişikliklerinizi yayınlamak için Domain Yönetimi sayfasına gidin.
+                            <p className="text-sm text-yellow-200 mb-3">
+                                Değişikliklerinizi yayınlamak veya geri almak için aşağıdaki butonları kullanın.
                             </p>
+                            <div className="flex gap-2">
+                                <button
+                                    onClick={async () => {
+                                        if (!confirm("Değişiklikleri geri almak istediğinizden emin misiniz? Bu işlem geri alınamaz.")) return;
+                                        try {
+                                            const response = await fetch("/api/site/rollback", {
+                                                method: "POST",
+                                                headers: { "Content-Type": "application/json" },
+                                                body: JSON.stringify({ siteId: site.id }),
+                                            });
+                                            const data = await response.json();
+                                            if (response.ok) {
+                                                alert("Değişiklikler başarıyla geri alındı!");
+                                                onRefresh();
+                                            } else {
+                                                alert(data.error || "Geri alma işlemi başarısız oldu");
+                                            }
+                                        } catch (error) {
+                                            console.error("Rollback hatası:", error);
+                                            alert("Bir hata oluştu. Lütfen tekrar deneyin.");
+                                        }
+                                    }}
+                                    className="px-4 py-2 bg-gray-600 hover:bg-gray-700 text-white font-semibold rounded-lg transition-colors duration-200 text-sm"
+                                >
+                                    ← Geri Dön
+                                </button>
+                            </div>
                         </div>
                     </div>
                 </div>

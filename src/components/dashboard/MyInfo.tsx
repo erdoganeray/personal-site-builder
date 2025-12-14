@@ -743,37 +743,64 @@ export default function MyInfo({ site, cvData, onDelete, onCVAnalyzed, deleting 
                                 ⚠️ Yayınlanan site son değişiklikleri içermiyor
                             </p>
                             <p className="text-yellow-200 text-sm mb-3">
-                                Yayınlanan sitenizi güncellemek için aşağıdaki butona tıklayın.
+                                Yayınlanan sitenizi güncellemek veya değişiklikleri geri almak için aşağıdaki butonları kullanın.
                             </p>
-                            <button
-                                onClick={async () => {
-                                    if (!confirm("Sitenizi yeniden yayınlamak istediğinizden emin misiniz?")) return;
-                                    setPublishing(true);
-                                    try {
-                                        const response = await fetch("/api/site/publish", {
-                                            method: "POST",
-                                            headers: { "Content-Type": "application/json" },
-                                            body: JSON.stringify({ siteId: site.id }),
-                                        });
-                                        const data = await response.json();
-                                        if (response.ok) {
-                                            alert(`Site başarıyla yeniden yayınlandı!\nURL: ${data.cloudflareUrl}`);
-                                            window.location.reload();
-                                        } else {
-                                            alert(data.error || "Site yayınlanamadı");
+                            <div className="flex gap-2">
+                                <button
+                                    onClick={async () => {
+                                        if (!confirm("Sitenizi yeniden yayınlamak istediğinizden emin misiniz?")) return;
+                                        setPublishing(true);
+                                        try {
+                                            const response = await fetch("/api/site/publish", {
+                                                method: "POST",
+                                                headers: { "Content-Type": "application/json" },
+                                                body: JSON.stringify({ siteId: site.id }),
+                                            });
+                                            const data = await response.json();
+                                            if (response.ok) {
+                                                alert(`Site başarıyla yeniden yayınlandı!\nURL: ${data.cloudflareUrl}`);
+                                                window.location.reload();
+                                            } else {
+                                                alert(data.error || "Site yayınlanamadı");
+                                            }
+                                        } catch (error) {
+                                            console.error("Yayınlama hatası:", error);
+                                            alert("Bir hata oluştu. Lütfen tekrar deneyin.");
+                                        } finally {
+                                            setPublishing(false);
                                         }
-                                    } catch (error) {
-                                        console.error("Yayınlama hatası:", error);
-                                        alert("Bir hata oluştu. Lütfen tekrar deneyin.");
-                                    } finally {
-                                        setPublishing(false);
-                                    }
-                                }}
-                                disabled={publishing}
-                                className="bg-yellow-600 hover:bg-yellow-700 disabled:bg-gray-400 text-white font-semibold py-2 px-4 rounded-lg transition-colors duration-200 text-sm"
-                            >
-                                {publishing ? "Yayınlanıyor..." : "Yeniden Yayınla"}
-                            </button>
+                                    }}
+                                    disabled={publishing}
+                                    className="bg-yellow-600 hover:bg-yellow-700 disabled:bg-gray-400 text-white font-semibold py-2 px-4 rounded-lg transition-colors duration-200 text-sm"
+                                >
+                                    {publishing ? "Yayınlanıyor..." : "Yeniden Yayınla"}
+                                </button>
+                                <button
+                                    onClick={async () => {
+                                        if (!confirm("Değişiklikleri geri almak istediğinizden emin misiniz? Bu işlem geri alınamaz.")) return;
+                                        try {
+                                            const response = await fetch("/api/site/rollback", {
+                                                method: "POST",
+                                                headers: { "Content-Type": "application/json" },
+                                                body: JSON.stringify({ siteId: site.id }),
+                                            });
+                                            const data = await response.json();
+                                            if (response.ok) {
+                                                alert("Değişiklikler başarıyla geri alındı!");
+                                                window.location.reload();
+                                            } else {
+                                                alert(data.error || "Geri alma işlemi başarısız oldu");
+                                            }
+                                        } catch (error) {
+                                            console.error("Rollback hatası:", error);
+                                            alert("Bir hata oluştu. Lütfen tekrar deneyin.");
+                                        }
+                                    }}
+                                    className="bg-gray-600 hover:bg-gray-700 text-white font-semibold py-2 px-4 rounded-lg transition-colors duration-200 text-sm"
+                                >
+                                    ← Geri Dön
+                                </button>
+                            </div>
 
                             {/* Change Details Panel */}
                             <ChangeDetailsPanel site={site} />
