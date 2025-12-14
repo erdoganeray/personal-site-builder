@@ -182,8 +182,8 @@ export default function MySite({ site, onRefresh }: MySiteProps) {
                 <p className="text-gray-400">Site önizlemenizi görüntüleyin ve düzenleyin</p>
             </div>
 
-            {/* Unpublished Changes Warning */}
-            {hasChanges && (
+            {/* Unpublished Changes Warning - Only show when site is published */}
+            {site?.status === "published" && hasChanges && (
                 <div className="bg-yellow-900/30 border border-yellow-700 rounded-lg p-4">
                     <div className="flex items-start gap-3">
                         <svg className="w-6 h-6 text-yellow-400 flex-shrink-0 mt-0.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">

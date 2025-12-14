@@ -731,7 +731,7 @@ export default function MyInfo({ site, cvData, onDelete, onCVAnalyzed, deleting 
             {/* Storage Indicator - Always show at top */}
             <StorageIndicator key={storageRefreshKey} />
 
-            {/* Unpublished Changes Warning - Always show at top if published and has changes */}
+            {/* Unpublished Changes Warning - Only show when site is published and has changes */}
             {site && site.status === "published" && hasUnpublishedChanges(site) && (
                 <div className="bg-yellow-900/30 border border-yellow-700 rounded-lg p-4">
                     <div className="flex items-start gap-3">

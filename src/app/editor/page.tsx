@@ -390,8 +390,8 @@ export default function EditorPage() {
 
                 {/* Chat/Revision Area */}
                 <div className="w-80 bg-gray-800 border-l border-gray-700 flex flex-col">
-                    {/* Unpublished Changes Warning */}
-                    {hasChanges && (
+                    {/* Unpublished Changes Warning - Only show when site is published */}
+                    {site?.status === "published" && hasChanges && (
                         <div className="bg-yellow-900/30 border-b border-yellow-700 p-4">
                             <div className="flex items-start gap-2">
                                 <svg className="w-5 h-5 text-yellow-400 flex-shrink-0 mt-0.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
