@@ -489,59 +489,6 @@ export default function Settings() {
                             </span>
                         </div>
 
-                        {/* Storage Usage */}
-                        <div className="py-3 border-b border-gray-700">
-                            <div className="flex items-center justify-between mb-3">
-                                <div className="flex items-center gap-2">
-                                    <svg
-                                        xmlns="http://www.w3.org/2000/svg"
-                                        className="h-5 w-5 text-cyan-400"
-                                        fill="none"
-                                        viewBox="0 0 24 24"
-                                        stroke="currentColor"
-                                    >
-                                        <path
-                                            strokeLinecap="round"
-                                            strokeLinejoin="round"
-                                            strokeWidth={2}
-                                            d="M4 7v10c0 2.21 3.582 4 8 4s8-1.79 8-4V7M4 7c0 2.21 3.582 4 8 4s8-1.79 8-4M4 7c0-2.21 3.582-4 8-4s8 1.79 8 4m0 5c0 2.21-3.582 4-8 4s-8-1.79-8-4"
-                                        />
-                                    </svg>
-                                    <span className="text-gray-400">Storage Kullanımı</span>
-                                </div>
-                                <span className="text-white font-medium text-sm">
-                                    {(() => {
-                                        const used = Number(session?.user?.storageUsed || 0);
-                                        const limit = Number(session?.user?.storageLimit || 104857600);
-                                        const usedMB = (used / (1024 * 1024)).toFixed(2);
-                                        const limitMB = (limit / (1024 * 1024)).toFixed(0);
-                                        const percentage = ((used / limit) * 100).toFixed(1);
-                                        return `${usedMB} MB / ${limitMB} MB (${percentage}%)`;
-                                    })()}
-                                </span>
-                            </div>
-                            {/* Progress Bar */}
-                            <div className="w-full bg-gray-700 rounded-full h-3 overflow-hidden">
-                                <div
-                                    className={`h-full transition-all duration-500 ${(() => {
-                                        const used = Number(session?.user?.storageUsed || 0);
-                                        const limit = Number(session?.user?.storageLimit || 104857600);
-                                        const percentage = (used / limit) * 100;
-                                        if (percentage >= 80) return "bg-gradient-to-r from-red-500 to-red-600";
-                                        if (percentage >= 50) return "bg-gradient-to-r from-yellow-500 to-orange-500";
-                                        return "bg-gradient-to-r from-green-500 to-emerald-500";
-                                    })()
-                                        }`}
-                                    style={{
-                                        width: `${Math.min(
-                                            ((Number(session?.user?.storageUsed || 0) / Number(session?.user?.storageLimit || 104857600)) * 100),
-                                            100
-                                        )}%`,
-                                    }}
-                                ></div>
-                            </div>
-                        </div>
-
                         {/* Monthly Edits */}
                         <div className="flex justify-between items-center py-3 border-b border-gray-700">
                             <div className="flex items-center gap-2">

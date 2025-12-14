@@ -12,6 +12,7 @@ import MySite from "@/components/dashboard/MySite";
 import Subscriptions from "@/components/dashboard/Subscriptions";
 import DomainManagement from "@/components/dashboard/DomainManagement";
 import Settings from "@/components/dashboard/Settings";
+import StorageManagement from "@/components/dashboard/StorageManagement";
 
 export default function DashboardPage() {
     const { data: session, status } = useSession();
@@ -110,6 +111,8 @@ export default function DashboardPage() {
                 return <Subscriptions />;
             case "domain":
                 return <DomainManagement />;
+            case "storage":
+                return <StorageManagement />;
             case "settings":
                 return <Settings />;
             default:

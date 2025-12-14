@@ -46,6 +46,15 @@ export default function DashboardMenu({ activeTab, onTabChange, isCollapsed, onT
             ),
         },
         {
+            id: "storage",
+            label: "Depolama Yönetimi",
+            icon: (
+                <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 7v10c0 2.21 3.582 4 8 4s8-1.79 8-4V7M4 7c0 2.21 3.582 4 8 4s8-1.79 8-4M4 7c0-2.21 3.582-4 8-4s8 1.79 8 4m0 5c0 2.21-3.582 4-8 4s-8-1.79-8-4" />
+                </svg>
+            ),
+        },
+        {
             id: "settings",
             label: "Ayarlar",
             icon: (
@@ -87,11 +96,10 @@ export default function DashboardMenu({ activeTab, onTabChange, isCollapsed, onT
                     <button
                         key={item.id}
                         onClick={() => onTabChange(item.id)}
-                        className={`w-full flex items-center gap-3 px-3 py-3 rounded-lg transition-all duration-200 ${
-                            activeTab === item.id
+                        className={`w-full flex items-center gap-3 px-3 py-3 rounded-lg transition-all duration-200 ${activeTab === item.id
                                 ? "bg-gradient-to-r from-purple-600 to-blue-600 text-white shadow-lg"
                                 : "text-gray-300 hover:bg-gray-700 hover:text-white"
-                        } ${isCollapsed ? 'justify-center' : ''}`}
+                            } ${isCollapsed ? 'justify-center' : ''}`}
                         title={isCollapsed ? item.label : undefined}
                     >
                         {item.icon}
