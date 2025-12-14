@@ -36,7 +36,26 @@ export async function POST(req: NextRequest) {
       })
     );
 
-    const currentCount = listResult.Contents?.length || 0;
+    const allFilesInR2 = listResult.Contents || [];
+
+    // Get soft-deleted assets from database
+    const { prisma } = await import("@/lib/prisma");
+    const deletedAssets = await prisma.deletedAsset.findMany({
+      where: {
+        userId: session.user.id,
+        assetType: "portfolio",
+      },
+      select: {
+        assetKey: true,
+      },
+    });
+
+    // Create a set of deleted asset keys for fast lookup
+    const deletedKeys = new Set(deletedAssets.map(asset => asset.assetKey));
+
+    // Count only active files (exclude soft-deleted ones)
+    const activeFiles = allFilesInR2.filter(file => !deletedKeys.has(file.Key || ""));
+    const currentCount = activeFiles.length;
 
     const formData = await req.formData();
     const files = formData.getAll("files") as File[];
