@@ -126,20 +126,6 @@
 
 # Geliştime Planı
 
-## Editor Chat İyileştirmeleri
-
-### Content-Aware Template Switching
-- LLM'in mevcut template'i analiz edip kullanıcı isteğine göre uygun template'e geçmesi
-- Örnekler:
-  - "Profil fotoğrafımı görmek istemiyorum" → Profil fotosuz hero template'ine geç
-  - "GPA'mı görmek istemiyorum" → GPA'sız education template'ine geç
-  - "Profil fotoğrafımı göstermek istiyorum" → Profil fotolu hero template'ine geç
-- Gereksinimler:
-  - Her component için içerik varyasyonlarına sahip template'ler (profil fotolu/fotosuz hero, GPA'lı/GPA'sız education vb.)
-  - LLM'in mevcut template'i ve kullanıcı isteğini analiz edip doğru template'i seçmesi
-  - Template metadata sistemi (hangi template hangi içeriği gösteriyor/gizliyor)
-
-
 ## Rollback
 - hem preview hem de publish için rollback sistemi ve ui tasarımı
 - version history (aboneliklerimdeki tablodaki değerleri de işlevsel hale getir)

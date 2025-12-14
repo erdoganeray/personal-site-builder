@@ -128,6 +128,7 @@ function buildAnalysisPrompt(
         ? `
 - İsim: ${cvData.personalInfo?.name || "Yok"}
 - Email: ${cvData.personalInfo?.email || "Yok"}
+- Profil Fotoğrafı: ${cvData.personalInfo?.profilePhotoUrl ? "VAR" : "YOK"}
 - Deneyim: ${cvData.experience?.length || 0} adet
 - Eğitim: ${cvData.education?.length || 0} adet
 - Portfolio: ${cvData.portfolio?.length || 0} fotoğraf
@@ -218,6 +219,26 @@ Yukarıdaki bilgilere göre kullanıcının ne istediğini analiz et ve aşağı
 - Sadece JSON döndür, başka açıklama yapma
 - Template ID'ler yukarıdaki listeden seçilmeli
 - position opsiyoneldir, belirtilmezse sona eklenir
+
+## Profil Fotoğrafı İşlemleri (ÖNEMLİ):
+⚠️ Profil fotoğrafı ekleme/kaldırma istekleri için özel kurallar:
+
+1. PROFIL FOTOĞRAFI KALDIRMA İSTEĞİ:
+   - Kullanıcı "profil fotoğrafımı kaldır", "profil fotosu olmasın", "fotoğraf istemiyorum" gibi ifadeler kullanırsa
+   - Hero template'i hero-minimal-text olarak değiştir (CHANGE_TEMPLATE)
+   - Örnek: {"type": "CHANGE_TEMPLATE", "category": "hero", "newTemplateId": "hero-minimal-text"}
+
+2. PROFIL FOTOĞRAFI EKLEME İSTEĞİ:
+   - Kullanıcı "profil fotoğrafı ekle", "profil fotom görünsün", "fotoğraf ekle" gibi ifadeler kullanırsa
+   - ÖNCE CV verisinde profil fotoğrafı olup olmadığını kontrol et
+   - EĞER profil fotoğrafı VAR ise:
+     * Hero template'i fotolu bir template'e değiştir (hero-modern-centered, hero-split-screen, hero-animated-gradient)
+     * Mevcut site stiline uygun olanı seç (varsayılan: hero-modern-centered)
+     * Örnek: {"type": "CHANGE_TEMPLATE", "category": "hero", "newTemplateId": "hero-modern-centered"}
+   - EĞER profil fotoğrafı YOK ise:
+     * MyInfo'ya yönlendir
+     * Örnek: {"type": "REDIRECT_TO_MYINFO", "reason": "Profil fotoğrafı eklemek için önce Bilgilerim sayfasından fotoğraf yüklemeniz gerekiyor", "field": "personal"}
+
 
 SADECE JSON formatında döndür, başka açıklama ekleme.
 JSON'dan önce veya sonra hiçbir metin olmasın.

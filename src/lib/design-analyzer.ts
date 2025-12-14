@@ -28,6 +28,7 @@ Email: ${cvData.personalInfo.email || "Belirtilmemiş"}
 Telefon: ${cvData.personalInfo.phone || "Belirtilmemiş"}
 Konum: ${cvData.personalInfo.location || "Belirtilmemiş"}
 Ünvan: ${cvData.personalInfo.title || "Belirtilmemiş"}
+Profil Fotoğrafı: ${cvData.personalInfo.profilePhotoUrl ? "VAR" : "YOK"}
 
 Özet: ${cvData.summary || "Belirtilmemiş"}
 
@@ -268,11 +269,14 @@ Renk Seçimi Kriterleri:
 
 Component Seçimi Kriterleri:
 - Navigation: Sayfanın genel stiline uygun (minimal site için minimal nav, creative site için sidebar)
-- Hero: Mesleğe ve CV stiline göre seç:
-  * hero-modern-centered: Profesyonel/kurumsal roller (Business Analyst, Project Manager, Consultant)
-  * hero-split-screen: Yaratıcı/tasarımcı roller (Designer, Photographer, Creative Director)
-  * hero-minimal-text: Developer/Engineer/Writer roller (Software Engineer, Data Scientist, Content Writer) - text odaklı
-  * hero-animated-gradient: Modern/tech/creative roller (UI/UX Designer, Frontend Developer, Digital Marketer) - görsel odaklı
+- Hero: Profil fotoğrafı durumuna ve mesleğe göre seç:
+  ⚠️ ÖNEMLİ: Profil fotoğrafı kontrolü ZORUNLU!
+  * PROFİL FOTOĞRAFI YOK → SADECE hero-minimal-text kullan (diğer hero template'leri KULLANMA)
+  * PROFİL FOTOĞRAFI VAR → Mesleğe göre seç:
+    - hero-modern-centered: Profesyonel/kurumsal roller (Business Analyst, Project Manager, Consultant)
+    - hero-split-screen: Yaratıcı/tasarımcı roller (Designer, Photographer, Creative Director)
+    - hero-minimal-text: Developer/Engineer/Writer roller (Software Engineer, Data Scientist, Content Writer) - text odaklı
+    - hero-animated-gradient: Modern/tech/creative roller (UI/UX Designer, Frontend Developer, Digital Marketer) - görsel odaklı
 - Experience: CV'deki iş deneyimi sayısına göre
 - Education: CV'deki eğitim bilgisi sayısına göre (varsa mutlaka ekle)
 - Portfolio: SADECE portfolio fotoğrafları varsa ekle (${cvData.portfolio?.length || 0} adet var). Education ve Skills arasına yerleştir. Yoksa hiç ekleme!
