@@ -26,8 +26,6 @@ export async function GET(request: NextRequest) {
         jsContent: true,
         cvContent: true,
         status: true,
-        revisionCount: true,
-        maxRevisions: true,
         createdAt: true,
         updatedAt: true,
         publishedAt: true,

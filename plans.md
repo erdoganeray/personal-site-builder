@@ -126,14 +126,19 @@
 
 # Geliştime Planı
 
-## Revise
-- Bilgilerime pp yükledin, site oluştururken Profil fotoğrafı olmayan hero oluştu, hero yu güncellediğinde pp doğru şekilde siteye entegre olmuyor.
-- revize hakkı dolunca revize isteyince uygun geri bildirimi veriyor ama next.js issue döndürüyor. döndürmesin.
-- Component kaldırma, component ekleme konusu üzerine çalışılmalı. Örneğin portfolio fotosu yokken site oluşturulunca portfolio fotoğrafı eklenince uyarı olmalı: "editöre gidin ve portfolio oluşturun".
-- Editördeki revizede tüm site yapay zekaya yazdırılıyor, bu hem işlemin çok uzun sürmesine hem de template sisteminin getirdiği standartlaşma kuralını bozuyor. 
-- Siteyi oluşturdun, editörden revize yaptın, bilgilerimden bir bilgiyi değiştirdin ve kaydettin, revize ile oluşturulmuş yeni site tasarımı korunmuyor. Bunun yerine ilk başta kendi oluşturduğu tasarıma geri dönüyor.
-- revise işleminde içerik değişimi yapılmamalı. herhangi içerik değişimi isteğinde kullanıcı bilgilerim e yönlendirilmeli.
-- componentlerin sırası, component kaldırma, component ekleme, component tasarımını değiştirme
+## Editor Chat İyileştirmeleri
+
+### Content-Aware Template Switching
+- LLM'in mevcut template'i analiz edip kullanıcı isteğine göre uygun template'e geçmesi
+- Örnekler:
+  - "Profil fotoğrafımı görmek istemiyorum" → Profil fotosuz hero template'ine geç
+  - "GPA'mı görmek istemiyorum" → GPA'sız education template'ine geç
+  - "Profil fotoğrafımı göstermek istiyorum" → Profil fotolu hero template'ine geç
+- Gereksinimler:
+  - Her component için içerik varyasyonlarına sahip template'ler (profil fotolu/fotosuz hero, GPA'lı/GPA'sız education vb.)
+  - LLM'in mevcut template'i ve kullanıcı isteğini analiz edip doğru template'i seçmesi
+  - Template metadata sistemi (hangi template hangi içeriği gösteriyor/gizliyor)
+
 
 ## Rollback
 - hem preview hem de publish için rollback sistemi ve ui tasarımı

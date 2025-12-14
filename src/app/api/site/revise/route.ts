@@ -2,7 +2,6 @@ import { NextRequest, NextResponse } from "next/server";
 import { getServerSession } from "next-auth";
 import { authOptions } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
-import { reviseWebsite } from "@/lib/gemini";
 import {
   checkAndResetEditCounter,
   hasRemainingEdits,
@@ -10,14 +9,26 @@ import {
   getRemainingEdits,
 } from "@/lib/subscription-utils";
 import { getPlanLimits, PlanType } from "@/lib/plan-constants";
+import { analyzeRevisionRequest } from "@/lib/revision-analyzer";
+import {
+  addComponent,
+  removeComponent,
+  reorderComponents,
+  changeComponentTemplate,
+  updateThemeColors,
+  validateComponentAddition,
+  DesignPlan,
+} from "@/lib/revision-operations";
+import { regeneratePreviewContent } from "@/lib/regenerate-preview";
+import { getRedirectMessage } from "@/lib/chat-suggestions";
 
 /**
  * POST /api/site/revise
- * Mevcut site'ı kullanıcı isteğine göre revize eder
+ * Template-based site revision using LLM analysis
  */
 export async function POST(req: NextRequest) {
   try {
-    // 1. Kullanıcı authentication kontrolü
+    // 1. Authentication check
     const session = await getServerSession(authOptions);
 
     if (!session?.user?.email) {
@@ -27,45 +38,39 @@ export async function POST(req: NextRequest) {
       );
     }
 
-    // 2. Request body'den siteId ve revisionRequest al
-    const { siteId, revisionRequest } = await req.json();
+    // 2. Get request body
+    const { siteId, message } = await req.json();
 
-    if (!siteId || !revisionRequest) {
+    if (!siteId || !message) {
       return NextResponse.json(
-        { error: "siteId and revisionRequest are required" },
+        { error: "siteId and message are required" },
         { status: 400 }
       );
     }
 
-    if (typeof revisionRequest !== 'string' || revisionRequest.trim().length === 0) {
+    if (typeof message !== "string" || message.trim().length === 0) {
       return NextResponse.json(
-        { error: "Revision request must be a non-empty string" },
+        { error: "Message must be a non-empty string" },
         { status: 400 }
       );
     }
 
-    // 3. Kullanıcıyı database'den bul
+    // 3. Find user
     const user = await prisma.user.findUnique({
       where: { email: session.user.email },
     });
 
     if (!user) {
-      return NextResponse.json(
-        { error: "User not found" },
-        { status: 404 }
-      );
+      return NextResponse.json({ error: "User not found" }, { status: 404 });
     }
 
-    // 4. Site'ı database'den bul ve kullanıcıya ait olduğunu kontrol et
+    // 4. Find site and verify ownership
     const site = await prisma.site.findUnique({
       where: { id: siteId },
     });
 
     if (!site) {
-      return NextResponse.json(
-        { error: "Site not found" },
-        { status: 404 }
-      );
+      return NextResponse.json({ error: "Site not found" }, { status: 404 });
     }
 
     if (site.userId !== user.id) {
@@ -78,91 +83,326 @@ export async function POST(req: NextRequest) {
     // 5. Check and reset monthly edit counter if needed
     const userWithResetCounter = await checkAndResetEditCounter(user.id);
 
-    // 6. Check if user has remaining edits this month
-    if (!hasRemainingEdits(userWithResetCounter.planType, userWithResetCounter.editsThisMonth)) {
-      const limits = getPlanLimits(userWithResetCounter.planType as PlanType);
+    // 7. Validate site has required content
+    if (!site.designPlan || !site.cvContent) {
       return NextResponse.json(
-        {
-          error: `Bu ay için düzenleme hakkınız doldu (${limits.editsPerMonth}/${limits.editsPerMonth}). Yeni ay başında hakkınız yenilenecek.`,
-          resetDate: userWithResetCounter.editsResetDate,
-        },
+        { error: "Site is missing design plan or CV content" },
         { status: 400 }
       );
     }
 
-    // 7. HTML, CSS ve JS içeriği kontrolü
-    if (!site.htmlContent || !site.cssContent || !site.jsContent) {
-      return NextResponse.json(
-        { error: "Site has missing content (HTML, CSS, or JS) to revise" },
-        { status: 400 }
-      );
-    }
-
-    // 8. Önceki status'ü sakla ve "generating" yap
-    const previousStatus = site.status;
-    await prisma.site.update({
-      where: { id: siteId },
-      data: { status: "generating" },
-    });
-
-    // 9. Gemini ile revize yap
-    let revisedResult;
+    // 8. Analyze user's revision request with LLM
+    let operation;
     try {
-      revisedResult = await reviseWebsite(
-        site.htmlContent,
-        site.cssContent,
-        site.jsContent,
-        revisionRequest.trim()
+      operation = await analyzeRevisionRequest(
+        message.trim(),
+        site.designPlan as unknown as DesignPlan,
+        site.cvContent as any
       );
-    } catch (geminiError) {
-      console.error("Gemini revision error:", geminiError);
-
-      // Hata durumunda status'ü önceki haline geri al
-      await prisma.site.update({
-        where: { id: siteId },
-        data: { status: previousStatus },
-      });
-
+    } catch (analysisError) {
+      console.error("Revision analysis error:", analysisError);
       return NextResponse.json(
         {
-          error: "Failed to revise website. Please try again with a clearer request.",
-          details: geminiError instanceof Error ? geminiError.message : "Unknown error",
+          error: "Talebinizi analiz edemedik. Lütfen daha açık bir şekilde belirtin.",
+          details:
+            analysisError instanceof Error
+              ? analysisError.message
+              : "Unknown error",
         },
         { status: 500 }
       );
     }
 
-    // 10. Increment edit counter
-    const updatedUser = await incrementEditCounter(user.id);
+    // 9. Handle operation based on type
+    let updatedDesignPlan = site.designPlan as unknown as DesignPlan;
+    let responseMessage = "";
+    let shouldRegeneratePreview = false;
+    let shouldIncrementQuota = true;
 
-    // 11. Revize edilmiş HTML, CSS ve JS'i veritabanına kaydet
-    // Status'ü önceki haline (previewed veya published) geri getir
-    const updatedSite = await prisma.site.update({
+    switch (operation.type) {
+      case "REDIRECT_TO_MYINFO":
+        // Don't increment quota for redirects
+        shouldIncrementQuota = false;
+        responseMessage = getRedirectMessage(operation.field);
+
+        return NextResponse.json({
+          success: true,
+          operation,
+          message: responseMessage,
+          redirectToMyInfo: true,
+          myInfoField: operation.field,
+          subscription: {
+            editsUsed: userWithResetCounter.editsThisMonth,
+            editsLimit: getPlanLimits(userWithResetCounter.planType as PlanType)
+              .editsPerMonth,
+            editsRemaining: getRemainingEdits(
+              userWithResetCounter.planType,
+              userWithResetCounter.editsThisMonth
+            ),
+            resetDate: userWithResetCounter.editsResetDate,
+          },
+        });
+
+      case "UNSUPPORTED":
+        // Don't increment quota for unsupported operations
+        shouldIncrementQuota = false;
+        responseMessage = operation.message;
+
+        return NextResponse.json({
+          success: false,
+          operation,
+          message: responseMessage,
+          subscription: {
+            editsUsed: userWithResetCounter.editsThisMonth,
+            editsLimit: getPlanLimits(userWithResetCounter.planType as PlanType)
+              .editsPerMonth,
+            editsRemaining: getRemainingEdits(
+              userWithResetCounter.planType,
+              userWithResetCounter.editsThisMonth
+            ),
+            resetDate: userWithResetCounter.editsResetDate,
+          },
+        });
+
+      case "CHAT":
+        // Don't increment quota for chat messages
+        shouldIncrementQuota = false;
+        responseMessage = operation.message;
+
+        return NextResponse.json({
+          success: true,
+          operation,
+          message: responseMessage,
+          subscription: {
+            editsUsed: userWithResetCounter.editsThisMonth,
+            editsLimit: getPlanLimits(userWithResetCounter.planType as PlanType)
+              .editsPerMonth,
+            editsRemaining: getRemainingEdits(
+              userWithResetCounter.planType,
+              userWithResetCounter.editsThisMonth
+            ),
+            resetDate: userWithResetCounter.editsResetDate,
+          },
+        });
+
+      case "ADD_COMPONENT":
+        // Check quota before actual revision
+        if (
+          !hasRemainingEdits(
+            userWithResetCounter.planType,
+            userWithResetCounter.editsThisMonth
+          )
+        ) {
+          const limits = getPlanLimits(userWithResetCounter.planType as PlanType);
+          return NextResponse.json(
+            {
+              error: `Bu ay için düzenleme hakkınız doldu (${limits.editsPerMonth}/${limits.editsPerMonth}). Yeni ay başında hakkınız yenilenecek.`,
+              resetDate: userWithResetCounter.editsResetDate,
+            },
+            { status: 400 }
+          );
+        }
+
+        // Validate component can be added
+        const validation = validateComponentAddition(
+          site.cvContent as any,
+          operation.category
+        );
+
+        if (!validation.isValid) {
+          shouldIncrementQuota = false;
+          return NextResponse.json({
+            success: false,
+            operation,
+            message: `❌ ${operation.category} bölümü eklenemedi: ${validation.reason}`,
+            subscription: {
+              editsUsed: userWithResetCounter.editsThisMonth,
+              editsLimit: getPlanLimits(
+                userWithResetCounter.planType as PlanType
+              ).editsPerMonth,
+              editsRemaining: getRemainingEdits(
+                userWithResetCounter.planType,
+                userWithResetCounter.editsThisMonth
+              ),
+              resetDate: userWithResetCounter.editsResetDate,
+            },
+          });
+        }
+
+        updatedDesignPlan = addComponent(
+          updatedDesignPlan,
+          operation.category,
+          operation.templateId,
+          operation.position
+        );
+        shouldRegeneratePreview = true;
+        responseMessage = `✅ ${operation.category} bölümü eklendi`;
+        break;
+
+      case "REMOVE_COMPONENT":
+        // Check quota before actual revision
+        if (
+          !hasRemainingEdits(
+            userWithResetCounter.planType,
+            userWithResetCounter.editsThisMonth
+          )
+        ) {
+          const limits = getPlanLimits(userWithResetCounter.planType as PlanType);
+          return NextResponse.json(
+            {
+              error: `Bu ay için düzenleme hakkınız doldu (${limits.editsPerMonth}/${limits.editsPerMonth}). Yeni ay başında hakkınız yenilenecek.`,
+              resetDate: userWithResetCounter.editsResetDate,
+            },
+            { status: 400 }
+          );
+        }
+        updatedDesignPlan = removeComponent(
+          updatedDesignPlan,
+          operation.category
+        );
+        shouldRegeneratePreview = true;
+        responseMessage = `✅ ${operation.category} bölümü kaldırıldı`;
+        break;
+
+      case "REORDER_COMPONENTS":
+        // Check quota before actual revision
+        if (
+          !hasRemainingEdits(
+            userWithResetCounter.planType,
+            userWithResetCounter.editsThisMonth
+          )
+        ) {
+          const limits = getPlanLimits(userWithResetCounter.planType as PlanType);
+          return NextResponse.json(
+            {
+              error: `Bu ay için düzenleme hakkınız doldu (${limits.editsPerMonth}/${limits.editsPerMonth}). Yeni ay başında hakkınız yenilenecek.`,
+              resetDate: userWithResetCounter.editsResetDate,
+            },
+            { status: 400 }
+          );
+        }
+        updatedDesignPlan = reorderComponents(
+          updatedDesignPlan,
+          operation.newOrder
+        );
+        shouldRegeneratePreview = true;
+        responseMessage = `✅ Bölüm sıralaması güncellendi`;
+        break;
+
+      case "CHANGE_TEMPLATE":
+        // Check quota before actual revision
+        if (
+          !hasRemainingEdits(
+            userWithResetCounter.planType,
+            userWithResetCounter.editsThisMonth
+          )
+        ) {
+          const limits = getPlanLimits(userWithResetCounter.planType as PlanType);
+          return NextResponse.json(
+            {
+              error: `Bu ay için düzenleme hakkınız doldu (${limits.editsPerMonth}/${limits.editsPerMonth}). Yeni ay başında hakkınız yenilenecek.`,
+              resetDate: userWithResetCounter.editsResetDate,
+            },
+            { status: 400 }
+          );
+        }
+        updatedDesignPlan = changeComponentTemplate(
+          updatedDesignPlan,
+          operation.category,
+          operation.newTemplateId
+        );
+        shouldRegeneratePreview = true;
+        responseMessage = `✅ ${operation.category} template'i değiştirildi`;
+        break;
+
+      case "UPDATE_THEME":
+        // Check quota before actual revision
+        if (
+          !hasRemainingEdits(
+            userWithResetCounter.planType,
+            userWithResetCounter.editsThisMonth
+          )
+        ) {
+          const limits = getPlanLimits(userWithResetCounter.planType as PlanType);
+          return NextResponse.json(
+            {
+              error: `Bu ay için düzenleme hakkınız doldu (${limits.editsPerMonth}/${limits.editsPerMonth}). Yeni ay başında hakkınız yenilenecek.`,
+              resetDate: userWithResetCounter.editsResetDate,
+            },
+            { status: 400 }
+          );
+        }
+        updatedDesignPlan = updateThemeColors(
+          updatedDesignPlan,
+          operation.colors
+        );
+        shouldRegeneratePreview = true;
+        responseMessage = `✅ Tema renkleri güncellendi`;
+        break;
+
+      default:
+        shouldIncrementQuota = false;
+        return NextResponse.json({
+          success: false,
+          operation,
+          message: "Bilinmeyen işlem tipi",
+        });
+    }
+
+    // 10. Regenerate preview content if needed
+    if (shouldRegeneratePreview) {
+      try {
+        // First update the designPlan in the database
+        await prisma.site.update({
+          where: { id: siteId },
+          data: { designPlan: updatedDesignPlan as any },
+        });
+
+        // Then regenerate preview content from the updated designPlan
+        await regeneratePreviewContent(siteId);
+      } catch (regenerateError) {
+        console.error("Preview regeneration error:", regenerateError);
+        return NextResponse.json(
+          {
+            error: "Preview oluşturulurken hata oluştu",
+            details:
+              regenerateError instanceof Error
+                ? regenerateError.message
+                : "Unknown error",
+          },
+          { status: 500 }
+        );
+      }
+    }
+
+    // 11. Increment edit counter
+    const updatedUser = shouldIncrementQuota
+      ? await incrementEditCounter(user.id)
+      : userWithResetCounter;
+
+    // 12. Get updated site
+    const updatedSite = await prisma.site.findUnique({
       where: { id: siteId },
-      data: {
-        htmlContent: revisedResult.html,
-        cssContent: revisedResult.css,
-        jsContent: revisedResult.js,
-        status: previousStatus, // Önceki status'ü koru (previewed veya published)
-        revisionCount: site.revisionCount + 1, // Keep for backward compatibility
-        updatedAt: new Date(),
+      select: {
+        id: true,
+        designPlan: true,
       },
     });
 
-    // 12. Başarılı response döndür
-    const remainingEdits = getRemainingEdits(updatedUser.planType, updatedUser.editsThisMonth);
+    // 13. Return success response
     const limits = getPlanLimits(updatedUser.planType as PlanType);
+    const remainingEdits = getRemainingEdits(
+      updatedUser.planType,
+      updatedUser.editsThisMonth
+    );
 
     return NextResponse.json({
       success: true,
-      message: "Website revised successfully",
-      changes: revisedResult.changes,
+      operation,
+      message: responseMessage,
       site: {
-        id: updatedSite.id,
-        title: updatedSite.title,
-        status: updatedSite.status,
-        revisionCount: updatedSite.revisionCount,
-        maxRevisions: updatedSite.maxRevisions,
+        id: updatedSite?.id,
+        designPlan: updatedSite?.designPlan,
       },
       subscription: {
         editsUsed: updatedUser.editsThisMonth,
@@ -171,7 +411,6 @@ export async function POST(req: NextRequest) {
         resetDate: updatedUser.editsResetDate,
       },
     });
-
   } catch (error) {
     console.error("Error in /api/site/revise:", error);
 

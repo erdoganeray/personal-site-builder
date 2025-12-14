@@ -143,7 +143,6 @@ export async function POST(req: NextRequest) {
           // Always include these components
           case 'navigation':
           case 'hero':
-          case 'about':
           case 'contact':
           case 'footer':
             return true;
@@ -338,8 +337,6 @@ export async function GET(req: NextRequest) {
       title: site.title,
       status: site.status,
       hasHtmlContent: !!site.htmlContent,
-      revisionCount: site.revisionCount,
-      maxRevisions: site.maxRevisions,
     });
 
   } catch (error) {

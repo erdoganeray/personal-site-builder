@@ -44,7 +44,15 @@ export async function regeneratePreviewContent(siteId: string): Promise<{
     }
 
     // 4. Regenerate HTML, CSS, JS from templates
-    console.log(`Regenerating preview for site ${siteId}...`);
+    console.log(`🔄 Regenerating preview for site ${siteId}...`);
+    console.log(`📋 Design Plan:`, JSON.stringify(designPlan.selectedComponents.map((c: any) => c.category), null, 2));
+    console.log(`📊 CV Data Summary:`, {
+      hasExperience: cvData.experience?.length || 0,
+      hasEducation: cvData.education?.length || 0,
+      hasPortfolio: cvData.portfolio?.length || 0,
+      hasSkills: cvData.skills?.length || 0,
+      hasLanguages: cvData.languages?.length || 0,
+    });
 
     let finalHtml = '';
     let finalCss = '';
@@ -80,7 +88,6 @@ export async function regeneratePreviewContent(siteId: string): Promise<{
           // Always include these components
           case 'navigation':
           case 'hero':
-          case 'about':
           case 'contact':
           case 'footer':
             return true;
