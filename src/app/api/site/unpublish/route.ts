@@ -4,6 +4,7 @@ import { authOptions } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
 import { unpublishFromCloudflare, deleteKVMapping } from "@/lib/cloudflare-deploy";
 import { recalculateUserStorage } from "@/lib/storage-calculator";
+import { revalidatePath } from "next/cache";
 
 export async function POST(req: NextRequest) {
   try {
@@ -108,6 +109,10 @@ export async function POST(req: NextRequest) {
       console.error("⚠️ Storage recalculation failed (non-blocking):", storageError);
       // Don't block unpublish flow if storage calculation fails
     }
+
+    // 7.6. Revalidate dashboard cache
+    revalidatePath('/dashboard');
+    revalidatePath('/dashboard?tab=domain-management');
 
     // 8. Başarılı yanıt
     return NextResponse.json({

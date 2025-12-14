@@ -251,7 +251,8 @@ export default function DomainManagement() {
 
             if (data.success) {
                 alert("Site yayından kaldırıldı. Subdomain rezervasyonu başlatıldı.");
-                fetchUserData();
+                // Force full page reload to clear all cache and show updated data
+                window.location.reload();
             } else {
                 alert(data.error || "Site yayından kaldırılamadı");
             }
