@@ -1,6 +1,8 @@
 import { CVData } from "./gemini-pdf-parser";
 import { ThemeColors, SelectedComponent, SiteGenerationPlan } from "@/types/templates";
 import { GoogleGenerativeAI } from "@google/generative-ai";
+import { generateFontPairsPromptText, getFontPairById } from "./font-registry";
+
 
 /**
  * Gemini API'ye CV bilgilerini ve prompt'u göndererek
@@ -305,6 +307,27 @@ Component Seçimi Kriterleri:
 - Mesleğe uygunluk
 - Kullanıcının özel isteklerini dikkate al
 
+${generateFontPairsPromptText()}
+
+Font Seçimi Kriterleri:
+- Mesleğe ve CV içeriğine uygun font kategorisi seç (modern/professional/creative/minimal)
+- Template style ile uyumlu font çifti seç
+- Heading ve body fontları birlikte uyumlu olmalı
+- Okunabilirlik her zaman öncelikli
+- Font Kategorileri:
+  * MODERN: Tech, startup, modern profiller için (Software Engineer, Developer, Data Scientist)
+  * PROFESSIONAL: Kurumsal, profesyonel profiller için (Manager, Consultant, Business Analyst)
+  * CREATIVE: Tasarımcı, yaratıcı profiller için (Designer, Photographer, Creative Director, Artist)
+  * MINIMAL: Minimal, sade tasarımlar için (Writer, Academic, Researcher)
+- Seçim Stratejisi:
+  * Meslek ve ünvan analiz et
+  * Template style'a uygun kategori seç
+  * Kategori içinden en uygun font pair'i seç
+  * Örnek: Software Engineer + modern style → modern-1 (Inter) veya modern-2 (Poppins)
+  * Örnek: Graphic Designer + creative style → creative-1 (Playfair Display + Source Sans Pro)
+  * Örnek: Business Consultant + professional style → professional-1 (Roboto)
+
+
 Çıktı formatı JSON olsun:
 {
   "themeColors": {
@@ -335,6 +358,8 @@ Component Seçimi Kriterleri:
   ],
   "layout": "single-page",
   "style": "modern",
+  "fontStyle": "modern",
+  "fontPairId": "modern-1",
   "reasoning": "Seçimlerinizin kısa açıklaması (2-3 cümle, Türkçe)"
 }
 
@@ -359,8 +384,23 @@ JSON'dan önce veya sonra hiçbir metin olmasın.
             throw new Error("Missing required fields in design plan");
          }
 
+         // Font pair processing
+         const fontPairId = parsed.fontPairId || 'professional-1';
+         const fontPair = getFontPairById(fontPairId);
+
+         if (!fontPair) {
+            console.warn(`Font pair not found: ${fontPairId}, using default`);
+         }
+
+         // Add font names to themeColors
+         const themeColorsWithFonts = {
+            ...parsed.themeColors,
+            fontHeading: fontPair?.heading || 'Roboto',
+            fontBody: fontPair?.body || 'Roboto'
+         };
+
          return {
-            themeColors: parsed.themeColors,
+            themeColors: themeColorsWithFonts,
             selectedComponents: parsed.selectedComponents,
             layout: parsed.layout || 'single-page',
             style: parsed.style || 'modern',
@@ -368,8 +408,11 @@ JSON'dan önce veya sonra hiçbir metin olmasın.
             iconSizes: parsed.iconSizes || {
                navigation: '20px',
                social: '18px'
-            }
+            },
+            fontStyle: parsed.fontStyle || 'professional',
+            fontPairId: fontPairId
          };
+
 
       } catch (parseError) {
          console.error("Failed to parse Gemini design analysis:", responseText);

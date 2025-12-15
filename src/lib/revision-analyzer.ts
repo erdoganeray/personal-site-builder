@@ -41,6 +41,11 @@ export type RevisionOperation =
         };
     }
     | {
+        type: "CHANGE_FONTS";
+        fontStyle: 'modern' | 'professional' | 'creative' | 'minimal';
+        fontPairId: string;
+    }
+    | {
         type: "REDIRECT_TO_MYINFO";
         reason: string;
         field: "personal" | "experience" | "education" | "skills" | "languages" | "portfolio";
@@ -145,6 +150,12 @@ ${currentComponents}
 
 Tema Renkleri: ${JSON.stringify(currentDesignPlan.themeColors || {}, null, 2)}
 
+Font Bilgileri:
+- Font Style: ${currentDesignPlan.fontStyle || 'professional'}
+- Font Pair ID: ${currentDesignPlan.fontPairId || 'professional-1'}
+- Heading Font: ${currentDesignPlan.themeColors?.fontHeading || 'Roboto'}
+- Body Font: ${currentDesignPlan.themeColors?.fontBody || 'Roboto'}
+
 ## Kullanılabilir Template'ler:
 ${JSON.stringify(AVAILABLE_TEMPLATES, null, 2)}
 
@@ -194,20 +205,45 @@ Yukarıdaki bilgilere göre kullanıcının ne istediğini analiz et ve aşağı
   }
 }
 
-6. MyInfo'ya Yönlendir (CV içeriği değişikliği için):
+6. Font Değiştir:
+{
+  "type": "CHANGE_FONTS",
+  "fontStyle": "modern",
+  "fontPairId": "modern-1"
+}
+
+Kullanılabilir Font Çiftleri:
+- modern-1: Inter (modern, tech profiller için)
+- modern-2: Poppins (modern, dinamik profiller için)
+- modern-3: Montserrat (modern, urban profiller için)
+- modern-4: Space Grotesk + Inter (modern, distinctive headings)
+- professional-1: Roboto (profesyonel, kurumsal için)
+- professional-2: Open Sans (profesyonel, friendly için)
+- professional-3: Lato (profesyonel, warm için)
+- professional-4: Work Sans (profesyonel, clean için)
+- creative-1: Playfair Display + Source Sans Pro (yaratıcı, elegant için)
+- creative-2: Merriweather + Open Sans (yaratıcı, classic için)
+- creative-3: Raleway (yaratıcı, distinctive için)
+- creative-4: Cormorant Garamond + Proza Libre (yaratıcı, sophisticated için)
+- minimal-1: DM Sans (minimal, geometric için)
+- minimal-2: IBM Plex Sans (minimal, neutral için)
+- minimal-3: Outfit (minimal, modern için)
+- minimal-4: Manrope (minimal, smooth için)
+
+7. MyInfo'ya Yönlendir (CV içeriği değişikliği için):
 {
   "type": "REDIRECT_TO_MYINFO",
   "reason": "İsim değişikliği için Bilgilerim sayfasına gitmeniz gerekiyor",
   "field": "personal"
 }
 
-7. Sohbet Mesajı (selamlaşma, genel sorular, teşekkür vb.):
+8. Sohbet Mesajı (selamlaşma, genel sorular, teşekkür vb.):
 {
   "type": "CHAT",
   "message": "Merhaba! Size nasıl yardımcı olabilirim? Sitenizde değişiklik yapmak isterseniz, lütfen ne yapmak istediğinizi belirtin."
 }
 
-8. Desteklenmeyen İşlem (site düzenleme ile ilgili ama yapılamayan):
+9. Desteklenmeyen İşlem (site düzenleme ile ilgili ama yapılamayan):
 {
   "type": "UNSUPPORTED",
   "message": "Bu işlem şu anda desteklenmiyor. Lütfen daha spesifik bir talep yazın."

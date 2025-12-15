@@ -2,6 +2,7 @@ import { prisma } from "@/lib/prisma";
 import { CVData } from "@/lib/gemini-pdf-parser";
 import { getTemplateById } from "@/components/site-templates";
 import { populateTemplate } from "@/lib/template-engine";
+import { getFontPairById } from "@/lib/font-registry";
 
 /**
  * Regenerates htmlContent, cssContent, jsContent from cvContent + designPlan
@@ -60,6 +61,9 @@ export async function regeneratePreviewContent(siteId: string): Promise<{
 
     try {
       // HTML beginning
+      const fontPair = getFontPairById(designPlan.fontPairId || 'professional-1');
+      const googleFontsUrl = fontPair?.googleFontsUrl || 'https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;700;900&display=swap';
+
       finalHtml = `<!DOCTYPE html>
 <html lang="tr">
 <head>
@@ -67,6 +71,10 @@ export async function regeneratePreviewContent(siteId: string): Promise<{
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>${cvData.personalInfo.name} - Kişisel Web Sitesi</title>
   <meta name="description" content="${cvData.personalInfo.title || 'Professional Portfolio'}">
+  <!-- Google Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="${googleFontsUrl}" rel="stylesheet">
   <link rel="stylesheet" href="styles.css">
 </head>
 <body>
@@ -146,10 +154,14 @@ export async function regeneratePreviewContent(siteId: string): Promise<{
 }
 
 body {
-  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+  font-family: '${designPlan.themeColors.fontBody || 'Inter'}', 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
   line-height: 1.6;
   color: ${designPlan.themeColors.text};
   background: ${designPlan.themeColors.background};
+}
+
+h1, h2, h3, h4, h5, h6 {
+  font-family: '${designPlan.themeColors.fontHeading || 'Inter'}', 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
 }
 
 .container {

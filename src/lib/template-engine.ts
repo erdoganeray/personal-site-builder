@@ -137,6 +137,8 @@ export function getHeroReplacements(
     '{{COLOR_BACKGROUND}}': themeColors.background,
     '{{COLOR_TEXT}}': themeColors.text,
     '{{COLOR_TEXT_SECONDARY}}': themeColors.textSecondary,
+    '{{FONT_HEADING}}': themeColors.fontHeading || 'Inter',
+    '{{FONT_BODY}}': themeColors.fontBody || 'Inter',
   };
 }
 
@@ -192,6 +194,8 @@ export function getExperienceReplacements(
     '{{COLOR_BACKGROUND}}': themeColors.background,
     '{{COLOR_TEXT}}': themeColors.text,
     '{{COLOR_TEXT_SECONDARY}}': themeColors.textSecondary,
+    '{{FONT_HEADING}}': themeColors.fontHeading || 'Inter',
+    '{{FONT_BODY}}': themeColors.fontBody || 'Inter',
   };
 }
 
@@ -394,6 +398,8 @@ export function getEducationReplacements(
     '{{COLOR_BACKGROUND}}': themeColors.background,
     '{{COLOR_TEXT}}': themeColors.text,
     '{{COLOR_TEXT_SECONDARY}}': themeColors.textSecondary,
+    '{{FONT_HEADING}}': themeColors.fontHeading || 'Inter',
+    '{{FONT_BODY}}': themeColors.fontBody || 'Inter',
   };
 }
 
@@ -612,6 +618,8 @@ export function getSkillsReplacements(
     '{{COLOR_BACKGROUND}}': themeColors.background,
     '{{COLOR_TEXT}}': themeColors.text,
     '{{COLOR_TEXT_SECONDARY}}': themeColors.textSecondary,
+    '{{FONT_HEADING}}': themeColors.fontHeading || 'Inter',
+    '{{FONT_BODY}}': themeColors.fontBody || 'Inter',
   };
 }
 
@@ -700,6 +708,8 @@ export function getPortfolioReplacements(
     '{{COLOR_BACKGROUND}}': themeColors.background,
     '{{COLOR_TEXT}}': themeColors.text,
     '{{COLOR_TEXT_SECONDARY}}': themeColors.textSecondary,
+    '{{FONT_HEADING}}': themeColors.fontHeading || 'Inter',
+    '{{FONT_BODY}}': themeColors.fontBody || 'Inter',
   };
 }
 
@@ -954,6 +964,8 @@ export function getLanguagesReplacements(
     '{{COLOR_CARD_BG_HOVER}}': 'rgba(255, 255, 255, 0.15)', // Hover state for cards
     '{{COLOR_BADGE_BG}}': 'rgba(0, 0, 0, 0.05)', // Badge background
     '{{COLOR_SHADOW}}': 'rgba(0, 0, 0, 0.1)', // Shadow color
+    '{{FONT_HEADING}}': themeColors.fontHeading || 'Inter',
+    '{{FONT_BODY}}': themeColors.fontBody || 'Inter',
   };
 }
 
@@ -975,6 +987,8 @@ export function getContactReplacements(
     '{{COLOR_BACKGROUND}}': themeColors.background,
     '{{COLOR_TEXT}}': themeColors.text,
     '{{COLOR_TEXT_SECONDARY}}': themeColors.textSecondary,
+    '{{FONT_HEADING}}': themeColors.fontHeading || 'Inter',
+    '{{FONT_BODY}}': themeColors.fontBody || 'Inter',
   };
 }
 
@@ -1032,6 +1046,8 @@ export function getFooterReplacements(
     '{{COLOR_BACKGROUND}}': themeColors.background,
     '{{COLOR_TEXT}}': themeColors.text,
     '{{COLOR_TEXT_SECONDARY}}': themeColors.textSecondary,
+    '{{FONT_HEADING}}': themeColors.fontHeading || 'Inter',
+    '{{FONT_BODY}}': themeColors.fontBody || 'Inter',
   };
 }
 
@@ -1107,6 +1123,8 @@ export function getNavigationReplacements(
     '{{COLOR_TEXT_SECONDARY}}': themeColors.textSecondary,
     '{{COLOR_ICON_PRIMARY}}': themeColors.iconPrimary || themeColors.primary,
     '{{COLOR_ICON_SECONDARY}}': themeColors.iconSecondary || themeColors.accent,
+    '{{FONT_HEADING}}': themeColors.fontHeading || 'Inter',
+    '{{FONT_BODY}}': themeColors.fontBody || 'Inter',
   };
 }
 

@@ -21,6 +21,7 @@ import {
 } from "@/lib/revision-operations";
 import { regeneratePreviewContent } from "@/lib/regenerate-preview";
 import { getRedirectMessage } from "@/lib/chat-suggestions";
+import { getFontPairById } from "@/lib/font-registry";
 
 /**
  * POST /api/site/revise
@@ -384,6 +385,73 @@ export async function POST(req: NextRequest) {
 
         shouldRegeneratePreview = true;
         responseMessage = `✅ Tema renkleri güncellendi`;
+        break;
+
+      case "CHANGE_FONTS":
+        // Check quota before actual revision
+        if (
+          !hasRemainingEdits(
+            userWithResetCounter.planType,
+            userWithResetCounter.editsThisMonth
+          )
+        ) {
+          const limits = getPlanLimits(userWithResetCounter.planType as PlanType);
+          return NextResponse.json(
+            {
+              error: `Bu ay için düzenleme hakkınız doldu (${limits.editsPerMonth}/${limits.editsPerMonth}). Yeni ay başında hakkınız yenilenecek.`,
+              resetDate: userWithResetCounter.editsResetDate,
+            },
+            { status: 400 }
+          );
+        }
+
+        // Debug: Log font change
+        console.log("\n🔤 FONT CHANGE DEBUG:");
+        console.log(`   Old Font Style: ${updatedDesignPlan.fontStyle || 'professional'}`);
+        console.log(`   Old Font Pair ID: ${updatedDesignPlan.fontPairId || 'professional-1'}`);
+        console.log(`   New Font Style: ${operation.fontStyle}`);
+        console.log(`   New Font Pair ID: ${operation.fontPairId}`);
+
+        // Get font pair
+        const fontPair = getFontPairById(operation.fontPairId);
+        if (!fontPair) {
+          shouldIncrementQuota = false;
+          return NextResponse.json({
+            success: false,
+            operation,
+            message: `❌ Font çifti bulunamadı: ${operation.fontPairId}`,
+            subscription: {
+              editsUsed: userWithResetCounter.editsThisMonth,
+              editsLimit: getPlanLimits(
+                userWithResetCounter.planType as PlanType
+              ).editsPerMonth,
+              editsRemaining: getRemainingEdits(
+                userWithResetCounter.planType,
+                userWithResetCounter.editsThisMonth
+              ),
+              resetDate: userWithResetCounter.editsResetDate,
+            },
+          });
+        }
+
+        // Update font in theme colors
+        updatedDesignPlan = updateThemeColors(
+          updatedDesignPlan,
+          {
+            fontHeading: fontPair.heading,
+            fontBody: fontPair.body
+          }
+        );
+
+        // Update font style and pair ID
+        updatedDesignPlan.fontStyle = operation.fontStyle;
+        updatedDesignPlan.fontPairId = operation.fontPairId;
+
+        console.log(`   ✅ Fonts Updated: ${fontPair.heading} / ${fontPair.body}`);
+        console.log("");
+
+        shouldRegeneratePreview = true;
+        responseMessage = `✅ Fontlar güncellendi: ${fontPair.heading}`;
         break;
 
       default:

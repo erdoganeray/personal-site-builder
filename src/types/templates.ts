@@ -11,6 +11,9 @@ export interface ThemeColors {
   textSecondary: string;
   iconPrimary?: string;
   iconSecondary?: string;
+  // Font properties
+  fontHeading?: string;
+  fontBody?: string;
 }
 
 export interface ComponentTemplate {
@@ -47,4 +50,6 @@ export interface SiteGenerationPlan {
     navigation: string;
     social: string;
   };
+  fontStyle?: 'modern' | 'professional' | 'creative' | 'minimal';
+  fontPairId?: string;
 }

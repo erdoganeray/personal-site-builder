@@ -21,12 +21,16 @@ export interface DesignPlan {
         accent: string;
         background?: string;
         text?: string;
+        fontHeading?: string;
+        fontBody?: string;
     };
     iconStyle?: 'outline' | 'solid';
     iconSizes?: {
         navigation: string;
         social: string;
     };
+    fontStyle?: 'modern' | 'professional' | 'creative' | 'minimal';
+    fontPairId?: string;
 }
 
 export interface ThemeColors {
@@ -35,6 +39,8 @@ export interface ThemeColors {
     accent: string;
     background?: string;
     text?: string;
+    fontHeading?: string;
+    fontBody?: string;
 }
 
 /**
