@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from "next/server";
 import { getServerSession } from "next-auth";
 import { authOptions } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
+import { extractAssetKeys, cleanupOrphanedAssets, calculateTotalSize } from "@/lib/asset-cleanup-utils";
 
 export async function POST(req: NextRequest) {
     try {
@@ -98,6 +99,17 @@ export async function POST(req: NextRequest) {
             }
         }
 
+        // 6. Delete preview-only assets (assets in current preview but not in published)
+        // This prevents storage bloat from orphaned assets
+        const currentAssets = extractAssetKeys(site.cvContent as any, site.userId);
+        const publishedAssets = extractAssetKeys(publishedCvContent, site.userId);
+        const previewOnlyAssets = currentAssets.filter(key => !publishedAssets.includes(key));
+
+        if (previewOnlyAssets.length > 0) {
+            console.log(`🧹 Found ${previewOnlyAssets.length} preview-only assets to clean up during rollback`);
+            await cleanupOrphanedAssets(previewOnlyAssets, site.userId);
+        }
+
         // 7. Perform rollback - copy published content to preview
         const updatedSite = await prisma.site.update({
             where: { id: siteId },
@@ -123,9 +135,21 @@ export async function POST(req: NextRequest) {
             console.log(`🗑️ Cleaned up ${deletedCount.count} DeletedAsset records for restored photos`);
         }
 
+        // 9. Recalculate user's storage to ensure UI consistency
+        // Calculate total size of all assets in the restored content
+        const totalStorageSize = await calculateTotalSize(publishedAssets);
+
+        await prisma.user.update({
+            where: { id: site.userId },
+            data: {
+                storageUsed: totalStorageSize,
+            },
+        });
+
+        console.log(`📊 Recalculated storage: ${totalStorageSize} bytes for user ${site.userId}`);
         console.log(`✅ Rollback successful for site ${siteId}`);
 
-        // 9. Return success response
+        // 10. Return success response
         return NextResponse.json({
             success: true,
             message: "Site successfully rolled back to last published version",

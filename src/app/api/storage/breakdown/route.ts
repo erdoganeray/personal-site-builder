@@ -23,7 +23,12 @@ async function getFileSize(key: string): Promise<number> {
         });
         const response = await s3Client.send(command);
         return response.ContentLength || 0;
-    } catch (error) {
+    } catch (error: any) {
+        // NotFound is expected when file doesn't exist (e.g., unpublished site)
+        if (error.name === 'NotFound' || error.$metadata?.httpStatusCode === 404) {
+            return 0;
+        }
+        // Log only unexpected errors
         console.error(`Error getting file size for ${key}:`, error);
         return 0;
     }

@@ -155,6 +155,21 @@ export async function cleanupOrphanedAssets(assetKeys: string[], userId: string)
 }
 
 /**
+ * Calculate total size of assets from R2
+ * Used to recalculate user's storage after operations like rollback
+ */
+export async function calculateTotalSize(assetKeys: string[]): Promise<number> {
+    let totalSize = 0;
+
+    for (const key of assetKeys) {
+        const size = await getFileSize(key);
+        totalSize += size;
+    }
+
+    return totalSize;
+}
+
+/**
  * Check if an asset key is referenced in published CV content
  * Used to prevent deletion of assets that are still in use
  */
