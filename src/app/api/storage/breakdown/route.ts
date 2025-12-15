@@ -45,9 +45,9 @@ export async function GET(req: NextRequest) {
             select: {
                 cvUrl: true,
                 cvContent: true,
-                htmlContent: true,
-                cssContent: true,
-                jsContent: true,
+                publishedHtmlContent: true,
+                publishedCssContent: true,
+                publishedJsContent: true,
             },
         });
 
@@ -164,20 +164,20 @@ export async function GET(req: NextRequest) {
         const publishedFiles: Array<{ name: string; size: number; type: string }> = [];
         let publishedTotal = 0;
 
-        if (site?.htmlContent) {
-            const htmlSize = Buffer.byteLength(site.htmlContent, 'utf8');
+        if (site?.publishedHtmlContent) {
+            const htmlSize = Buffer.byteLength(site.publishedHtmlContent, 'utf8');
             publishedFiles.push({ name: "HTML", size: htmlSize, type: "html" });
             publishedTotal += htmlSize;
         }
 
-        if (site?.cssContent) {
-            const cssSize = Buffer.byteLength(site.cssContent, 'utf8');
+        if (site?.publishedCssContent) {
+            const cssSize = Buffer.byteLength(site.publishedCssContent, 'utf8');
             publishedFiles.push({ name: "CSS", size: cssSize, type: "css" });
             publishedTotal += cssSize;
         }
 
-        if (site?.jsContent) {
-            const jsSize = Buffer.byteLength(site.jsContent, 'utf8');
+        if (site?.publishedJsContent) {
+            const jsSize = Buffer.byteLength(site.publishedJsContent, 'utf8');
             publishedFiles.push({ name: "JavaScript", size: jsSize, type: "js" });
             publishedTotal += jsSize;
         }
