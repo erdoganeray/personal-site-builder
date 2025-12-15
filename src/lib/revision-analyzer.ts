@@ -121,8 +121,8 @@ function buildAnalysisPrompt(
     cvData: CVData | null
 ): string {
     const currentComponents = currentDesignPlan.selectedComponents
-        .map((c) => c.category)
-        .join(", ");
+        .map((c) => `${c.category}: ${c.templateId}`)
+        .join("\n");
 
     const cvSummary = cvData
         ? `
@@ -140,7 +140,9 @@ function buildAnalysisPrompt(
 Sen bir kişisel web sitesi düzenleme asistanısın. Kullanıcının isteğini analiz edip uygun işlemi belirle.
 
 ## Mevcut Site Yapısı:
-Aktif Componentler: ${currentComponents}
+Aktif Componentler ve Kullanılan Template'ler:
+${currentComponents}
+
 Tema Renkleri: ${JSON.stringify(currentDesignPlan.themeColors || {}, null, 2)}
 
 ## Kullanılabilir Template'ler:
@@ -219,6 +221,7 @@ Yukarıdaki bilgilere göre kullanıcının ne istediğini analiz et ve aşağı
 - Sadece JSON döndür, başka açıklama yapma
 - Template ID'ler yukarıdaki listeden seçilmeli
 - position opsiyoneldir, belirtilmezse sona eklenir
+- ⚠️ KRİTİK: Template değiştirirken, o component için ZATEN KULLANILMAKTA OLAN template'i asla seçme! Mutlaka farklı bir template seç. Aksi halde kullanıcının düzenleme hakkı boşa harcanır ve sitede hiçbir değişiklik olmaz.
 
 ## Profil Fotoğrafı İşlemleri (ÖNEMLİ):
 ⚠️ Profil fotoğrafı ekleme/kaldırma istekleri için özel kurallar:
