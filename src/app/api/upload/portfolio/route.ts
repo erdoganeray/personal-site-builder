@@ -227,38 +227,64 @@ export async function DELETE(req: NextRequest) {
       );
     }
 
-    // SOFT DELETE: Mark for deletion instead of deleting immediately
-    // This allows rollback to restore the photo
     const { prisma } = await import("@/lib/prisma");
 
-    await prisma.deletedAsset.create({
-      data: {
-        userId: session.user.id,
-        assetKey: key,
-        assetType: "portfolio",
-      },
+    // Check if site is published
+    const site = await prisma.site.findFirst({
+      where: { userId: session.user.id },
+      select: { status: true },
     });
 
-    console.log("Portfolio image marked for deletion (soft delete):", key);
+    // If site is NOT published, delete directly from R2 (no need for rollback)
+    // If site IS published, use soft delete to allow rollback
+    if (site?.status !== "published") {
+      // HARD DELETE: Site is not published, so delete immediately from R2
+      await s3Client.send(
+        new DeleteObjectCommand({
+          Bucket: process.env.R2_BUCKET_NAME!,
+          Key: key,
+        })
+      );
 
-    // Note: Photo remains in R2 for 30 days
-    // Cron job will clean up after 30 days
+      console.log("Portfolio image deleted permanently (site not published):", key);
 
-    // Recalculate user's storage after marking deletion
-    // (Storage calculation should exclude soft-deleted assets)
-    try {
-      await recalculateUserStorage(session.user.id);
-    } catch (storageError) {
-      console.error("Failed to recalculate storage:", storageError);
-      // Don't fail the request if storage calculation fails
+      // Recalculate user's storage after deletion
+      try {
+        await recalculateUserStorage(session.user.id);
+      } catch (storageError) {
+        console.error("Failed to recalculate storage:", storageError);
+      }
+
+      return NextResponse.json({
+        success: true,
+        message: "Image deleted permanently",
+      });
+    } else {
+      // SOFT DELETE: Site is published, mark for deletion to allow rollback
+      await prisma.deletedAsset.create({
+        data: {
+          userId: session.user.id,
+          assetKey: key,
+          assetType: "portfolio",
+        },
+      });
+
+      console.log("Portfolio image marked for deletion (soft delete - site published):", key);
+
+      // Recalculate user's storage after marking deletion
+      try {
+        await recalculateUserStorage(session.user.id);
+      } catch (storageError) {
+        console.error("Failed to recalculate storage:", storageError);
+      }
+
+      return NextResponse.json({
+        success: true,
+        message: "Image marked for deletion successfully",
+      });
     }
-
-    return NextResponse.json({
-      success: true,
-      message: "Image marked for deletion successfully",
-    });
   } catch (error) {
-    console.error("Portfolio image soft delete error:", error);
+    console.error("Portfolio image delete error:", error);
     return NextResponse.json(
       { error: "Delete failed" },
       { status: 500 }

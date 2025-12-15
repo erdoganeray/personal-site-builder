@@ -111,7 +111,31 @@ export async function POST(req: NextRequest) {
       },
     });
 
-    // 8.5. Recalculate storage to include HTML, CSS, JS files
+    // 8.5. Auto-cleanup: Remove orphaned assets from previous published version
+    if (site.publishedCvContent) {
+      try {
+        const { extractAssetKeys, cleanupOrphanedAssets } = await import("@/lib/asset-cleanup-utils");
+
+        // Extract asset keys from old and new content
+        const oldAssets = extractAssetKeys(site.publishedCvContent, site.userId);
+        const newAssets = extractAssetKeys(site.cvContent, site.userId);
+
+        // Find orphaned assets (in old but not in new)
+        const orphanedAssets = oldAssets.filter(key => !newAssets.includes(key));
+
+        if (orphanedAssets.length > 0) {
+          console.log(`🧹 Found ${orphanedAssets.length} orphaned assets to clean up`);
+          await cleanupOrphanedAssets(orphanedAssets, site.userId);
+        } else {
+          console.log(`✅ No orphaned assets to clean up`);
+        }
+      } catch (cleanupError) {
+        console.error("⚠️ Auto-cleanup failed (non-blocking):", cleanupError);
+        // Don't block publish flow if cleanup fails
+      }
+    }
+
+    // 9. Recalculate storage to include HTML, CSS, JS files
     try {
       await recalculateUserStorage(site.user.id);
       console.log(`✅ Storage recalculated for user ${site.user.id} after publish`);
@@ -120,7 +144,7 @@ export async function POST(req: NextRequest) {
       // Don't block publish flow if storage calculation fails
     }
 
-    // 9. Başarılı yanıt
+    // 10. Başarılı yanıt
     return NextResponse.json({
       success: true,
       message: "Site published successfully!",

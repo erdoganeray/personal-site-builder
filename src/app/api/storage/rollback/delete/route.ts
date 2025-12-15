@@ -61,6 +61,69 @@ export async function DELETE(req: NextRequest) {
             return NextResponse.json({ error: "Unauthorized" }, { status: 403 });
         }
 
+        // Check if asset is in published content (deletion protection)
+        const site = await prisma.site.findFirst({
+            where: { userId: userId },
+            select: {
+                publishedCvContent: true,
+            },
+        });
+
+        if (site?.publishedCvContent) {
+            // Check if this asset is referenced in published content
+            const publishedCvContent = site.publishedCvContent as any;
+            const publishedAssets: string[] = [];
+
+            // Extract profile photo
+            const profilePhotoUrl = publishedCvContent.personalInfo?.profilePhotoUrl;
+            if (profilePhotoUrl) {
+                // Normalize to R2 key format
+                let key: string;
+                if (profilePhotoUrl.startsWith('/_assets/profile/')) {
+                    const fileName = profilePhotoUrl.replace('/_assets/profile/', '');
+                    key = `users/${userId}/profile/${fileName}`;
+                } else if (profilePhotoUrl.includes('/users/')) {
+                    const urlParts = profilePhotoUrl.split("/");
+                    const keyParts = urlParts.slice(urlParts.indexOf("users"));
+                    key = keyParts.join("/");
+                } else {
+                    key = profilePhotoUrl;
+                }
+                publishedAssets.push(key);
+            }
+
+            // Extract portfolio photos
+            if (Array.isArray(publishedCvContent.portfolio)) {
+                for (const item of publishedCvContent.portfolio) {
+                    if (item.imageUrl) {
+                        let key: string;
+                        if (item.imageUrl.startsWith('/_assets/portfolio/')) {
+                            const fileName = item.imageUrl.replace('/_assets/portfolio/', '');
+                            key = `users/${userId}/portfolio/${fileName}`;
+                        } else if (item.imageUrl.includes('/users/')) {
+                            const urlParts = item.imageUrl.split("/");
+                            const keyParts = urlParts.slice(urlParts.indexOf("users"));
+                            key = keyParts.join("/");
+                        } else {
+                            key = item.imageUrl;
+                        }
+                        publishedAssets.push(key);
+                    }
+                }
+            }
+
+            // If asset is in published content, block deletion
+            if (publishedAssets.includes(asset.assetKey)) {
+                return NextResponse.json(
+                    {
+                        error: "Bu dosya yayınlanmış versiyonunuzda kullanılıyor. Önce 'Geri Dön' yapın veya yeni versiyonu yayınlayın.",
+                        inPublishedContent: true,
+                    },
+                    { status: 409 } // Conflict
+                );
+            }
+        }
+
         // Get file size before deletion
         const fileSize = await getFileSize(asset.assetKey);
 
