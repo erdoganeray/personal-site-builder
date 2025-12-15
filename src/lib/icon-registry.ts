@@ -17,6 +17,24 @@ import {
   GraduationCap,
   Image,
   Zap,
+  // Skills icons
+  Code,
+  Palette,
+  Music,
+  Camera,
+  // Education icons
+  BookOpen,
+  Award,
+  FileCheck,
+  // Work icons
+  Laptop,
+  Coffee,
+  Presentation,
+  Rocket,
+  // Creative icons
+  Paintbrush,
+  Film,
+  Headphones,
   type LucideIcon
 } from 'lucide-react';
 
@@ -28,7 +46,7 @@ export type IconStyle = 'outline' | 'solid';
 /**
  * Icon category types
  */
-export type IconCategory = 'contact' | 'ui' | 'social' | 'navigation';
+export type IconCategory = 'contact' | 'ui' | 'social' | 'navigation' | 'skills' | 'education' | 'work' | 'creative';
 
 /**
  * Icon registry structure
@@ -75,6 +93,28 @@ export const iconRegistry: IconRegistry = {
     zap: { outline: Zap, solid: Zap },
     globe: { outline: Globe, solid: Globe },
     mail: { outline: Mail, solid: Mail },
+  },
+  skills: {
+    code: { outline: Code, solid: Code },
+    palette: { outline: Palette, solid: Palette },
+    music: { outline: Music, solid: Music },
+    camera: { outline: Camera, solid: Camera },
+  },
+  education: {
+    book: { outline: BookOpen, solid: BookOpen },
+    award: { outline: Award, solid: Award },
+    certificate: { outline: FileCheck, solid: FileCheck },
+  },
+  work: {
+    laptop: { outline: Laptop, solid: Laptop },
+    coffee: { outline: Coffee, solid: Coffee },
+    presentation: { outline: Presentation, solid: Presentation },
+    rocket: { outline: Rocket, solid: Rocket },
+  },
+  creative: {
+    paintbrush: { outline: Paintbrush, solid: Paintbrush },
+    film: { outline: Film, solid: Film },
+    headphones: { outline: Headphones, solid: Headphones },
   },
 };
 
@@ -159,6 +199,24 @@ function renderIconToSvg(
     'GraduationCap': '<path d="M22 10v6M2 10l10-5 10 5-10 5z"/><path d="M6 12v5c3 3 9 3 12 0v-5"/>',
     'Image': '<rect width="18" height="18" x="3" y="3" rx="2" ry="2"/><circle cx="9" cy="9" r="2"/><path d="m21 15-3.086-3.086a2 2 0 0 0-2.828 0L6 21"/>',
     'Zap': '<polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/>',
+    // Skills icons
+    'Code': '<polyline points="16 18 22 12 16 6"/><polyline points="8 6 2 12 8 18"/>',
+    'Palette': '<circle cx="13.5" cy="6.5" r=".5"/><circle cx="17.5" cy="10.5" r=".5"/><circle cx="8.5" cy="7.5" r=".5"/><circle cx="6.5" cy="12.5" r=".5"/><path d="M12 2C6.5 2 2 6.5 2 12s4.5 10 10 10c.926 0 1.648-.746 1.648-1.688 0-.437-.18-.835-.437-1.125-.29-.289-.438-.652-.438-1.125a1.64 1.64 0 0 1 1.668-1.668h1.996c3.051 0 5.555-2.503 5.555-5.554C21.965 6.012 17.461 2 12 2z"/>',
+    'Music': '<path d="M9 18V5l12-2v13"/><circle cx="6" cy="18" r="3"/><circle cx="18" cy="16" r="3"/>',
+    'Camera': '<path d="M14.5 4h-5L7 7H4a2 2 0 0 0-2 2v9a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2V9a2 2 0 0 0-2-2h-3l-2.5-3z"/><circle cx="12" cy="13" r="3"/>',
+    // Education icons
+    'BookOpen': '<path d="M2 3h6a4 4 0 0 1 4 4v14a3 3 0 0 0-3-3H2z"/><path d="M22 3h-6a4 4 0 0 0-4 4v14a3 3 0 0 1 3-3h7z"/>',
+    'Award': '<circle cx="12" cy="8" r="6"/><path d="M15.477 12.89 17 22l-5-3-5 3 1.523-9.11"/>',
+    'FileCheck': '<path d="M15 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V7Z"/><path d="M14 2v4a2 2 0 0 0 2 2h4"/><path d="m9 15 2 2 4-4"/>',
+    // Work icons
+    'Laptop': '<path d="M20 16V7a2 2 0 0 0-2-2H6a2 2 0 0 0-2 2v9m16 0H4m16 0 1.28 2.55a1 1 0 0 1-.9 1.45H3.62a1 1 0 0 1-.9-1.45L4 16"/>',
+    'Coffee': '<path d="M17 8h1a4 4 0 1 1 0 8h-1"/><path d="M3 8h14v9a4 4 0 0 1-4 4H7a4 4 0 0 1-4-4Z"/><line x1="6" x2="6" y1="2" y2="4"/><line x1="10" x2="10" y1="2" y2="4"/><line x1="14" x2="14" y1="2" y2="4"/>',
+    'Presentation': '<path d="M2 3h20"/><path d="M21 3v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V3"/><path d="m7 21 5-5 5 5"/>',
+    'Rocket': '<path d="M4.5 16.5c-1.5 1.26-2 5-2 5s3.74-.5 5-2c.71-.84.7-2.13-.09-2.91a2.18 2.18 0 0 0-2.91-.09z"/><path d="m12 15-3-3a22 22 0 0 1 2-3.95A12.88 12.88 0 0 1 22 2c0 2.72-.78 7.5-6 11a22.35 22.35 0 0 1-4 2z"/><path d="M9 12H4s.55-3.03 2-4c1.62-1.08 5 0 5 0"/><path d="M12 15v5s3.03-.55 4-2c1.08-1.62 0-5 0-5"/>',
+    // Creative icons
+    'Paintbrush': '<path d="M18.37 2.63 14 7l-1.59-1.59a2 2 0 0 0-2.82 0L8 7l9 9 1.59-1.59a2 2 0 0 0 0-2.82L17 10l4.37-4.37a2.12 2.12 0 1 0-3-3Z"/><path d="M9 8c-2 3-4 3.5-7 4l8 10c2-1 6-5 6-7"/><path d="M14.5 17.5 4.5 15"/>',
+    'Film': '<rect width="18" height="18" x="3" y="3" rx="2"/><path d="M7 3v18"/><path d="M3 7.5h4"/><path d="M3 12h18"/><path d="M3 16.5h4"/><path d="M17 3v18"/><path d="M17 7.5h4"/><path d="M17 16.5h4"/>',
+    'Headphones': '<path d="M3 14h3a2 2 0 0 1 2 2v3a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-7a9 9 0 0 1 18 0v7a2 2 0 0 1-2 2h-1a2 2 0 0 1-2-2v-3a2 2 0 0 1 2-2h3"/>',
   };
 
   // Get icon name from component

@@ -260,12 +260,30 @@ Görevin:
 2. Yukarıdaki template'lerden hangilerinin kullanılacağına karar ver
 3. Her kategoriden (navigation, hero, experience, education, skills, contact, footer) bir template seç
 4. Genel stil anlayışını belirle (modern/minimal/creative/professional)
+5. Icon stilini ve boyutlarını belirle (outline/solid ve px değerleri)
 
 Renk Seçimi Kriterleri:
 - Kişinin mesleğine uygun (örn: teknoloji için mavi/mor, tasarım için canlı renkler)
 - Profesyonel ve okunabilir
 - Kontrast oranları yeterli
 - Kullanıcının özel isteklerini dikkate al
+
+Icon Seçimi Kriterleri:
+- Icon Style: Tema estetiğine göre seç
+  * 'outline': Modern, minimal, temiz estetik için (çoğu durumda tercih et)
+  * 'solid': Kalın, dolu, güçlü görsel varlık için (bold tasarımlar için)
+- Icon Sizes: Tasarım estetiğine ve boşluklara göre seç
+  * navigation: Navigasyon iconları için (örn: "20px", "24px")
+  * social: Sosyal medya iconları için (örn: "18px", "22px")
+  * Genel olarak 18-24px arası tercih et
+  * Modern/bold tasarımlar için daha büyük (22-24px)
+  * Minimal/sade tasarımlar için daha küçük (18-20px)
+- Icon Colors: Tema renkleriyle uyumlu icon renkleri seç
+  * iconPrimary: Ana icon rengi (genellikle primary veya accent rengine yakın)
+  * iconSecondary: İkincil icon rengi (hover states için, genellikle daha koyu/açık varyant)
+  * Icon renkleri tema renkleriyle uyumlu olmalı
+  * Yeterli kontrast sağlamalı (background üzerinde okunabilir)
+  * Örnek: Dark tema için açık renkler, light tema için koyu renkler
 
 Component Seçimi Kriterleri:
 - Navigation: Sayfanın genel stiline uygun (minimal site için minimal nav, creative site için sidebar)
@@ -295,7 +313,14 @@ Component Seçimi Kriterleri:
     "accent": "#hex",
     "background": "#hex",
     "text": "#hex",
-    "textSecondary": "#hex"
+    "textSecondary": "#hex",
+    "iconPrimary": "#hex",
+    "iconSecondary": "#hex"
+  },
+  "iconStyle": "outline",
+  "iconSizes": {
+    "navigation": "20px",
+    "social": "18px"
   },
   "selectedComponents": [
     { "category": "navigation", "templateId": "nav-classic-horizontal" },
@@ -338,7 +363,12 @@ JSON'dan önce veya sonra hiçbir metin olmasın.
             themeColors: parsed.themeColors,
             selectedComponents: parsed.selectedComponents,
             layout: parsed.layout || 'single-page',
-            style: parsed.style || 'modern'
+            style: parsed.style || 'modern',
+            iconStyle: parsed.iconStyle || 'outline',
+            iconSizes: parsed.iconSizes || {
+               navigation: '20px',
+               social: '18px'
+            }
          };
 
       } catch (parseError) {

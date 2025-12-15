@@ -22,6 +22,11 @@ export interface DesignPlan {
         background?: string;
         text?: string;
     };
+    iconStyle?: 'outline' | 'solid';
+    iconSizes?: {
+        navigation: string;
+        social: string;
+    };
 }
 
 export interface ThemeColors {

@@ -460,6 +460,7 @@ export const navigationTemplate3: ComponentTemplate = {
       align-items: center;
       justify-content: center;
       flex-shrink: 0;
+      color: {{COLOR_ICON_PRIMARY}};
     }
 
     .nav-sidebar-icon svg {
@@ -467,6 +468,24 @@ export const navigationTemplate3: ComponentTemplate = {
       height: 20px;
       stroke: currentColor;
       fill: none;
+      transition: transform 0.3s ease, stroke-width 0.3s ease;
+    }
+
+    .nav-sidebar-link:hover .nav-sidebar-icon {
+      color: {{COLOR_ICON_SECONDARY}};
+    }
+
+    .nav-sidebar-link:hover .nav-sidebar-icon svg {
+      transform: scale(1.15) rotate(5deg);
+    }
+
+    .nav-sidebar-link.active .nav-sidebar-icon svg {
+      animation: pulse 2s ease-in-out infinite;
+    }
+
+    @keyframes pulse {
+      0%, 100% { transform: scale(1); }
+      50% { transform: scale(1.1); }
     }
 
     .nav-sidebar-text {
@@ -488,7 +507,7 @@ export const navigationTemplate3: ComponentTemplate = {
     }
 
     .nav-sidebar-social a {
-      color: rgba(255, 255, 255, 0.8);
+      color: {{COLOR_ICON_PRIMARY}};
       text-decoration: none;
       transition: all 0.3s ease;
       display: inline-flex;
@@ -501,7 +520,7 @@ export const navigationTemplate3: ComponentTemplate = {
     }
 
     .nav-sidebar-social a:hover {
-      color: #ffffff;
+      color: {{COLOR_ICON_SECONDARY}};
       background: rgba(255, 255, 255, 0.2);
       transform: translateY(-2px);
     }

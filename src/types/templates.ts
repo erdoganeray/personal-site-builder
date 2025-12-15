@@ -9,6 +9,8 @@ export interface ThemeColors {
   background: string;
   text: string;
   textSecondary: string;
+  iconPrimary?: string;
+  iconSecondary?: string;
 }
 
 export interface ComponentTemplate {
@@ -40,4 +42,9 @@ export interface SiteGenerationPlan {
   selectedComponents: SelectedComponent[];
   layout: 'single-page' | 'multi-page';
   style: 'modern' | 'minimal' | 'creative' | 'professional';
+  iconStyle?: 'outline' | 'solid';
+  iconSizes?: {
+    navigation: string;
+    social: string;
+  };
 }

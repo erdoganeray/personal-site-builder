@@ -118,7 +118,9 @@ export async function regeneratePreviewContent(siteId: string): Promise<{
           template,
           cvData,
           designPlan.themeColors,
-          componentsToRender
+          componentsToRender,
+          designPlan.iconStyle,
+          designPlan.iconSizes
         );
 
         finalHtml += populated.html + '\n';

@@ -19,9 +19,10 @@ export const SECTION_NAME_MAP: Record<string, string> = {
  * Section icon haritası - icon registry kullanarak SVG iconlar döndürür
  * @param category - Section category
  * @param size - Icon size in pixels
+ * @param style - Icon style (outline or solid)
  * @returns SVG icon HTML string
  */
-export function getSectionIconSvg(category: string, size: number = 24): string {
+export function getSectionIconSvg(category: string, size: number = 24, style: 'outline' | 'solid' = 'outline'): string {
     const iconMap: Record<string, { category: string; name: string }> = {
         'hero': { category: 'navigation', name: 'home' },
         'experience': { category: 'navigation', name: 'briefcase' },
@@ -33,18 +34,20 @@ export function getSectionIconSvg(category: string, size: number = 24): string {
     };
 
     const iconConfig = iconMap[category] || { category: 'ui', name: 'info' };
-    return getIconSvg(iconConfig.category as any, iconConfig.name as any, 'outline', size);
+    return getIconSvg(iconConfig.category as any, iconConfig.name as any, style, size);
 }
 
 /**
  * Navigation menu item'larını oluşturur
  * @param selectedComponents - Seçilen component'ler
  * @param templateType - Navigation template tipi
+ * @param iconStyle - Icon style (outline or solid)
  * @returns HTML string olarak menu item'ları
  */
 export function generateNavigationMenuItems(
     selectedComponents: SelectedComponent[],
-    templateType: 'classic' | 'minimal' | 'sidebar' | 'floating'
+    templateType: 'classic' | 'minimal' | 'sidebar' | 'floating',
+    iconStyle: 'outline' | 'solid' = 'outline'
 ): string {
     // Navigation ve footer dışındaki tüm component'leri al
     const menuableComponents = selectedComponents.filter(
@@ -67,7 +70,7 @@ export function generateNavigationMenuItems(
         case 'sidebar':
             return menuableComponents.map((comp, index) => {
                 const name = SECTION_NAME_MAP[comp.category] || comp.category;
-                const iconSvg = getSectionIconSvg(comp.category, 20);
+                const iconSvg = getSectionIconSvg(comp.category, 20, iconStyle);
                 const activeClass = index === 0 ? 'active' : '';
                 return `
           <li>

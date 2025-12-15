@@ -1043,7 +1043,9 @@ export function getNavigationReplacements(
   cvData: CVData,
   themeColors: ThemeColors,
   selectedComponents: SelectedComponent[],
-  templateId?: string
+  templateId?: string,
+  iconStyle?: 'outline' | 'solid',
+  iconSizes?: { navigation: string; social: string }
 ): PlaceholderReplacements {
   const initials = cvData.personalInfo.name
     .split(' ')
@@ -1062,7 +1064,11 @@ export function getNavigationReplacements(
 
   // Menu item'larını server-side oluştur
   const { generateNavigationMenuItems } = require('./navigation-utils');
-  const navMenuItems = generateNavigationMenuItems(selectedComponents, templateType);
+  const navMenuItems = generateNavigationMenuItems(
+    selectedComponents,
+    templateType,
+    iconStyle || 'outline'
+  );
 
   // Sosyal medya linklerini oluştur - sadece dolu olanlar görünsün
   // Icon'ları direkt SVG olarak inject ediyoruz çünkü {{SOCIAL_LINKS}} zaten HTML olarak yerleştiriliyor
@@ -1070,15 +1076,18 @@ export function getNavigationReplacements(
 
   console.log('🔍 DEBUG: Generating social links with icons...');
 
+  const socialIconSize = iconSizes?.social ? parseInt(iconSizes.social) : 20;
+  const socialIconStyle = iconStyle || 'outline';
+
   const socialLinks = [
-    cvData.personalInfo.linkedin ? `<a href="${cvData.personalInfo.linkedin}" target="_blank" rel="noopener noreferrer" title="LinkedIn" aria-label="LinkedIn">${getIconSvg('social', 'linkedin', 'outline', 20)}</a>` : '',
-    cvData.personalInfo.github ? `<a href="${cvData.personalInfo.github}" target="_blank" rel="noopener noreferrer" title="GitHub" aria-label="GitHub">${getIconSvg('social', 'github', 'outline', 20)}</a>` : '',
-    cvData.personalInfo.facebook ? `<a href="${cvData.personalInfo.facebook}" target="_blank" rel="noopener noreferrer" title="Facebook" aria-label="Facebook">${getIconSvg('social', 'globe', 'outline', 20)}</a>` : '',
-    cvData.personalInfo.instagram ? `<a href="${cvData.personalInfo.instagram}" target="_blank" rel="noopener noreferrer" title="Instagram" aria-label="Instagram">${getIconSvg('social', 'globe', 'outline', 20)}</a>` : '',
-    cvData.personalInfo.x ? `<a href="${cvData.personalInfo.x}" target="_blank" rel="noopener noreferrer" title="X (Twitter)" aria-label="X">${getIconSvg('social', 'twitter', 'outline', 20)}</a>` : '',
-    cvData.personalInfo.website ? `<a href="${cvData.personalInfo.website}" target="_blank" rel="noopener noreferrer" title="Website" aria-label="Website">${getIconSvg('social', 'globe', 'outline', 20)}</a>` : '',
-    cvData.personalInfo.email ? `<a href="mailto:${cvData.personalInfo.email}" title="Email" aria-label="Email">${getIconSvg('contact', 'mail', 'outline', 20)}</a>` : '',
-    cvData.personalInfo.phone ? `<a href="tel:${cvData.personalInfo.phone}" title="Phone" aria-label="Phone">${getIconSvg('contact', 'phone', 'outline', 20)}</a>` : '',
+    cvData.personalInfo.linkedin ? `<a href="${cvData.personalInfo.linkedin}" target="_blank" rel="noopener noreferrer" title="LinkedIn" aria-label="LinkedIn">${getIconSvg('social', 'linkedin', socialIconStyle, socialIconSize)}</a>` : '',
+    cvData.personalInfo.github ? `<a href="${cvData.personalInfo.github}" target="_blank" rel="noopener noreferrer" title="GitHub" aria-label="GitHub">${getIconSvg('social', 'github', socialIconStyle, socialIconSize)}</a>` : '',
+    cvData.personalInfo.facebook ? `<a href="${cvData.personalInfo.facebook}" target="_blank" rel="noopener noreferrer" title="Facebook" aria-label="Facebook">${getIconSvg('social', 'globe', socialIconStyle, socialIconSize)}</a>` : '',
+    cvData.personalInfo.instagram ? `<a href="${cvData.personalInfo.instagram}" target="_blank" rel="noopener noreferrer" title="Instagram" aria-label="Instagram">${getIconSvg('social', 'globe', socialIconStyle, socialIconSize)}</a>` : '',
+    cvData.personalInfo.x ? `<a href="${cvData.personalInfo.x}" target="_blank" rel="noopener noreferrer" title="X (Twitter)" aria-label="X">${getIconSvg('social', 'twitter', socialIconStyle, socialIconSize)}</a>` : '',
+    cvData.personalInfo.website ? `<a href="${cvData.personalInfo.website}" target="_blank" rel="noopener noreferrer" title="Website" aria-label="Website">${getIconSvg('social', 'globe', socialIconStyle, socialIconSize)}</a>` : '',
+    cvData.personalInfo.email ? `<a href="mailto:${cvData.personalInfo.email}" title="Email" aria-label="Email">${getIconSvg('contact', 'mail', socialIconStyle, socialIconSize)}</a>` : '',
+    cvData.personalInfo.phone ? `<a href="tel:${cvData.personalInfo.phone}" title="Phone" aria-label="Phone">${getIconSvg('contact', 'phone', socialIconStyle, socialIconSize)}</a>` : '',
   ].filter(link => link !== '').join('\n    ');
 
   console.log('✅ DEBUG: Social links generated:', socialLinks.substring(0, 200) + '...');
@@ -1088,12 +1097,16 @@ export function getNavigationReplacements(
     '{{INITIALS}}': initials,
     '{{NAV_MENU_ITEMS}}': navMenuItems,
     '{{SOCIAL_LINKS}}': socialLinks,
+    '{{ICON_SIZE_NAVIGATION}}': iconSizes?.navigation || '20px',
+    '{{ICON_SIZE_SOCIAL}}': iconSizes?.social || '18px',
     '{{COLOR_PRIMARY}}': themeColors.primary,
     '{{COLOR_SECONDARY}}': themeColors.secondary,
     '{{COLOR_ACCENT}}': themeColors.accent,
     '{{COLOR_BACKGROUND}}': themeColors.background,
     '{{COLOR_TEXT}}': themeColors.text,
     '{{COLOR_TEXT_SECONDARY}}': themeColors.textSecondary,
+    '{{COLOR_ICON_PRIMARY}}': themeColors.iconPrimary || themeColors.primary,
+    '{{COLOR_ICON_SECONDARY}}': themeColors.iconSecondary || themeColors.accent,
   };
 }
 
@@ -1104,11 +1117,20 @@ export function getReplacementsForComponent(
   component: ComponentTemplate,
   cvData: CVData,
   themeColors: ThemeColors,
-  selectedComponents?: SelectedComponent[]
+  selectedComponents?: SelectedComponent[],
+  iconStyle?: 'outline' | 'solid',
+  iconSizes?: { navigation: string; social: string }
 ): PlaceholderReplacements {
   switch (component.category) {
     case 'navigation':
-      return getNavigationReplacements(cvData, themeColors, selectedComponents || [], component.id);
+      return getNavigationReplacements(
+        cvData,
+        themeColors,
+        selectedComponents || [],
+        component.id,
+        iconStyle,
+        iconSizes
+      );
     case 'hero':
       return getHeroReplacements(cvData, themeColors);
     case 'experience':
@@ -1137,12 +1159,21 @@ export function populateTemplate(
   component: ComponentTemplate,
   cvData: CVData,
   themeColors: ThemeColors,
-  selectedComponents?: SelectedComponent[]
+  selectedComponents?: SelectedComponent[],
+  iconStyle?: 'outline' | 'solid',
+  iconSizes?: { navigation: string; social: string }
 ): { html: string; css: string; js?: string } {
-  const replacements = getReplacementsForComponent(component, cvData, themeColors, selectedComponents);
+  const replacements = getReplacementsForComponent(
+    component,
+    cvData,
+    themeColors,
+    selectedComponents,
+    iconStyle,
+    iconSizes
+  );
 
   // Get icon style from template (default to 'outline')
-  const iconStyle = component.iconStyle || 'outline';
+  const templateIconStyle = component.iconStyle || iconStyle || 'outline';
 
   // Replace standard placeholders
   let html = replacePlaceholders(component.htmlTemplate, replacements);
@@ -1172,14 +1203,14 @@ export function populateTemplate(
     }
 
     // Get icon with determined category
-    let iconSvg = getIconSvg(category, iconName, iconStyle, 24, 'inline-icon');
+    let iconSvg = getIconSvg(category, iconName, templateIconStyle, 24, 'inline-icon');
 
     // Fallback: try other categories if not found
     if (!iconSvg || iconSvg.includes('Info')) {
       const categories: Array<'contact' | 'ui' | 'social'> = ['contact', 'ui', 'social'];
       for (const cat of categories) {
         if (cat !== category && iconExists(cat, iconName)) {
-          iconSvg = getIconSvg(cat, iconName, iconStyle, 24, 'inline-icon');
+          iconSvg = getIconSvg(cat, iconName, templateIconStyle, 24, 'inline-icon');
           break;
         }
       }

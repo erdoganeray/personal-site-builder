@@ -169,7 +169,14 @@ export async function POST(req: NextRequest) {
           continue;
         }
 
-        const populated = populateTemplate(template, cvData, designPlan.themeColors, componentsToRender);
+        const populated = populateTemplate(
+          template,
+          cvData,
+          designPlan.themeColors,
+          componentsToRender,
+          designPlan.iconStyle,
+          designPlan.iconSizes
+        );
 
         finalHtml += populated.html + '\n';
         finalCss += populated.css + '\n\n';
