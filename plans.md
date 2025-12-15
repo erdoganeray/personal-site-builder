@@ -126,11 +126,6 @@
 
 # Geliştime Planı
 
-## Rollback
-- hem preview hem de publish için rollback sistemi ve ui tasarımı
-- version history (aboneliklerimdeki tablodaki değerleri de işlevsel hale getir)
-- domain rezevasyonu (aboneliklerimdeki tablodaki değerleri de işlevsel hale getir)
-
 ## Icon, Font, Color Palette, Stock Image
 - site oluşturma aşamasına hazır icon, font desteği ekle
 - gemini api color sistemi bazen renklerin birbiri ile karışmasına sebep oluyor. color palette sistemi ekle
@@ -283,3 +278,11 @@
 - SMS onayı
 - 2 adımlı doğrulama
 - Chatte hafıza özelliği yok
+- **Rollback Edge Case:** Kullanıcı 1 portfolio fotoyu kaldırdı → foto fallback'e düştü (DeletedAsset) → 30 gün geçti ve foto R2'den kalıcı silindi → kullanıcı "Geri Dön" dediğinde ne olacak?
+  - **Problem:** Rollback işlemi publishedCvContent'i geri yükler ama foto artık R2'de yok → kırık foto linkleri (404)
+  - **Çözüm Seçenekleri:**
+    1. Rollback sırasında R2'de dosya kontrolü yap, eksik dosya varsa uyar ve rollback'i engelle/onay iste
+    2. Partial rollback: Mevcut dosyaları geri yükle, eksik olanları publishedCvContent'ten çıkar
+    3. DeletedAsset kayıtlarını asla silme (sadece R2'den sil), rollback sırasında "dosya artık mevcut değil" uyarısı ver
+    4. Tombstone pattern: Silinen dosyalar için kalıcı kayıt tut
+  - **Önerilen:** Seçenek 1 + 3 kombinasyonu (DeletedAsset kayıtlarını sakla + rollback sırasında dosya kontrolü)
