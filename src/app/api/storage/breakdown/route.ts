@@ -45,9 +45,6 @@ export async function GET(req: NextRequest) {
             select: {
                 cvUrl: true,
                 cvContent: true,
-                publishedHtmlContent: true,
-                publishedCssContent: true,
-                publishedJsContent: true,
             },
         });
 
@@ -160,26 +157,31 @@ export async function GET(req: NextRequest) {
             }
         }
 
-        // Calculate Published Site Files Storage
+        // Calculate Published Site Files Storage (from R2, not database)
         const publishedFiles: Array<{ name: string; size: number; type: string }> = [];
         let publishedTotal = 0;
 
-        if (site?.publishedHtmlContent) {
-            const htmlSize = Buffer.byteLength(site.publishedHtmlContent, 'utf8');
-            publishedFiles.push({ name: "HTML", size: htmlSize, type: "html" });
-            publishedTotal += htmlSize;
-        }
+        // Get site ID to construct R2 paths
+        const siteId = await prisma.site.findFirst({
+            where: { userId },
+            select: { id: true },
+        });
 
-        if (site?.publishedCssContent) {
-            const cssSize = Buffer.byteLength(site.publishedCssContent, 'utf8');
-            publishedFiles.push({ name: "CSS", size: cssSize, type: "css" });
-            publishedTotal += cssSize;
-        }
+        if (siteId) {
+            // Check R2 for published files
+            const publishedFilePaths = [
+                { key: `users/${userId}/site/${siteId.id}/index.html`, name: "HTML", type: "html" },
+                { key: `users/${userId}/site/${siteId.id}/styles.css`, name: "CSS", type: "css" },
+                { key: `users/${userId}/site/${siteId.id}/script.js`, name: "JavaScript", type: "js" },
+            ];
 
-        if (site?.publishedJsContent) {
-            const jsSize = Buffer.byteLength(site.publishedJsContent, 'utf8');
-            publishedFiles.push({ name: "JavaScript", size: jsSize, type: "js" });
-            publishedTotal += jsSize;
+            for (const file of publishedFilePaths) {
+                const fileSize = await getFileSize(file.key);
+                if (fileSize > 0) {
+                    publishedFiles.push({ name: file.name, size: fileSize, type: file.type });
+                    publishedTotal += fileSize;
+                }
+            }
         }
 
         // Calculate Rollback Files Storage
