@@ -57,7 +57,7 @@ export type RevisionOperation =
 // Available templates for each component category
 // Synced with actual template files in src/components/site-templates/
 const AVAILABLE_TEMPLATES = {
-    nav: ["nav-classic-horizontal", "nav-minimal-centered", "nav-sidebar-modern", "nav-floating-dot"],
+    navigation: ["nav-classic-horizontal", "nav-minimal-centered", "nav-sidebar-modern", "nav-floating-dot"],
     hero: ["hero-modern-centered", "hero-split-screen", "hero-minimal-text", "hero-animated-gradient"],
     experience: ["experience-timeline", "experience-cards", "experience-accordion", "experience-minimal", "experience-horizontal-timeline", "experience-tabs"],
     education: ["education-timeline", "education-cards", "education-modern", "education-accordion", "education-horizontal-timeline", "education-tabs"],
@@ -172,7 +172,7 @@ Yukarıdaki bilgilere göre kullanıcının ne istediğini analiz et ve aşağı
 3. Component Sırala:
 {
   "type": "REORDER_COMPONENTS",
-  "newOrder": ["nav", "hero", "portfolio", "experience", "contact", "footer"]
+  "newOrder": ["navigation", "hero", "portfolio", "experience", "contact", "footer"]
 }
 
 4. Template Değiştir:

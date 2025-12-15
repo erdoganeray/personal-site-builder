@@ -15,6 +15,7 @@ export interface ComponentTemplate {
   id: string;
   name: string;
   category: 'navigation' | 'hero' | 'experience' | 'education' | 'portfolio' | 'skills' | 'languages' | 'contact' | 'footer';
+  iconStyle?: 'outline' | 'solid'; // Icon style for this template
   htmlTemplate: string;
   cssTemplate: string;
   jsTemplate?: string;

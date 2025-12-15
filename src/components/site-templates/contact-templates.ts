@@ -8,6 +8,7 @@ export const contactTemplate1: ComponentTemplate = {
   id: "contact-modern-form",
   name: "Modern Contact Form",
   category: "contact",
+  iconStyle: "outline",
   htmlTemplate: `
     <section id="contact" class="contact-modern-section">
       <div class="contact-modern-container">
@@ -19,7 +20,7 @@ export const contactTemplate1: ComponentTemplate = {
         <div class="contact-modern-content">
           <div class="contact-modern-info">
             <div class="contact-modern-info-item">
-              <div class="contact-modern-info-icon">📧</div>
+              <div class="contact-modern-info-icon">{{ICON:mail}}</div>
               <div class="contact-modern-info-details">
                 <h3>Email</h3>
                 <a href="mailto:{{EMAIL}}">{{EMAIL}}</a>
@@ -27,7 +28,7 @@ export const contactTemplate1: ComponentTemplate = {
             </div>
             
             <div class="contact-modern-info-item">
-              <div class="contact-modern-info-icon">📱</div>
+              <div class="contact-modern-info-icon">{{ICON:phone}}</div>
               <div class="contact-modern-info-details">
                 <h3>Telefon</h3>
                 <a href="tel:{{PHONE}}">{{PHONE}}</a>
@@ -35,7 +36,7 @@ export const contactTemplate1: ComponentTemplate = {
             </div>
             
             <div class="contact-modern-info-item">
-              <div class="contact-modern-info-icon">📍</div>
+              <div class="contact-modern-info-icon">{{ICON:mapPin}}</div>
               <div class="contact-modern-info-details">
                 <h3>Konum</h3>
                 <p>{{LOCATION}}</p>
@@ -95,7 +96,7 @@ export const contactTemplate1: ComponentTemplate = {
             
             <button type="submit" class="contact-modern-submit-btn">
               <span class="contact-modern-btn-text">Gönder</span>
-              <span class="contact-modern-btn-spinner" style="display:none;">⏳</span>
+              <span class="contact-modern-btn-spinner" style="display:none;">{{ICON:loader}}</span>
             </button>
             
             <!-- Success/Error messages -->
@@ -425,7 +426,7 @@ export const contactTemplate1: ComponentTemplate = {
         if (isPreview) {
           // Preview mode: Show info message instead of sending
           await new Promise(resolve => setTimeout(resolve, 1000)); // Simulate delay
-          messageDiv.textContent = 'ℹ️ Önizleme modunda mesaj gönderimi devre dışıdır. Site yayınlandığında contact formu çalışacaktır.';
+          messageDiv.textContent = '{{ICON:info}} Önizleme modunda mesaj gönderimi devre dışıdır. Site yayınlandığında contact formu çalışacaktır.';
           messageDiv.className = 'form-message success';
           messageDiv.style.display = 'block';
           form.reset();
@@ -446,7 +447,7 @@ export const contactTemplate1: ComponentTemplate = {
           }
           
           // Success
-          messageDiv.textContent = '✅ Mesajınız başarıyla gönderildi! En kısa sürede dönüş yapacağım.';
+          messageDiv.textContent = '{{ICON:check}} Mesajınız başarıyla gönderildi! En kısa sürede dönüş yapacağım.';
           messageDiv.className = 'form-message success';
           messageDiv.style.display = 'block';
           form.reset();
@@ -454,7 +455,7 @@ export const contactTemplate1: ComponentTemplate = {
         
       } catch (error) {
         // Error
-        messageDiv.textContent = '❌ ' + (error.message || 'Bir hata oluştu. Lütfen tekrar deneyin.');
+        messageDiv.textContent = '{{ICON:x}} ' + (error.message || 'Bir hata oluştu. Lütfen tekrar deneyin.');
         messageDiv.className = 'form-message error';
         messageDiv.style.display = 'block';
       } finally {
@@ -481,6 +482,7 @@ export const contactTemplate2: ComponentTemplate = {
   id: "contact-minimal-centered",
   name: "Minimal Centered Contact",
   category: "contact",
+  iconStyle: "solid",
   htmlTemplate: `
     <section id="contact" class="contact-section-minimal">
       <div class="contact-container-minimal">
@@ -488,19 +490,19 @@ export const contactTemplate2: ComponentTemplate = {
         
         <div class="contact-methods">
           <a href="mailto:{{EMAIL}}" class="contact-method">
-            <span class="method-icon">✉️</span>
+            <span class="method-icon">{{ICON:mail}}</span>
             <span class="method-label">Email</span>
             <span class="method-value">{{EMAIL}}</span>
           </a>
           
           <a href="tel:{{PHONE}}" class="contact-method">
-            <span class="method-icon">📞</span>
+            <span class="method-icon">{{ICON:phone}}</span>
             <span class="method-label">Telefon</span>
             <span class="method-value">{{PHONE}}</span>
           </a>
           
           <div class="contact-method">
-            <span class="method-icon">📍</span>
+            <span class="method-icon">{{ICON:mapPin}}</span>
             <span class="method-label">Konum</span>
             <span class="method-value">{{LOCATION}}</span>
           </div>
@@ -599,6 +601,7 @@ export const contactTemplate3: ComponentTemplate = {
   id: "contact-split-info",
   name: "Split Layout Contact",
   category: "contact",
+  iconStyle: "outline",
   htmlTemplate: `
     <section id="contact" class="contact-section-split">
       <div class="contact-split-left">
@@ -608,7 +611,7 @@ export const contactTemplate3: ComponentTemplate = {
           
           <div class="split-info-list">
             <div class="split-info-item">
-              <div class="split-icon">📧</div>
+              <div class="split-icon">{{ICON:mail}}</div>
               <div>
                 <div class="split-label">Email</div>
                 <a href="mailto:{{EMAIL}}" class="split-value">{{EMAIL}}</a>
@@ -616,7 +619,7 @@ export const contactTemplate3: ComponentTemplate = {
             </div>
             
             <div class="split-info-item">
-              <div class="split-icon">📱</div>
+              <div class="split-icon">{{ICON:phone}}</div>
               <div>
                 <div class="split-label">Telefon</div>
                 <a href="tel:{{PHONE}}" class="split-value">{{PHONE}}</a>
@@ -624,7 +627,7 @@ export const contactTemplate3: ComponentTemplate = {
             </div>
             
             <div class="split-info-item">
-              <div class="split-icon">📍</div>
+              <div class="split-icon">{{ICON:mapPin}}</div>
               <div>
                 <div class="split-label">Konum</div>
                 <div class="split-value">{{LOCATION}}</div>
@@ -686,7 +689,7 @@ export const contactTemplate3: ComponentTemplate = {
           
           <button type="submit" class="split-submit">
             <span class="btn-text">Gönder</span>
-            <span class="btn-spinner" style="display:none;">⏳</span>
+            <span class="btn-spinner" style="display:none;">{{ICON:loader}}</span>
           </button>
           
           <!-- Success/Error messages -->
@@ -993,7 +996,7 @@ export const contactTemplate3: ComponentTemplate = {
         if (isPreview) {
           // Preview mode: Show info message instead of sending
           await new Promise(resolve => setTimeout(resolve, 1000)); // Simulate delay
-          messageDiv.textContent = 'ℹ️ Önizleme modunda mesaj gönderimi devre dışıdır. Site yayınlandığında contact formu çalışacaktır.';
+          messageDiv.textContent = '{{ICON:info}} Önizleme modunda mesaj gönderimi devre dışıdır. Site yayınlandığında contact formu çalışacaktır.';
           messageDiv.className = 'form-message-split success';
           messageDiv.style.display = 'block';
           form.reset();
@@ -1014,7 +1017,7 @@ export const contactTemplate3: ComponentTemplate = {
           }
           
           // Success
-          messageDiv.textContent = '✅ Teşekkürler! Mesajınız başarıyla gönderildi.';
+          messageDiv.textContent = '{{ICON:check}} Teşekkürler! Mesajınız başarıyla gönderildi.';
           messageDiv.className = 'form-message-split success';
           messageDiv.style.display = 'block';
           form.reset();
@@ -1022,7 +1025,7 @@ export const contactTemplate3: ComponentTemplate = {
         
       } catch (error) {
         // Error
-        messageDiv.textContent = '❌ ' + (error.message || 'Bir hata oluştu. Lütfen tekrar deneyin.');
+        messageDiv.textContent = '{{ICON:x}} ' + (error.message || 'Bir hata oluştu. Lütfen tekrar deneyin.');
         messageDiv.className = 'form-message-split error';
         messageDiv.style.display = 'block';
       } finally {

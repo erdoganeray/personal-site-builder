@@ -987,15 +987,18 @@ export function getFooterReplacements(
   selectedComponents?: SelectedComponent[]
 ): PlaceholderReplacements {
   // Sosyal medya linklerini oluştur - sadece dolu olanlar görünsün
+  // Icon'ları direkt SVG olarak inject ediyoruz
+  const { getIconSvg } = require('./icon-registry');
+
   const socialLinks = [
-    cvData.personalInfo.linkedin ? `<a href="${cvData.personalInfo.linkedin}" target="_blank" rel="noopener noreferrer" title="LinkedIn" aria-label="LinkedIn">💼</a>` : '',
-    cvData.personalInfo.github ? `<a href="${cvData.personalInfo.github}" target="_blank" rel="noopener noreferrer" title="GitHub" aria-label="GitHub">⚙️</a>` : '',
-    cvData.personalInfo.facebook ? `<a href="${cvData.personalInfo.facebook}" target="_blank" rel="noopener noreferrer" title="Facebook" aria-label="Facebook">📘</a>` : '',
-    cvData.personalInfo.instagram ? `<a href="${cvData.personalInfo.instagram}" target="_blank" rel="noopener noreferrer" title="Instagram" aria-label="Instagram">📷</a>` : '',
-    cvData.personalInfo.x ? `<a href="${cvData.personalInfo.x}" target="_blank" rel="noopener noreferrer" title="X (Twitter)" aria-label="X">🐦</a>` : '',
-    cvData.personalInfo.website ? `<a href="${cvData.personalInfo.website}" target="_blank" rel="noopener noreferrer" title="Website" aria-label="Website">🌐</a>` : '',
-    cvData.personalInfo.email ? `<a href="mailto:${cvData.personalInfo.email}" title="Email" aria-label="Email">📧</a>` : '',
-    cvData.personalInfo.phone ? `<a href="tel:${cvData.personalInfo.phone}" title="Telefon" aria-label="Telefon">📱</a>` : '',
+    cvData.personalInfo.linkedin ? `<a href="${cvData.personalInfo.linkedin}" target="_blank" rel="noopener noreferrer" title="LinkedIn" aria-label="LinkedIn">${getIconSvg('social', 'linkedin', 'outline', 20)}</a>` : '',
+    cvData.personalInfo.github ? `<a href="${cvData.personalInfo.github}" target="_blank" rel="noopener noreferrer" title="GitHub" aria-label="GitHub">${getIconSvg('social', 'github', 'outline', 20)}</a>` : '',
+    cvData.personalInfo.facebook ? `<a href="${cvData.personalInfo.facebook}" target="_blank" rel="noopener noreferrer" title="Facebook" aria-label="Facebook">${getIconSvg('social', 'globe', 'outline', 20)}</a>` : '',
+    cvData.personalInfo.instagram ? `<a href="${cvData.personalInfo.instagram}" target="_blank" rel="noopener noreferrer" title="Instagram" aria-label="Instagram">${getIconSvg('social', 'globe', 'outline', 20)}</a>` : '',
+    cvData.personalInfo.x ? `<a href="${cvData.personalInfo.x}" target="_blank" rel="noopener noreferrer" title="X (Twitter)" aria-label="X">${getIconSvg('social', 'twitter', 'outline', 20)}</a>` : '',
+    cvData.personalInfo.website ? `<a href="${cvData.personalInfo.website}" target="_blank" rel="noopener noreferrer" title="Website" aria-label="Website">${getIconSvg('social', 'globe', 'outline', 20)}</a>` : '',
+    cvData.personalInfo.email ? `<a href="mailto:${cvData.personalInfo.email}" title="Email" aria-label="Email">${getIconSvg('contact', 'mail', 'outline', 20)}</a>` : '',
+    cvData.personalInfo.phone ? `<a href="tel:${cvData.personalInfo.phone}" title="Telefon" aria-label="Telefon">${getIconSvg('contact', 'phone', 'outline', 20)}</a>` : '',
   ].filter(link => link !== '').join('\n    ');
 
   // Footer navigation linklerini oluştur (navigation ve footer hariç tüm section'lar)
@@ -1062,16 +1065,23 @@ export function getNavigationReplacements(
   const navMenuItems = generateNavigationMenuItems(selectedComponents, templateType);
 
   // Sosyal medya linklerini oluştur - sadece dolu olanlar görünsün
+  // Icon'ları direkt SVG olarak inject ediyoruz çünkü {{SOCIAL_LINKS}} zaten HTML olarak yerleştiriliyor
+  const { getIconSvg } = require('./icon-registry');
+
+  console.log('🔍 DEBUG: Generating social links with icons...');
+
   const socialLinks = [
-    cvData.personalInfo.linkedin ? `<a href="${cvData.personalInfo.linkedin}" target="_blank" rel="noopener noreferrer" title="LinkedIn" aria-label="LinkedIn">💼</a>` : '',
-    cvData.personalInfo.github ? `<a href="${cvData.personalInfo.github}" target="_blank" rel="noopener noreferrer" title="GitHub" aria-label="GitHub">⚙️</a>` : '',
-    cvData.personalInfo.facebook ? `<a href="${cvData.personalInfo.facebook}" target="_blank" rel="noopener noreferrer" title="Facebook" aria-label="Facebook">📘</a>` : '',
-    cvData.personalInfo.instagram ? `<a href="${cvData.personalInfo.instagram}" target="_blank" rel="noopener noreferrer" title="Instagram" aria-label="Instagram">📷</a>` : '',
-    cvData.personalInfo.x ? `<a href="${cvData.personalInfo.x}" target="_blank" rel="noopener noreferrer" title="X (Twitter)" aria-label="X">🐦</a>` : '',
-    cvData.personalInfo.website ? `<a href="${cvData.personalInfo.website}" target="_blank" rel="noopener noreferrer" title="Website" aria-label="Website">🌐</a>` : '',
-    cvData.personalInfo.email ? `<a href="mailto:${cvData.personalInfo.email}" title="Email" aria-label="Email">📧</a>` : '',
-    cvData.personalInfo.phone ? `<a href="tel:${cvData.personalInfo.phone}" title="Phone" aria-label="Phone">📱</a>` : '',
+    cvData.personalInfo.linkedin ? `<a href="${cvData.personalInfo.linkedin}" target="_blank" rel="noopener noreferrer" title="LinkedIn" aria-label="LinkedIn">${getIconSvg('social', 'linkedin', 'outline', 20)}</a>` : '',
+    cvData.personalInfo.github ? `<a href="${cvData.personalInfo.github}" target="_blank" rel="noopener noreferrer" title="GitHub" aria-label="GitHub">${getIconSvg('social', 'github', 'outline', 20)}</a>` : '',
+    cvData.personalInfo.facebook ? `<a href="${cvData.personalInfo.facebook}" target="_blank" rel="noopener noreferrer" title="Facebook" aria-label="Facebook">${getIconSvg('social', 'globe', 'outline', 20)}</a>` : '',
+    cvData.personalInfo.instagram ? `<a href="${cvData.personalInfo.instagram}" target="_blank" rel="noopener noreferrer" title="Instagram" aria-label="Instagram">${getIconSvg('social', 'globe', 'outline', 20)}</a>` : '',
+    cvData.personalInfo.x ? `<a href="${cvData.personalInfo.x}" target="_blank" rel="noopener noreferrer" title="X (Twitter)" aria-label="X">${getIconSvg('social', 'twitter', 'outline', 20)}</a>` : '',
+    cvData.personalInfo.website ? `<a href="${cvData.personalInfo.website}" target="_blank" rel="noopener noreferrer" title="Website" aria-label="Website">${getIconSvg('social', 'globe', 'outline', 20)}</a>` : '',
+    cvData.personalInfo.email ? `<a href="mailto:${cvData.personalInfo.email}" title="Email" aria-label="Email">${getIconSvg('contact', 'mail', 'outline', 20)}</a>` : '',
+    cvData.personalInfo.phone ? `<a href="tel:${cvData.personalInfo.phone}" title="Phone" aria-label="Phone">${getIconSvg('contact', 'phone', 'outline', 20)}</a>` : '',
   ].filter(link => link !== '').join('\n    ');
+
+  console.log('✅ DEBUG: Social links generated:', socialLinks.substring(0, 200) + '...');
 
   return {
     '{{NAME}}': cvData.personalInfo.name,
@@ -1131,11 +1141,56 @@ export function populateTemplate(
 ): { html: string; css: string; js?: string } {
   const replacements = getReplacementsForComponent(component, cvData, themeColors, selectedComponents);
 
+  // Get icon style from template (default to 'outline')
+  const iconStyle = component.iconStyle || 'outline';
+
+  // Replace standard placeholders
+  let html = replacePlaceholders(component.htmlTemplate, replacements);
+  let css = replacePlaceholders(component.cssTemplate, replacements);
+  let js = component.jsTemplate
+    ? replacePlaceholders(component.jsTemplate, replacements)
+    : undefined;
+
+  // Replace icon placeholders: {{ICON:iconName}}
+  const { getIconSvg, iconExists } = require('./icon-registry');
+
+  html = html.replace(/\{\{ICON:(\w+)\}\}/g, (match, iconName) => {
+    // Intelligently determine icon category to avoid false warnings
+    let category: 'contact' | 'ui' | 'social' = 'contact';
+
+    // UI icons
+    if (['loader', 'check', 'x', 'info', 'arrowUp', 'chevronDown'].includes(iconName)) {
+      category = 'ui';
+    }
+    // Social icons
+    else if (['linkedin', 'github', 'twitter', 'globe'].includes(iconName)) {
+      category = 'social';
+    }
+    // Contact icons (mail, phone, mapPin)
+    else {
+      category = 'contact';
+    }
+
+    // Get icon with determined category
+    let iconSvg = getIconSvg(category, iconName, iconStyle, 24, 'inline-icon');
+
+    // Fallback: try other categories if not found
+    if (!iconSvg || iconSvg.includes('Info')) {
+      const categories: Array<'contact' | 'ui' | 'social'> = ['contact', 'ui', 'social'];
+      for (const cat of categories) {
+        if (cat !== category && iconExists(cat, iconName)) {
+          iconSvg = getIconSvg(cat, iconName, iconStyle, 24, 'inline-icon');
+          break;
+        }
+      }
+    }
+
+    return iconSvg || match; // Return original if icon not found
+  });
+
   return {
-    html: replacePlaceholders(component.htmlTemplate, replacements),
-    css: replacePlaceholders(component.cssTemplate, replacements),
-    js: component.jsTemplate
-      ? replacePlaceholders(component.jsTemplate, replacements)
-      : undefined
+    html,
+    css,
+    js
   };
 }

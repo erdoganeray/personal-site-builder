@@ -8,6 +8,7 @@ export const footerTemplate1: ComponentTemplate = {
   id: "footer-modern-centered",
   name: "Modern Centered Footer",
   category: "footer",
+  iconStyle: "outline",
   htmlTemplate: `
     <footer id="footer" class="footer-modern-section">
       <div class="footer-modern-container">
@@ -216,6 +217,7 @@ export const footerTemplate2: ComponentTemplate = {
   id: "footer-minimal-simple",
   name: "Minimal Simple Footer",
   category: "footer",
+  iconStyle: "outline",
   htmlTemplate: `
     <footer id="footer" class="footer-minimal-section">
       <div class="footer-minimal-container">
@@ -397,6 +399,7 @@ export const footerTemplate3: ComponentTemplate = {
   id: "footer-split-columns",
   name: "Split Columns Footer",
   category: "footer",
+  iconStyle: "outline",
   htmlTemplate: `
     <footer id="footer" class="footer-split-section">
       <div class="footer-split-container">
@@ -619,6 +622,7 @@ export const footerTemplate4: ComponentTemplate = {
   id: "footer-wave-sticky",
   name: "Wave Sticky Footer",
   category: "footer",
+  iconStyle: "outline",
   htmlTemplate: `
     <footer id="footer" class="footer-wave-section">
       <svg class="footer-wave-divider" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1440 120" preserveAspectRatio="none">
@@ -909,6 +913,7 @@ export const footerTemplate5: ComponentTemplate = {
   id: "footer-mega-columns",
   name: "Mega Footer",
   category: "footer",
+  iconStyle: "outline",
   htmlTemplate: `
     <footer id="footer" class="footer-mega-section">
       <div class="footer-mega-container">
@@ -932,15 +937,15 @@ export const footerTemplate5: ComponentTemplate = {
             <h4>İletişim Bilgileri</h4>
             <ul>
               <li>
-                <span class="footer-mega-icon">📧</span>
+                <span class="footer-mega-icon">{{ICON:mail}}</span>
                 <a href="mailto:{{EMAIL}}" aria-label="Email gönder">{{EMAIL}}</a>
               </li>
               <li>
-                <span class="footer-mega-icon">📱</span>
+                <span class="footer-mega-icon">{{ICON:phone}}</span>
                 <a href="tel:{{PHONE}}" aria-label="Telefon et">{{PHONE}}</a>
               </li>
               <li>
-                <span class="footer-mega-icon">📍</span>
+                <span class="footer-mega-icon">{{ICON:mapPin}}</span>
                 <span>{{LOCATION}}</span>
               </li>
             </ul>

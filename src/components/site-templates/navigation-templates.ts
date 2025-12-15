@@ -402,6 +402,7 @@ export const navigationTemplate3: ComponentTemplate = {
       justify-content: center;
       font-size: 2rem;
       font-weight: 700;
+      color: {{COLOR_TEXT}};
       backdrop-filter: blur(10px);
     }
 
@@ -409,6 +410,7 @@ export const navigationTemplate3: ComponentTemplate = {
       margin: 0;
       font-size: 1.2rem;
       font-weight: 600;
+      color: {{COLOR_TEXT}};
     }
 
     .nav-sidebar-menu {
@@ -452,11 +454,24 @@ export const navigationTemplate3: ComponentTemplate = {
     }
 
     .nav-sidebar-icon {
-      font-size: 1.5rem;
+      width: 20px;
+      height: 20px;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      flex-shrink: 0;
+    }
+
+    .nav-sidebar-icon svg {
+      width: 20px;
+      height: 20px;
+      stroke: currentColor;
+      fill: none;
     }
 
     .nav-sidebar-text {
       font-weight: 500;
+      font-size: 0.95rem;
     }
 
     .nav-sidebar-footer {
@@ -467,18 +482,35 @@ export const navigationTemplate3: ComponentTemplate = {
     .nav-sidebar-social {
       display: flex;
       justify-content: center;
-      gap: 1rem;
+      align-items: center;
+      gap: 0.75rem;
+      flex-wrap: wrap;
     }
 
     .nav-sidebar-social a {
       color: rgba(255, 255, 255, 0.8);
       text-decoration: none;
-      font-size: 1.5rem;
-      transition: color 0.3s ease;
+      transition: all 0.3s ease;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      width: 32px;
+      height: 32px;
+      border-radius: 6px;
+      background: rgba(255, 255, 255, 0.1);
     }
 
     .nav-sidebar-social a:hover {
       color: #ffffff;
+      background: rgba(255, 255, 255, 0.2);
+      transform: translateY(-2px);
+    }
+
+    .nav-sidebar-social a svg {
+      width: 18px;
+      height: 18px;
+      stroke: currentColor;
+      fill: none;
     }
 
     .nav-sidebar-toggle {

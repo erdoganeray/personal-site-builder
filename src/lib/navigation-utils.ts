@@ -1,4 +1,5 @@
 import { SelectedComponent } from "@/types/templates";
+import { getIconSvg } from "./icon-registry";
 
 /**
  * Merkezi section isim haritası
@@ -15,17 +16,25 @@ export const SECTION_NAME_MAP: Record<string, string> = {
 };
 
 /**
- * Section icon haritası (sidebar ve floating navigation için)
+ * Section icon haritası - icon registry kullanarak SVG iconlar döndürür
+ * @param category - Section category
+ * @param size - Icon size in pixels
+ * @returns SVG icon HTML string
  */
-export const SECTION_ICON_MAP: Record<string, string> = {
-    'hero': '🏠',
-    'experience': '💼',
-    'education': '🎓',
-    'portfolio': '🎨',
-    'skills': '⚡',
-    'languages': '🌍',
-    'contact': '📧'
-};
+export function getSectionIconSvg(category: string, size: number = 24): string {
+    const iconMap: Record<string, { category: string; name: string }> = {
+        'hero': { category: 'navigation', name: 'home' },
+        'experience': { category: 'navigation', name: 'briefcase' },
+        'education': { category: 'navigation', name: 'graduationCap' },
+        'portfolio': { category: 'navigation', name: 'image' },
+        'skills': { category: 'navigation', name: 'zap' },
+        'languages': { category: 'navigation', name: 'globe' },
+        'contact': { category: 'contact', name: 'mail' }
+    };
+
+    const iconConfig = iconMap[category] || { category: 'ui', name: 'info' };
+    return getIconSvg(iconConfig.category as any, iconConfig.name as any, 'outline', size);
+}
 
 /**
  * Navigation menu item'larını oluşturur
@@ -58,12 +67,12 @@ export function generateNavigationMenuItems(
         case 'sidebar':
             return menuableComponents.map((comp, index) => {
                 const name = SECTION_NAME_MAP[comp.category] || comp.category;
-                const icon = SECTION_ICON_MAP[comp.category] || '📄';
+                const iconSvg = getSectionIconSvg(comp.category, 20);
                 const activeClass = index === 0 ? 'active' : '';
                 return `
           <li>
             <a href="#${comp.category}" class="nav-sidebar-link ${activeClass}">
-              <span class="nav-sidebar-icon">${icon}</span>
+              <span class="nav-sidebar-icon">${iconSvg}</span>
               <span class="nav-sidebar-text">${name}</span>
             </a>
           </li>
@@ -93,13 +102,4 @@ export function generateNavigationMenuItems(
  */
 export function getSectionName(sectionId: string): string {
     return SECTION_NAME_MAP[sectionId] || sectionId.charAt(0).toUpperCase() + sectionId.slice(1);
-}
-
-/**
- * Section ID'den icon döndürür
- * @param sectionId - Section ID
- * @returns Emoji icon
- */
-export function getSectionIcon(sectionId: string): string {
-    return SECTION_ICON_MAP[sectionId] || '📄';
 }

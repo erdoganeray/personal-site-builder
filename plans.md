@@ -127,9 +127,10 @@
 # Geliştime Planı
 
 ## Icon, Font, Color Palette, Stock Image
-- site oluşturma aşamasına hazır icon, font desteği ekle
-- gemini api color sistemi bazen renklerin birbiri ile karışmasına sebep oluyor. color palette sistemi ekle
-- icon, font, color palette, stock image revise si doğru çalışmalı
+- icon: hem landing page te hem de kullanıcıların oluşturdukları sitelerinde entegre olabilecek şekilde icon sistemi eklemeliyliz
+- font: hem landing page te hem de kullanıcıların oluşturdukları sitelerinde entegre olabilecek şekilde font sistemi eklemeliyliz
+- color palette: geliştirme sürecinde fark ettiğim bir sıkıntı, oluşturulan sitelerde bazen renkler birbiri ile uyumsuz oluyor, özellikle text ler arka planlar üzerinde kaybolabiliyor. hem gemini api in daha doğru seçimler yapabilmesi için hem de sitem de site oluşturma alanına color palette seçimi ui ekleyeceğiz
+- stock image: oluşturulan sitelerde hiç görsel kullanılmıyor. ana projede stock görseller olmalı, belki bir json dosyasında her bir görselin açıklaması olabilir , site oluşturulurken uygun templatelere uygun stock resimler eşleştirilmeli, site dosyalarına bu görseller eklenmeli. ve tabii hem halihazırdaki hem de daha sonra oluşturulacak templateler stock image aware olmalı
 - site oluşturulunca tarayıcı tab inde görünen isim logo ne olacak?
 
 ## UI/UX Güncellemeleri
