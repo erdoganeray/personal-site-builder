@@ -64,13 +64,25 @@ export async function regeneratePreviewContent(siteId: string): Promise<{
       const fontPair = getFontPairById(designPlan.fontPairId || 'professional-1');
       const googleFontsUrl = fontPair?.googleFontsUrl || 'https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;700;900&display=swap';
 
+      // Generate dynamic favicon from initials
+      const initials = cvData.personalInfo.name
+        .split(' ')
+        .map(word => word.charAt(0).toUpperCase())
+        .slice(0, 2)
+        .join('');
+      const faviconColor = designPlan.themeColors.primary || '#3B82F6';
+      const faviconSvg = `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64"><rect width="64" height="64" rx="12" fill="${faviconColor}"/><text x="32" y="42" font-family="Arial, sans-serif" font-size="28" font-weight="bold" fill="white" text-anchor="middle">${initials}</text></svg>`;
+      const faviconBase64 = `data:image/svg+xml;base64,${Buffer.from(faviconSvg).toString('base64')}`;
+
       finalHtml = `<!DOCTYPE html>
 <html lang="tr">
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>${cvData.personalInfo.name} - Kişisel Web Sitesi</title>
+  <title>${cvData.personalInfo.name}</title>
   <meta name="description" content="${cvData.personalInfo.title || 'Professional Portfolio'}">
+  <!-- Favicon -->
+  <link rel="icon" type="image/svg+xml" href="${faviconBase64}">
   <!-- Google Fonts -->
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -214,7 +226,7 @@ ${finalJs}
         htmlContent: finalHtml,
         cssContent: finalCss,
         jsContent: finalJs,
-        title: `${cvData.personalInfo.name} - Kişisel Web Sitesi`,
+        title: cvData.personalInfo.name,
         updatedAt: new Date(),
       },
     });

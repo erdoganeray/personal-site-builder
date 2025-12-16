@@ -277,7 +277,7 @@ export const educationTemplate2: ComponentTemplate = {
     }
 
     .education-card {
-      background: white;
+      background: {{COLOR_SURFACE}};
       border-radius: 12px;
       padding: 2rem;
       box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
@@ -491,7 +491,7 @@ export const educationTemplate3: ComponentTemplate = {
   cssTemplate: `
     .education-modern {
       padding: 5rem 2rem;
-      background: linear-gradient(135deg, {{COLOR_BACKGROUND}} 0%, #f8f9fa 100%);
+      background: linear-gradient(135deg, {{COLOR_BACKGROUND}} 0%, {{COLOR_SURFACE}} 100%);
     }
 
     .education-list {
@@ -503,7 +503,7 @@ export const educationTemplate3: ComponentTemplate = {
     }
 
     .education-modern-item {
-      background: white;
+      background: {{COLOR_SURFACE}};
       border-radius: 16px;
       padding: 2.5rem;
       box-shadow: 0 10px 30px rgba(0, 0, 0, 0.08);
@@ -750,7 +750,7 @@ export const educationTemplate4: ComponentTemplate = {
     }
 
     .accordion-item-edu {
-      background: white;
+      background: {{COLOR_SURFACE}};
       border-radius: 8px;
       margin-bottom: 1rem;
       overflow: hidden;
@@ -768,7 +768,7 @@ export const educationTemplate4: ComponentTemplate = {
       align-items: center;
       padding: 1.5rem;
       cursor: pointer;
-      background: white;
+      background: {{COLOR_SURFACE}};
       border: none;
       width: 100%;
       text-align: left;
@@ -776,7 +776,7 @@ export const educationTemplate4: ComponentTemplate = {
     }
 
     .accordion-header-edu:hover {
-      background: #f8f9fa;
+      background: {{COLOR_HOVER}};
     }
 
     .accordion-header-edu:focus {
@@ -978,7 +978,7 @@ export const educationTemplate4: ComponentTemplate = {
       }
 
       .accordion-header-edu:hover {
-        background: white;
+        background: {{COLOR_SURFACE}};
       }
     }
   `,
@@ -1169,7 +1169,7 @@ export const educationTemplate5: ComponentTemplate = {
     }
 
     .horizontal-timeline-card-edu {
-      background: white;
+      background: {{COLOR_SURFACE}};
       border-radius: 12px;
       padding: 1.5rem;
       box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
@@ -1451,7 +1451,7 @@ export const educationTemplate6: ComponentTemplate = {
     }
 
     .tab-item-edu {
-      background: white;
+      background: {{COLOR_SURFACE}};
       border-radius: 8px;
       overflow: hidden;
       box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
@@ -1468,7 +1468,7 @@ export const educationTemplate6: ComponentTemplate = {
       justify-content: space-between;
       align-items: center;
       padding: 1.25rem 1.5rem;
-      background: white;
+      background: {{COLOR_SURFACE}};
       border: none;
       cursor: pointer;
       text-align: left;
@@ -1477,7 +1477,7 @@ export const educationTemplate6: ComponentTemplate = {
     }
 
     .tab-button-edu:hover {
-      background: #f8f9fa;
+      background: {{COLOR_HOVER}};
     }
 
     .tab-button-edu:focus {
@@ -1668,7 +1668,7 @@ export const educationTemplate6: ComponentTemplate = {
       }
 
       .tab-button-edu:hover {
-        background: white;
+        background: {{COLOR_SURFACE}};
       }
     }
   `,

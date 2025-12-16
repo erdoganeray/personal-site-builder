@@ -96,7 +96,7 @@ export const skillsTemplate2: ComponentTemplate = {
     }
 
     .skill-card {
-      background: white;
+      background: {{COLOR_SURFACE}};
       border-radius: 12px;
       padding: 1.5rem;
       text-align: center;
@@ -175,7 +175,7 @@ export const skillsTemplate3: ComponentTemplate = {
     }
 
     .skill-category-group {
-      background: white;
+      background: {{COLOR_SURFACE}};
       border-radius: 12px;
       overflow: hidden;
       box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);

@@ -152,7 +152,7 @@ export const contactTemplate1: ComponentTemplate = {
       gap: 20px;
       align-items: start;
       padding: 25px;
-      background: white;
+      background: {{COLOR_SURFACE}};
       border-radius: 12px;
       box-shadow: 0 2px 10px rgba(0,0,0,0.1);
       transition: transform 0.3s, box-shadow 0.3s;

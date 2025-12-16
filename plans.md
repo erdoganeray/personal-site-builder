@@ -249,6 +249,10 @@
   - Veri silme hakkı (right to be forgotten)
   - Kullanıcı onayları (consent management)
 
+## Yayınlamadan Önce Son Yapılacaklar
+- bazı templateler çok basit, daha modernleştir
+- template havuzunu biraz daha geliştir
+
 ## Versel Deploydan Sonra Yapılacaklar
 
 ### Vercel Cron Job

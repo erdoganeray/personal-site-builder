@@ -214,7 +214,7 @@ export const experienceTemplate2: ComponentTemplate = {
     }
 
     .experience-card {
-      background: white;
+      background: {{COLOR_SURFACE}};
       border-radius: 12px;
       padding: 2rem;
       box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
@@ -379,7 +379,7 @@ export const experienceTemplate3: ComponentTemplate = {
     }
 
     .accordion-item {
-      background: white;
+      background: {{COLOR_SURFACE}};
       border-radius: 8px;
       margin-bottom: 1rem;
       overflow: hidden;
@@ -397,7 +397,7 @@ export const experienceTemplate3: ComponentTemplate = {
       align-items: center;
       padding: 1.5rem;
       cursor: pointer;
-      background: white;
+      background: {{COLOR_SURFACE}};
       border: none;
       width: 100%;
       text-align: left;
@@ -405,7 +405,7 @@ export const experienceTemplate3: ComponentTemplate = {
     }
 
     .accordion-header:hover {
-      background: #f8f9fa;
+      background: {{COLOR_HOVER}};
     }
 
     .accordion-header:focus {
@@ -848,7 +848,7 @@ export const experienceTemplate5: ComponentTemplate = {
     }
 
     .horizontal-timeline-card {
-      background: white;
+      background: {{COLOR_SURFACE}};
       border-radius: 12px;
       padding: 1.5rem;
       box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
@@ -1026,7 +1026,7 @@ export const experienceTemplate6: ComponentTemplate = {
     }
 
     .tab-item {
-      background: white;
+      background: {{COLOR_SURFACE}};
       border-radius: 8px;
       overflow: hidden;
       box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
@@ -1043,7 +1043,7 @@ export const experienceTemplate6: ComponentTemplate = {
       justify-content: space-between;
       align-items: center;
       padding: 1.25rem 1.5rem;
-      background: white;
+      background: {{COLOR_SURFACE}};
       border: none;
       cursor: pointer;
       text-align: left;
@@ -1052,7 +1052,7 @@ export const experienceTemplate6: ComponentTemplate = {
     }
 
     .tab-button:hover {
-      background: #f8f9fa;
+      background: {{COLOR_HOVER}};
     }
 
     .tab-button:focus {

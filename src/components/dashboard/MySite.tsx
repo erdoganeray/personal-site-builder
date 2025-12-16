@@ -135,12 +135,35 @@ export default function MySite({ site, onRefresh }: MySiteProps) {
     const handleDeletePreview = async () => {
         if (!site) return;
 
-        if (!confirm("Önizleme sitesini silmek istediğinizden emin misiniz? Bu işlem geri alınamaz.")) {
-            return;
+        // Check if site is published - show extra warning
+        if (site.status === "published") {
+            if (!confirm("⚠️ DİKKAT: Siteniz yayında!\n\nÖnizlemeyi silmek, sitenizi de yayından kaldıracaktır. Bu işlem geri alınamaz.\n\nDevam etmek istiyor musunuz?")) {
+                return;
+            }
+        } else {
+            if (!confirm("Önizleme sitesini silmek istediğinizden emin misiniz? Bu işlem geri alınamaz.")) {
+                return;
+            }
         }
 
         setDeletingPreview(true);
         try {
+            // If site is published, first unpublish it
+            if (site.status === "published") {
+                const unpublishResponse = await fetch("/api/site/unpublish", {
+                    method: "POST",
+                    headers: { "Content-Type": "application/json" },
+                    body: JSON.stringify({ siteId: site.id }),
+                });
+
+                if (!unpublishResponse.ok) {
+                    const unpublishData = await unpublishResponse.json();
+                    alert(unpublishData.error || "Site yayından kaldırılamadı");
+                    return;
+                }
+            }
+
+            // Now delete the preview
             const response = await fetch(`/api/site/delete-preview?id=${site.id}`, {
                 method: "DELETE",
             });
@@ -229,7 +252,7 @@ export default function MySite({ site, onRefresh }: MySiteProps) {
             )}
 
             {/* Delete Preview Button */}
-            {site.htmlContent && site.status !== "published" && (
+            {site.htmlContent && (
                 <div className="flex justify-end">
                     <button
                         onClick={handleDeletePreview}
