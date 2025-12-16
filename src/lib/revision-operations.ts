@@ -173,21 +173,62 @@ export function changeComponentTemplate(
 }
 
 /**
- * Update theme colors in the design plan
+ * Update theme colors in the design plan using 4-color base palette
  * @param designPlan Current design plan
- * @param newColors New theme colors (partial update supported)
- * @returns Updated design plan
+ * @param basePalette 4 base colors (primary, secondary, accent, neutral)
+ * @param theme Optional theme type (light/dark)
+ * @returns Updated design plan with full color palette
  */
 export function updateThemeColors(
     designPlan: DesignPlan,
-    newColors: Partial<ThemeColors>
+    basePalette: {
+        primary: string;
+        secondary: string;
+        accent: string;
+        neutral: string;
+    },
+    theme?: 'light' | 'dark'
 ): DesignPlan {
+    const { generateFullPalette } = require('./color-utils');
+
+    // Tema belirtilmemişse mevcut temayı koru veya varsayılan olarak 'light' kullan
+    const currentTheme = theme || (designPlan as any).theme || 'light';
+
+    // 4 ana renkten full palette oluştur
+    const fullPalette = generateFullPalette(basePalette, currentTheme);
+
+    // Font bilgilerini koru
+    const themeColorsWithFonts = {
+        ...fullPalette,
+        fontHeading: designPlan.themeColors?.fontHeading,
+        fontBody: designPlan.themeColors?.fontBody,
+    };
+
     return {
         ...designPlan,
-        themeColors: {
-            ...designPlan.themeColors,
-            ...newColors,
-        } as ThemeColors,
+        themeColors: themeColorsWithFonts as any,
+        theme: currentTheme,
+    } as any;
+}
+
+/**
+ * Extract base palette from existing design plan theme colors
+ * Useful for partial color updates in revise operations
+ * @param designPlan Current design plan
+ * @returns Base palette with 4 colors
+ */
+export function extractBasePaletteFromDesignPlan(designPlan: DesignPlan): {
+    primary: string;
+    secondary: string;
+    accent: string;
+    neutral: string;
+} {
+    const colors = designPlan.themeColors;
+    return {
+        primary: colors?.primary || '#2563eb',
+        secondary: colors?.secondary || '#7c3aed',
+        accent: colors?.accent || '#06b6d4',
+        neutral: (colors as any)?.neutral || colors?.text || '#64748b',
     };
 }
 

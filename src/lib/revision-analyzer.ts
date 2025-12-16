@@ -36,9 +36,11 @@ export type RevisionOperation =
             primary?: string;
             secondary?: string;
             accent?: string;
+            neutral?: string;
             background?: string;
             text?: string;
         };
+        theme?: 'light' | 'dark';
     }
     | {
         type: "CHANGE_FONTS";
@@ -195,17 +197,37 @@ Yukarıdaki bilgilere göre kullanıcının ne istediğini analiz et ve aşağı
   "newTemplateId": "hero-animated-gradient"
 }
 
-5. Tema Rengi Değiştir:
+5. Tema Rengi Değiştir (Kısmi - Sadece Accent Renkleri):
 {
   "type": "UPDATE_THEME",
   "colors": {
     "primary": "#2563eb",
-    "secondary": "#3b82f6",
     "accent": "#60a5fa"
   }
 }
 
-6. Font Değiştir:
+6. Dark/Light Theme Değiştir (Tam - TÜM Renkler):
+⚠️ Kullanıcı "dark theme", "koyu tema", "light theme", "açık tema" derse, Gemini'den TÜM renkleri iste!
+{
+  "type": "UPDATE_THEME",
+  "theme": "dark",
+  "colors": {
+    "primary": "#3b82f6",
+    "secondary": "#8b5cf6",
+    "accent": "#06b6d4",
+    "neutral": "#94a3b8",
+    "background": "#0f172a",
+    "surface": "#1e293b",
+    "text": "#f1f5f9",
+    "textSecondary": "#cbd5e1",
+    "border": "rgba(148, 163, 184, 0.2)",
+    "hover": "#334155",
+    "iconPrimary": "#3b82f6",
+    "iconSecondary": "#06b6d4"
+  }
+}
+
+7. Font Değiştir:
 {
   "type": "CHANGE_FONTS",
   "fontStyle": "modern",
@@ -258,6 +280,7 @@ Kullanılabilir Font Çiftleri:
 - Template ID'ler yukarıdaki listeden seçilmeli
 - position opsiyoneldir, belirtilmezse sona eklenir
 - ⚠️ KRİTİK: Template değiştirirken, o component için ZATEN KULLANILMAKTA OLAN template'i asla seçme! Mutlaka farklı bir template seç. Aksi halde kullanıcının düzenleme hakkı boşa harcanır ve sitede hiçbir değişiklik olmaz.
+- ⚠️ DARK/LIGHT THEME DEĞİŞİKLİĞİ: Kullanıcı "dark theme", "koyu tema", "light theme", "açık tema" derse, UPDATE_THEME operasyonunda TÜM renkleri belirt (primary, secondary, accent, neutral, background, surface, text, textSecondary, border, hover, iconPrimary, iconSecondary). Sadece renk tonu değişikliği (örn: "mavi tema", "kırmızı yap") için sadece base colors (primary, secondary, accent) değiştir.
 
 ## Profil Fotoğrafı İşlemleri (ÖNEMLİ):
 ⚠️ Profil fotoğrafı ekleme/kaldırma istekleri için özel kurallar:

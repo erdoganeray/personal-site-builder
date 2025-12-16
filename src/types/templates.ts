@@ -3,14 +3,22 @@
  */
 
 export interface ThemeColors {
+  // Base colors (selected by Gemini or user)
   primary: string;
   secondary: string;
   accent: string;
+  neutral: string;
+
+  // Derived colors (auto-generated from base colors)
   background: string;
+  surface: string;
   text: string;
   textSecondary: string;
-  iconPrimary?: string;
-  iconSecondary?: string;
+  border: string;
+  hover: string;
+  iconPrimary: string;
+  iconSecondary: string;
+
   // Font properties
   fontHeading?: string;
   fontBody?: string;
@@ -42,6 +50,7 @@ export interface SelectedComponent {
 
 export interface SiteGenerationPlan {
   themeColors: ThemeColors;
+  theme: 'light' | 'dark';  // Light or dark theme
   selectedComponents: SelectedComponent[];
   layout: 'single-page' | 'multi-page';
   style: 'modern' | 'minimal' | 'creative' | 'professional';

@@ -258,17 +258,116 @@ FOOTER SECTION:
    - Kullanıcıya maksimum bilgi ve navigasyon sunulacaksa
 
 Görevin:
-1. CV'ye ve kullanıcı isteğine en uygun tema renklerini belirle (hex kodları)
-2. Yukarıdaki template'lerden hangilerinin kullanılacağına karar ver
-3. Her kategoriden (navigation, hero, experience, education, skills, contact, footer) bir template seç
-4. Genel stil anlayışını belirle (modern/minimal/creative/professional)
-5. Icon stilini ve boyutlarını belirle (outline/solid ve px değerleri)
+1. CV'ye ve kullanıcı isteğine en uygun 4 ana rengi belirle (primary, secondary, accent, neutral)
+2. Light veya dark tema seç
+3. Yukarıdaki template'lerden hangilerinin kullanılacağına karar ver
+4. Her kategoriden (navigation, hero, experience, education, skills, contact, footer) bir template seç
+5. Genel stil anlayışını belirle (modern/minimal/creative/professional)
+6. Icon stilini ve boyutlarını belirle (outline/solid ve px değerleri)
 
-Renk Seçimi Kriterleri:
-- Kişinin mesleğine uygun (örn: teknoloji için mavi/mor, tasarım için canlı renkler)
-- Profesyonel ve okunabilir
-- Kontrast oranları yeterli
-- Kullanıcının özel isteklerini dikkate al
+## Color Palette System
+
+Gemini, aşağıdaki **TÜM renkleri** döndürmelidir:
+
+### Base Colors (4 ana renk):
+- **primary**: Ana marka rengi
+- **secondary**: İkincil marka rengi (primary'ye yakın ton)
+- **accent**: Vurgu rengi (butonlar, linkler için)
+- **neutral**: Nötr baz renk (gri tonları için)
+
+### Derived Colors (tema renkleri - Gemini karar versin):
+- **background**: Sayfa arka plan rengi
+- **surface**: Kart/panel arka plan rengi
+- **text**: Ana metin rengi
+- **textSecondary**: İkincil metin rengi
+- **border**: Kenarlık rengi (rgba formatında, opacity: 0.1-0.3)
+- **hover**: Hover state rengi (background'dan hafif farklı)
+- **iconPrimary**: Ana icon rengi (genellikle primary ile aynı)
+- **iconSecondary**: İkincil icon rengi (genellikle accent ile aynı)
+
+### Light Tema Örnek Palette:
+
+Palette 1 - Blue Tech (Software Engineer, Developer, Data Scientist):
+{
+  "primary": "#2563eb",
+  "secondary": "#7c3aed",
+  "accent": "#06b6d4",
+  "neutral": "#64748b",
+  "background": "#ffffff",
+  "surface": "#f8f9fa",
+  "text": "#1a1a1a",
+  "textSecondary": "#666666",
+  "border": "rgba(100, 116, 139, 0.2)",
+  "hover": "#f1f5f9",
+  "iconPrimary": "#2563eb",
+  "iconSecondary": "#06b6d4"
+}
+
+Palette 2 - Vibrant Creative (Graphic Designer, UI/UX Designer, Artist):
+{
+  "primary": "#ec4899",
+  "secondary": "#f59e0b",
+  "accent": "#8b5cf6",
+  "neutral": "#6b7280",
+  "background": "#ffffff",
+  "surface": "#fef3f2",
+  "text": "#1a1a1a",
+  "textSecondary": "#666666",
+  "border": "rgba(107, 114, 128, 0.2)",
+  "hover": "#fef2f2",
+  "iconPrimary": "#ec4899",
+  "iconSecondary": "#8b5cf6"
+}
+
+### Dark Tema Örnek Palette:
+
+Palette 3 - Dark Tech (Developer, Engineer - dark theme):
+{
+  "primary": "#3b82f6",
+  "secondary": "#8b5cf6",
+  "accent": "#06b6d4",
+  "neutral": "#94a3b8",
+  "background": "#0f172a",
+  "surface": "#1e293b",
+  "text": "#f1f5f9",
+  "textSecondary": "#cbd5e1",
+  "border": "rgba(148, 163, 184, 0.2)",
+  "hover": "#334155",
+  "iconPrimary": "#3b82f6",
+  "iconSecondary": "#06b6d4"
+}
+
+Palette 4 - Dark Creative (Designer - dark theme):
+{
+  "primary": "#f472b6",
+  "secondary": "#fbbf24",
+  "accent": "#a78bfa",
+  "neutral": "#9ca3af",
+  "background": "#111827",
+  "surface": "#1f2937",
+  "text": "#f9fafb",
+  "textSecondary": "#d1d5db",
+  "border": "rgba(156, 163, 175, 0.2)",
+  "hover": "#374151",
+  "iconPrimary": "#f472b6",
+  "iconSecondary": "#a78bfa"
+}
+
+### Renk Seçim Kuralları:
+- Kişinin mesleğine uygun base palette seç (primary, secondary, accent, neutral)
+- Kullanıcının özel renk istekleri varsa dikkate al (örn: "dark theme", "mavi tonlar")
+- Light/dark tema seçimine göre background, surface, text renklerini ayarla
+- **Light tema**: background beyaz (#ffffff), text koyu (#1a1a1a)
+- **Dark tema**: background koyu (#0f172a, #111827), text açık (#f1f5f9, #f9fafb)
+- Kontrast oranlarına dikkat et (WCAG AA: 4.5:1 minimum text/background)
+- Border rengi rgba formatında olmalı (opacity: 0.1-0.3 arası)
+- Hover rengi background'dan hafif farklı olmalı (light: daha açık, dark: daha koyu)
+- iconPrimary genellikle primary ile aynı, iconSecondary genellikle accent ile aynı
+
+### Tema Seçimi (Light/Dark):
+- Varsayılan: "light" (çoğu durumda)
+- Dark tema: Sadece kullanıcı özel isterse (örn: "dark theme kullan", "koyu tema")
+- Kullanıcı isteği yoksa "light" kullan
 
 Icon Seçimi Kriterleri:
 - Icon Style: Tema estetiğine göre seç
@@ -334,12 +433,17 @@ Font Seçimi Kriterleri:
     "primary": "#hex",
     "secondary": "#hex",
     "accent": "#hex",
+    "neutral": "#hex",
     "background": "#hex",
+    "surface": "#hex",
     "text": "#hex",
     "textSecondary": "#hex",
+    "border": "rgba(r, g, b, opacity)",
+    "hover": "#hex",
     "iconPrimary": "#hex",
     "iconSecondary": "#hex"
   },
+  "theme": "light",
   "iconStyle": "outline",
   "iconSizes": {
     "navigation": "20px",
@@ -384,6 +488,28 @@ JSON'dan önce veya sonra hiçbir metin olmasın.
             throw new Error("Missing required fields in design plan");
          }
 
+         // Gemini'den gelen TÜM renkleri al (fallback değerlerle)
+         const theme = parsed.theme || 'light';
+         const isLight = theme === 'light';
+
+         const themeColors = {
+            // Base colors
+            primary: parsed.themeColors.primary || '#2563eb',
+            secondary: parsed.themeColors.secondary || '#7c3aed',
+            accent: parsed.themeColors.accent || '#06b6d4',
+            neutral: parsed.themeColors.neutral || '#64748b',
+
+            // Derived colors - Gemini'den gelirse kullan, yoksa tema'ya göre fallback
+            background: parsed.themeColors.background || (isLight ? '#ffffff' : '#0f172a'),
+            surface: parsed.themeColors.surface || (isLight ? '#f8f9fa' : '#1e293b'),
+            text: parsed.themeColors.text || (isLight ? '#1a1a1a' : '#f1f5f9'),
+            textSecondary: parsed.themeColors.textSecondary || (isLight ? '#666666' : '#cbd5e1'),
+            border: parsed.themeColors.border || (isLight ? 'rgba(100, 116, 139, 0.2)' : 'rgba(148, 163, 184, 0.2)'),
+            hover: parsed.themeColors.hover || (isLight ? '#f1f5f9' : '#334155'),
+            iconPrimary: parsed.themeColors.iconPrimary || parsed.themeColors.primary || '#2563eb',
+            iconSecondary: parsed.themeColors.iconSecondary || parsed.themeColors.accent || '#06b6d4',
+         };
+
          // Font pair processing
          const fontPairId = parsed.fontPairId || 'professional-1';
          const fontPair = getFontPairById(fontPairId);
@@ -394,13 +520,14 @@ JSON'dan önce veya sonra hiçbir metin olmasın.
 
          // Add font names to themeColors
          const themeColorsWithFonts = {
-            ...parsed.themeColors,
+            ...themeColors,
             fontHeading: fontPair?.heading || 'Roboto',
             fontBody: fontPair?.body || 'Roboto'
          };
 
          return {
             themeColors: themeColorsWithFonts,
+            theme: theme,
             selectedComponents: parsed.selectedComponents,
             layout: parsed.layout || 'single-page',
             style: parsed.style || 'modern',

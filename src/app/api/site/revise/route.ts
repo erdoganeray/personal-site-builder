@@ -15,7 +15,6 @@ import {
   removeComponent,
   reorderComponents,
   changeComponentTemplate,
-  updateThemeColors,
   validateComponentAddition,
   DesignPlan,
 } from "@/lib/revision-operations";
@@ -370,17 +369,45 @@ export async function POST(req: NextRequest) {
             { status: 400 }
           );
         }
+
         // Debug: Log theme color update
         console.log("\n🎨 THEME UPDATE DEBUG:");
         console.log(`   Old Colors:`, updatedDesignPlan.themeColors);
-        console.log(`   New Colors:`, operation.colors);
+        console.log(`   New Colors from Gemini:`, operation.colors);
+        console.log(`   Theme:`, (operation as any).theme);
 
-        updatedDesignPlan = updateThemeColors(
-          updatedDesignPlan,
-          operation.colors
-        );
+        // Merge TÜM renkleri (Gemini'den gelenler öncelikli)
+        const currentColors: any = updatedDesignPlan.themeColors || {};
+        const updatedThemeColors = {
+          // Base colors
+          primary: operation.colors.primary || currentColors.primary,
+          secondary: operation.colors.secondary || currentColors.secondary,
+          accent: operation.colors.accent || currentColors.accent,
+          neutral: operation.colors.neutral || (currentColors as any).neutral,
 
-        console.log(`   ✅ Merged Colors:`, updatedDesignPlan.themeColors);
+          // Derived colors - Gemini'den gelirse kullan
+          background: operation.colors.background || currentColors.background,
+          surface: (operation.colors as any).surface || (currentColors as any).surface,
+          text: operation.colors.text || currentColors.text,
+          textSecondary: (operation.colors as any).textSecondary || (currentColors as any).textSecondary,
+          border: (operation.colors as any).border || (currentColors as any).border,
+          hover: (operation.colors as any).hover || (currentColors as any).hover,
+          iconPrimary: (operation.colors as any).iconPrimary || (currentColors as any).iconPrimary,
+          iconSecondary: (operation.colors as any).iconSecondary || (currentColors as any).iconSecondary,
+
+          // Keep fonts
+          fontHeading: currentColors.fontHeading,
+          fontBody: currentColors.fontBody,
+        };
+
+        updatedDesignPlan.themeColors = updatedThemeColors as any;
+
+        // Update theme if provided
+        if ((operation as any).theme) {
+          (updatedDesignPlan as any).theme = (operation as any).theme;
+        }
+
+        console.log(`   ✅ Final Theme Colors:`, updatedDesignPlan.themeColors);
         console.log("");
 
         shouldRegeneratePreview = true;
@@ -434,14 +461,13 @@ export async function POST(req: NextRequest) {
           });
         }
 
-        // Update font in theme colors
-        updatedDesignPlan = updateThemeColors(
-          updatedDesignPlan,
-          {
-            fontHeading: fontPair.heading,
-            fontBody: fontPair.body
-          }
-        );
+        // Keep current colors, only update fonts
+
+        // Manually update fonts in themeColors
+        if (updatedDesignPlan.themeColors) {
+          updatedDesignPlan.themeColors.fontHeading = fontPair.heading;
+          updatedDesignPlan.themeColors.fontBody = fontPair.body;
+        }
 
         // Update font style and pair ID
         updatedDesignPlan.fontStyle = operation.fontStyle;
