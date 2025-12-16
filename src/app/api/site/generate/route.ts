@@ -108,6 +108,42 @@ export async function POST(req: NextRequest) {
       );
     }
 
+    // 8.5 Stock Photo Selection - Eğer stok fotoğraflı template seçildiyse
+    const stockPhotoTemplates = ['hero-fullscreen-bg', 'hero-split-image', 'contact-image-side'];
+    const selectedTemplateIds = designPlan.selectedComponents.map((c: any) => c.templateId);
+    const needsStockPhotos = selectedTemplateIds.some((id: string) => stockPhotoTemplates.includes(id));
+
+    if (needsStockPhotos) {
+      console.log("📸 Stock photo templates detected, fetching images...");
+      try {
+        const { getStockPhotoForTemplate } = await import("@/lib/stock-photo-selector");
+        const stockImages: Record<string, any> = {};
+
+        // Hero için stok fotoğraf gerekli mi?
+        if (selectedTemplateIds.includes('hero-fullscreen-bg') || selectedTemplateIds.includes('hero-split-image')) {
+          console.log("🖼️ Fetching hero stock photo...");
+          const heroResult = await getStockPhotoForTemplate('hero', cvData, designPlan.themeColors, designPlan.style);
+          stockImages['hero'] = heroResult.photo;
+          console.log(`✅ Hero stock photo: ${heroResult.photo.url.substring(0, 50)}...`);
+        }
+
+        // Contact için stok fotoğraf gerekli mi?
+        if (selectedTemplateIds.includes('contact-image-side')) {
+          console.log("🖼️ Fetching contact stock photo...");
+          const contactResult = await getStockPhotoForTemplate('contact', cvData, designPlan.themeColors, designPlan.style);
+          stockImages['contact'] = contactResult.photo;
+          console.log(`✅ Contact stock photo: ${contactResult.photo.url.substring(0, 50)}...`);
+        }
+
+        // designPlan'a stockImages ekle
+        designPlan.stockImages = stockImages;
+        console.log("📸 Stock photos added to design plan");
+      } catch (stockError) {
+        console.error("⚠️ Stock photo fetch error (continuing without stock photos):", stockError);
+        // Hata olursa devam et, fallback SVG'ler kullanılacak
+      }
+    }
+
     // 9. Seçilen template'leri al ve CV verileriyle doldur
     console.log("Populating templates with CV data...");
     let finalHtml = '';
@@ -183,7 +219,8 @@ export async function POST(req: NextRequest) {
           designPlan.themeColors,
           componentsToRender,
           designPlan.iconStyle,
-          designPlan.iconSizes
+          designPlan.iconSizes,
+          designPlan.stockImages // Stock images parametresi
         );
 
         finalHtml += populated.html + '\n';

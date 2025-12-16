@@ -61,4 +61,16 @@ export interface SiteGenerationPlan {
   };
   fontStyle?: 'modern' | 'professional' | 'creative' | 'minimal';
   fontPairId?: string;
+
+  /** Stok fotoğraf bilgileri (hotlinking için URL'ler) */
+  stockImages?: {
+    [category: string]: {
+      url: string;
+      alt: string;
+      photographer?: string;
+      pexelsId?: number;
+      avgColor?: string;
+    };
+  };
 }
+

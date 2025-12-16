@@ -11,68 +11,80 @@ import { DesignPlan } from "./revision-operations";
 
 // Operation types
 export type RevisionOperation =
-    | {
-        type: "ADD_COMPONENT";
-        category: string;
-        templateId: string;
-        position?: number;
-    }
-    | {
-        type: "REMOVE_COMPONENT";
-        category: string;
-    }
-    | {
-        type: "REORDER_COMPONENTS";
-        newOrder: string[];
-    }
-    | {
-        type: "CHANGE_TEMPLATE";
-        category: string;
-        newTemplateId: string;
-    }
-    | {
-        type: "UPDATE_THEME";
-        colors: {
-            primary?: string;
-            secondary?: string;
-            accent?: string;
-            neutral?: string;
-            background?: string;
-            text?: string;
-        };
-        theme?: 'light' | 'dark';
-    }
-    | {
-        type: "CHANGE_FONTS";
-        fontStyle: 'modern' | 'professional' | 'creative' | 'minimal';
-        fontPairId: string;
-    }
-    | {
-        type: "REDIRECT_TO_MYINFO";
-        reason: string;
-        field: "personal" | "experience" | "education" | "skills" | "languages" | "portfolio";
-    }
-    | {
-        type: "CHAT";
-        message: string;
-    }
-    | {
-        type: "UNSUPPORTED";
-        message: string;
+  | {
+    type: "ADD_COMPONENT";
+    category: string;
+    templateId: string;
+    position?: number;
+  }
+  | {
+    type: "REMOVE_COMPONENT";
+    category: string;
+  }
+  | {
+    type: "REORDER_COMPONENTS";
+    newOrder: string[];
+  }
+  | {
+    type: "CHANGE_TEMPLATE";
+    category: string;
+    newTemplateId: string;
+  }
+  | {
+    type: "UPDATE_THEME";
+    colors: {
+      primary?: string;
+      secondary?: string;
+      accent?: string;
+      neutral?: string;
+      background?: string;
+      text?: string;
     };
+    theme?: 'light' | 'dark';
+  }
+  | {
+    type: "CHANGE_FONTS";
+    fontStyle: 'modern' | 'professional' | 'creative' | 'minimal';
+    fontPairId: string;
+  }
+  | {
+    type: "REDIRECT_TO_MYINFO";
+    reason: string;
+    field: "personal" | "experience" | "education" | "skills" | "languages" | "portfolio";
+  }
+  | {
+    type: "CHAT";
+    message: string;
+  }
+  | {
+    type: "UNSUPPORTED";
+    message: string;
+  };
 
 // Available templates for each component category
 // Synced with actual template files in src/components/site-templates/
 const AVAILABLE_TEMPLATES = {
-    navigation: ["nav-classic-horizontal", "nav-minimal-centered", "nav-sidebar-modern", "nav-floating-dot"],
-    hero: ["hero-modern-centered", "hero-split-screen", "hero-minimal-text", "hero-animated-gradient"],
-    experience: ["experience-timeline", "experience-cards", "experience-accordion", "experience-minimal", "experience-horizontal-timeline", "experience-tabs"],
-    education: ["education-timeline", "education-cards", "education-modern", "education-accordion", "education-horizontal-timeline", "education-tabs"],
-    skills: ["skills-progress-bars", "skills-card-grid", "skills-categorized", "skills-minimal-list", "skills-tag-cloud"],
-    languages: ["languages-progress-bars", "languages-card-grid", "languages-minimalist", "languages-certification", "languages-accordion", "languages-badge-cloud"],
-    portfolio: ["portfolio-grid", "portfolio-masonry", "portfolio-carousel", "portfolio-bento-grid"],
-    contact: ["contact-modern-form", "contact-minimal-centered", "contact-split-info"],
-    footer: ["footer-modern-centered", "footer-minimal-simple", "footer-split-columns", "footer-wave-sticky", "footer-mega-columns"],
+  navigation: ["nav-classic-horizontal", "nav-minimal-centered", "nav-sidebar-modern", "nav-floating-dot"],
+  hero: [
+    "hero-modern-centered",
+    "hero-split-screen",
+    "hero-minimal-text",
+    "hero-animated-gradient",
+    "hero-fullscreen-bg",    // 🆕 Stok fotoğraf arka planlı
+    "hero-split-image"       // 🆕 Split layout stok fotoğraf
+  ],
+  experience: ["experience-timeline", "experience-cards", "experience-accordion", "experience-minimal", "experience-horizontal-timeline", "experience-tabs"],
+  education: ["education-timeline", "education-cards", "education-modern", "education-accordion", "education-horizontal-timeline", "education-tabs"],
+  skills: ["skills-progress-bars", "skills-card-grid", "skills-categorized", "skills-minimal-list", "skills-tag-cloud"],
+  languages: ["languages-progress-bars", "languages-card-grid", "languages-minimalist", "languages-certification", "languages-accordion", "languages-badge-cloud"],
+  portfolio: ["portfolio-grid", "portfolio-masonry", "portfolio-carousel", "portfolio-bento-grid"],
+  contact: [
+    "contact-modern-form",
+    "contact-minimal-centered",
+    "contact-split-info",
+    "contact-image-side"     // 🆕 Stok fotoğraf yanlı
+  ],
+  footer: ["footer-modern-centered", "footer-minimal-simple", "footer-split-columns", "footer-wave-sticky", "footer-mega-columns"],
 };
 
 /**
@@ -83,56 +95,56 @@ const AVAILABLE_TEMPLATES = {
  * @returns Analyzed operation
  */
 export async function analyzeRevisionRequest(
-    message: string,
-    currentDesignPlan: DesignPlan,
-    cvData: CVData | null
+  message: string,
+  currentDesignPlan: DesignPlan,
+  cvData: CVData | null
 ): Promise<RevisionOperation> {
-    try {
-        const apiKey = process.env.GEMINI_API_KEY;
+  try {
+    const apiKey = process.env.GEMINI_API_KEY;
 
-        if (!apiKey) {
-            throw new Error("GEMINI_API_KEY environment variable is not set");
-        }
-
-        const modelName = process.env.GEMINI_MODEL || "gemini-2.0-flash-exp";
-        const genAI = new GoogleGenerativeAI(apiKey);
-        const model = genAI.getGenerativeModel({ model: modelName });
-
-        // Build comprehensive prompt
-        const prompt = buildAnalysisPrompt(message, currentDesignPlan, cvData);
-
-        const result = await model.generateContent(prompt);
-        const responseText = result.response.text();
-
-        // Parse LLM response
-        const operation = parseOperationResponse(responseText);
-
-        return operation;
-    } catch (error) {
-        console.error("Error analyzing revision request:", error);
-
-        // Fallback to unsupported operation
-        return {
-            type: "UNSUPPORTED",
-            message: "Talebinizi anlayamadım. Lütfen daha açık bir şekilde belirtin.",
-        };
+    if (!apiKey) {
+      throw new Error("GEMINI_API_KEY environment variable is not set");
     }
+
+    const modelName = process.env.GEMINI_MODEL || "gemini-2.0-flash-exp";
+    const genAI = new GoogleGenerativeAI(apiKey);
+    const model = genAI.getGenerativeModel({ model: modelName });
+
+    // Build comprehensive prompt
+    const prompt = buildAnalysisPrompt(message, currentDesignPlan, cvData);
+
+    const result = await model.generateContent(prompt);
+    const responseText = result.response.text();
+
+    // Parse LLM response
+    const operation = parseOperationResponse(responseText);
+
+    return operation;
+  } catch (error) {
+    console.error("Error analyzing revision request:", error);
+
+    // Fallback to unsupported operation
+    return {
+      type: "UNSUPPORTED",
+      message: "Talebinizi anlayamadım. Lütfen daha açık bir şekilde belirtin.",
+    };
+  }
 }
 
 /**
  * Build comprehensive LLM prompt for analysis
  */
 function buildAnalysisPrompt(
-    message: string,
-    currentDesignPlan: DesignPlan,
-    cvData: CVData | null
+  message: string,
+  currentDesignPlan: DesignPlan,
+  cvData: CVData | null
 ): string {
-    const currentComponents = currentDesignPlan.selectedComponents
-        .map((c) => `${c.category}: ${c.templateId}`)
-        .join("\n");
+  const currentComponents = currentDesignPlan.selectedComponents
+    .map((c) => `${c.category}: ${c.templateId}`)
+    .join("\n");
 
-    const cvSummary = cvData
-        ? `
+  const cvSummary = cvData
+    ? `
 - İsim: ${cvData.personalInfo?.name || "Yok"}
 - Email: ${cvData.personalInfo?.email || "Yok"}
 - Profil Fotoğrafı: ${cvData.personalInfo?.profilePhotoUrl ? "VAR" : "YOK"}
@@ -141,9 +153,9 @@ function buildAnalysisPrompt(
 - Portfolio: ${cvData.portfolio?.length || 0} fotoğraf
 - Yetenekler: ${cvData.skills?.length || 0} adet
 - Diller: ${cvData.languages?.length || 0} adet`
-        : "CV verisi yok";
+    : "CV verisi yok";
 
-    return `
+  return `
 Sen bir kişisel web sitesi düzenleme asistanısın. Kullanıcının isteğini analiz edip uygun işlemi belirle.
 
 ## Mevcut Site Yapısı:
@@ -280,6 +292,24 @@ Kullanılabilir Font Çiftleri:
 - Template ID'ler yukarıdaki listeden seçilmeli
 - position opsiyoneldir, belirtilmezse sona eklenir
 - ⚠️ KRİTİK: Template değiştirirken, o component için ZATEN KULLANILMAKTA OLAN template'i asla seçme! Mutlaka farklı bir template seç. Aksi halde kullanıcının düzenleme hakkı boşa harcanır ve sitede hiçbir değişiklik olmaz.
+
+## STOK FOTOĞRAFLI TEMPLATE'LER (ÖNEMLİ):
+Aşağıdaki template'ler Pexels stok fotoğrafları kullanır ve çok etkileyici görünürler:
+
+### Hero Template'leri:
+- hero-fullscreen-bg: Tam ekran stok fotoğraf arka plan, tema renkleriyle overlay, parallax efekti
+  * "impressive", "etkileyici", "full screen", "tam ekran", "background image" gibi istekler için
+  * Business, Marketing, Corporate profiller için ideal
+- hero-split-image: Sol taraf içerik, sağ taraf stok fotoğraf (50/50 split)
+  * "split", "image", "yarı yarıya", "görsel" gibi istekler için
+  * Designer, Developer, Creative profiller için ideal
+
+### Contact Template'leri:
+- contact-image-side: Sol taraf iletişim bilgileri, sağ taraf stok fotoğraf
+  * "image", "görsel", "fotoğraflı", "modern" contact istekleri için
+  * Form yok, sadece iletişim bilgileri kartları + CTA
+
+Kullanıcı "fotoğraflı", "görselli", "image", "impressive" gibi kelimeler kullanırsa bu template'leri öner.
 - ⚠️ DARK/LIGHT THEME DEĞİŞİKLİĞİ: Kullanıcı "dark theme", "koyu tema", "light theme", "açık tema" derse, UPDATE_THEME operasyonunda TÜM renkleri belirt (primary, secondary, accent, neutral, background, surface, text, textSecondary, border, hover, iconPrimary, iconSecondary). Sadece renk tonu değişikliği (örn: "mavi tema", "kırmızı yap") için sadece base colors (primary, secondary, accent) değiştir.
 
 ## Profil Fotoğrafı İşlemleri (ÖNEMLİ):
@@ -311,31 +341,31 @@ JSON'dan önce veya sonra hiçbir metin olmasın.
  * Parse LLM response into RevisionOperation
  */
 function parseOperationResponse(responseText: string): RevisionOperation {
-    try {
-        // Clean JSON response
-        let cleanedText = responseText.trim();
+  try {
+    // Clean JSON response
+    let cleanedText = responseText.trim();
 
-        // Remove markdown code blocks if present
-        cleanedText = cleanedText.replace(/^```json\s*/i, "").replace(/^```\s*/, "");
-        cleanedText = cleanedText.replace(/\s*```$/g, "");
-        cleanedText = cleanedText.trim();
+    // Remove markdown code blocks if present
+    cleanedText = cleanedText.replace(/^```json\s*/i, "").replace(/^```\s*/, "");
+    cleanedText = cleanedText.replace(/\s*```$/g, "");
+    cleanedText = cleanedText.trim();
 
-        // Parse JSON
-        const parsed = JSON.parse(cleanedText) as RevisionOperation;
+    // Parse JSON
+    const parsed = JSON.parse(cleanedText) as RevisionOperation;
 
-        // Validate operation type
-        if (!parsed.type) {
-            throw new Error("Missing operation type");
-        }
-
-        return parsed;
-    } catch (error) {
-        console.error("Failed to parse operation response:", responseText);
-
-        // Return unsupported operation as fallback
-        return {
-            type: "UNSUPPORTED",
-            message: "Talebinizi işleyemedim. Lütfen daha açık bir şekilde belirtin.",
-        };
+    // Validate operation type
+    if (!parsed.type) {
+      throw new Error("Missing operation type");
     }
+
+    return parsed;
+  } catch (error) {
+    console.error("Failed to parse operation response:", responseText);
+
+    // Return unsupported operation as fallback
+    return {
+      type: "UNSUPPORTED",
+      message: "Talebinizi işleyemedim. Lütfen daha açık bir şekilde belirtin.",
+    };
+  }
 }

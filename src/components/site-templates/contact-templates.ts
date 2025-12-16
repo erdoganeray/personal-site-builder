@@ -1049,10 +1049,336 @@ export const contactTemplate3: ComponentTemplate = {
 };
 
 /**
+ * Contact Template 4 - Image Side Layout
+ * Sol tarafta iletişim bilgileri, sağ tarafta stok fotoğraf bulunan contact section
+ */
+export const contactTemplate4: ComponentTemplate = {
+  id: "contact-image-side",
+  name: "Image Side Contact",
+  category: "contact",
+  iconStyle: "outline",
+  htmlTemplate: `
+    <section id="contact" class="contact-image-section" aria-label="Contact section">
+      <div class="contact-image-content">
+        <div class="contact-image-inner">
+          <h2 class="contact-image-title">İletişime Geçin</h2>
+          <p class="contact-image-subtitle">Birlikte harika projeler yaratmak için benimle iletişime geçin</p>
+          
+          <div class="contact-image-info">
+            <a href="mailto:{{EMAIL}}" class="contact-image-item">
+              <div class="contact-image-icon">{{ICON:mail}}</div>
+              <div class="contact-image-details">
+                <span class="contact-image-label">Email</span>
+                <span class="contact-image-value">{{EMAIL}}</span>
+              </div>
+            </a>
+            
+            <a href="tel:{{PHONE}}" class="contact-image-item">
+              <div class="contact-image-icon">{{ICON:phone}}</div>
+              <div class="contact-image-details">
+                <span class="contact-image-label">Telefon</span>
+                <span class="contact-image-value">{{PHONE}}</span>
+              </div>
+            </a>
+            
+            <div class="contact-image-item">
+              <div class="contact-image-icon">{{ICON:mapPin}}</div>
+              <div class="contact-image-details">
+                <span class="contact-image-label">Konum</span>
+                <span class="contact-image-value">{{LOCATION}}</span>
+              </div>
+            </div>
+          </div>
+          
+          <a href="mailto:{{EMAIL}}" class="contact-image-cta">
+            Mesaj Gönder
+          </a>
+        </div>
+      </div>
+      
+      <div class="contact-image-wrapper" aria-hidden="true">
+        <img 
+          src="{{STOCK_IMAGE:contact}}" 
+          alt="{{STOCK_IMAGE_ALT:contact}}" 
+          class="contact-image-bg"
+          loading="lazy"
+        />
+        <div class="contact-image-overlay"></div>
+      </div>
+    </section>
+  `,
+  cssTemplate: `
+    .contact-image-section {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      min-height: 80vh;
+      background: {{COLOR_BACKGROUND}};
+    }
+
+    .contact-image-content {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 4rem 3rem;
+      background: {{COLOR_BACKGROUND}};
+    }
+
+    .contact-image-inner {
+      max-width: 480px;
+      animation: contactFadeIn 0.8s ease-out;
+    }
+
+    @keyframes contactFadeIn {
+      from {
+        opacity: 0;
+        transform: translateX(-20px);
+      }
+      to {
+        opacity: 1;
+        transform: translateX(0);
+      }
+    }
+
+    .contact-image-title {
+      font-size: 2.75rem;
+      font-weight: 800;
+      color: {{COLOR_TEXT}};
+      margin-bottom: 0.75rem;
+      line-height: 1.1;
+    }
+
+    .contact-image-subtitle {
+      font-size: 1.1rem;
+      color: {{COLOR_TEXT_SECONDARY}};
+      margin-bottom: 2.5rem;
+      line-height: 1.6;
+    }
+
+    .contact-image-info {
+      display: flex;
+      flex-direction: column;
+      gap: 1.25rem;
+      margin-bottom: 2.5rem;
+    }
+
+    .contact-image-item {
+      display: flex;
+      align-items: center;
+      gap: 1rem;
+      padding: 1.25rem 1.5rem;
+      background: {{COLOR_SURFACE}};
+      border-radius: 12px;
+      text-decoration: none;
+      transition: all 0.3s ease;
+      border: 1px solid {{COLOR_BORDER}};
+    }
+
+    a.contact-image-item:hover {
+      transform: translateX(8px);
+      border-color: {{COLOR_PRIMARY}};
+      box-shadow: 0 4px 15px rgba(0, 0, 0, 0.08);
+    }
+
+    .contact-image-icon {
+      width: 48px;
+      height: 48px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      background: linear-gradient(135deg, {{COLOR_PRIMARY}}, {{COLOR_SECONDARY}});
+      border-radius: 10px;
+      flex-shrink: 0;
+    }
+
+    .contact-image-icon svg {
+      color: white;
+    }
+
+    .contact-image-details {
+      display: flex;
+      flex-direction: column;
+      gap: 0.25rem;
+    }
+
+    .contact-image-label {
+      font-size: 0.85rem;
+      color: {{COLOR_TEXT_SECONDARY}};
+      font-weight: 500;
+    }
+
+    .contact-image-value {
+      font-size: 1rem;
+      color: {{COLOR_TEXT}};
+      font-weight: 600;
+    }
+
+    .contact-image-cta {
+      display: inline-block;
+      padding: 1rem 2.5rem;
+      background: {{COLOR_PRIMARY}};
+      color: white;
+      text-decoration: none;
+      border-radius: 8px;
+      font-weight: 600;
+      font-size: 1rem;
+      transition: all 0.3s ease;
+      box-shadow: 0 4px 15px {{COLOR_PRIMARY}}40;
+    }
+
+    .contact-image-cta:hover {
+      transform: translateY(-3px);
+      box-shadow: 0 8px 25px {{COLOR_PRIMARY}}50;
+    }
+
+    .contact-image-cta:focus {
+      outline: 3px solid {{COLOR_PRIMARY}};
+      outline-offset: 3px;
+    }
+
+    /* Image wrapper */
+    .contact-image-wrapper {
+      position: relative;
+      overflow: hidden;
+    }
+
+    .contact-image-bg {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      object-position: center;
+      transition: transform 0.6s ease;
+    }
+
+    .contact-image-wrapper:hover .contact-image-bg {
+      transform: scale(1.05);
+    }
+
+    .contact-image-overlay {
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: linear-gradient(
+        to right,
+        {{COLOR_PRIMARY}}15 0%,
+        transparent 50%
+      );
+      pointer-events: none;
+    }
+
+    /* Responsive */
+    @media (max-width: 1024px) {
+      .contact-image-title {
+        font-size: 2.25rem;
+      }
+
+      .contact-image-content {
+        padding: 3rem 2rem;
+      }
+    }
+
+    @media (max-width: 768px) {
+      .contact-image-section {
+        grid-template-columns: 1fr;
+        min-height: auto;
+      }
+
+      .contact-image-wrapper {
+        order: -1;
+        height: 40vh;
+        min-height: 250px;
+      }
+
+      .contact-image-content {
+        padding: 3rem 2rem;
+      }
+
+      .contact-image-inner {
+        max-width: 100%;
+        text-align: center;
+      }
+
+      .contact-image-item {
+        justify-content: flex-start;
+        text-align: left;
+      }
+
+      a.contact-image-item:hover {
+        transform: translateY(-3px);
+      }
+
+      .contact-image-cta {
+        width: 100%;
+        text-align: center;
+      }
+    }
+
+    @media (max-width: 480px) {
+      .contact-image-content {
+        padding: 2rem 1.5rem;
+      }
+
+      .contact-image-title {
+        font-size: 1.85rem;
+      }
+
+      .contact-image-subtitle {
+        font-size: 1rem;
+      }
+
+      .contact-image-item {
+        padding: 1rem;
+      }
+
+      .contact-image-icon {
+        width: 40px;
+        height: 40px;
+      }
+
+      .contact-image-value {
+        font-size: 0.95rem;
+      }
+    }
+
+    /* Reduced motion */
+    @media (prefers-reduced-motion: reduce) {
+      .contact-image-inner {
+        animation: none;
+      }
+
+      .contact-image-wrapper:hover .contact-image-bg {
+        transform: none;
+      }
+
+      a.contact-image-item:hover,
+      .contact-image-cta:hover {
+        transform: none;
+      }
+    }
+  `,
+  placeholders: [
+    "{{EMAIL}}",
+    "{{PHONE}}",
+    "{{LOCATION}}",
+    "{{COLOR_PRIMARY}}",
+    "{{COLOR_SECONDARY}}",
+    "{{COLOR_BACKGROUND}}",
+    "{{COLOR_SURFACE}}",
+    "{{COLOR_BORDER}}",
+    "{{COLOR_TEXT}}",
+    "{{COLOR_TEXT_SECONDARY}}",
+    "{{STOCK_IMAGE:contact}}",
+    "{{STOCK_IMAGE_ALT:contact}}",
+  ],
+};
+
+/**
  * Tüm contact template'lerini export et
  */
 export const contactTemplates = [
   contactTemplate1,
   contactTemplate2,
   contactTemplate3,
+  contactTemplate4,
 ];

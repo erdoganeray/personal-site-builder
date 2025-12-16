@@ -1216,7 +1216,8 @@ export function populateTemplate(
   themeColors: ThemeColors,
   selectedComponents?: SelectedComponent[],
   iconStyle?: 'outline' | 'solid',
-  iconSizes?: { navigation: string; social: string }
+  iconSizes?: { navigation: string; social: string },
+  stockImages?: { [category: string]: { url: string; alt: string; photographer?: string; pexelsId?: number; avgColor?: string; } }
 ): { html: string; css: string; js?: string } {
   const replacements = getReplacementsForComponent(
     component,
@@ -1273,6 +1274,59 @@ export function populateTemplate(
 
     return iconSvg || match; // Return original if icon not found
   });
+
+  // Replace stock image placeholders: {{STOCK_IMAGE:category}} and {{STOCK_IMAGE_ALT:category}}
+  if (stockImages) {
+    // Replace {{STOCK_IMAGE:category}} with URL
+    html = html.replace(/\{\{STOCK_IMAGE:([a-zA-Z0-9-_]+)\}\}/g, (match, imgCategory) => {
+      const stockImage = stockImages[imgCategory];
+      if (stockImage && stockImage.url) {
+        return stockImage.url;
+      }
+      // Fallback to default SVG
+      return `/defaults/${imgCategory}-fallback.svg`;
+    });
+
+    // Replace {{STOCK_IMAGE_ALT:category}} with alt text
+    html = html.replace(/\{\{STOCK_IMAGE_ALT:([a-zA-Z0-9-_]+)\}\}/g, (match, imgCategory) => {
+      const stockImage = stockImages[imgCategory];
+      if (stockImage && stockImage.alt) {
+        return escapeHtml(stockImage.alt);
+      }
+      return `Professional ${imgCategory} background`;
+    });
+
+    // Replace {{STOCK_IMAGE_PHOTOGRAPHER:category}} with photographer name (optional)
+    html = html.replace(/\{\{STOCK_IMAGE_PHOTOGRAPHER:([a-zA-Z0-9-_]+)\}\}/g, (match, imgCategory) => {
+      const stockImage = stockImages[imgCategory];
+      if (stockImage && stockImage.photographer) {
+        return escapeHtml(stockImage.photographer);
+      }
+      return '';
+    });
+
+    // Replace in CSS as well (for background-image)
+    css = css.replace(/\{\{STOCK_IMAGE:([a-zA-Z0-9-_]+)\}\}/g, (match, imgCategory) => {
+      const stockImage = stockImages[imgCategory];
+      if (stockImage && stockImage.url) {
+        return stockImage.url;
+      }
+      return `/defaults/${imgCategory}-fallback.svg`;
+    });
+  } else {
+    // If no stockImages provided, use fallback URLs
+    html = html.replace(/\{\{STOCK_IMAGE:([a-zA-Z0-9-_]+)\}\}/g, (match, imgCategory) => {
+      return `/defaults/${imgCategory}-fallback.svg`;
+    });
+    html = html.replace(/\{\{STOCK_IMAGE_ALT:([a-zA-Z0-9-_]+)\}\}/g, (match, imgCategory) => {
+      return `Professional ${imgCategory} background`;
+    });
+    html = html.replace(/\{\{STOCK_IMAGE_PHOTOGRAPHER:([a-zA-Z0-9-_]+)\}\}/g, () => '');
+
+    css = css.replace(/\{\{STOCK_IMAGE:([a-zA-Z0-9-_]+)\}\}/g, (match, imgCategory) => {
+      return `/defaults/${imgCategory}-fallback.svg`;
+    });
+  }
 
   return {
     html,

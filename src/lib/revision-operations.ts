@@ -31,6 +31,16 @@ export interface DesignPlan {
     };
     fontStyle?: 'modern' | 'professional' | 'creative' | 'minimal';
     fontPairId?: string;
+    style?: 'modern' | 'minimal' | 'creative' | 'professional';
+    stockImages?: {
+        [category: string]: {
+            url: string;
+            alt: string;
+            photographer?: string;
+            pexelsId?: number;
+            avgColor?: string;
+        };
+    };
 }
 
 export interface ThemeColors {

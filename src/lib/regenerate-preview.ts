@@ -128,7 +128,8 @@ export async function regeneratePreviewContent(siteId: string): Promise<{
           designPlan.themeColors,
           componentsToRender,
           designPlan.iconStyle,
-          designPlan.iconSizes
+          designPlan.iconSizes,
+          designPlan.stockImages // Stock images parametresi
         );
 
         finalHtml += populated.html + '\n';

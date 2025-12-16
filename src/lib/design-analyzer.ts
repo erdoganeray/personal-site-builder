@@ -63,6 +63,16 @@ HERO SECTION:
 2. hero-split-screen: İki kolonlu düzen, sol taraf içerik, sağ taraf görsel
 3. hero-minimal-text: Minimal, büyük tipografi odaklı, profil fotoğrafı yok, typing effect animasyonu
 4. hero-animated-gradient: Animasyonlu gradient background, glassmorphism efekti, floating particles
+5. hero-fullscreen-bg: 🆕 STOK FOTOĞRAF - Tam ekran arka plan görseli, tema renkleriyle overlay, parallax scroll efekti
+   - Mesleğe uygun profesyonel stok fotoğraf arka plan olarak kullanılır
+   - Görsel üzerine tema renkleriyle gradient overlay uygulanır
+   - Modern ve etkileyici görünüm isteniyorsa tercih et
+   - Meslekler: Business, Marketing, Finance, Consulting, HR profilleri için ideal
+6. hero-split-image: 🆕 STOK FOTOĞRAF - Split layout, sol taraf içerik, sağ taraf stok fotoğraf
+   - Sol %50 içerik, sağ %50 mesleğe uygun stok fotoğraf
+   - Modern ve profesyonel görünüm
+   - Meslekler: Designer, Developer, Engineer, Creative profiller için ideal
+   - Mobilde stacked layout (görsel üstte)
 
 EXPERIENCE SECTION:
 1. experience-timeline: Zaman çizelgesi şeklinde dikey düzen, sol tarafta çizgi ve noktalar
@@ -231,6 +241,12 @@ CONTACT SECTION:
    - Gradient arka plan kullanılacaksa
    - Form ve bilgi ayrı vurgulanmalıysa
    - Modern ve göz alıcı tasarım tercih ediliyorsa
+4. contact-image-side: 🆕 STOK FOTOĞRAF - Split layout, sol taraf iletişim bilgileri, sağ taraf stok fotoğraf
+   - Sol %50 iletişim kartları + CTA, sağ %50 mesleğe uygun stok fotoğraf
+   - Görsel odaklı ve modern tasarım
+   - Form yok, sadece iletişim bilgileri ve "Mesaj Gönder" linki
+   - Meslekler: Designer, Creative, Marketing profilleri için ideal
+   - Mobilde stacked layout (görsel üstte)
 
 
 FOOTER SECTION:
@@ -390,12 +406,17 @@ Component Seçimi Kriterleri:
 - Navigation: Sayfanın genel stiline uygun (minimal site için minimal nav, creative site için sidebar)
 - Hero: Profil fotoğrafı durumuna ve mesleğe göre seç:
   ⚠️ ÖNEMLİ: Profil fotoğrafı kontrolü ZORUNLU!
-  * PROFİL FOTOĞRAFI YOK → SADECE hero-minimal-text kullan (diğer hero template'leri KULLANMA)
+  * PROFİL FOTOĞRAFI YOK → Şu template'lerden birini seç:
+    - hero-minimal-text: Minimal, text odaklı (Developer, Writer, Engineer için)
+    - hero-fullscreen-bg: 🆕 Stok fotoğraf arka planlı (Business, Marketing, Finance için) - STOK FOTOĞRAF kullanır
+    - hero-split-image: 🆕 Split layout stok fotoğraf (Designer, Creative için) - STOK FOTOĞRAF kullanır
   * PROFİL FOTOĞRAFI VAR → Mesleğe göre seç:
     - hero-modern-centered: Profesyonel/kurumsal roller (Business Analyst, Project Manager, Consultant)
     - hero-split-screen: Yaratıcı/tasarımcı roller (Designer, Photographer, Creative Director)
     - hero-minimal-text: Developer/Engineer/Writer roller (Software Engineer, Data Scientist, Content Writer) - text odaklı
     - hero-animated-gradient: Modern/tech/creative roller (UI/UX Designer, Frontend Developer, Digital Marketer) - görsel odaklı
+    - hero-fullscreen-bg: 🆕 Business/Corporate/Marketing roller - stok fotoğraf arka plan + profil fotoğrafı
+    - hero-split-image: 🆕 Designer/Developer/Creative roller - split layout stok fotoğraf + profil fotoğrafı
 - Experience: CV'deki iş deneyimi sayısına göre
 - Education: CV'deki eğitim bilgisi sayısına göre (varsa mutlaka ekle)
 - Portfolio: SADECE portfolio fotoğrafları varsa ekle (${cvData.portfolio?.length || 0} adet var). Education ve Skills arasına yerleştir. Yoksa hiç ekleme!

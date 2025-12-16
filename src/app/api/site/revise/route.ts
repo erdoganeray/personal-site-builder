@@ -241,6 +241,34 @@ export async function POST(req: NextRequest) {
           operation.templateId,
           operation.position
         );
+
+        // Stock Photo Selection - Eğer stok fotoğraflı template eklendiyse
+        const stockPhotoTemplatesAdd = ['hero-fullscreen-bg', 'hero-split-image', 'contact-image-side'];
+        if (stockPhotoTemplatesAdd.includes(operation.templateId)) {
+          console.log(`📸 Stock photo template added: ${operation.templateId}`);
+          try {
+            const { getStockPhotoForTemplate } = await import("@/lib/stock-photo-selector");
+
+            console.log(`🖼️ Fetching ${operation.category} stock photo...`);
+
+            const stockResult = await getStockPhotoForTemplate(
+              operation.category as 'hero' | 'contact',
+              site.cvContent as any,
+              updatedDesignPlan.themeColors as any,
+              updatedDesignPlan.style
+            );
+
+            if (!updatedDesignPlan.stockImages) {
+              updatedDesignPlan.stockImages = {};
+            }
+            (updatedDesignPlan.stockImages as any)[operation.category] = stockResult.photo;
+
+            console.log(`✅ ${operation.category} stock photo: ${stockResult.photo.url.substring(0, 50)}...`);
+          } catch (stockError) {
+            console.error("⚠️ Stock photo fetch error (continuing with fallback):", stockError);
+          }
+        }
+
         shouldRegeneratePreview = true;
         responseMessage = `✅ ${operation.category} bölümü eklendi`;
         break;
@@ -336,11 +364,62 @@ export async function POST(req: NextRequest) {
         console.log(`   Old Template: ${oldComponent?.templateId || 'NOT FOUND'}`);
         console.log(`   New Template: ${operation.newTemplateId}`);
 
+        // Aynı template seçildiyse işlem yapma (kullanıcının hakkını boşa harcama)
+        if (oldComponent?.templateId === operation.newTemplateId) {
+          console.log("   ⚠️ Same template selected, skipping change");
+          shouldIncrementQuota = false;
+          return NextResponse.json({
+            success: false,
+            operation,
+            message: `ℹ️ ${operation.category} bölümünde zaten bu template kullanılıyor. Farklı bir template seçmek ister misiniz?`,
+            subscription: {
+              editsUsed: userWithResetCounter.editsThisMonth,
+              editsLimit: getPlanLimits(userWithResetCounter.planType as PlanType).editsPerMonth,
+              editsRemaining: getRemainingEdits(
+                userWithResetCounter.planType,
+                userWithResetCounter.editsThisMonth
+              ),
+              resetDate: userWithResetCounter.editsResetDate,
+            },
+          });
+        }
+
         updatedDesignPlan = changeComponentTemplate(
           updatedDesignPlan,
           operation.category,
           operation.newTemplateId
         );
+
+        // Stock Photo Selection - Eğer stok fotoğraflı template'e geçildiyse
+        const stockPhotoTemplates = ['hero-fullscreen-bg', 'hero-split-image', 'contact-image-side'];
+        if (stockPhotoTemplates.includes(operation.newTemplateId)) {
+          console.log(`📸 Stock photo template detected: ${operation.newTemplateId}`);
+          try {
+            const { getStockPhotoForTemplate } = await import("@/lib/stock-photo-selector");
+
+            // Template kategorisine göre stok fotoğraf al
+            const category = operation.category; // 'hero' veya 'contact'
+            console.log(`🖼️ Fetching ${category} stock photo...`);
+
+            const stockResult = await getStockPhotoForTemplate(
+              category as 'hero' | 'contact',
+              site.cvContent as any,
+              updatedDesignPlan.themeColors as any,
+              updatedDesignPlan.style
+            );
+
+            // stockImages'ı güncelle veya oluştur
+            if (!updatedDesignPlan.stockImages) {
+              updatedDesignPlan.stockImages = {};
+            }
+            (updatedDesignPlan.stockImages as any)[category] = stockResult.photo;
+
+            console.log(`✅ ${category} stock photo: ${stockResult.photo.url.substring(0, 50)}...`);
+          } catch (stockError) {
+            console.error("⚠️ Stock photo fetch error (continuing with fallback):", stockError);
+            // Hata olursa devam et, fallback SVG'ler kullanılacak
+          }
+        }
 
         // Debug: Verify change was applied
         const newComponent = updatedDesignPlan.selectedComponents.find(

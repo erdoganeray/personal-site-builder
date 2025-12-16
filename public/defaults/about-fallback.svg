@@ -1,0 +1,15 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1280" height="720" viewBox="0 0 1280 720">
+  <defs>
+    <linearGradient id="aboutGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" style="stop-color:#4f46e5;stop-opacity:1" />
+      <stop offset="100%" style="stop-color:#7c3aed;stop-opacity:1" />
+    </linearGradient>
+    <pattern id="waves" width="100" height="20" patternUnits="userSpaceOnUse">
+      <path d="M0,10 Q25,0 50,10 T100,10" fill="none" stroke="rgba(255,255,255,0.05)" stroke-width="1"/>
+    </pattern>
+  </defs>
+  <rect width="100%" height="100%" fill="url(#aboutGrad)"/>
+  <rect width="100%" height="100%" fill="url(#waves)"/>
+  <circle cx="200" cy="150" r="80" fill="rgba(255,255,255,0.05)"/>
+  <circle cx="1080" cy="570" r="100" fill="rgba(255,255,255,0.05)"/>
+</svg>
