@@ -3,6 +3,8 @@
 import { useState, useEffect } from "react";
 import { useSession, signOut } from "next-auth/react";
 import { useRouter } from "next/navigation";
+import { toast } from "@/components/ui/Toast";
+import PasswordStrengthMeter from "@/components/ui/PasswordStrengthMeter";
 
 export default function Settings() {
     const { data: session } = useSession();
@@ -50,12 +52,12 @@ export default function Settings() {
         e.preventDefault();
 
         if (newPassword !== confirmPassword) {
-            alert("Yeni şifreler eşleşmiyor!");
+            toast.error("Yeni şifreler eşleşmiyor!");
             return;
         }
 
         if (newPassword.length < 6) {
-            alert("Şifre en az 6 karakter olmalıdır!");
+            toast.error("Şifre en az 6 karakter olmalıdır!");
             return;
         }
 
@@ -75,18 +77,18 @@ export default function Settings() {
             const data = await response.json();
 
             if (!response.ok) {
-                alert(data.error || "Şifre güncellenirken bir hata oluştu");
+                toast.error(data.error || "Şifre güncellenirken bir hata oluştu");
                 return;
             }
 
             // Başarılı
-            alert("Şifreniz başarıyla güncellendi!");
+            toast.success("Şifreniz başarıyla güncellendi!");
             setCurrentPassword("");
             setNewPassword("");
             setConfirmPassword("");
         } catch (error) {
             console.error("Password update error:", error);
-            alert("Bir hata oluştu. Lütfen tekrar deneyin.");
+            toast.error("Bir hata oluştu. Lütfen tekrar deneyin.");
         } finally {
             setUpdatingPassword(false);
         }
@@ -96,7 +98,7 @@ export default function Settings() {
         e.preventDefault();
 
         if (!email || !email.includes("@")) {
-            alert("Geçerli bir e-posta adresi girin!");
+            toast.error("Geçerli bir e-posta adresi girin!");
             return;
         }
 
@@ -113,15 +115,15 @@ export default function Settings() {
             const data = await response.json();
 
             if (!response.ok) {
-                alert(data.error || "E-posta güncellenirken bir hata oluştu");
+                toast.error(data.error || "E-posta güncellenirken bir hata oluştu");
                 return;
             }
 
             // Başarılı
-            alert("Doğrulama e-postası gönderildi! Lütfen e-postanızı kontrol edin.");
+            toast.success("Doğrulama e-postası gönderildi! Lütfen e-postanızı kontrol edin.");
         } catch (error) {
             console.error("Email update error:", error);
-            alert("Bir hata oluştu. Lütfen tekrar deneyin.");
+            toast.error("Bir hata oluştu. Lütfen tekrar deneyin.");
         } finally {
             setUpdatingEmail(false);
         }
@@ -140,8 +142,8 @@ export default function Settings() {
             return;
         }
 
-        if (deleteConfirmText !== "DELETE") {
-            setDeleteError("Onaylamak için 'DELETE' yazmanız gerekiyor");
+        if (deleteConfirmText !== "HESABI SİL") {
+            setDeleteError("Onaylamak için 'HESABI SİL' yazmanız gerekiyor");
             return;
         }
 
@@ -166,7 +168,7 @@ export default function Settings() {
             }
 
             // Success - sign out and redirect
-            alert("Hesabınız başarıyla silindi. Güle güle!");
+            toast.success("Hesabınız başarıyla silindi. Güle güle!");
             await signOut({ redirect: false });
             router.push("/login");
         } catch (error) {
@@ -273,7 +275,7 @@ export default function Settings() {
                     </div>
                     <div>
                         <label className="block text-sm font-medium text-gray-300 mb-2">
-                            Yeni Şifre
+                            Yeni Şifre <span className="text-red-400">*</span>
                         </label>
                         <input
                             type="password"
@@ -284,20 +286,42 @@ export default function Settings() {
                             required
                             minLength={6}
                         />
+                        <PasswordStrengthMeter password={newPassword} showRequirements={false} />
                     </div>
                     <div>
                         <label className="block text-sm font-medium text-gray-300 mb-2">
-                            Yeni Şifre (Tekrar)
+                            Yeni Şifre (Tekrar) <span className="text-red-400">*</span>
                         </label>
                         <input
                             type="password"
                             value={confirmPassword}
                             onChange={(e) => setConfirmPassword(e.target.value)}
-                            className="w-full px-4 py-3 bg-gray-700 border border-gray-600 text-white rounded-lg focus:ring-2 focus:ring-blue-500"
+                            className={`w-full px-4 py-3 bg-gray-700 border text-white rounded-lg focus:ring-2 focus:ring-blue-500 ${confirmPassword && newPassword !== confirmPassword
+                                ? 'border-red-500'
+                                : confirmPassword && newPassword === confirmPassword
+                                    ? 'border-green-500'
+                                    : 'border-gray-600'
+                                }`}
                             placeholder="••••••••"
                             required
                             minLength={6}
                         />
+                        {confirmPassword && newPassword !== confirmPassword && (
+                            <p className="text-xs text-red-400 mt-1 flex items-center gap-1">
+                                <svg className="w-3 h-3" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+                                </svg>
+                                Şifreler eşleşmiyor
+                            </p>
+                        )}
+                        {confirmPassword && newPassword === confirmPassword && (
+                            <p className="text-xs text-green-400 mt-1 flex items-center gap-1">
+                                <svg className="w-3 h-3" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
+                                </svg>
+                                Şifreler eşleşiyor
+                            </p>
+                        )}
                     </div>
                     <button
                         type="submit"
@@ -694,14 +718,14 @@ export default function Settings() {
 
                             <div>
                                 <label className="block text-sm font-medium text-gray-300 mb-2">
-                                    Onaylamak için <span className="font-bold text-red-400">DELETE</span> yazın:
+                                    Onaylamak için <span className="font-bold text-red-400">HESABI SİL</span> yazın:
                                 </label>
                                 <input
                                     type="text"
                                     value={deleteConfirmText}
                                     onChange={(e) => setDeleteConfirmText(e.target.value)}
                                     className="w-full px-4 py-3 bg-gray-700 border border-gray-600 text-white rounded-lg focus:ring-2 focus:ring-red-500 focus:border-red-500 font-mono"
-                                    placeholder="DELETE yazın"
+                                    placeholder="HESABI SİL yazın"
                                     disabled={deleting}
                                     onKeyDown={(e) => {
                                         if (e.key === "Enter" && !deleting) {

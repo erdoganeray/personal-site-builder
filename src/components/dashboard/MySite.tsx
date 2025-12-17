@@ -4,6 +4,8 @@ import { useState, useMemo, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import { hasUnpublishedChanges } from "@/lib/change-detection";
 import { convertRelativeAssetsToAbsolute } from "@/lib/iframe-utils";
+import { toast } from "@/components/ui/Toast";
+import ConfirmDialog from "@/components/ui/ConfirmDialog";
 
 interface SubscriptionUsage {
     edits: {
@@ -24,6 +26,12 @@ export default function MySite({ site, onRefresh }: MySiteProps) {
     const [customPrompt, setCustomPrompt] = useState("");
     const [viewMode, setViewMode] = useState<"desktop" | "tablet" | "mobile">("desktop");
     const [subscriptionUsage, setSubscriptionUsage] = useState<SubscriptionUsage | null>(null);
+
+    // Confirm dialog state
+    const [confirmDialog, setConfirmDialog] = useState<{
+        isOpen: boolean;
+        type: "deletePreviewPublished" | "deletePreview" | "rollback" | null;
+    }>({ isOpen: false, type: null });
 
     // Fetch subscription usage
     useEffect(() => {
@@ -99,7 +107,7 @@ export default function MySite({ site, onRefresh }: MySiteProps) {
 
     const handleGenerateSite = async () => {
         if (!site) {
-            alert("Lütfen önce CV yükleyin");
+            toast.error("Lütfen önce CV yükleyin");
             return;
         }
 
@@ -120,13 +128,13 @@ export default function MySite({ site, onRefresh }: MySiteProps) {
 
             if (response.ok) {
                 onRefresh();
-                alert("Site başarıyla oluşturuldu!");
+                toast.success("Site başarıyla oluşturuldu!");
             } else {
-                alert(data.error || "Site oluşturulamadı. Lütfen tekrar deneyin.");
+                toast.error(data.error || "Site oluşturulamadı. Lütfen tekrar deneyin.");
             }
         } catch (error) {
             console.error("Site oluşturma hatası:", error);
-            alert("Bir hata oluştu. Lütfen tekrar deneyin.");
+            toast.error("Bir hata oluştu. Lütfen tekrar deneyin.");
         } finally {
             setGenerating(false);
         }
@@ -137,15 +145,26 @@ export default function MySite({ site, onRefresh }: MySiteProps) {
 
         // Check if site is published - show extra warning
         if (site.status === "published") {
-            if (!confirm("⚠️ DİKKAT: Siteniz yayında!\n\nÖnizlemeyi silmek, sitenizi de yayından kaldıracaktır. Bu işlem geri alınamaz.\n\nDevam etmek istiyor musunuz?")) {
-                return;
-            }
+            setConfirmDialog({ isOpen: true, type: "deletePreviewPublished" });
         } else {
-            if (!confirm("Önizleme sitesini silmek istediğinizden emin misiniz? Bu işlem geri alınamaz.")) {
-                return;
-            }
+            setConfirmDialog({ isOpen: true, type: "deletePreview" });
         }
+    };
 
+    const handleRollback = () => {
+        setConfirmDialog({ isOpen: true, type: "rollback" });
+    };
+
+    const handleConfirmAction = async () => {
+        if (confirmDialog.type === "deletePreviewPublished" || confirmDialog.type === "deletePreview") {
+            await executeDeletePreview();
+        } else if (confirmDialog.type === "rollback") {
+            await executeRollback();
+        }
+        setConfirmDialog({ isOpen: false, type: null });
+    };
+
+    const executeDeletePreview = async () => {
         setDeletingPreview(true);
         try {
             // If site is published, first unpublish it
@@ -158,7 +177,7 @@ export default function MySite({ site, onRefresh }: MySiteProps) {
 
                 if (!unpublishResponse.ok) {
                     const unpublishData = await unpublishResponse.json();
-                    alert(unpublishData.error || "Site yayından kaldırılamadı");
+                    toast.error(unpublishData.error || "Site yayından kaldırılamadı");
                     return;
                 }
             }
@@ -171,16 +190,36 @@ export default function MySite({ site, onRefresh }: MySiteProps) {
             const data = await response.json();
 
             if (response.ok) {
-                alert("Önizleme sitesi başarıyla silindi!");
+                toast.success("Önizleme sitesi başarıyla silindi!");
                 onRefresh();
             } else {
-                alert(data.error || "Önizleme silinemedi");
+                toast.error(data.error || "Önizleme silinemedi");
             }
         } catch (error) {
             console.error("Silme hatası:", error);
-            alert("Bir hata oluştu. Lütfen tekrar deneyin.");
+            toast.error("Bir hata oluştu. Lütfen tekrar deneyin.");
         } finally {
             setDeletingPreview(false);
+        }
+    };
+
+    const executeRollback = async () => {
+        try {
+            const response = await fetch("/api/site/rollback", {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({ siteId: site.id }),
+            });
+            const data = await response.json();
+            if (response.ok) {
+                toast.success("Değişiklikler başarıyla geri alındı!");
+                onRefresh();
+            } else {
+                toast.error(data.error || "Geri alma işlemi başarısız oldu");
+            }
+        } catch (error) {
+            console.error("Rollback hatası:", error);
+            toast.error("Bir hata oluştu. Lütfen tekrar deneyin.");
         }
     };
 
@@ -199,6 +238,7 @@ export default function MySite({ site, onRefresh }: MySiteProps) {
     }
 
     return (
+        <>
         <div className="space-y-6">
             <div>
                 <h2 className="text-2xl font-bold text-white mb-2">Sitem</h2>
@@ -221,26 +261,7 @@ export default function MySite({ site, onRefresh }: MySiteProps) {
                             </p>
                             <div className="flex gap-2">
                                 <button
-                                    onClick={async () => {
-                                        if (!confirm("Değişiklikleri geri almak istediğinizden emin misiniz? Bu işlem geri alınamaz.")) return;
-                                        try {
-                                            const response = await fetch("/api/site/rollback", {
-                                                method: "POST",
-                                                headers: { "Content-Type": "application/json" },
-                                                body: JSON.stringify({ siteId: site.id }),
-                                            });
-                                            const data = await response.json();
-                                            if (response.ok) {
-                                                alert("Değişiklikler başarıyla geri alındı!");
-                                                onRefresh();
-                                            } else {
-                                                alert(data.error || "Geri alma işlemi başarısız oldu");
-                                            }
-                                        } catch (error) {
-                                            console.error("Rollback hatası:", error);
-                                            alert("Bir hata oluştu. Lütfen tekrar deneyin.");
-                                        }
-                                    }}
+                                    onClick={handleRollback}
                                     className="px-4 py-2 bg-gray-600 hover:bg-gray-700 text-white font-semibold rounded-lg transition-colors duration-200 text-sm"
                                 >
                                     ← Geri Dön
@@ -354,5 +375,30 @@ export default function MySite({ site, onRefresh }: MySiteProps) {
                 </div>
             )}
         </div>
+
+            {/* Confirm Dialog */ }
+    <ConfirmDialog
+        isOpen={confirmDialog.isOpen}
+        onClose={() => setConfirmDialog({ isOpen: false, type: null })}
+        onConfirm={handleConfirmAction}
+        title={
+            confirmDialog.type === "deletePreviewPublished" ? "⚠️ Site Yayında!" :
+                confirmDialog.type === "deletePreview" ? "Önizlemeyi Sil" :
+                    "Değişiklikleri Geri Al"
+        }
+        message={
+            confirmDialog.type === "deletePreviewPublished"
+                ? "Önizlemeyi silmek, sitenizi de yayından kaldıracaktır. Bu işlem geri alınamaz. Devam etmek istiyor musunuz?"
+                : confirmDialog.type === "deletePreview"
+                    ? "Önizleme sitesini silmek istediğinizden emin misiniz? Bu işlem geri alınamaz."
+                    : "Değişiklikleri geri almak istediğinizden emin misiniz? Bu işlem geri alınamaz."
+        }
+        confirmText={
+            confirmDialog.type === "rollback" ? "Geri Al" : "Sil"
+        }
+        variant={confirmDialog.type === "deletePreviewPublished" ? "danger" : "warning"}
+        loading={deletingPreview}
+    />
+        </>
     );
 }

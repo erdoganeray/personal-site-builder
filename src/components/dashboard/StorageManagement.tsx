@@ -1,6 +1,7 @@
 "use client";
 
 import { useState, useEffect } from "react";
+import { toast } from "@/components/ui/Toast";
 
 interface FileInfo {
     name: string;
@@ -92,14 +93,14 @@ export default function StorageManagement() {
                 await fetchStorageData();
                 await fetchRollbackFiles();
                 setDeleteConfirm(null);
-                alert("Dosya başarıyla silindi!");
+                toast.success("Dosya başarıyla silindi!");
             } else {
                 const data = await response.json();
-                alert(data.error || "Dosya silinemedi");
+                toast.error(data.error || "Dosya silinemedi");
             }
         } catch (error) {
             console.error("Failed to delete file:", error);
-            alert("Bir hata oluştu");
+            toast.error("Bir hata oluştu");
         } finally {
             setDeleting(false);
         }

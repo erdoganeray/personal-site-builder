@@ -3,6 +3,7 @@
 import { useState } from "react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
+import PasswordStrengthMeter from "@/components/ui/PasswordStrengthMeter";
 
 export default function RegisterPage() {
     const router = useRouter();
@@ -81,7 +82,7 @@ export default function RegisterPage() {
 
                     <div>
                         <label htmlFor="email" className="block text-sm font-medium text-gray-300 mb-2">
-                            Email
+                            Email <span className="text-red-400">*</span>
                         </label>
                         <input
                             id="email"
@@ -96,7 +97,7 @@ export default function RegisterPage() {
 
                     <div>
                         <label htmlFor="password" className="block text-sm font-medium text-gray-300 mb-2">
-                            Password
+                            Password <span className="text-red-400">*</span>
                         </label>
                         <input
                             id="password"
@@ -108,7 +109,7 @@ export default function RegisterPage() {
                             className="w-full px-4 py-3 bg-gray-700 border border-gray-600 rounded-lg text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
                             placeholder="••••••••"
                         />
-                        <p className="text-xs text-gray-400 mt-1">Minimum 6 characters</p>
+                        <PasswordStrengthMeter password={password} />
                     </div>
 
                     <button

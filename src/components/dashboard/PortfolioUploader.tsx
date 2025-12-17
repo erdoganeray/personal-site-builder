@@ -1,6 +1,7 @@
 "use client";
 
 import { useState, useRef } from "react";
+import { toast } from "@/components/ui/Toast";
 
 interface UploadProgress {
     fileName: string;
@@ -51,7 +52,7 @@ export default function PortfolioUploader({
 
         // Check if adding these files would exceed the limit
         if (currentCount + fileArray.length > maxCount) {
-            alert(`Maksimum ${maxCount} adet portfolio fotoğrafı ekleyebilirsiniz. Şu anda ${currentCount} fotoğrafınız var. ${remainingSlots} adet daha ekleyebilirsiniz.`);
+            toast.error(`Maksimum ${maxCount} adet portfolio fotoğrafı ekleyebilirsiniz. Şu anda ${currentCount} fotoğrafınız var. ${remainingSlots} adet daha ekleyebilirsiniz.`);
             return;
         }
 
@@ -94,21 +95,21 @@ export default function PortfolioUploader({
         }
 
         if (messages.length > 0) {
-            alert(messages.join('\n\n'));
+            toast.warning(messages.join('\n\n'));
         }
 
         if (validFiles.length > 0) {
             // DEFERRED MODE: Just pass files to parent, don't upload
             if (deferredMode && onFilesSelected) {
                 onFilesSelected(validFiles);
-                alert(`${validFiles.length} dosya seçildi. Değişiklikleri kaydetmeyi unutmayın!`);
+                toast.info(`${validFiles.length} dosya seçildi. Değişiklikleri kaydetmeyi unutmayın!`);
             } else {
                 // IMMEDIATE MODE: Upload files now
                 uploadFiles(validFiles);
             }
         } else if (duplicates.length > 0 && errors.length === 0) {
             // Only duplicates, inform user
-            alert('Seçilen tüm dosyalar zaten yüklenmiş.');
+            toast.info('Seçilen tüm dosyalar zaten yüklenmiş.');
         }
     };
 
@@ -255,11 +256,13 @@ export default function PortfolioUploader({
                 const message = successful === total
                     ? `${successful} dosya başarıyla yüklendi!`
                     : `${successful}/${total} dosya yüklendi. ${total - successful} dosya başarısız.`;
-                alert(message + '\n\nDeğişiklikleri kaydetmeyi unutmayın!');
+                toast.success(message, {
+                    description: 'Değişiklikleri kaydetmeyi unutmayın!'
+                });
             }, 500);
         } else if (files.length > 0) {
             console.log('No files uploaded successfully');
-            alert('Hiçbir dosya yüklenemedi. Lütfen tekrar deneyin.');
+            toast.error('Hiçbir dosya yüklenemedi. Lütfen tekrar deneyin.');
         }
     };
 

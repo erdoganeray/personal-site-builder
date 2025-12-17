@@ -8,6 +8,8 @@ import PortfolioUploader from "@/components/dashboard/PortfolioUploader";
 import PortfolioMetadataEditor from "@/components/dashboard/PortfolioMetadataEditor";
 import StorageIndicator from "@/components/dashboard/StorageIndicator";
 import ChangeDetailsPanel from "./ChangeDetailsPanel";
+import { toast } from "@/components/ui/Toast";
+import ConfirmDialog from "@/components/ui/ConfirmDialog";
 
 interface MyInfoProps {
     site: any;
@@ -47,6 +49,13 @@ export default function MyInfo({ site, cvData, onDelete, onCVAnalyzed, deleting 
     const [portfolio, setPortfolio] = useState<CVPortfolioItem[]>([]);
     const [uploadingPortfolio, setUploadingPortfolio] = useState(false);
     const [editingPortfolioIndex, setEditingPortfolioIndex] = useState<number | null>(null);
+
+    // Confirm dialog state
+    const [confirmDialog, setConfirmDialog] = useState<{
+        isOpen: boolean;
+        type: "deletePendingPhoto" | "deleteSavedPhoto" | "deletePortfolio" | "republish" | "rollback" | null;
+        portfolioIndex?: number;
+    }>({ isOpen: false, type: null });
 
     // Deferred upload state - files held in memory until save
     const [pendingProfilePhoto, setPendingProfilePhoto] = useState<File | null>(null);
@@ -261,7 +270,7 @@ export default function MyInfo({ site, cvData, onDelete, onCVAnalyzed, deleting 
                     }
                 } catch (error) {
                     console.error("Profile photo upload error:", error);
-                    alert("Profil fotoğrafı yüklenirken hata oluştu: " + (error instanceof Error ? error.message : "Bilinmeyen hata"));
+                    toast.error("Profil fotoğrafı yüklenirken hata oluştu: " + (error instanceof Error ? error.message : "Bilinmeyen hata"));
                     setSaving(false);
                     setUploadingPhoto(false);
                     return; // Don't proceed with save if photo upload fails
@@ -336,7 +345,7 @@ export default function MyInfo({ site, cvData, onDelete, onCVAnalyzed, deleting 
                     console.log(`✅ ${uploadedUrls.length}/${pendingPortfolio.length} portfolio images uploaded`);
                 } catch (error) {
                     console.error("Portfolio upload error:", error);
-                    alert("Portfolio fotoğrafları yüklenirken hata oluştu. Bazı fotoğraflar yüklenmemiş olabilir.");
+                    toast.error("Portfolio fotoğrafları yüklenirken hata oluştu. Bazı fotoğraflar yüklenmemiş olabilir.");
                     // Don't return - continue with save even if some portfolio uploads failed
                 } finally {
                     setUploadingPortfolio(false);
@@ -403,16 +412,16 @@ export default function MyInfo({ site, cvData, onDelete, onCVAnalyzed, deleting 
                 setPhotoMarkedForDeletion(false);
                 setPortfolioMarkedForDeletion([]); // Clear portfolio deletion marks
 
-                alert("Bilgileriniz başarıyla kaydedildi!");
+                toast.success("Bilgileriniz başarıyla kaydedildi!");
                 setIsEditing(false);
 
                 window.location.reload(); // Refresh to show updated data
             } else {
-                alert(data.error || "Bilgiler kaydedilemedi");
+                toast.error(data.error || "Bilgiler kaydedilemedi");
             }
         } catch (error) {
             console.error("Error saving info:", error);
-            alert("Bir hata oluştu");
+            toast.error("Bir hata oluştu");
         } finally {
             setSaving(false);
         }
@@ -559,13 +568,13 @@ export default function MyInfo({ site, cvData, onDelete, onCVAnalyzed, deleting 
         // Validate file type
         const allowedTypes = ["image/jpeg", "image/jpg", "image/png", "image/webp"];
         if (!allowedTypes.includes(file.type)) {
-            alert("Sadece JPEG, PNG ve WebP formatları desteklenmektedir");
+            toast.error("Sadece JPEG, PNG ve WebP formatları desteklenmektedir");
             return;
         }
 
         // Validate file size (5MB)
         if (file.size > 5 * 1024 * 1024) {
-            alert("Dosya boyutu 5MB'dan küçük olmalıdır");
+            toast.error("Dosya boyutu 5MB'dan küçük olmalıdır");
             return;
         }
 
@@ -574,30 +583,30 @@ export default function MyInfo({ site, cvData, onDelete, onCVAnalyzed, deleting 
         setProfilePhotoPreview(URL.createObjectURL(file));
 
         // Show info message
-        alert("Profil fotoğrafı seçildi. Değişiklikleri kaydetmeyi unutmayın!");
+        toast.info("Profil fotoğrafı seçildi. Değişiklikleri kaydetmeyi unutmayın!");
     };
 
     const handlePhotoDelete = async () => {
         // If there's a pending photo, just clear it from memory
         if (pendingProfilePhoto) {
-            if (!confirm("Seçilen fotoğrafı kaldırmak istediğinizden emin misiniz?")) {
-                return;
-            }
-            setPendingProfilePhoto(null);
-            if (profilePhotoPreview) {
-                URL.revokeObjectURL(profilePhotoPreview);
-            }
-            setProfilePhotoPreview("");
+            setConfirmDialog({ isOpen: true, type: "deletePendingPhoto" });
             return;
         }
 
         // If there's a saved photo, mark it for deletion (don't delete from Cloudflare yet)
         if (!profilePhotoUrl) return;
+        setConfirmDialog({ isOpen: true, type: "deleteSavedPhoto" });
+    };
 
-        if (!confirm("Profil fotoğrafını silmek istediğinizden emin misiniz?")) {
-            return;
+    const executeDeletePendingPhoto = () => {
+        setPendingProfilePhoto(null);
+        if (profilePhotoPreview) {
+            URL.revokeObjectURL(profilePhotoPreview);
         }
+        setProfilePhotoPreview("");
+    };
 
+    const executeDeleteSavedPhoto = () => {
         // Mark for deletion instead of deleting immediately
         // Actual deletion will happen on save
         setPhotoMarkedForDeletion(true);
@@ -703,9 +712,12 @@ export default function MyInfo({ site, cvData, onDelete, onCVAnalyzed, deleting 
     };
 
     const handlePortfolioDelete = (imageUrl: string, index: number) => {
-        if (!confirm("Bu portfolio fotoğrafını silmek istediğinizden emin misiniz?")) {
-            return;
-        }
+        setConfirmDialog({ isOpen: true, type: "deletePortfolio", portfolioIndex: index });
+    };
+
+    const executeDeletePortfolio = (index: number) => {
+        const imageUrl = portfolio[index]?.imageUrl;
+        if (!imageUrl) return;
 
         // DEFERRED DELETION: Mark for deletion instead of deleting immediately
         // Actual deletion will happen on save
@@ -715,11 +727,87 @@ export default function MyInfo({ site, cvData, onDelete, onCVAnalyzed, deleting 
         setPortfolio(portfolio.filter((_, i) => i !== index));
 
         // Show info message
-        alert("Portfolio fotoğrafı kaldırıldı. Değişiklikleri kaydetmeyi unutmayın!");
+        toast.info("Portfolio fotoğrafı kaldırıldı. Değişiklikleri kaydetmeyi unutmayın!");
     };
 
+    const handleRepublish = () => {
+        setConfirmDialog({ isOpen: true, type: "republish" });
+    };
+
+    const executeRepublish = async () => {
+        setPublishing(true);
+        try {
+            const response = await fetch("/api/site/publish", {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({ siteId: site.id }),
+            });
+            const data = await response.json();
+            if (response.ok) {
+                toast.success(`Site başarıyla yeniden yayınlandı!`, {
+                    description: data.cloudflareUrl
+                });
+                window.location.reload();
+            } else {
+                toast.error(data.error || "Site yayınlanamadı");
+            }
+        } catch (error) {
+            console.error("Yayınlama hatası:", error);
+            toast.error("Bir hata oluştu. Lütfen tekrar deneyin.");
+        } finally {
+            setPublishing(false);
+        }
+    };
+
+    const handleRollback = () => {
+        setConfirmDialog({ isOpen: true, type: "rollback" });
+    };
+
+    const executeRollback = async () => {
+        try {
+            const response = await fetch("/api/site/rollback", {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({ siteId: site.id }),
+            });
+            const data = await response.json();
+            if (response.ok) {
+                toast.success("Değişiklikler başarıyla geri alındı!");
+                window.location.reload();
+            } else {
+                toast.error(data.error || "Geri alma işlemi başarısız oldu");
+            }
+        } catch (error) {
+            console.error("Rollback hatası:", error);
+            toast.error("Bir hata oluştu. Lütfen tekrar deneyin.");
+        }
+    };
+
+    const handleConfirmAction = async () => {
+        switch (confirmDialog.type) {
+            case "deletePendingPhoto":
+                executeDeletePendingPhoto();
+                break;
+            case "deleteSavedPhoto":
+                executeDeleteSavedPhoto();
+                break;
+            case "deletePortfolio":
+                if (confirmDialog.portfolioIndex !== undefined) {
+                    executeDeletePortfolio(confirmDialog.portfolioIndex);
+                }
+                break;
+            case "republish":
+                await executeRepublish();
+                break;
+            case "rollback":
+                await executeRollback();
+                break;
+        }
+        setConfirmDialog({ isOpen: false, type: null });
+    };
 
     return (
+        <>
         <div className="space-y-6">
             <div>
                 <h2 className="text-2xl font-bold text-white mb-2">Bilgilerim</h2>
@@ -747,55 +835,14 @@ export default function MyInfo({ site, cvData, onDelete, onCVAnalyzed, deleting 
                             </p>
                             <div className="flex gap-2">
                                 <button
-                                    onClick={async () => {
-                                        if (!confirm("Sitenizi yeniden yayınlamak istediğinizden emin misiniz?")) return;
-                                        setPublishing(true);
-                                        try {
-                                            const response = await fetch("/api/site/publish", {
-                                                method: "POST",
-                                                headers: { "Content-Type": "application/json" },
-                                                body: JSON.stringify({ siteId: site.id }),
-                                            });
-                                            const data = await response.json();
-                                            if (response.ok) {
-                                                alert(`Site başarıyla yeniden yayınlandı!\nURL: ${data.cloudflareUrl}`);
-                                                window.location.reload();
-                                            } else {
-                                                alert(data.error || "Site yayınlanamadı");
-                                            }
-                                        } catch (error) {
-                                            console.error("Yayınlama hatası:", error);
-                                            alert("Bir hata oluştu. Lütfen tekrar deneyin.");
-                                        } finally {
-                                            setPublishing(false);
-                                        }
-                                    }}
+                                    onClick={handleRepublish}
                                     disabled={publishing}
                                     className="bg-yellow-600 hover:bg-yellow-700 disabled:bg-gray-400 text-white font-semibold py-2 px-4 rounded-lg transition-colors duration-200 text-sm"
                                 >
                                     {publishing ? "Yayınlanıyor..." : "Yeniden Yayınla"}
                                 </button>
                                 <button
-                                    onClick={async () => {
-                                        if (!confirm("Değişiklikleri geri almak istediğinizden emin misiniz? Bu işlem geri alınamaz.")) return;
-                                        try {
-                                            const response = await fetch("/api/site/rollback", {
-                                                method: "POST",
-                                                headers: { "Content-Type": "application/json" },
-                                                body: JSON.stringify({ siteId: site.id }),
-                                            });
-                                            const data = await response.json();
-                                            if (response.ok) {
-                                                alert("Değişiklikler başarıyla geri alındı!");
-                                                window.location.reload();
-                                            } else {
-                                                alert(data.error || "Geri alma işlemi başarısız oldu");
-                                            }
-                                        } catch (error) {
-                                            console.error("Rollback hatası:", error);
-                                            alert("Bir hata oluştu. Lütfen tekrar deneyin.");
-                                        }
-                                    }}
+                                    onClick={handleRollback}
                                     className="bg-gray-600 hover:bg-gray-700 text-white font-semibold py-2 px-4 rounded-lg transition-colors duration-200 text-sm"
                                 >
                                     ← Geri Dön
@@ -1694,5 +1741,42 @@ export default function MyInfo({ site, cvData, onDelete, onCVAnalyzed, deleting 
                 </div>
             )}
         </div>
+
+            {/* Confirm Dialog */ }
+    <ConfirmDialog
+        isOpen={confirmDialog.isOpen}
+        onClose={() => setConfirmDialog({ isOpen: false, type: null })}
+        onConfirm={handleConfirmAction}
+        title={
+            confirmDialog.type === "deletePendingPhoto" ? "Seçili Fotoğrafı Kaldır" :
+                confirmDialog.type === "deleteSavedPhoto" ? "Profil Fotoğrafını Sil" :
+                    confirmDialog.type === "deletePortfolio" ? "Portfolio Fotoğrafını Sil" :
+                        confirmDialog.type === "republish" ? "Siteyi Yeniden Yayınla" :
+                            "Değişiklikleri Geri Al"
+        }
+        message={
+            confirmDialog.type === "deletePendingPhoto"
+                ? "Seçilen fotoğrafı kaldırmak istediğinizden emin misiniz?"
+                : confirmDialog.type === "deleteSavedPhoto"
+                    ? "Profil fotoğrafını silmek istediğinizden emin misiniz?"
+                    : confirmDialog.type === "deletePortfolio"
+                        ? "Bu portfolio fotoğrafını silmek istediğinizden emin misiniz?"
+                        : confirmDialog.type === "republish"
+                            ? "Sitenizi yeniden yayınlamak istediğinizden emin misiniz?"
+                            : "Değişiklikleri geri almak istediğinizden emin misiniz? Bu işlem geri alınamaz."
+        }
+        confirmText={
+            confirmDialog.type === "republish" ? "Yayınla" :
+                confirmDialog.type === "rollback" ? "Geri Al" :
+                    "Sil"
+        }
+        variant={
+            confirmDialog.type === "rollback" ? "danger" :
+                confirmDialog.type === "republish" ? "info" :
+                    "warning"
+        }
+        loading={publishing}
+    />
+        </>
     );
 }

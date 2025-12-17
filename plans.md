@@ -1,38 +1,6 @@
-# Ideas
-
-## Project Features for Users
-- day/night mode (optional olmalı, chat özelliğini bekle)
-- multi languages (optional olmalı, chat özelliğini bekle)
-- blog page and blog editor
-- google analytics
-- seo özelleştirmeleri
-- hiç görsel alanlar düşünmedik, template görseller kullanılabilir. kullanıcı kendi görsellerini ekleyebilir.
-- color palette ui. kullanıcı hazır color palette seçebilir, kendi color palette ini oluşturabilir.
-- multiple pages'da page akışı için ai desteği
-- ai ile metin, görsel üretimi
-- ai metin üretimleri de tone belirleme
-- tek prompt yerine birkaç soru ile fikir alma
-- dashboard'dan domain satın alma
-- her component'i kendi içinde ui ile editleme
-- sadece cv web page değil, ürün/iş/business tanıtımı da olabilir.
-- user, template leri kendi seçebilir
-- custom css
-- component marketplace
-- Fotoğraflı cv'lerde cv parse edilirken fotoğraf profil fotoğrafı olarak çekilebilir (word vs gibi eklentilerden sonra handle edilmeli)
-
-## Landing Page
-- sss eklenecek
-- night/day
-- multi languages
-- showcase
-
-## User Page
-- word/linkedin profile cv upload
-- blog images upload
-- billing/domain/settings bölümleri aktif hale getirilmeli
-
-## Editor Content Page
-- editor sayfasındaki preview da sitem de olmayan hatalar görülüyor. navigation menunun hero componentinin üstünde kalmasından kaynaklı profil fotoğrafının bir kısmı görülmüyor.
+# Domain Fikirleri
+- profilly.me
+- profilly.io
 
 # Paid Plans Options
 
@@ -63,114 +31,7 @@
 - portfolioda video
 - belki more belirli mb storage
 
-# Hata Yönetimi
-- unpublish durumunda bazı kritik problemler:
-    - version history yok,
-    - rollback yapılamıyor, son publish siteye geri dönüş yok,
-    - subdomain null olunca, başkası aynı subdomain'İ alabilir
-- ui/ux iyileştirmeleri
-    - Loading state'leri ekle (spinner'lar)
-    - Error handling iyileştir (hata mesajları)
-    - Responsive tasarımı kontrol et (mobil uyumlu mu?)
-- Kullanıcı arayüzünü güzelleştir
-    - Tailwind CSS ile modern görünüm
-    - İkonlar ekle (Lucide React)
-    - Animasyonlar (Framer Motion - optional)
-- Edge Case
-    - çok büyük pdf
-    - bozuk pdf
-    - gemini hata verirse?
-    - cloudflare r2 bozuksa?
-
-# Test
-
-## Navigation
-
-## Hero
-
-## Experience
-
-## Education
-- okul logosu bulunabilir internette?
-
-## Portfolio
-- cv'den otomatik parse
-- drag and drop ile sıralama değiştirilecek
-- farklı boyutlarda görsellere uygunluk
-- görsel crop/resize
-- video support
-- AI-generated metadata from images
-
-## Skills
-
-## Languages
-
-## Contact
-- **Email Sender Domain (Future Enhancement):** Şu an `onboarding@resend.dev` test domain'i kullanılıyor. İleride profesyonel görünüm için custom domain eklenebilir:
-  - Resend Dashboard → Add Domain
-  - DNS kayıtları ekle (TXT, CNAME records)
-  - Verify domain
-  - Kodda `from: 'contact@yourdomain.com'` olarak güncelle
-
-
-# Güvenlik
-- API key'leri `.env` dosyasında (GitHub'a commit edilmemiş)
-- Production environment variables Vercel'de ayarlı
-- Şifre hash'leme çalışıyor (bcrypt/argon2)
-- SQL injection koruması var (Prisma otomatik yapıyor)
-- Özellikle bilgilerimdeki text alanlarına eklenen textlerin içine zararlı scriptler eklenebilir, bunların önüne geçmek gerek
-
-# Domain Fikirleri
-- profilly.me
-- profilly.io
-
 # Geliştime Planı
-
-## Icon, Font, Color Palette, Stock Image
-- icon: hem landing page te hem de kullanıcıların oluşturdukları sitelerinde entegre olabilecek şekilde icon sistemi eklemeliyliz
-- font: hem landing page te hem de kullanıcıların oluşturdukları sitelerinde entegre olabilecek şekilde font sistemi eklemeliyliz
-- color palette: geliştirme sürecinde fark ettiğim bir sıkıntı, oluşturulan sitelerde bazen renkler birbiri ile uyumsuz oluyor, özellikle text ler arka planlar üzerinde kaybolabiliyor. hem gemini api in daha doğru seçimler yapabilmesi için hem de sitem de site oluşturma alanına color palette seçimi ui ekleyeceğiz
-- stock image: oluşturulan sitelerde hiç görsel kullanılmıyor. ana projede stock görseller olmalı, belki bir json dosyasında her bir görselin açıklaması olabilir , site oluşturulurken uygun templatelere uygun stock resimler eşleştirilmeli, site dosyalarına bu görseller eklenmeli. ve tabii hem halihazırdaki hem de daha sonra oluşturulacak templateler stock image aware olmalı
-- site oluşturulunca tarayıcı tab inde görünen isim logo ne olacak?
-
-## UI/UX Güncellemeleri
-- landing sitenin tüm makyajını güncelle
-- yeniden yayınla ui nın tasarımını unutma
-
-### Toast Notification Sistemi
-- `react-hot-toast` veya `sonner` kütüphanesini yükle
-- Tüm `alert()` çağrılarını modern toast notification'lara çevir
-- Başarı, hata, uyarı ve bilgi mesajları için farklı stiller ve ikonlar
-- Toast position ve duration ayarları (örn: top-right, 3 saniye)
-- Dismiss butonu ve auto-dismiss özelliği
-
-### Form Validasyon İyileştirmeleri
-- Gerçek zamanlı validasyon feedback'i (onChange/onBlur)
-- Input field'ların altında inline hata mesajları
-- Şifre gücü göstergesi (password strength meter)
-  - Zayıf/Orta/Güçlü gösterimi
-  - Renk kodlaması (kırmızı/sarı/yeşil)
-  - Şifre gereksinimleri checklist'i
-- E-posta format validasyonu (regex)
-- Required field'lar için görsel işaretler (*)
-- Form submit öncesi tüm validasyonların kontrolü
-
-### Loading State Animasyonları
-- Skeleton loader'lar (Settings, MyInfo, Subscriptions, vb.)
-- Smooth transition'lar (fade-in, slide-in)
-- Button loading state'leri (spinner + disabled)
-- Disabled state'lerde opacity efekti
-- Progress indicator'lar (örn: dosya yükleme için)
-- Lazy loading için placeholder'lar
-
-### Genel UI İyileştirmeleri
-- Tutarlı spacing ve padding kullanımı
-- Responsive breakpoint'leri optimize et (mobile-first)
-- Hover efektleri ve micro-interactions
-- Focus state'leri (accessibility için)
-- Empty state'ler için güzel placeholder'lar
-- Confirmation modal'ları (kritik işlemler için)
-- Tooltip'ler (bilgilendirici açıklamalar için)
 
 ## Performans İyileştirmeleri
 - Kaydet butonunda muhtemelen çok fazla işlem oluyor ve ortalama 15 saniye sürüyor. Oldukça uzun bir süre.
@@ -182,6 +43,12 @@
 - paid plan
 
 ## Güvenlik İyileştirmeleri
+
+- API key'leri `.env` dosyasında (GitHub'a commit edilmemiş)
+- Production environment variables Vercel'de ayarlı
+- Şifre hash'leme çalışıyor (bcrypt/argon2)
+- SQL injection koruması var (Prisma otomatik yapıyor)
+- Özellikle bilgilerimdeki text alanlarına eklenen textlerin içine zararlı scriptler eklenebilir, bunların önüne geçmek gerek
 
 ### Rate Limiting
 - Rate limiting middleware oluştur
@@ -249,9 +116,23 @@
   - Veri silme hakkı (right to be forgotten)
   - Kullanıcı onayları (consent management)
 
+### Edge Case
+- çok büyük pdf
+- bozuk pdf
+- gemini hata verirse?
+- cloudflare r2 bozuksa?
+
 ## Yayınlamadan Önce Son Yapılacaklar
 - bazı templateler çok basit, daha modernleştir
 - template havuzunu biraz daha geliştir
+- landing sitenin tüm makyajını güncelle
+- yeniden yayınla ui nın tasarımını unutma
+
+### Landing Page
+- sss eklenecek
+- night/day
+- multi languages
+- showcase
 
 ## Versel Deploydan Sonra Yapılacaklar
 
@@ -278,11 +159,29 @@
 - Resend test domain'i (onboarding@resend.dev) sadece kayıtlı e-posta adresine (erayerdogan3551@gmail.com) gönderim yapabilir; production'da personaweb.info domain'i eklendikten sonra tüm e-postalara gönderim yapılabilecek.
 
 # MVP'de Olmasına Gerek Var Mı?
+- sadece cv web page değil. ürün/iş tanıtı sitesi de üretilebilir.
 - Şifremi unuttum
 - E postamı unuttum
 - SMS onayı
 - 2 adımlı doğrulama
 - Chatte hafıza özelliği yok
+- word/linkedin profile cv upload
+- day/night mode for users
+- multi languages desteği
+- blog page and blog editor. blog images upload
+- google analytics
+- multi pages desteği
+- kullanıcılar editor de tek bir görseli ya da bir metni revize edebilir. her component içinde component e özel revise olabilir.
+- metin üretimlerinde yapay zeka tone'u olabilir
+- tek prompt ile site generation yerine sohbete dayalı daha fazla bilgi alınabilecek bir yöntem (özellikle landing page'ten hemen ulaşılabilecek ve giriş ya da kayıt yapmaya teşvik edecek bir yöntem)
+- user, template leri kendi seçebilir
+- custom css
+- component marketplace
+- Fotoğraflı cv'lerde cv parse edilirken fotoğraf profil fotoğrafı olarak çekilebilir (word vs gibi eklentilerden sonra handle edilmeli)
+- drag and drop ile sıralama değiştirilecek
+- görsel crop/resize
+- video support
+- AI-generated metadata from images
 - **Rollback Edge Case:** Kullanıcı 1 portfolio fotoyu kaldırdı → foto fallback'e düştü (DeletedAsset) → 30 gün geçti ve foto R2'den kalıcı silindi → kullanıcı "Geri Dön" dediğinde ne olacak?
   - **Problem:** Rollback işlemi publishedCvContent'i geri yükler ama foto artık R2'de yok → kırık foto linkleri (404)
   - **Çözüm Seçenekleri:**

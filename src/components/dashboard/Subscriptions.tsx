@@ -1,6 +1,8 @@
 "use client";
 
 import { useEffect, useState } from "react";
+import { toast } from "@/components/ui/Toast";
+import ConfirmDialog from "@/components/ui/ConfirmDialog";
 
 interface SubscriptionInfo {
     plan: {
@@ -59,11 +61,33 @@ export default function Subscriptions() {
         }
     };
 
-    const handlePublish = async (siteId: string) => {
-        if (!confirm("Sitenizi yayınlamak istediğinizden emin misiniz?")) {
-            return;
-        }
+    // Confirm dialog states
+    const [confirmDialog, setConfirmDialog] = useState<{
+        isOpen: boolean;
+        type: "publish" | "unpublish" | null;
+        siteId: string | null;
+    }>({ isOpen: false, type: null, siteId: null });
 
+    const handlePublish = async (siteId: string) => {
+        setConfirmDialog({ isOpen: true, type: "publish", siteId });
+    };
+
+    const handleUnpublish = async (siteId: string) => {
+        setConfirmDialog({ isOpen: true, type: "unpublish", siteId });
+    };
+
+    const handleConfirmAction = async () => {
+        if (!confirmDialog.siteId) return;
+
+        if (confirmDialog.type === "publish") {
+            await executePublish(confirmDialog.siteId);
+        } else if (confirmDialog.type === "unpublish") {
+            await executeUnpublish(confirmDialog.siteId);
+        }
+        setConfirmDialog({ isOpen: false, type: null, siteId: null });
+    };
+
+    const executePublish = async (siteId: string) => {
         setPublishing(true);
         try {
             const response = await fetch("/api/site/publish", {
@@ -77,25 +101,23 @@ export default function Subscriptions() {
             const data = await response.json();
 
             if (response.ok) {
-                alert(`Site başarıyla yayınlandı!\nURL: ${data.cloudflareUrl}`);
+                toast.success(`Site başarıyla yayınlandı!`, {
+                    description: data.cloudflareUrl
+                });
                 fetchSubscriptionInfo();
                 window.open(data.cloudflareUrl, "_blank");
             } else {
-                alert(data.error || "Site yayınlanamadı");
+                toast.error(data.error || "Site yayınlanamadı");
             }
         } catch (error) {
             console.error("Yayınlama hatası:", error);
-            alert("Bir hata oluştu. Lütfen tekrar deneyin.");
+            toast.error("Bir hata oluştu. Lütfen tekrar deneyin.");
         } finally {
             setPublishing(false);
         }
     };
 
-    const handleUnpublish = async (siteId: string) => {
-        if (!confirm("Sitenizi yayından kaldırmak istediğinizden emin misiniz?")) {
-            return;
-        }
-
+    const executeUnpublish = async (siteId: string) => {
         setUnpublishing(true);
         try {
             const response = await fetch("/api/site/unpublish", {
@@ -109,14 +131,14 @@ export default function Subscriptions() {
             const data = await response.json();
 
             if (response.ok) {
-                alert("Site yayından kaldırıldı!");
+                toast.success("Site yayından kaldırıldı!");
                 fetchSubscriptionInfo();
             } else {
-                alert(data.error || "Site yayından kaldırılamadı");
+                toast.error(data.error || "Site yayından kaldırılamadı");
             }
         } catch (error) {
             console.error("Yayından kaldırma hatası:", error);
-            alert("Bir hata oluştu. Lütfen tekrar deneyin.");
+            toast.error("Bir hata oluştu. Lütfen tekrar deneyin.");
         } finally {
             setUnpublishing(false);
         }
@@ -436,6 +458,21 @@ export default function Subscriptions() {
                     </table>
                 </div>
             </div>
+
+            {/* Confirm Dialog */}
+            <ConfirmDialog
+                isOpen={confirmDialog.isOpen}
+                onClose={() => setConfirmDialog({ isOpen: false, type: null, siteId: null })}
+                onConfirm={handleConfirmAction}
+                title={confirmDialog.type === "publish" ? "Siteyi Yayınla" : "Siteyi Yayından Kaldır"}
+                message={confirmDialog.type === "publish"
+                    ? "Sitenizi yayınlamak istediğinizden emin misiniz?"
+                    : "Sitenizi yayından kaldırmak istediğinizden emin misiniz?"
+                }
+                confirmText={confirmDialog.type === "publish" ? "Yayınla" : "Yayından Kaldır"}
+                variant={confirmDialog.type === "publish" ? "info" : "warning"}
+                loading={publishing || unpublishing}
+            />
         </div>
     );
 }
