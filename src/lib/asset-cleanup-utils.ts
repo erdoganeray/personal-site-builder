@@ -72,6 +72,7 @@ export function extractAssetKeys(cvContent: any, userId: string): string[] {
 
 /**
  * Get file size from R2
+ * Returns 0 if file doesn't exist (expected for orphaned/already deleted files)
  */
 async function getFileSize(key: string): Promise<number> {
     try {
@@ -81,8 +82,12 @@ async function getFileSize(key: string): Promise<number> {
         });
         const response = await s3Client.send(command);
         return response.ContentLength || 0;
-    } catch (error) {
-        console.error(`⚠️ Error getting file size for ${key}:`, error);
+    } catch (error: any) {
+        // NotFound is expected for orphaned files that were already deleted
+        // Only log unexpected errors
+        if (error?.name !== 'NotFound' && error?.$metadata?.httpStatusCode !== 404) {
+            console.error(`⚠️ Error getting file size for ${key}:`, error);
+        }
         return 0;
     }
 }

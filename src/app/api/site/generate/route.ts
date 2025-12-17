@@ -8,6 +8,7 @@ import { analyzeSiteDesign } from "@/lib/design-analyzer";
 import { getTemplateById } from "@/components/site-templates";
 import { populateTemplate } from "@/lib/template-engine";
 import { getFontPairById } from "@/lib/font-registry";
+import { generateAllSEOTags } from "@/lib/seo-generator";
 
 export async function POST(req: NextRequest) {
   try {
@@ -224,13 +225,26 @@ export async function POST(req: NextRequest) {
       const faviconSvg = `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64"><rect width="64" height="64" rx="12" fill="${faviconColor}"/><text x="32" y="42" font-family="Arial, sans-serif" font-size="28" font-weight="bold" fill="white" text-anchor="middle">${initials}</text></svg>`;
       const faviconBase64 = `data:image/svg+xml;base64,${Buffer.from(faviconSvg).toString('base64')}`;
 
+      // Generate site URL for SEO
+      const baseDomain = process.env.NEXT_PUBLIC_BASE_DOMAIN || 'personalweb.info';
+      const siteUrl = site.subdomain ? `https://${site.subdomain}.${baseDomain}` : `https://${baseDomain}`;
+
+      // Generate all SEO tags
+      console.log('🔍 Generating SEO tags for new site...');
+      const seoTags = generateAllSEOTags(
+        cvData,
+        designPlan.seoData,
+        designPlan.themeColors,
+        siteUrl
+      );
+      console.log('✅ SEO Tags generated, length:', seoTags.length);
+
       finalHtml = `<!DOCTYPE html>
 <html lang="tr">
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>${cvData.personalInfo.name}</title>
-  <meta name="description" content="${cvData.personalInfo.title || 'Professional Portfolio'}">
+${seoTags}
   <!-- Favicon -->
   <link rel="icon" type="image/svg+xml" href="${faviconBase64}">
   <!-- Google Fonts -->
@@ -240,6 +254,7 @@ export async function POST(req: NextRequest) {
   <link rel="stylesheet" href="styles.css">
 </head>
 <body>
+<main role="main">
 `;
 
       // Helper function to check if a component should be included based on CV data
@@ -303,6 +318,7 @@ export async function POST(req: NextRequest) {
 
       // HTML bitişi
       finalHtml += `
+</main>
   <script src="script.js"></script>
 </body>
 </html>`;

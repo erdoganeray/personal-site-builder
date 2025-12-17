@@ -448,6 +448,14 @@ Font Seçimi Kriterleri:
   * Örnek: Business Consultant + professional style → professional-1 (Roboto)
 
 
+## SEO Optimizasyonu
+
+Site için SEO meta bilgileri oluştur:
+- **metaTitle**: "İsim Soyisim - Meslek Ünvanı | Portfolio" formatında (max 60 karakter)
+- **metaDescription**: Kişinin deneyimini ve uzmanlığını özetleyen SEO dostu açıklama (150-160 karakter, Türkçe veya İngilizce - CV diline göre)
+- **keywords**: CV'den çıkarılan 5-10 anahtar kelime (yetenekler, meslek, şehir vb.)
+- **professionalSummary**: JSON-LD structured data için kısa profesyonel özet (1-2 cümle)
+
 Çıktı formatı JSON olsun:
 {
   "themeColors": {
@@ -475,9 +483,7 @@ Font Seçimi Kriterleri:
     { "category": "hero", "templateId": "hero-modern-centered" },
     { "category": "experience", "templateId": "experience-timeline" },
     { "category": "education", "templateId": "education-timeline" },
-    // Portfolio burada (eğer fotoğraf varsa) - { "category": "portfolio", "templateId": "portfolio-grid" }
     { "category": "skills", "templateId": "skills-card-grid" },
-    // Languages burada (eğer dil bilgisi varsa) - { "category": "languages", "templateId": "languages-card-grid" }
     { "category": "contact", "templateId": "contact-modern-form" },
     { "category": "footer", "templateId": "footer-modern-centered" }
   ],
@@ -485,6 +491,12 @@ Font Seçimi Kriterleri:
   "style": "modern",
   "fontStyle": "modern",
   "fontPairId": "modern-1",
+  "seoData": {
+    "metaTitle": "Ahmet Yılmaz - Software Engineer | Portfolio",
+    "metaDescription": "5+ yıl deneyimli full-stack developer. React, Node.js ve cloud teknolojilerinde uzman. İstanbul merkezli yazılım mühendisi.",
+    "keywords": ["Software Engineer", "Full Stack Developer", "React", "Node.js", "İstanbul"],
+    "professionalSummary": "Deneyimli yazılım mühendisi, modern web teknolojileri konusunda uzman."
+  },
   "reasoning": "Seçimlerinizin kısa açıklaması (2-3 cümle, Türkçe)"
 }
 
@@ -546,6 +558,14 @@ JSON'dan önce veya sonra hiçbir metin olmasın.
             fontBody: fontPair?.body || 'Roboto'
          };
 
+         // SEO data processing
+         const seoData = parsed.seoData ? {
+            metaTitle: parsed.seoData.metaTitle || `${cvData.personalInfo.name} | Portfolio`,
+            metaDescription: parsed.seoData.metaDescription || cvData.summary?.slice(0, 160) || '',
+            keywords: parsed.seoData.keywords || [],
+            professionalSummary: parsed.seoData.professionalSummary || cvData.summary
+         } : undefined;
+
          return {
             themeColors: themeColorsWithFonts,
             theme: theme,
@@ -558,7 +578,8 @@ JSON'dan önce veya sonra hiçbir metin olmasın.
                social: '18px'
             },
             fontStyle: parsed.fontStyle || 'professional',
-            fontPairId: fontPairId
+            fontPairId: fontPairId,
+            seoData: seoData
          };
 
 
