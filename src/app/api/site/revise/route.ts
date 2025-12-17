@@ -247,23 +247,62 @@ export async function POST(req: NextRequest) {
         if (stockPhotoTemplatesAdd.includes(operation.templateId)) {
           console.log(`📸 Stock photo template added: ${operation.templateId}`);
           try {
-            const { getStockPhotoForTemplate } = await import("@/lib/stock-photo-selector");
+            const { generateBatchSearchQueries, selectBestPhotoAlgorithmic } = await import("@/lib/stock-photo-selector");
+            const { searchMultipleQueries } = await import("@/lib/stock-photo-service");
+            const { STOCK_PHOTO_CATEGORIES } = await import("@/lib/stock-photo-registry");
 
-            console.log(`🖼️ Fetching ${operation.category} stock photo...`);
+            const category = operation.category as 'hero' | 'contact';
+            console.log(`🖼️ Fetching ${category} stock photo...`);
 
-            const stockResult = await getStockPhotoForTemplate(
-              operation.category as 'hero' | 'contact',
-              site.cvContent as any,
-              updatedDesignPlan.themeColors as any,
-              updatedDesignPlan.style
-            );
+            // Batch query (tek kategori için de kullanılabilir)
+            const batchQueries = await generateBatchSearchQueries([category], {
+              cvData: {
+                name: (site.cvContent as any).personalInfo?.name,
+                profession: (site.cvContent as any).personalInfo?.title,
+                industry: (site.cvContent as any).experience?.[0]?.company,
+                skills: (site.cvContent as any).skills?.slice(0, 5).map((s: any) => typeof s === 'string' ? s : s.name),
+                summary: (site.cvContent as any).summary
+              },
+              templateStyle: updatedDesignPlan.style || 'modern',
+              themeColors: updatedDesignPlan.themeColors ? {
+                primary: updatedDesignPlan.themeColors.primary,
+                secondary: updatedDesignPlan.themeColors.secondary,
+                isDarkTheme: (updatedDesignPlan.themeColors.background?.startsWith('#0') || updatedDesignPlan.themeColors.background?.startsWith('#1')) ?? false
+              } : undefined
+            });
 
-            if (!updatedDesignPlan.stockImages) {
-              updatedDesignPlan.stockImages = {};
+            const categoryConfig = STOCK_PHOTO_CATEGORIES[category];
+            const queries = batchQueries[category]?.queries || categoryConfig.defaultQueries;
+
+            // Pexels'de ara
+            const candidates = await searchMultipleQueries(queries, {
+              orientation: categoryConfig?.orientation || 'landscape',
+              perPage: 5,
+              minWidth: categoryConfig?.minWidth || 1280
+            });
+
+            if (candidates.length > 0) {
+              // Algoritmik seçim
+              const selectedPhoto = selectBestPhotoAlgorithmic(
+                candidates,
+                updatedDesignPlan.themeColors?.primary || '#2563eb',
+                categoryConfig?.orientation === 'landscape'
+              );
+
+              if (!updatedDesignPlan.stockImages) {
+                updatedDesignPlan.stockImages = {};
+              }
+              (updatedDesignPlan.stockImages as any)[category] = {
+                url: selectedPhoto.src.large2x || selectedPhoto.src.large || selectedPhoto.src.original,
+                alt: selectedPhoto.alt || `Professional ${category} image`,
+                photographer: selectedPhoto.photographer,
+                pexelsId: selectedPhoto.id,
+                avgColor: selectedPhoto.avg_color,
+                source: 'pexels'
+              };
+
+              console.log(`✅ ${category} stock photo: ${selectedPhoto.src.large2x?.substring(0, 50)}...`);
             }
-            (updatedDesignPlan.stockImages as any)[operation.category] = stockResult.photo;
-
-            console.log(`✅ ${operation.category} stock photo: ${stockResult.photo.url.substring(0, 50)}...`);
           } catch (stockError) {
             console.error("⚠️ Stock photo fetch error (continuing with fallback):", stockError);
           }
@@ -395,26 +434,63 @@ export async function POST(req: NextRequest) {
         if (stockPhotoTemplates.includes(operation.newTemplateId)) {
           console.log(`📸 Stock photo template detected: ${operation.newTemplateId}`);
           try {
-            const { getStockPhotoForTemplate } = await import("@/lib/stock-photo-selector");
+            const { generateBatchSearchQueries, selectBestPhotoAlgorithmic } = await import("@/lib/stock-photo-selector");
+            const { searchMultipleQueries } = await import("@/lib/stock-photo-service");
+            const { STOCK_PHOTO_CATEGORIES } = await import("@/lib/stock-photo-registry");
 
-            // Template kategorisine göre stok fotoğraf al
-            const category = operation.category; // 'hero' veya 'contact'
+            const category = operation.category as 'hero' | 'contact';
             console.log(`🖼️ Fetching ${category} stock photo...`);
 
-            const stockResult = await getStockPhotoForTemplate(
-              category as 'hero' | 'contact',
-              site.cvContent as any,
-              updatedDesignPlan.themeColors as any,
-              updatedDesignPlan.style
-            );
+            // Batch query (tek kategori için de kullanılabilir)
+            const batchQueries = await generateBatchSearchQueries([category], {
+              cvData: {
+                name: (site.cvContent as any).personalInfo?.name,
+                profession: (site.cvContent as any).personalInfo?.title,
+                industry: (site.cvContent as any).experience?.[0]?.company,
+                skills: (site.cvContent as any).skills?.slice(0, 5).map((s: any) => typeof s === 'string' ? s : s.name),
+                summary: (site.cvContent as any).summary
+              },
+              templateStyle: updatedDesignPlan.style || 'modern',
+              themeColors: updatedDesignPlan.themeColors ? {
+                primary: updatedDesignPlan.themeColors.primary,
+                secondary: updatedDesignPlan.themeColors.secondary,
+                isDarkTheme: (updatedDesignPlan.themeColors.background?.startsWith('#0') || updatedDesignPlan.themeColors.background?.startsWith('#1')) ?? false
+              } : undefined
+            });
 
-            // stockImages'ı güncelle veya oluştur
-            if (!updatedDesignPlan.stockImages) {
-              updatedDesignPlan.stockImages = {};
+            const categoryConfig = STOCK_PHOTO_CATEGORIES[category];
+            const queries = batchQueries[category]?.queries || categoryConfig.defaultQueries;
+
+            // Pexels'de ara
+            const candidates = await searchMultipleQueries(queries, {
+              orientation: categoryConfig?.orientation || 'landscape',
+              perPage: 5,
+              minWidth: categoryConfig?.minWidth || 1280
+            });
+
+            if (candidates.length > 0) {
+              // Algoritmik seçim
+              const selectedPhoto = selectBestPhotoAlgorithmic(
+                candidates,
+                updatedDesignPlan.themeColors?.primary || '#2563eb',
+                categoryConfig?.orientation === 'landscape'
+              );
+
+              // stockImages'ı güncelle veya oluştur
+              if (!updatedDesignPlan.stockImages) {
+                updatedDesignPlan.stockImages = {};
+              }
+              (updatedDesignPlan.stockImages as any)[category] = {
+                url: selectedPhoto.src.large2x || selectedPhoto.src.large || selectedPhoto.src.original,
+                alt: selectedPhoto.alt || `Professional ${category} image`,
+                photographer: selectedPhoto.photographer,
+                pexelsId: selectedPhoto.id,
+                avgColor: selectedPhoto.avg_color,
+                source: 'pexels'
+              };
+
+              console.log(`✅ ${category} stock photo: ${selectedPhoto.src.large2x?.substring(0, 50)}...`);
             }
-            (updatedDesignPlan.stockImages as any)[category] = stockResult.photo;
-
-            console.log(`✅ ${category} stock photo: ${stockResult.photo.url.substring(0, 50)}...`);
           } catch (stockError) {
             console.error("⚠️ Stock photo fetch error (continuing with fallback):", stockError);
             // Hata olursa devam et, fallback SVG'ler kullanılacak

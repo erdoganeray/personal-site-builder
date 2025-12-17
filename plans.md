@@ -33,10 +33,6 @@
 
 # Geliştime Planı
 
-## Performans İyileştirmeleri
-- Kaydet butonunda muhtemelen çok fazla işlem oluyor ve ortalama 15 saniye sürüyor. Oldukça uzun bir süre.
-- Loading state geliştirmeleri
-
 ## SEO İyileştirmeleri
 - landing page
 - free plan

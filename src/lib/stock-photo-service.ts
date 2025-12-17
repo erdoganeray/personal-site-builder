@@ -210,20 +210,24 @@ export async function searchMultipleQueries(
     const allPhotos: PexelsPhoto[] = [];
     const seenIds = new Set<number>();
 
-    for (const query of queries) {
-        const photos = await searchStockPhotos(query, {
+    // Paralel arama yap - tüm sorguları aynı anda çalıştır
+    const searchPromises = queries.map(query =>
+        searchStockPhotos(query, {
             ...options,
             perPage: options.perPage || 5
-        });
+        })
+    );
 
-        // Benzersiz fotoğrafları ekle
+    const results = await Promise.all(searchPromises);
+
+    // Sonuçları birleştir, benzersiz olanları al
+    for (const photos of results) {
         for (const photo of photos) {
             if (!seenIds.has(photo.id)) {
                 seenIds.add(photo.id);
                 allPhotos.push(photo);
             }
         }
-
         // Yeterli aday var mı?
         if (allPhotos.length >= 10) break;
     }

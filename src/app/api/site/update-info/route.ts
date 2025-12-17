@@ -162,17 +162,22 @@ export async function PATCH(req: NextRequest) {
         });
 
         // Auto-regenerate preview ONLY if site has been generated (status != "draft" and designPlan exists)
+        let previewStatus = 'not_applicable';
+
         if (updatedSite.status !== "draft" && updatedSite.designPlan) {
             console.log(`Auto-regenerating preview for site ${siteId} after info update...`);
 
-            const result = await regeneratePreviewContent(siteId);
-
-            if (!result.success) {
-                console.error('Failed to auto-regenerate preview:', result.error);
-                // Don't fail the request - just log the error
-            } else {
-                console.log('✅ Preview auto-regenerated successfully');
-            }
+            // Async regeneration - kullanıcı beklemeden response döner
+            previewStatus = 'regenerating';
+            regeneratePreviewContent(siteId)
+                .then(result => {
+                    if (result.success) {
+                        console.log('✅ Preview auto-regenerated successfully');
+                    } else {
+                        console.error('Failed to auto-regenerate preview:', result.error);
+                    }
+                })
+                .catch(err => console.error('Preview regeneration error:', err));
         } else {
             console.log(`Skipping preview regeneration: status=${updatedSite.status}, hasDesignPlan=${!!updatedSite.designPlan}`);
         }
@@ -180,6 +185,7 @@ export async function PATCH(req: NextRequest) {
         return NextResponse.json({
             message: "Site info updated successfully",
             site: updatedSite,
+            previewStatus // Client'a preview durumunu bildir
         });
     } catch (error) {
         console.error("Error updating site info:", error);

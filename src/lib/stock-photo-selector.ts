@@ -151,6 +151,122 @@ Yanıt formatı:
 }
 
 /**
+ * Birden fazla kategori için tek seferde arama sorguları üretir (Batch)
+ * 
+ * @param categories - Kategori listesi (örn: ['hero', 'contact'])
+ * @param context - CV ve template bilgileri
+ * @returns Her kategori için arama sorguları
+ */
+export async function generateBatchSearchQueries(
+    categories: string[],
+    context: Omit<PhotoSelectionContext, 'templateCategory'>
+): Promise<Record<string, GeneratedSearchQueries>> {
+    const apiKey = process.env.GEMINI_API_KEY;
+
+    if (!apiKey) {
+        console.warn('⚠️ GEMINI_API_KEY not set, using default queries for all categories');
+        const result: Record<string, GeneratedSearchQueries> = {};
+        for (const category of categories) {
+            result[category] = getDefaultQueries({ ...context, templateCategory: category as any });
+        }
+        return result;
+    }
+
+    try {
+        const modelName = process.env.GEMINI_MODEL || "gemini-2.0-flash";
+        const genAI = new GoogleGenerativeAI(apiKey);
+        const model = genAI.getGenerativeModel({ model: modelName });
+
+        // Her kategori için açıklama hazırla
+        const categoryDescriptions = categories.map(cat => {
+            const config = STOCK_PHOTO_CATEGORIES[cat];
+            return `- ${cat}: ${config?.description || 'Professional background image'}`;
+        }).join('\n');
+
+        const prompt = `
+Sen profesyonel bir web sitesi tasarımcısısın. Aşağıdaki CV bilgilerine dayanarak,
+belirtilen kategoriler için en uygun stok fotoğraf arama sorgularını üret.
+
+CV Bilgileri:
+- İsim: ${context.cvData.name || 'Belirtilmemiş'}
+- Meslek/Ünvan: ${context.cvData.profession || 'Belirtilmemiş'}
+- Sektör: ${context.cvData.industry || 'Belirtilmemiş'}
+- Yetenekler: ${context.cvData.skills?.slice(0, 5).join(', ') || 'Belirtilmemiş'}
+- Özet: ${context.cvData.summary?.substring(0, 200) || 'Belirtilmemiş'}
+
+Template Bilgileri:
+- Site Stili: ${context.templateStyle || 'modern'}
+${context.themeColors ? `- Tema: ${context.themeColors.isDarkTheme ? 'Koyu' : 'Açık'} tema` : ''}
+
+Kategoriler:
+${categoryDescriptions}
+
+Kurallar:
+1. İngilizce arama sorguları üret (Pexels için)
+2. Her kategori için mesleğe ve sektöre uygun görseller için sorgular olsun
+3. Her sorgu 2-4 kelime olmalı (çok spesifik olma)
+4. Profesyonel ve modern görseller için optimize et
+5. Her kategori için 3 farklı arama sorgusu öner
+
+ÖNEMLİ: Sadece JSON formatında yanıt ver, başka açıklama ekleme.
+
+Yanıt formatı:
+{
+  "hero": {
+    "queries": ["query1", "query2", "query3"],
+    "reasoning": "Kısa açıklama"
+  },
+  "contact": {
+    "queries": ["query1", "query2", "query3"],
+    "reasoning": "Kısa açıklama"
+  }
+}
+`;
+
+        console.log(`🤖 Gemini: Generating batch search queries for [${categories.join(', ')}]...`);
+
+        const result = await model.generateContent(prompt);
+        const responseText = result.response.text();
+
+        // JSON parse
+        let cleanedText = responseText.trim();
+        cleanedText = cleanedText.replace(/^```json\s*/i, '').replace(/^```\s*/, '');
+        cleanedText = cleanedText.replace(/\s*```$/g, '');
+        cleanedText = cleanedText.trim();
+
+        const parsed = JSON.parse(cleanedText);
+
+        // Validasyon ve fallback
+        const batchResult: Record<string, GeneratedSearchQueries> = {};
+        for (const category of categories) {
+            if (parsed[category] && parsed[category].queries && Array.isArray(parsed[category].queries)) {
+                batchResult[category] = {
+                    queries: parsed[category].queries.slice(0, 3),
+                    reasoning: parsed[category].reasoning || 'AI-generated queries'
+                };
+                console.log(`✅ Gemini generated queries for ${category}: ${batchResult[category].queries.join(', ')}`);
+            } else {
+                // Fallback: Default queries kullan
+                console.warn(`⚠️ Invalid response for ${category}, using defaults`);
+                batchResult[category] = getDefaultQueries({ ...context, templateCategory: category as any });
+            }
+        }
+
+        return batchResult;
+
+    } catch (error) {
+        console.error('❌ Gemini batch query generation error:', error);
+        // Fallback: Her kategori için default queries
+        const result: Record<string, GeneratedSearchQueries> = {};
+        for (const category of categories) {
+            result[category] = getDefaultQueries({ ...context, templateCategory: category as any });
+        }
+        return result;
+    }
+}
+
+
+/**
  * Aday görseller arasından en uygun olanı seçer
  * 
  * @param candidates - Pexels'den gelen aday görseller
@@ -321,8 +437,12 @@ export async function getStockPhotoForTemplate(
             };
         }
 
-        // 3. Gemini ile en uygun görseli seç
-        const selectedPhoto = await selectBestPhotoWithAI(allCandidates, context);
+        // 3. Algoritmik olarak en uygun görseli seç (Gemini yerine)
+        const selectedPhoto = selectBestPhotoAlgorithmic(
+            allCandidates,
+            themeColors?.primary || '#2563eb',
+            categoryConfig?.orientation === 'landscape'
+        );
 
         return {
             photo: {
@@ -468,3 +588,107 @@ function isColorDark(color: string): boolean {
 
     return luminance < 0.5;
 }
+
+/**
+ * Hex rengini RGB'ye çevirir
+ */
+function hexToRgb(hex: string): { r: number; g: number; b: number } {
+    const cleanHex = hex.replace('#', '');
+    return {
+        r: parseInt(cleanHex.substring(0, 2), 16),
+        g: parseInt(cleanHex.substring(2, 4), 16),
+        b: parseInt(cleanHex.substring(4, 6), 16)
+    };
+}
+
+/**
+ * İki renk arasındaki Euclidean mesafeyi hesaplar
+ */
+function getColorDistance(hex1: string, hex2: string): number {
+    try {
+        const rgb1 = hexToRgb(hex1);
+        const rgb2 = hexToRgb(hex2);
+
+        return Math.sqrt(
+            Math.pow(rgb1.r - rgb2.r, 2) +
+            Math.pow(rgb1.g - rgb2.g, 2) +
+            Math.pow(rgb1.b - rgb2.b, 2)
+        );
+    } catch {
+        return 999; // Hata durumunda yüksek mesafe döndür
+    }
+}
+
+/**
+ * Fotoğraf için skor hesaplar (0-100 arası)
+ */
+function calculatePhotoScore(
+    photo: PexelsPhoto,
+    primaryColor: string,
+    preferLandscape: boolean = true
+): number {
+    let score = 0;
+
+    // 1. Renk uyumu (0-40 puan)
+    if (photo.avg_color && primaryColor) {
+        const distance = getColorDistance(photo.avg_color, primaryColor);
+        // Mesafe 0-441 arası olabilir (RGB max distance)
+        // Düşük mesafe = yüksek puan
+        score += Math.max(0, 40 - (distance / 11));
+    }
+
+    // 2. Boyut kalitesi (0-30 puan)
+    if (photo.width >= 1920) score += 30;
+    else if (photo.width >= 1280) score += 20;
+    else if (photo.width >= 800) score += 10;
+
+    // 3. Oran uyumu (0-20 puan)
+    const aspectRatio = photo.width / photo.height;
+    if (preferLandscape && aspectRatio > 1.3) score += 20;
+    else if (!preferLandscape && aspectRatio < 0.8) score += 20;
+    else if (aspectRatio >= 1.0 && aspectRatio <= 1.5) score += 10; // Orta oran
+
+    // 4. Alt text kalitesi (0-10 puan)
+    if (photo.alt && photo.alt.length > 20) score += 10;
+    else if (photo.alt && photo.alt.length > 0) score += 5;
+
+    return score;
+}
+
+/**
+ * Algoritmik olarak en iyi fotoğrafı seçer (Gemini yerine)
+ * 
+ * @param candidates - Aday fotoğraflar
+ * @param primaryColor - Tema ana rengi
+ * @param preferLandscape - Landscape tercih edilsin mi
+ * @returns En yüksek skorlu fotoğraf
+ */
+export function selectBestPhotoAlgorithmic(
+    candidates: PexelsPhoto[],
+    primaryColor: string,
+    preferLandscape: boolean = true
+): PexelsPhoto {
+    if (candidates.length === 0) {
+        throw new Error('No candidates provided');
+    }
+
+    if (candidates.length === 1) {
+        return candidates[0];
+    }
+
+    // Her fotoğraf için skor hesapla
+    const scored = candidates.map(photo => ({
+        photo,
+        score: calculatePhotoScore(photo, primaryColor, preferLandscape)
+    }));
+
+    // Skora göre sırala (en yüksek skor önce)
+    scored.sort((a, b) => b.score - a.score);
+
+    console.log(`📊 Photo scores: ${scored.slice(0, 3).map((s, i) =>
+        `#${i + 1}: ${s.score.toFixed(1)}`
+    ).join(', ')}`);
+
+    return scored[0].photo;
+}
+

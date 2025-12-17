@@ -116,24 +116,83 @@ export async function POST(req: NextRequest) {
     if (needsStockPhotos) {
       console.log("📸 Stock photo templates detected, fetching images...");
       try {
-        const { getStockPhotoForTemplate } = await import("@/lib/stock-photo-selector");
-        const stockImages: Record<string, any> = {};
+        const { generateBatchSearchQueries, selectBestPhotoAlgorithmic } = await import("@/lib/stock-photo-selector");
+        const { searchMultipleQueries } = await import("@/lib/stock-photo-service");
+        const { STOCK_PHOTO_CATEGORIES } = await import("@/lib/stock-photo-registry");
 
-        // Hero için stok fotoğraf gerekli mi?
+        // Gerekli kategorileri belirle
+        const requiredCategories: string[] = [];
         if (selectedTemplateIds.includes('hero-fullscreen-bg') || selectedTemplateIds.includes('hero-split-image')) {
-          console.log("🖼️ Fetching hero stock photo...");
-          const heroResult = await getStockPhotoForTemplate('hero', cvData, designPlan.themeColors, designPlan.style);
-          stockImages['hero'] = heroResult.photo;
-          console.log(`✅ Hero stock photo: ${heroResult.photo.url.substring(0, 50)}...`);
+          requiredCategories.push('hero');
+        }
+        if (selectedTemplateIds.includes('contact-image-side')) {
+          requiredCategories.push('contact');
         }
 
-        // Contact için stok fotoğraf gerekli mi?
-        if (selectedTemplateIds.includes('contact-image-side')) {
-          console.log("🖼️ Fetching contact stock photo...");
-          const contactResult = await getStockPhotoForTemplate('contact', cvData, designPlan.themeColors, designPlan.style);
-          stockImages['contact'] = contactResult.photo;
-          console.log(`✅ Contact stock photo: ${contactResult.photo.url.substring(0, 50)}...`);
-        }
+        // Batch Gemini query - tek seferde tüm kategoriler için sorgular üret
+        const batchQueries = await generateBatchSearchQueries(requiredCategories, {
+          cvData: {
+            name: cvData.personalInfo?.name,
+            profession: cvData.personalInfo?.title || cvData.summary?.split('.')[0]?.substring(0, 50),
+            industry: cvData.experience?.[0]?.company,
+            skills: cvData.skills?.slice(0, 5).map((s: any) => typeof s === 'string' ? s : s.name),
+            summary: cvData.summary
+          },
+          templateStyle: designPlan.style || 'modern',
+          themeColors: designPlan.themeColors ? {
+            primary: designPlan.themeColors.primary,
+            secondary: designPlan.themeColors.secondary,
+            isDarkTheme: designPlan.themeColors.background?.startsWith('#0') || designPlan.themeColors.background?.startsWith('#1')
+          } : undefined
+        });
+
+        // Paralel stock photo fetch - tüm kategoriler için aynı anda
+        const photoPromises = requiredCategories.map(async (category) => {
+          const categoryConfig = STOCK_PHOTO_CATEGORIES[category];
+          const queries = batchQueries[category]?.queries || categoryConfig.defaultQueries;
+
+          console.log(`🖼️ Fetching ${category} stock photo with queries: ${queries.join(', ')}`);
+
+          // Pexels'de ara
+          const candidates = await searchMultipleQueries(queries, {
+            orientation: categoryConfig?.orientation || 'landscape',
+            perPage: 5,
+            minWidth: categoryConfig?.minWidth || 1280
+          });
+
+          if (candidates.length === 0) {
+            throw new Error(`No photos found for ${category}`);
+          }
+
+          // Algoritmik seçim
+          const selectedPhoto = selectBestPhotoAlgorithmic(
+            candidates,
+            designPlan.themeColors?.primary || '#2563eb',
+            categoryConfig?.orientation === 'landscape'
+          );
+
+          return {
+            category,
+            photo: {
+              url: selectedPhoto.src.large2x || selectedPhoto.src.large || selectedPhoto.src.original,
+              alt: selectedPhoto.alt || `Professional ${category} image`,
+              photographer: selectedPhoto.photographer,
+              pexelsId: selectedPhoto.id,
+              avgColor: selectedPhoto.avg_color,
+              source: 'pexels'
+            }
+          };
+        });
+
+        console.log(`🖼️ Fetching ${photoPromises.length} stock photos in parallel...`);
+        const results = await Promise.all(photoPromises);
+
+        // Sonuçları stockImages objesine ekle
+        const stockImages: Record<string, any> = {};
+        results.forEach(r => {
+          stockImages[r.category] = r.photo;
+          console.log(`✅ ${r.category} stock photo: ${r.photo.url.substring(0, 50)}...`);
+        });
 
         // designPlan'a stockImages ekle
         designPlan.stockImages = stockImages;
