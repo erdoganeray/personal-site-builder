@@ -114,79 +114,90 @@ export default async function Home() {
       </div>
 
       {/* Hero Section */}
-      <section className="relative pt-40 pb-24 px-4 overflow-hidden min-h-[90vh] flex flex-col justify-center">
+      <section className="relative pt-24 pb-16 px-4 overflow-hidden">
         {/* Background Gradients */}
         <div className="absolute top-0 left-1/2 -translate-x-1/2 w-[1000px] h-[500px] bg-purple-600/20 rounded-full blur-[120px] -z-10 animate-pulse" style={{ animationDuration: '4s' }} />
         <div className="absolute bottom-0 right-0 w-[800px] h-[600px] bg-blue-600/10 rounded-full blur-[100px] -z-10" />
 
-        <div className="max-w-4xl mx-auto text-center mb-12">
-          <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-white/5 border border-white/10 mb-8 animate-fade-in backdrop-blur-sm">
-            <span className="relative flex h-2 w-2">
-              <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-green-400 opacity-75"></span>
-              <span className="relative inline-flex rounded-full h-2 w-2 bg-green-500"></span>
-            </span>
-            <span className="text-xs font-medium text-gray-300">Yapay Zeka Destekli Site Oluşturucu</span>
+        <div className="max-w-5xl mx-auto">
+          {/* Badge */}
+          <div className="flex justify-center mb-6 animate-fade-in">
+            <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-white/5 border border-white/10 backdrop-blur-sm">
+              <span className="relative flex h-2 w-2">
+                <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-green-400 opacity-75"></span>
+                <span className="relative inline-flex rounded-full h-2 w-2 bg-green-500"></span>
+              </span>
+              <span className="text-xs font-medium text-gray-300">Yapay Zeka Destekli Site Oluşturucu</span>
+            </div>
           </div>
 
-          <h1 className="text-5xl md:text-7xl font-bold text-white mb-8 leading-tight tracking-tight animate-slide-up">
-            Hayalinizdeki Siteyi <br />
+          {/* Main Heading */}
+          <h1 className="text-4xl md:text-5xl lg:text-6xl font-bold text-white mb-4 leading-tight tracking-tight text-center animate-slide-up">
+            Hayalinizdeki Siteyi{" "}
             <span className="text-transparent bg-clip-text bg-gradient-to-r from-purple-400 via-pink-400 to-blue-400">
               Saniyeler İçinde
             </span>{" "}
             Kurun
           </h1>
 
-          <p className="text-lg text-gray-400 mb-12 max-w-2xl mx-auto animate-slide-up animation-delay-100">
+          {/* Subtitle */}
+          <p className="text-base md:text-lg text-gray-400 mb-8 text-center max-w-3xl mx-auto animate-slide-up animation-delay-100">
             Kodlama veya tasarım bilgisine ihtiyacınız yok. Sadece ne istediğinizi söyleyin veya CV'nizi yükleyin, gerisini Profilly halletsin.
           </p>
 
-          {/* Interactive Mock UI */}
-          <div className="relative max-w-2xl mx-auto bg-[#1a1a1a] rounded-2xl border border-white/10 p-2 shadow-2xl animate-scale-in group hover:border-purple-500/20 transition-colors duration-500">
-            <div className="bg-[#0a0a0a] rounded-xl border border-white/5 p-4 relative overflow-hidden">
-              {/* "Active" border effect explanation: The border-white/5 is subtle, but we add a glow on focus/hover */}
-              <div className="flex items-start gap-4 relatie z-10">
-                <div className="mt-3">
-                  <div className="w-8 h-8 rounded-full bg-gradient-to-br from-purple-500 to-blue-500 flex items-center justify-center">
-                    <Sparkles className="w-4 h-4 text-white" />
+          {/* Simplified Prompt Input */}
+          <div className="max-w-3xl mx-auto mb-8 animate-scale-in">
+            <div className="relative group">
+              <div className="flex items-center gap-3 bg-[#1a1a1a]/80 backdrop-blur-xl border border-white/10 rounded-2xl p-2 shadow-2xl hover:border-purple-500/30 transition-all duration-300">
+                {/* Sparkles Icon */}
+                <div className="flex-shrink-0 ml-2">
+                  <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-purple-500/20 to-blue-500/20 flex items-center justify-center">
+                    <Sparkles className="w-5 h-5 text-purple-400" />
                   </div>
                 </div>
-                <div className="flex-1">
-                  <div className="text-left mb-2">
-                    <p className="text-purple-400 text-xs font-semibold tracking-wide uppercase">AI Prompt</p>
-                  </div>
-                  <textarea
-                    className="w-full bg-transparent text-gray-200 text-lg resize-none focus:outline-none min-h-[80px] placeholder-gray-600"
-                    placeholder="Yazılım mühendisiyim. Modern, karanlık temalı ve projelerimi vitrinleyebileceğim minimalist bir portfolyo sitesi oluştur..."
-                    spellCheck={false}
-                  />
-                </div>
+
+                {/* Input Field */}
+                <input
+                  type="text"
+                  placeholder="Yazılım mühendisiyim. Modern, karanlık temalı ve projelerimi vitrinleyebileceğim minimalist bir portfolyo sitesi oluştur..."
+                  className="flex-1 bg-transparent text-white text-base md:text-lg placeholder-gray-500 focus:outline-none py-2"
+                />
+
+                {/* File Upload Button */}
+                <button className="flex-shrink-0 p-2.5 rounded-xl hover:bg-white/5 transition-colors group/upload">
+                  <Paperclip className="w-5 h-5 text-gray-400 group-hover/upload:text-purple-400 transition-colors" />
+                </button>
+
+                {/* Generate Button */}
+                <button className="flex-shrink-0 flex items-center gap-2 px-6 py-3 bg-gradient-to-r from-purple-600 to-blue-600 hover:from-purple-500 hover:to-blue-500 text-white font-semibold rounded-xl transition-all transform hover:scale-105 active:scale-95 shadow-lg shadow-purple-500/25">
+                  <span className="hidden sm:inline">Oluştur</span>
+                  <ArrowRight className="w-5 h-5" />
+                </button>
               </div>
 
-              <div className="flex flex-col sm:flex-row justify-between items-center mt-4 pt-4 border-t border-white/5 gap-4">
-                <div className="flex items-center gap-4 w-full sm:w-auto">
-                  <button className="flex items-center gap-2 text-gray-400 hover:text-white transition-colors group/btn px-3 py-1.5 rounded-lg hover:bg-white/5 w-full sm:w-auto justify-center sm:justify-start">
-                    <Paperclip className="w-4 h-4 group-hover/btn:text-purple-400 transition-colors" />
-                    <span className="text-sm">Dosya Ekle</span>
-                  </button>
-                  <span className="text-xs text-gray-600 hidden sm:inline">PDF</span>
-                </div>
-
-                <div className="flex items-center gap-3 w-full sm:w-auto">
-                  <button className="flex items-center justify-center gap-2 px-4 py-2 bg-white/5 text-gray-300 font-medium rounded-lg hover:bg-white/10 transition-all hover:text-white w-full sm:w-auto">
-                    <Dices className="w-4 h-4" />
-                    <span className="text-sm">Şanslı Hissediyorum</span>
-                  </button>
-                  <button className="flex items-center justify-center gap-2 px-6 py-2 bg-white text-black font-semibold rounded-lg hover:bg-gray-200 transition-all active:scale-95 w-full sm:w-auto shadow-lg shadow-white/5">
-                    <Sparkles className="w-4 h-4" />
-                    <span>Oluştur</span>
-                  </button>
-                </div>
-              </div>
+              {/* Supported formats text */}
+              <p className="text-xs text-gray-500 text-center mt-3">
+                Desteklenen formatlar: PDF (Maks 5MB)
+              </p>
             </div>
+          </div>
 
-            {/* Decorative Elements */}
-            <div className="absolute -top-20 -right-20 w-40 h-40 bg-purple-500/10 rounded-full blur-3xl pointer-events-none" />
-            <div className="absolute -bottom-20 -left-20 w-40 h-40 bg-blue-500/10 rounded-full blur-3xl pointer-events-none" />
+          {/* Role Suggestions */}
+          <div className="flex flex-wrap justify-center gap-3 max-w-4xl mx-auto animate-fade-in animation-delay-200">
+            {[
+              { icon: "💻", label: "Yazılım Mühendisi" },
+              { icon: "🎨", label: "Kreatif Direktör" },
+              { icon: "📱", label: "Pazarlama Uzmanı" },
+              { icon: "🚀", label: "Ürün Yöneticisi" }
+            ].map((role, i) => (
+              <button
+                key={i}
+                className="inline-flex items-center gap-2 px-4 py-2 bg-white/5 hover:bg-white/10 border border-white/10 hover:border-purple-500/30 rounded-full text-sm text-gray-300 hover:text-white transition-all"
+              >
+                <span>{role.icon}</span>
+                <span>{role.label}</span>
+              </button>
+            ))}
           </div>
         </div>
       </section>

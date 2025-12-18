@@ -37,10 +37,6 @@
 - landing sitenin tüm makyajını güncelle
 - yeniden yayınla ui nın tasarımını unutma
 - landing page için seo geliştirmesi
-
-### Landing Page
-- sss eklenecek
-- night/day
 - multi languages
 - showcase
 
