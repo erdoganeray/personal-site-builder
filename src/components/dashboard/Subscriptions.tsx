@@ -3,6 +3,19 @@
 import { useEffect, useState } from "react";
 import { toast } from "@/components/ui/Toast";
 import ConfirmDialog from "@/components/ui/ConfirmDialog";
+import {
+    CreditCard,
+    Edit3,
+    HardDrive,
+    Clock,
+    Globe,
+    Check,
+    X,
+    Crown,
+    Zap,
+    ExternalLink,
+    XCircle
+} from "lucide-react";
 
 interface SubscriptionInfo {
     plan: {
@@ -156,13 +169,13 @@ export default function Subscriptions() {
     const renderFeatureValue = (value: string | boolean) => {
         if (typeof value === "boolean") {
             return value ? (
-                <svg className="h-5 w-5 text-green-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
-                </svg>
+                <div className="w-6 h-6 rounded-full bg-green-500/20 flex items-center justify-center">
+                    <Check className="h-4 w-4 text-green-400" />
+                </div>
             ) : (
-                <svg className="h-5 w-5 text-red-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
-                </svg>
+                <div className="w-6 h-6 rounded-full bg-red-500/20 flex items-center justify-center">
+                    <X className="h-4 w-4 text-red-400" />
+                </div>
             );
         }
         return <span className="text-sm text-gray-300">{value}</span>;
@@ -172,72 +185,62 @@ export default function Subscriptions() {
         return (
             <div className="space-y-6">
                 <div>
-                    <h2 className="text-2xl font-bold text-white mb-2">Aboneliklerim</h2>
+                    <h2 className="text-2xl font-bold text-white mb-2">Faturalandırma</h2>
                     <p className="text-gray-400">Plan bilgilerinizi ve kullanım durumunuzu görüntüleyin</p>
                 </div>
 
                 {/* Skeleton for Current Plan Card */}
-                <div className="bg-gradient-to-br from-blue-900/50 to-purple-900/50 rounded-xl border border-blue-700 p-6 animate-pulse">
-                    <div className="flex items-center justify-between mb-4">
-                        <div>
-                            <div className="h-8 bg-gray-700 rounded w-32 mb-2"></div>
-                            <div className="h-5 bg-gray-700 rounded w-20"></div>
-                        </div>
-                        <div className="h-10 bg-gray-700 rounded-full w-32"></div>
-                    </div>
+                <div className="relative bg-[#1a1a1a]/60 backdrop-blur-xl rounded-2xl border border-white/10 p-6 animate-pulse overflow-hidden">
+                    {/* Background Gradient Effects */}
+                    <div className="absolute top-0 right-0 w-64 h-64 bg-purple-500/10 rounded-full blur-[80px] -mr-32 -mt-32" />
+                    <div className="absolute bottom-0 left-0 w-48 h-48 bg-blue-500/10 rounded-full blur-[60px] -ml-24 -mb-24" />
 
-                    {/* Skeleton for Usage Stats */}
-                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-6">
-                        <div className="bg-gray-800/50 rounded-lg p-4">
-                            <div className="h-4 bg-gray-700 rounded w-32 mb-2"></div>
-                            <div className="h-10 bg-gray-700 rounded w-24 mb-2"></div>
-                            <div className="h-2 bg-gray-700 rounded mb-2"></div>
-                            <div className="h-3 bg-gray-700 rounded w-40"></div>
+                    <div className="relative z-10">
+                        <div className="flex items-center justify-between mb-4">
+                            <div>
+                                <div className="h-8 bg-white/10 rounded-lg w-32 mb-2"></div>
+                                <div className="h-5 bg-white/10 rounded-lg w-20"></div>
+                            </div>
+                            <div className="h-10 bg-white/10 rounded-xl w-32"></div>
                         </div>
-                        <div className="bg-gray-800/50 rounded-lg p-4">
-                            <div className="h-4 bg-gray-700 rounded w-32 mb-2"></div>
-                            <div className="h-10 bg-gray-700 rounded w-24 mb-2"></div>
-                            <div className="h-2 bg-gray-700 rounded mb-2"></div>
-                            <div className="h-3 bg-gray-700 rounded w-40"></div>
-                        </div>
-                        <div className="bg-gray-800/50 rounded-lg p-4">
-                            <div className="h-4 bg-gray-700 rounded w-32 mb-2"></div>
-                            <div className="h-10 bg-gray-700 rounded w-24 mb-2"></div>
-                            <div className="h-3 bg-gray-700 rounded w-40 mt-2"></div>
-                        </div>
-                        <div className="bg-gray-800/50 rounded-lg p-4 md:col-span-2">
-                            <div className="h-4 bg-gray-700 rounded w-32 mb-2"></div>
-                            <div className="h-8 bg-gray-700 rounded w-24 mb-2"></div>
-                            <div className="h-3 bg-gray-700 rounded w-48"></div>
+
+                        {/* Skeleton for Usage Stats */}
+                        <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-6">
+                            {[1, 2, 3, 4].map((i) => (
+                                <div key={i} className={`bg-[#0f0f0f]/80 rounded-xl p-4 border border-white/5 ${i === 4 ? 'md:col-span-2' : ''}`}>
+                                    <div className="h-4 bg-white/10 rounded w-32 mb-2"></div>
+                                    <div className="h-10 bg-white/10 rounded w-24 mb-2"></div>
+                                    <div className="h-2 bg-white/10 rounded mb-2"></div>
+                                    <div className="h-3 bg-white/10 rounded w-40"></div>
+                                </div>
+                            ))}
                         </div>
                     </div>
                 </div>
 
                 {/* Skeleton for Plan Comparison */}
                 <div>
-                    <div className="h-7 bg-gray-700 rounded w-48 mb-4"></div>
+                    <div className="h-7 bg-white/10 rounded-lg w-48 mb-4"></div>
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                        <div className="bg-gray-800 rounded-xl border border-gray-700 p-6">
-                            <div className="h-6 bg-gray-700 rounded w-24 mb-2"></div>
-                            <div className="h-10 bg-gray-700 rounded w-20 mb-4"></div>
-                        </div>
-                        <div className="bg-gray-800 rounded-xl border border-gray-700 p-6">
-                            <div className="h-6 bg-gray-700 rounded w-24 mb-2"></div>
-                            <div className="h-10 bg-gray-700 rounded w-20 mb-4"></div>
-                        </div>
+                        {[1, 2].map((i) => (
+                            <div key={i} className="bg-[#1a1a1a]/60 backdrop-blur-xl rounded-2xl border border-white/10 p-6">
+                                <div className="h-6 bg-white/10 rounded w-24 mb-2"></div>
+                                <div className="h-10 bg-white/10 rounded w-20 mb-4"></div>
+                            </div>
+                        ))}
                     </div>
 
                     {/* Skeleton for Feature Table */}
-                    <div className="mt-6 bg-gray-800 rounded-xl border border-gray-700 overflow-hidden">
-                        <div className="bg-gray-700 p-4">
-                            <div className="h-5 bg-gray-600 rounded w-32"></div>
+                    <div className="mt-6 bg-[#1a1a1a]/60 backdrop-blur-xl rounded-2xl border border-white/10 overflow-hidden">
+                        <div className="bg-[#0f0f0f]/80 p-4 border-b border-white/5">
+                            <div className="h-5 bg-white/10 rounded w-32"></div>
                         </div>
-                        <div className="divide-y divide-gray-700">
+                        <div className="divide-y divide-white/5">
                             {[1, 2, 3, 4, 5].map((i) => (
                                 <div key={i} className="p-4 flex gap-4">
-                                    <div className="h-4 bg-gray-700 rounded flex-1"></div>
-                                    <div className="h-4 bg-gray-700 rounded w-20"></div>
-                                    <div className="h-4 bg-gray-700 rounded w-20"></div>
+                                    <div className="h-4 bg-white/10 rounded flex-1"></div>
+                                    <div className="h-4 bg-white/10 rounded w-20"></div>
+                                    <div className="h-4 bg-white/10 rounded w-20"></div>
                                 </div>
                             ))}
                         </div>
@@ -251,7 +254,7 @@ export default function Subscriptions() {
         return (
             <div className="space-y-6">
                 <div>
-                    <h2 className="text-2xl font-bold text-white mb-2">Aboneliklerim</h2>
+                    <h2 className="text-2xl font-bold text-white mb-2">Faturalandırma</h2>
                     <p className="text-gray-400">Abonelik bilgileri yüklenemedi.</p>
                 </div>
             </div>
@@ -263,119 +266,157 @@ export default function Subscriptions() {
     return (
         <div className="space-y-6">
             <div>
-                <h2 className="text-2xl font-bold text-white mb-2">Aboneliklerim</h2>
+                <h2 className="text-2xl font-bold text-white mb-2">Faturalandırma</h2>
                 <p className="text-gray-400">Plan bilgilerinizi ve kullanım durumunuzu görüntüleyin</p>
             </div>
 
-            {/* Current Plan */}
-            <div className="bg-gradient-to-br from-blue-900/50 to-purple-900/50 rounded-xl border border-blue-700 p-6">
-                <div className="flex items-center justify-between mb-4">
-                    <div>
-                        <h3 className="text-2xl font-bold text-white mb-1">{subscriptionInfo.plan.name}</h3>
-                        <p className="text-blue-300">{subscriptionInfo.plan.price} TL/ay</p>
-                    </div>
-                    <div className="bg-blue-600 text-white px-4 py-2 rounded-full font-semibold">
-                        Mevcut Plan
-                    </div>
-                </div>
+            {/* Current Plan Card */}
+            <div className="relative bg-[#1a1a1a]/60 backdrop-blur-xl rounded-2xl border border-white/10 p-6 overflow-hidden">
+                {/* Background Gradient Effects */}
+                <div className="absolute top-0 right-0 w-64 h-64 bg-purple-500/10 rounded-full blur-[80px] -mr-32 -mt-32" />
+                <div className="absolute bottom-0 left-0 w-48 h-48 bg-blue-500/10 rounded-full blur-[60px] -ml-24 -mb-24" />
 
-                {/* Usage Stats */}
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-6">
-                    {/* Edit Rights */}
-                    <div className="bg-gray-800/50 rounded-lg p-4">
-                        <p className="text-gray-400 text-sm mb-1">Kalan Düzenleme Hakkı</p>
-                        <p className="text-3xl font-bold text-white">
-                            {subscriptionInfo.usage.edits.remaining}/{subscriptionInfo.usage.edits.limit}
-                        </p>
-                        <div className="mt-2 bg-gray-700 rounded-full h-2">
-                            <div
-                                className="bg-blue-600 h-2 rounded-full"
-                                style={{
-                                    width: `${(subscriptionInfo.usage.edits.remaining / subscriptionInfo.usage.edits.limit) * 100
-                                        }%`,
-                                }}
-                            ></div>
-                        </div>
-                        <p className="text-xs text-gray-500 mt-2">
-                            Yenileme: {formatDate(subscriptionInfo.usage.edits.resetDate)}
-                        </p>
-                    </div>
-
-                    {/* Storage */}
-                    <div className="bg-gray-800/50 rounded-lg p-4">
-                        <p className="text-gray-400 text-sm mb-1">Depolama Kullanımı</p>
-                        <p className="text-3xl font-bold text-white">
-                            {subscriptionInfo.usage.storage.usedMB.toFixed(2)} MB
-                        </p>
-                        <div className="mt-2 bg-gray-700 rounded-full h-2">
-                            <div
-                                className="bg-green-600 h-2 rounded-full"
-                                style={{
-                                    width: `${(subscriptionInfo.usage.storage.usedMB / subscriptionInfo.usage.storage.limitMB) * 100
-                                        }%`,
-                                }}
-                            ></div>
-                        </div>
-                        <p className="text-xs text-gray-500 mt-2">
-                            Limit: {subscriptionInfo.usage.storage.limitMB.toFixed(0)} MB
-                        </p>
-                    </div>
-
-                    {/* Version History (Dummy) */}
-                    <div className="bg-gray-800/50 rounded-lg p-4">
-                        <p className="text-gray-400 text-sm mb-1">Version History</p>
-                        <p className="text-3xl font-bold text-white">{subscriptionInfo.plan.limits.versionHistory}</p>
-                        <p className="text-xs text-gray-500 mt-2">Versiyon geçmişi (yakında)</p>
-                    </div>
-
-                    {/* Domain Reservation (Dummy) */}
-                    <div className="bg-gray-800/50 rounded-lg p-4 md:col-span-2">
-                        <p className="text-gray-400 text-sm mb-1">Domain Rezervasyonu</p>
-                        <p className="text-2xl font-bold text-white">
-                            {subscriptionInfo.plan.limits.domainReservationDays} gün
-                        </p>
-                        <p className="text-xs text-gray-500 mt-2">Domain rezervasyon süresi (yakında)</p>
-                    </div>
-                </div>
-
-                {/* Publish/Unpublish Buttons */}
-                {subscriptionInfo.sites.total > 0 && (
-                    <div className="space-y-3 mt-4">
-                        <h4 className="text-lg font-semibold text-white">Site Yönetimi</h4>
-                        {subscriptionInfo.sites.publishedUrls.map((site) => (
-                            <div key={site.id} className="bg-gray-700/50 rounded-lg p-4">
-                                {site.url ? (
-                                    <>
-                                        <p className="text-sm text-gray-400 mb-2">Yayınlanan Site:</p>
-                                        <a
-                                            href={site.url}
-                                            target="_blank"
-                                            rel="noopener noreferrer"
-                                            className="text-green-400 hover:text-green-300 underline break-all block mb-3"
-                                        >
-                                            {site.url}
-                                        </a>
-                                        <button
-                                            onClick={() => handleUnpublish(site.id)}
-                                            disabled={unpublishing}
-                                            className="w-full bg-red-600 hover:bg-red-700 disabled:bg-gray-400 text-white font-bold py-3 px-6 rounded-lg transition-colors duration-200"
-                                        >
-                                            {unpublishing ? "Kaldırılıyor..." : "Yayından Kaldır"}
-                                        </button>
-                                    </>
-                                ) : (
-                                    <button
-                                        onClick={() => handlePublish(site.id)}
-                                        disabled={publishing}
-                                        className="w-full bg-gradient-to-r from-green-600 to-emerald-600 hover:from-green-700 hover:to-emerald-700 disabled:from-gray-400 disabled:to-gray-500 text-white font-bold py-3 px-6 rounded-lg transition-all duration-200"
-                                    >
-                                        {publishing ? "Yayınlanıyor..." : "Beğendim, Yayınla!"}
-                                    </button>
-                                )}
+                <div className="relative z-10">
+                    <div className="flex items-center justify-between mb-6">
+                        <div className="flex items-center gap-4">
+                            <div className="w-12 h-12 rounded-xl bg-gradient-to-br from-purple-500/20 to-blue-500/20 flex items-center justify-center border border-white/5">
+                                <CreditCard className="w-6 h-6 text-purple-400" />
                             </div>
-                        ))}
+                            <div>
+                                <h3 className="text-2xl font-bold text-white">{subscriptionInfo.plan.name}</h3>
+                                <p className="text-gray-400">{subscriptionInfo.plan.price} TL/ay</p>
+                            </div>
+                        </div>
+                        <div className="px-4 py-2 bg-gradient-to-r from-purple-600 to-blue-600 text-white rounded-xl font-semibold flex items-center gap-2 shadow-lg shadow-purple-500/20">
+                            <Crown className="w-4 h-4" />
+                            Mevcut Plan
+                        </div>
                     </div>
-                )}
+
+                    {/* Usage Stats */}
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-6">
+                        {/* Edit Rights */}
+                        <div className="bg-[#0f0f0f]/80 rounded-xl p-4 border border-white/5">
+                            <div className="flex items-center gap-3 mb-3">
+                                <div className="w-8 h-8 rounded-lg bg-gradient-to-br from-purple-500/20 to-blue-500/20 flex items-center justify-center border border-white/5">
+                                    <Edit3 className="w-4 h-4 text-purple-400" />
+                                </div>
+                                <p className="text-gray-400 text-sm">Kalan Düzenleme Hakkı</p>
+                            </div>
+                            <p className="text-3xl font-bold text-white mb-2">
+                                {subscriptionInfo.usage.edits.remaining}/{subscriptionInfo.usage.edits.limit}
+                            </p>
+                            <div className="bg-[#1a1a1a] rounded-full h-2 overflow-hidden">
+                                <div
+                                    className="bg-gradient-to-r from-purple-600 to-blue-600 h-2 rounded-full transition-all duration-300"
+                                    style={{
+                                        width: `${(subscriptionInfo.usage.edits.remaining / subscriptionInfo.usage.edits.limit) * 100}%`,
+                                    }}
+                                ></div>
+                            </div>
+                            <p className="text-xs text-gray-500 mt-2">
+                                Yenileme: {formatDate(subscriptionInfo.usage.edits.resetDate)}
+                            </p>
+                        </div>
+
+                        {/* Storage */}
+                        <div className="bg-[#0f0f0f]/80 rounded-xl p-4 border border-white/5">
+                            <div className="flex items-center gap-3 mb-3">
+                                <div className="w-8 h-8 rounded-lg bg-gradient-to-br from-green-500/20 to-emerald-500/20 flex items-center justify-center border border-white/5">
+                                    <HardDrive className="w-4 h-4 text-green-400" />
+                                </div>
+                                <p className="text-gray-400 text-sm">Depolama Kullanımı</p>
+                            </div>
+                            <p className="text-3xl font-bold text-white mb-2">
+                                {subscriptionInfo.usage.storage.usedMB.toFixed(2)} MB
+                            </p>
+                            <div className="bg-[#1a1a1a] rounded-full h-2 overflow-hidden">
+                                <div
+                                    className="bg-gradient-to-r from-green-500 to-emerald-500 h-2 rounded-full transition-all duration-300"
+                                    style={{
+                                        width: `${(subscriptionInfo.usage.storage.usedMB / subscriptionInfo.usage.storage.limitMB) * 100}%`,
+                                    }}
+                                ></div>
+                            </div>
+                            <p className="text-xs text-gray-500 mt-2">
+                                Limit: {subscriptionInfo.usage.storage.limitMB.toFixed(0)} MB
+                            </p>
+                        </div>
+
+                        {/* Version History */}
+                        <div className="bg-[#0f0f0f]/80 rounded-xl p-4 border border-white/5">
+                            <div className="flex items-center gap-3 mb-3">
+                                <div className="w-8 h-8 rounded-lg bg-gradient-to-br from-amber-500/20 to-orange-500/20 flex items-center justify-center border border-white/5">
+                                    <Clock className="w-4 h-4 text-amber-400" />
+                                </div>
+                                <p className="text-gray-400 text-sm">Versiyon Geçmişi</p>
+                            </div>
+                            <p className="text-3xl font-bold text-white">{subscriptionInfo.plan.limits.versionHistory}</p>
+                            <p className="text-xs text-gray-500 mt-2">Versiyon geçmişi (yakında)</p>
+                        </div>
+
+                        {/* Domain Reservation */}
+                        <div className="bg-[#0f0f0f]/80 rounded-xl p-4 border border-white/5">
+                            <div className="flex items-center gap-3 mb-3">
+                                <div className="w-8 h-8 rounded-lg bg-gradient-to-br from-cyan-500/20 to-blue-500/20 flex items-center justify-center border border-white/5">
+                                    <Globe className="w-4 h-4 text-cyan-400" />
+                                </div>
+                                <p className="text-gray-400 text-sm">Domain Rezervasyonu</p>
+                            </div>
+                            <p className="text-2xl font-bold text-white">
+                                {subscriptionInfo.plan.limits.domainReservationDays} gün
+                            </p>
+                            <p className="text-xs text-gray-500 mt-2">Domain rezervasyon süresi (yakında)</p>
+                        </div>
+                    </div>
+
+                    {/* Publish/Unpublish Buttons */}
+                    {subscriptionInfo.sites.total > 0 && (
+                        <div className="space-y-3">
+                            <div className="flex items-center gap-3">
+                                <div className="w-8 h-8 rounded-lg bg-gradient-to-br from-purple-500/20 to-blue-500/20 flex items-center justify-center border border-white/5">
+                                    <Zap className="w-4 h-4 text-purple-400" />
+                                </div>
+                                <h4 className="text-lg font-semibold text-white">Site Yönetimi</h4>
+                            </div>
+                            {subscriptionInfo.sites.publishedUrls.map((site) => (
+                                <div key={site.id} className="bg-[#0f0f0f]/80 rounded-xl p-4 border border-white/5">
+                                    {site.url ? (
+                                        <>
+                                            <p className="text-sm text-gray-400 mb-2">Yayınlanan Site:</p>
+                                            <a
+                                                href={site.url}
+                                                target="_blank"
+                                                rel="noopener noreferrer"
+                                                className="text-green-400 hover:text-green-300 underline break-all block mb-3 flex items-center gap-2"
+                                            >
+                                                {site.url}
+                                                <ExternalLink className="w-4 h-4 flex-shrink-0" />
+                                            </a>
+                                            <button
+                                                onClick={() => handleUnpublish(site.id)}
+                                                disabled={unpublishing}
+                                                className="w-full bg-red-500/10 hover:bg-red-500/20 border border-red-500/30 hover:border-red-500/50 disabled:opacity-50 text-red-400 hover:text-red-300 font-bold py-3 px-6 rounded-xl transition-all duration-200 flex items-center justify-center gap-2"
+                                            >
+                                                <XCircle className="w-5 h-5" />
+                                                {unpublishing ? "Kaldırılıyor..." : "Yayından Kaldır"}
+                                            </button>
+                                        </>
+                                    ) : (
+                                        <button
+                                            onClick={() => handlePublish(site.id)}
+                                            disabled={publishing}
+                                            className="w-full bg-gradient-to-r from-green-600 to-emerald-600 hover:from-green-500 hover:to-emerald-500 disabled:from-gray-600 disabled:to-gray-700 text-white font-bold py-3 px-6 rounded-xl transition-all duration-200 flex items-center justify-center gap-2 shadow-lg shadow-green-500/20"
+                                        >
+                                            <Zap className="w-5 h-5" />
+                                            {publishing ? "Yayınlanıyor..." : "Beğendim, Yayınla!"}
+                                        </button>
+                                    )}
+                                </div>
+                            ))}
+                        </div>
+                    )}
+                </div>
             </div>
 
             {/* Plan Comparison */}
@@ -384,74 +425,94 @@ export default function Subscriptions() {
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                     {/* Free Plan */}
                     <div
-                        className={`rounded-xl border p-6 transition-all duration-200 ${isFree
-                            ? "bg-gradient-to-br from-blue-900/30 to-purple-900/30 border-blue-600"
-                            : "bg-gray-800 border-gray-700"
+                        className={`relative rounded-2xl border p-6 transition-all duration-200 overflow-hidden ${isFree
+                            ? "bg-[#1a1a1a]/60 backdrop-blur-xl border-purple-500/30"
+                            : "bg-[#1a1a1a]/60 backdrop-blur-xl border-white/10"
                             }`}
                     >
-                        <div className="mb-4">
-                            <h4 className="text-xl font-bold text-white mb-2">Free Plan</h4>
-                            <div className="flex items-baseline">
-                                <span className="text-3xl font-bold text-white">0 TL</span>
-                                <span className="text-gray-400 ml-1">/ay</span>
-                            </div>
-                        </div>
-
                         {isFree && (
-                            <div className="bg-blue-600 text-white px-3 py-1 rounded-full text-sm font-semibold inline-block mb-4">
-                                Mevcut Plan
-                            </div>
+                            <>
+                                <div className="absolute top-0 right-0 w-48 h-48 bg-purple-500/10 rounded-full blur-[60px] -mr-24 -mt-24" />
+                                <div className="absolute bottom-0 left-0 w-32 h-32 bg-blue-500/10 rounded-full blur-[40px] -ml-16 -mb-16" />
+                            </>
                         )}
+                        <div className="relative z-10">
+                            <div className="mb-4">
+                                <h4 className="text-xl font-bold text-white mb-2">Free Plan</h4>
+                                <div className="flex items-baseline">
+                                    <span className="text-3xl font-bold text-white">0 TL</span>
+                                    <span className="text-gray-400 ml-1">/ay</span>
+                                </div>
+                            </div>
+
+                            {isFree && (
+                                <div className="px-4 py-2 bg-gradient-to-r from-purple-600 to-blue-600 text-white rounded-xl text-sm font-semibold inline-flex items-center gap-2 shadow-lg shadow-purple-500/20">
+                                    <Crown className="w-4 h-4" />
+                                    Mevcut Plan
+                                </div>
+                            )}
+                        </div>
                     </div>
 
                     {/* Paid Plan */}
                     <div
-                        className={`rounded-xl border p-6 transition-all duration-200 ${!isFree
-                            ? "bg-gradient-to-br from-blue-900/30 to-purple-900/30 border-blue-600"
-                            : "bg-gray-800 border-gray-700"
+                        className={`relative rounded-2xl border p-6 transition-all duration-200 overflow-hidden ${!isFree
+                            ? "bg-[#1a1a1a]/60 backdrop-blur-xl border-purple-500/30"
+                            : "bg-[#1a1a1a]/60 backdrop-blur-xl border-white/10"
                             }`}
                     >
-                        <div className="mb-4">
-                            <h4 className="text-xl font-bold text-white mb-2">Paid Plan</h4>
-                            <div className="flex items-baseline">
-                                <span className="text-3xl font-bold text-white">150 TL</span>
-                                <span className="text-gray-400 ml-1">/ay</span>
-                            </div>
-                        </div>
-
                         {!isFree && (
-                            <div className="bg-blue-600 text-white px-3 py-1 rounded-full text-sm font-semibold inline-block mb-4">
-                                Mevcut Plan
+                            <>
+                                <div className="absolute top-0 right-0 w-48 h-48 bg-purple-500/10 rounded-full blur-[60px] -mr-24 -mt-24" />
+                                <div className="absolute bottom-0 left-0 w-32 h-32 bg-blue-500/10 rounded-full blur-[40px] -ml-16 -mb-16" />
+                            </>
+                        )}
+                        <div className="relative z-10">
+                            <div className="mb-4">
+                                <h4 className="text-xl font-bold text-white mb-2">Pro Plan</h4>
+                                <div className="flex items-baseline">
+                                    <span className="text-3xl font-bold text-white">150 TL</span>
+                                    <span className="text-gray-400 ml-1">/ay</span>
+                                </div>
                             </div>
-                        )}
 
-                        {isFree && (
-                            <button
-                                disabled
-                                className="w-full mt-4 bg-gray-700 text-gray-400 cursor-not-allowed py-3 px-4 rounded-lg font-semibold"
-                            >
-                                Yakında
-                            </button>
-                        )}
+                            {!isFree ? (
+                                <div className="px-4 py-2 bg-gradient-to-r from-purple-600 to-blue-600 text-white rounded-xl text-sm font-semibold inline-flex items-center gap-2 shadow-lg shadow-purple-500/20">
+                                    <Crown className="w-4 h-4" />
+                                    Mevcut Plan
+                                </div>
+                            ) : (
+                                <button
+                                    disabled
+                                    className="w-full mt-4 py-3 px-4 rounded-xl font-semibold bg-white/5 border border-white/10 text-gray-500 cursor-not-allowed"
+                                >
+                                    Yakında
+                                </button>
+                            )}
+                        </div>
                     </div>
                 </div>
 
                 {/* Feature Comparison Table */}
-                <div className="mt-6 bg-gray-800 rounded-xl border border-gray-700 overflow-hidden">
+                <div className="mt-6 bg-[#1a1a1a]/60 backdrop-blur-xl rounded-2xl border border-white/10 overflow-hidden">
                     <table className="w-full">
-                        <thead className="bg-gray-700">
+                        <thead className="bg-[#0f0f0f]/80 border-b border-white/5">
                             <tr>
-                                <th className="px-6 py-3 text-left text-sm font-semibold text-white">Özellik</th>
-                                <th className="px-6 py-3 text-center text-sm font-semibold text-white">Free Plan</th>
-                                <th className="px-6 py-3 text-center text-sm font-semibold text-white">Paid Plan</th>
+                                <th className="px-6 py-4 text-left text-sm font-semibold text-white">Özellik</th>
+                                <th className="px-6 py-4 text-center text-sm font-semibold text-white">Free Plan</th>
+                                <th className="px-6 py-4 text-center text-sm font-semibold text-white">Pro Plan</th>
                             </tr>
                         </thead>
-                        <tbody className="divide-y divide-gray-700">
+                        <tbody className="divide-y divide-white/5">
                             {subscriptionInfo.features.map((feature, index) => (
-                                <tr key={index} className="hover:bg-gray-700/50">
+                                <tr key={index} className="hover:bg-white/5 transition-colors">
                                     <td className="px-6 py-4 text-sm text-gray-300">{feature.name}</td>
-                                    <td className="px-6 py-4 text-center">{renderFeatureValue(feature.free)}</td>
-                                    <td className="px-6 py-4 text-center">{renderFeatureValue(feature.paid)}</td>
+                                    <td className="px-6 py-4">
+                                        <div className="flex justify-center">{renderFeatureValue(feature.free)}</div>
+                                    </td>
+                                    <td className="px-6 py-4">
+                                        <div className="flex justify-center">{renderFeatureValue(feature.paid)}</div>
+                                    </td>
                                 </tr>
                             ))}
                         </tbody>
