@@ -39,6 +39,7 @@
 - landing page için seo geliştirmesi
 - multi languages
 - showcase
+- dashboard hemen yükselt ekranı
 
 ## Versel Deploydan Sonra Yapılacaklar
 

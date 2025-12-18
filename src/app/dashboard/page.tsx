@@ -1,30 +1,44 @@
 "use client";
 
 import { useSession } from "next-auth/react";
-import Link from "next/link";
-import SignOutButton from "@/components/SignOutButton";
-import { useRouter } from "next/navigation";
-import { useEffect, useState } from "react";
+import { useRouter, useSearchParams } from "next/navigation";
+import { useEffect, useState, Suspense } from "react";
 import type { CVData } from "@/lib/gemini-pdf-parser";
 import DashboardMenu from "@/components/dashboard/DashboardMenu";
+import Overview from "@/components/dashboard/Overview";
 import MyInfo from "@/components/dashboard/MyInfo";
 import MySite from "@/components/dashboard/MySite";
 import Subscriptions from "@/components/dashboard/Subscriptions";
 import DomainManagement from "@/components/dashboard/DomainManagement";
 import Settings from "@/components/dashboard/Settings";
-import StorageManagement from "@/components/dashboard/StorageManagement";
 import { toast } from "@/components/ui/Toast";
 import ConfirmDialog from "@/components/ui/ConfirmDialog";
 
-export default function DashboardPage() {
+function DashboardContent() {
     const { data: session, status } = useSession();
     const router = useRouter();
+    const searchParams = useSearchParams();
+    const tabParam = searchParams.get("tab");
+
     const [site, setSite] = useState<any>(null);
     const [cvData, setCvData] = useState<CVData | null>(null);
     const [loading, setLoading] = useState(true);
     const [deleting, setDeleting] = useState(false);
-    const [activeTab, setActiveTab] = useState("my-info");
+    const [activeTab, setActiveTab] = useState(tabParam || "overview");
     const [isMenuCollapsed, setIsMenuCollapsed] = useState(false);
+
+    // Sync activeTab to URL and handle back/forward navigation
+    useEffect(() => {
+        if (tabParam && tabParam !== activeTab && ["overview", "my-info", "my-site", "subscriptions", "domain", "settings"].includes(tabParam)) {
+            setActiveTab(tabParam);
+        }
+    }, [tabParam]);
+
+    // Update URL when activeTab changes (optional but good for UX)
+    const handleTabChange = (tab: string) => {
+        setActiveTab(tab);
+        router.push(`/dashboard?tab=${tab}`, { scroll: false });
+    };
 
     // Confirm dialog state
     const [confirmDialog, setConfirmDialog] = useState<{
@@ -112,6 +126,14 @@ export default function DashboardPage() {
 
     const renderContent = () => {
         switch (activeTab) {
+            case "overview":
+                return (
+                    <Overview
+                        site={site}
+                        userName={session?.user?.name || ""}
+                        onTabChange={handleTabChange}
+                    />
+                );
             case "my-info":
                 return (
                     <MyInfo
@@ -128,18 +150,14 @@ export default function DashboardPage() {
                 return <Subscriptions />;
             case "domain":
                 return <DomainManagement />;
-            case "storage":
-                return <StorageManagement />;
             case "settings":
                 return <Settings />;
             default:
                 return (
-                    <MyInfo
+                    <Overview
                         site={site}
-                        cvData={cvData}
-                        onDelete={handleDelete}
-                        onCVAnalyzed={handleCVAnalyzed}
-                        deleting={deleting}
+                        userName={session?.user?.name || ""}
+                        onTabChange={handleTabChange}
                     />
                 );
         }
@@ -147,8 +165,7 @@ export default function DashboardPage() {
 
     if (status === "loading") {
         return (
-
-            <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-gray-900 via-gray-800 to-gray-900">
+            <div className="min-h-screen flex items-center justify-center bg-[#0a0a0a]">
                 <div className="text-white text-xl">Loading...</div>
             </div>
         );
@@ -161,40 +178,31 @@ export default function DashboardPage() {
     // İlk veri yüklenirken loading göster
     if (loading) {
         return (
-
-            <div className="min-h-screen bg-gradient-to-br from-gray-900 via-gray-800 to-gray-900">
-                <nav className="bg-gray-800 border-b border-gray-700">
-                    <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-                        <div className="flex justify-between h-16 items-center">
-                            <Link href="/" className="text-2xl font-bold bg-gradient-to-r from-purple-400 to-blue-400 bg-clip-text text-transparent">
-                                SiteBuilder AI
-                            </Link>
-                            <div className="flex items-center gap-6">
-                                <Link href="/" className="text-gray-300 hover:text-white transition-colors">
-                                    Ana Sayfa
-                                </Link>
-                                <Link href="/editor" className="text-gray-300 hover:text-white transition-colors">
-                                    Editör
-                                </Link>
-                                <div className="relative group">
-                                    <button className="px-4 py-2 text-gray-300 hover:text-white transition-colors flex items-center gap-2">
-                                        {session.user?.name || session.user?.email}
-                                        <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
-                                        </svg>
-                                    </button>
-                                    <div className="absolute right-0 mt-2 w-48 bg-gray-800 rounded-lg shadow-xl border border-gray-700 opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-200">
-                                        <SignOutButton />
-                                    </div>
+            <div className="min-h-screen bg-[#0a0a0a] flex">
+                {/* Sidebar Skeleton */}
+                <div className={`bg-[#0a0a0a] border-r border-white/10 transition-all duration-300 ${isMenuCollapsed ? 'w-16' : 'w-64'}`}>
+                    <div className="p-4 border-b border-white/10">
+                        <div className="flex items-center gap-3">
+                            <div className="w-12 h-12 rounded-full bg-white/5 animate-pulse" />
+                            {!isMenuCollapsed && (
+                                <div className="space-y-2 flex-1">
+                                    <div className="h-3 w-16 bg-white/5 rounded animate-pulse" />
+                                    <div className="h-4 w-24 bg-white/5 rounded animate-pulse" />
                                 </div>
-                            </div>
+                            )}
                         </div>
                     </div>
-                </nav>
+                    <div className="p-3 space-y-2">
+                        {[1, 2, 3, 4, 5, 6].map((i) => (
+                            <div key={i} className={`h-12 bg-white/5 rounded-xl animate-pulse ${isMenuCollapsed ? 'w-10 mx-auto' : 'w-full'}`} />
+                        ))}
+                    </div>
+                </div>
 
-                <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
+                {/* Main Content Skeleton */}
+                <div className="flex-1 p-8">
                     <div className="flex flex-col items-center justify-center min-h-[60vh]">
-                        <div className="bg-gray-800 rounded-2xl shadow-2xl p-12 border border-gray-700 text-center">
+                        <div className="bg-[#111]/80 backdrop-blur-sm rounded-2xl border border-white/10 p-12 text-center">
                             <div className="flex justify-center mb-6">
                                 <svg className="animate-spin h-16 w-16 text-purple-400" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
                                     <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
@@ -209,71 +217,29 @@ export default function DashboardPage() {
                             </p>
                         </div>
                     </div>
-                </main>
+                </div>
             </div>
         );
     }
 
     return (
         <>
-            <div className="min-h-screen bg-gradient-to-br from-gray-900 via-gray-800 to-gray-900">
-                <nav className="bg-gray-800 border-b border-gray-700">
-                    <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-                        <div className="flex justify-between h-16 items-center">
-                            <Link href="/" className="text-2xl font-bold bg-gradient-to-r from-purple-400 to-blue-400 bg-clip-text text-transparent">
-                                SiteBuilder AI
-                            </Link>
-                            <div className="flex items-center gap-6">
-                                <Link href="/" className="text-gray-300 hover:text-white transition-colors">
-                                    Ana Sayfa
-                                </Link>
-                                <Link href="/editor" className="text-gray-300 hover:text-white transition-colors">
-                                    Editör
-                                </Link>
-                                <div className="relative group">
-                                    <button className="px-4 py-2 text-gray-300 hover:text-white transition-colors flex items-center gap-2">
-                                        {session.user?.name || session.user?.email}
-                                        <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
-                                        </svg>
-                                    </button>
-                                    <div className="absolute right-0 mt-2 w-48 bg-gray-800 rounded-lg shadow-xl border border-gray-700 opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-200">
-                                        <SignOutButton />
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                </nav>
+            <div className="min-h-screen bg-[#0a0a0a] flex">
+                {/* Left Menu */}
+                <div className={`relative transition-all duration-300 flex-shrink-0 ${isMenuCollapsed ? 'w-16' : 'w-64'}`}>
+                    <DashboardMenu
+                        activeTab={activeTab}
+                        onTabChange={handleTabChange}
+                        isCollapsed={isMenuCollapsed}
+                        onToggleCollapse={() => setIsMenuCollapsed(!isMenuCollapsed)}
+                        userName={session.user?.name || session.user?.email || ""}
+                        userImage={session.user?.image || undefined}
+                    />
+                </div>
 
-                <main className="w-full px-4 py-8">
-                    {/* Welcome Header */}
-                    <div className="mb-8">
-                        <h1 className="text-3xl font-bold text-white mb-2">
-                            Dashboard
-                        </h1>
-                        <p className="text-gray-400">
-                            Hoş geldin, {session.user?.name || session.user?.email}! 👋
-                        </p>
-                    </div>
-
-                    {/* Dashboard Layout */}
-                    <div className="flex gap-4">
-                        {/* Left Menu */}
-                        <div className={`transition-all duration-300 ${isMenuCollapsed ? 'w-16' : 'w-64'}`}>
-                            <DashboardMenu
-                                activeTab={activeTab}
-                                onTabChange={setActiveTab}
-                                isCollapsed={isMenuCollapsed}
-                                onToggleCollapse={() => setIsMenuCollapsed(!isMenuCollapsed)}
-                            />
-                        </div>
-
-                        {/* Right Content */}
-                        <div className="flex-1">
-                            {renderContent()}
-                        </div>
-                    </div>
+                {/* Right Content */}
+                <main className="flex-1 p-8 overflow-y-auto">
+                    {renderContent()}
                 </main>
             </div>
 
@@ -290,5 +256,17 @@ export default function DashboardPage() {
                 confirmInputText="DELETE"
             />
         </>
+    );
+}
+
+export default function DashboardPage() {
+    return (
+        <Suspense fallback={
+            <div className="min-h-screen flex items-center justify-center bg-[#0a0a0a]">
+                <div className="text-white text-xl">Loading...</div>
+            </div>
+        }>
+            <DashboardContent />
+        </Suspense>
     );
 }
