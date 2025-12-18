@@ -2,610 +2,438 @@ import Link from "next/link";
 import { getServerSession } from "next-auth/next";
 import { authOptions } from "@/lib/auth";
 import SignOutButton from "@/components/SignOutButton";
+import {
+  FileText,
+  Sparkles,
+  Paperclip,
+  Upload,
+  CheckCircle2,
+  Zap,
+  Layout,
+  Globe,
+  ArrowRight,
+  ChevronDown,
+  User,
+  LogOut,
+  LayoutDashboard,
+  HelpCircle,
+  Dices
+} from "lucide-react";
+import Image from "next/image";
 
 export default async function Home() {
   const session = await getServerSession(authOptions);
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-gray-900 via-gray-800 to-gray-900">
+    <div className="min-h-screen bg-[#0a0a0a] selection:bg-purple-500/30">
       {/* Navigation Bar */}
-      <nav className="border-b border-gray-700 bg-gray-800/50 backdrop-blur-sm sticky top-0 z-50">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="flex justify-between items-center h-16">
-            <div className="flex items-center">
-              <Link href="/" className="text-2xl font-bold bg-gradient-to-r from-purple-400 to-blue-400 bg-clip-text text-transparent">
-                SiteBuilder AI
+      <div className="fixed top-6 left-0 right-0 z-50 flex justify-center px-4 animate-slide-down">
+        <nav className="bg-gray-900/80 backdrop-blur-md border border-white/10 rounded-full px-6 py-3 w-full max-w-5xl shadow-2xl shadow-purple-500/5">
+          <div className="flex justify-between items-center">
+            {/* Scroll to top link */}
+            <Link href="#" className="flex items-center gap-2 group">
+              <div className="w-8 h-8 rounded-lg bg-gradient-to-tr from-purple-600 to-blue-600 flex items-center justify-center group-hover:scale-105 transition-transform">
+                <span className="text-white font-bold text-lg">P</span>
+              </div>
+              <span className="text-xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-white to-gray-400 group-hover:from-white group-hover:to-white transition-all">
+                Profilly
+              </span>
+            </Link>
+
+            <div className="hidden md:flex items-center gap-8">
+              <Link href="#how-it-works" className="text-sm font-medium text-gray-400 hover:text-white transition-colors">
+                Nasıl Çalışır?
               </Link>
-            </div>
-            <div className="hidden md:flex items-center gap-6">
-              <Link href="/" className="text-gray-300 hover:text-white transition-colors">
-                Ana Sayfa
+              <Link href="#showcase" className="text-sm font-medium text-gray-400 hover:text-white transition-colors">
+                Örnekler
               </Link>
-              <Link href="#features" className="text-gray-300 hover:text-white transition-colors">
-                Özellikler
-              </Link>
-              <Link href="#pricing" className="text-gray-300 hover:text-white transition-colors">
+              <Link href="#pricing" className="text-sm font-medium text-gray-400 hover:text-white transition-colors">
                 Fiyatlandırma
               </Link>
-              <Link href="#contact" className="text-gray-300 hover:text-white transition-colors">
-                İletişim
-              </Link>
             </div>
+
             <div className="flex items-center gap-4">
               {session ? (
-                <>
-                  <div className="relative group">
-                    <button className="px-4 py-2 text-gray-300 hover:text-white transition-colors flex items-center gap-2">
-                      {session.user?.name || session.user?.email}
-                      <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
-                      </svg>
-                    </button>
-                    <div className="absolute right-0 mt-2 w-48 bg-gray-800 rounded-lg shadow-xl border border-gray-700 opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-200">
+                <div className="relative group">
+                  <button className="flex items-center gap-3 pl-1 pr-2 py-1 rounded-full hover:bg-white/5 transition-colors border border-transparent hover:border-white/10">
+                    <div className="w-8 h-8 rounded-full bg-gradient-to-br from-purple-500 to-blue-500 p-[1px] overflow-hidden">
+                      {session.user?.image ? (
+                        <Image
+                          src={session.user.image}
+                          alt="Profile"
+                          width={32}
+                          height={32}
+                          className="rounded-full object-cover"
+                        />
+                      ) : (
+                        <div className="w-full h-full bg-gradient-to-br from-purple-600 to-blue-600 flex items-center justify-center text-xs font-bold text-white">
+                          {session.user?.name?.[0]?.toUpperCase() || session.user?.email?.[0]?.toUpperCase() || "U"}
+                        </div>
+                      )}
+                    </div>
+                    <ChevronDown className="w-4 h-4 text-gray-400 group-hover:text-white transition-colors" />
+                  </button>
+
+                  {/* Dropdown Menu */}
+                  <div className="absolute right-0 top-full mt-2 w-56 rounded-xl bg-gray-900 border border-white/10 shadow-xl overflow-hidden opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all transform origin-top-right scale-95 group-hover:scale-100">
+                    <div className="p-2">
+                      <div className="px-3 py-2 border-b border-white/5 mb-1">
+                        <p className="text-sm font-medium text-white truncate">{session.user?.name}</p>
+                        <p className="text-xs text-gray-500 truncate">{session.user?.email}</p>
+                      </div>
                       <Link
                         href="/dashboard"
-                        className="block px-4 py-3 text-gray-300 hover:bg-gray-700 hover:text-white transition-colors rounded-t-lg"
+                        className="flex items-center gap-2 px-3 py-2 text-sm text-gray-300 hover:text-white hover:bg-white/5 rounded-lg transition-colors"
                       >
-                        Profil
+                        <LayoutDashboard className="w-4 h-4" />
+                        Panel
                       </Link>
                       <SignOutButton />
                     </div>
                   </div>
-                </>
+                </div>
               ) : (
                 <>
                   <Link
                     href="/login"
-                    className="px-4 py-2 text-gray-300 hover:text-white transition-colors"
+                    className="text-sm font-medium text-gray-300 hover:text-white transition-colors hidden sm:block"
                   >
-                    Giriş Yap
+                    Giriş
                   </Link>
                   <Link
                     href="/register"
-                    className="px-6 py-2 bg-gradient-to-r from-purple-600 to-blue-600 hover:from-purple-700 hover:to-blue-700 text-white font-semibold rounded-lg transition-all duration-200 shadow-lg hover:shadow-xl"
+                    className="px-5 py-2 bg-white text-black text-sm font-semibold rounded-full hover:bg-gray-200 transition-colors"
                   >
-                    Kayıt Ol
+                    Ücretsiz Dene
                   </Link>
                 </>
               )}
             </div>
           </div>
-        </div>
-      </nav>
+        </nav>
+      </div>
 
       {/* Hero Section */}
-      <section className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-20 sm:py-32">
-        <div className="text-center">
-          <h1 className="text-5xl sm:text-6xl lg:text-7xl font-bold text-white mb-6 leading-tight animate-fade-in">
-            AI ile 60 Saniyede{" "}
-            <span className="bg-gradient-to-r from-purple-400 to-blue-400 bg-clip-text text-transparent animate-pulse">
-              Kişisel Web Sitenizi
-            </span>{" "}
-            Oluşturun
-          </h1>
-          <p className="text-xl sm:text-2xl text-gray-300 mb-12 max-w-3xl mx-auto animate-slide-up animation-delay-200">
-            CV'nizi yükleyin, yapay zeka sizin için profesyonel bir web sitesi oluştursun. 
-            Kodlama bilgisi gerektirmez, dakikalar içinde yayına alın.
-          </p>
-          <div className="flex flex-col sm:flex-row gap-4 justify-center items-center animate-slide-up animation-delay-300">
-            <Link
-              href="/register"
-              className="px-8 py-4 bg-gradient-to-r from-purple-600 to-blue-600 hover:from-purple-700 hover:to-blue-700 text-white text-lg font-bold rounded-lg transition-all duration-300 shadow-2xl hover:shadow-purple-500/50 hover:scale-110 hover:-translate-y-1 w-full sm:w-auto transform"
-            >
-              Hemen Ücretsiz Dene →
-            </Link>
-            <Link
-              href="#how-it-works"
-              className="px-8 py-4 bg-gray-800 hover:bg-gray-700 text-white text-lg font-semibold rounded-lg transition-all duration-300 border border-gray-700 hover:border-purple-500 w-full sm:w-auto transform hover:scale-105"
-            >
-              Nasıl Çalışır?
-            </Link>
+      <section className="relative pt-40 pb-24 px-4 overflow-hidden min-h-[90vh] flex flex-col justify-center">
+        {/* Background Gradients */}
+        <div className="absolute top-0 left-1/2 -translate-x-1/2 w-[1000px] h-[500px] bg-purple-600/20 rounded-full blur-[120px] -z-10 animate-pulse" style={{ animationDuration: '4s' }} />
+        <div className="absolute bottom-0 right-0 w-[800px] h-[600px] bg-blue-600/10 rounded-full blur-[100px] -z-10" />
+
+        <div className="max-w-4xl mx-auto text-center mb-12">
+          <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-white/5 border border-white/10 mb-8 animate-fade-in backdrop-blur-sm">
+            <span className="relative flex h-2 w-2">
+              <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-green-400 opacity-75"></span>
+              <span className="relative inline-flex rounded-full h-2 w-2 bg-green-500"></span>
+            </span>
+            <span className="text-xs font-medium text-gray-300">Yapay Zeka Destekli Site Oluşturucu</span>
           </div>
-          <p className="mt-8 text-gray-400 text-sm animate-fade-in animation-delay-500">
-            ✓ Kredi kartı gerektirmez  ✓ Anında başlayın  ✓ Ücretsiz subdomain
+
+          <h1 className="text-5xl md:text-7xl font-bold text-white mb-8 leading-tight tracking-tight animate-slide-up">
+            Hayalinizdeki Siteyi <br />
+            <span className="text-transparent bg-clip-text bg-gradient-to-r from-purple-400 via-pink-400 to-blue-400">
+              Saniyeler İçinde
+            </span>{" "}
+            Kurun
+          </h1>
+
+          <p className="text-lg text-gray-400 mb-12 max-w-2xl mx-auto animate-slide-up animation-delay-100">
+            Kodlama veya tasarım bilgisine ihtiyacınız yok. Sadece ne istediğinizi söyleyin veya CV'nizi yükleyin, gerisini Profilly halletsin.
           </p>
+
+          {/* Interactive Mock UI */}
+          <div className="relative max-w-2xl mx-auto bg-[#1a1a1a] rounded-2xl border border-white/10 p-2 shadow-2xl animate-scale-in group hover:border-purple-500/20 transition-colors duration-500">
+            <div className="bg-[#0a0a0a] rounded-xl border border-white/5 p-4 relative overflow-hidden">
+              {/* "Active" border effect explanation: The border-white/5 is subtle, but we add a glow on focus/hover */}
+              <div className="flex items-start gap-4 relatie z-10">
+                <div className="mt-3">
+                  <div className="w-8 h-8 rounded-full bg-gradient-to-br from-purple-500 to-blue-500 flex items-center justify-center">
+                    <Sparkles className="w-4 h-4 text-white" />
+                  </div>
+                </div>
+                <div className="flex-1">
+                  <div className="text-left mb-2">
+                    <p className="text-purple-400 text-xs font-semibold tracking-wide uppercase">AI Prompt</p>
+                  </div>
+                  <textarea
+                    className="w-full bg-transparent text-gray-200 text-lg resize-none focus:outline-none min-h-[80px] placeholder-gray-600"
+                    placeholder="Yazılım mühendisiyim. Modern, karanlık temalı ve projelerimi vitrinleyebileceğim minimalist bir portfolyo sitesi oluştur..."
+                    spellCheck={false}
+                  />
+                </div>
+              </div>
+
+              <div className="flex flex-col sm:flex-row justify-between items-center mt-4 pt-4 border-t border-white/5 gap-4">
+                <div className="flex items-center gap-4 w-full sm:w-auto">
+                  <button className="flex items-center gap-2 text-gray-400 hover:text-white transition-colors group/btn px-3 py-1.5 rounded-lg hover:bg-white/5 w-full sm:w-auto justify-center sm:justify-start">
+                    <Paperclip className="w-4 h-4 group-hover/btn:text-purple-400 transition-colors" />
+                    <span className="text-sm">Dosya Ekle</span>
+                  </button>
+                  <span className="text-xs text-gray-600 hidden sm:inline">PDF</span>
+                </div>
+
+                <div className="flex items-center gap-3 w-full sm:w-auto">
+                  <button className="flex items-center justify-center gap-2 px-4 py-2 bg-white/5 text-gray-300 font-medium rounded-lg hover:bg-white/10 transition-all hover:text-white w-full sm:w-auto">
+                    <Dices className="w-4 h-4" />
+                    <span className="text-sm">Şanslı Hissediyorum</span>
+                  </button>
+                  <button className="flex items-center justify-center gap-2 px-6 py-2 bg-white text-black font-semibold rounded-lg hover:bg-gray-200 transition-all active:scale-95 w-full sm:w-auto shadow-lg shadow-white/5">
+                    <Sparkles className="w-4 h-4" />
+                    <span>Oluştur</span>
+                  </button>
+                </div>
+              </div>
+            </div>
+
+            {/* Decorative Elements */}
+            <div className="absolute -top-20 -right-20 w-40 h-40 bg-purple-500/10 rounded-full blur-3xl pointer-events-none" />
+            <div className="absolute -bottom-20 -left-20 w-40 h-40 bg-blue-500/10 rounded-full blur-3xl pointer-events-none" />
+          </div>
         </div>
       </section>
 
-      {/* Stats Section */}
-      <section className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
-        <div className="grid grid-cols-2 md:grid-cols-4 gap-8">
-          {[
-            { label: "Site Oluşturuldu", value: "50+" },
-            { label: "Ortalama Süre", value: "45 sn" },
-            { label: "Memnuniyet", value: "98%" },
-            { label: "Ücretsiz Revize", value: "1x" },
-          ].map((stat, index) => (
-            <div key={stat.label} className="text-center transform hover:scale-110 transition-all duration-300 animate-fade-in" style={{animationDelay: `${index * 100}ms`}}>
-              <div className="text-3xl sm:text-4xl font-bold bg-gradient-to-r from-purple-400 to-blue-400 bg-clip-text text-transparent mb-2 animate-bounce-slow">
-                {stat.value}
-              </div>
-              <div className="text-gray-400 text-sm">{stat.label}</div>
+      {/* Showcase Section */}
+      <section id="showcase" className="py-24 px-4 bg-[#0d0d0d]">
+        <div className="max-w-7xl mx-auto">
+          <div className="flex flex-col md:flex-row justify-between items-end mb-12 gap-6">
+            <div className="max-w-2xl">
+              <h2 className="text-3xl md:text-5xl font-bold text-white mb-4">Profilly ile Yapıldı</h2>
+              <p className="text-gray-400 text-lg">Binlerce kullanıcı hayallerindeki siteye Profilly ile kavuştu. İlham alın.</p>
             </div>
-          ))}
+            <Link href="/register" className="text-white flex items-center gap-2 hover:gap-3 transition-all font-medium group">
+              Daha fazlasını gör
+              <ArrowRight className="w-4 h-4 group-hover:text-purple-400 transition-colors" />
+            </Link>
+          </div>
+
+          <div className="grid md:grid-cols-3 gap-8">
+            {[1, 2, 3].map((i) => (
+              <div key={i} className="group relative aspect-[4/3] rounded-2xl overflow-hidden bg-gray-900 border border-white/5">
+                <div className="absolute inset-0 bg-gradient-to-t from-gray-900 to-transparent opacity-60 z-10" />
+                <div className="absolute bottom-0 left-0 p-6 z-20 translate-y-4 group-hover:translate-y-0 transition-transform duration-300">
+                  <h3 className="text-xl font-bold text-white mb-1">Portfolyo Tasarımı {i}</h3>
+                  <p className="text-sm text-gray-400 opacity-0 group-hover:opacity-100 transition-opacity duration-300">Creative Director • Portfolio</p>
+                </div>
+                {/* Placeholder for site screenshots - using gradients for now */}
+                <div className={`w-full h-full bg-gradient-to-br ${i === 1 ? 'from-purple-900 to-gray-900' :
+                  i === 2 ? 'from-blue-900 to-gray-900' :
+                    'from-pink-900 to-gray-900'
+                  } group-hover:scale-105 transition-transform duration-500`} />
+              </div>
+            ))}
+          </div>
         </div>
       </section>
 
       {/* How It Works Section */}
-      <section id="how-it-works" className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-20 sm:py-32">
-        <div className="text-center mb-16">
-          <h2 className="text-4xl sm:text-5xl font-bold text-white mb-4">
-            Nasıl Çalışır?
-          </h2>
-          <p className="text-xl text-gray-300">
-            4 basit adımda kişisel web siteniz hazır
-          </p>
-        </div>
-        <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-8">
-          {[
-            {
-              step: "1",
-              title: "CV Yükle",
-              description: "PDF formatında CV'nizi yükleyin. Maksimum 4MB.",
-              icon: "📄",
-            },
-            {
-              step: "2",
-              title: "AI Analiz",
-              description: "Gemini 2.0 Flash yapay zekası CV'nizi analiz eder ve yapılandırır.",
-              icon: "🤖",
-            },
-            {
-              step: "3",
-              title: "Önizle & Revize",
-              description: "Sitenizi görün, beğenmediyseniz 1 ücretsiz revize hakkınız var.",
-              icon: "👁️",
-            },
-            {
-              step: "4",
-              title: "Yayınla",
-              description: "Tek tıkla Cloudflare'de yayınlayın. SSL ve subdomain dahil.",
-              icon: "🚀",
-            },
-          ].map((item, index) => (
-            <div
-              key={item.step}
-              className="bg-gray-800 rounded-2xl p-8 border border-gray-700 shadow-xl hover:shadow-2xl hover:border-purple-500/50 transition-all duration-300 relative transform hover:scale-105 hover:-translate-y-2 animate-slide-up"
-              style={{animationDelay: `${index * 150}ms`}}
-            >
-              <div className="absolute -top-4 -left-4 w-12 h-12 bg-gradient-to-r from-purple-600 to-blue-600 rounded-full flex items-center justify-center text-white font-bold text-xl shadow-lg transform hover:rotate-12 transition-transform duration-300">
-                {item.step}
-              </div>
-              <div className="text-5xl mb-4 text-center transform hover:scale-125 transition-transform duration-300">{item.icon}</div>
-              <h3 className="text-xl font-bold text-white mb-3">{item.title}</h3>
-              <p className="text-gray-300">{item.description}</p>
-            </div>
-          ))}
-        </div>
-      </section>
+      <section id="how-it-works" className="py-24 px-4 relative">
+        <div className="max-w-7xl mx-auto">
+          <div className="text-center mb-16">
+            <h2 className="text-3xl md:text-5xl font-bold text-white mb-6">Nasıl Çalışır?</h2>
+            <p className="text-gray-400 max-w-xl mx-auto">Karmaşık süreçleri unutun. Modern web teknolojisi ile tanışın.</p>
+          </div>
 
-      {/* Features Section */}
-      <section id="features" className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-20 sm:py-32 bg-gray-800/30 rounded-3xl">
-        <div className="text-center mb-16">
-          <h2 className="text-4xl sm:text-5xl font-bold text-white mb-4">
-            Güçlü Özellikler
-          </h2>
-          <p className="text-xl text-gray-300">
-            Her şey dahil, ek ücret yok
-          </p>
-        </div>
-        <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-8">
-          {[
-            {
-              title: "AI-Powered Üretim",
-              description: "Google Gemini 2.0 Flash ile otomatik HTML/CSS oluşturma",
-              icon: "⚡",
-              gradient: "from-purple-500 to-pink-500",
-            },
-            {
-              title: "Tek Tık Deployment",
-              description: "Cloudflare Pages ile anında yayınlama, manuel ayar yok",
-              icon: "☁️",
-              gradient: "from-blue-500 to-cyan-500",
-            },
-            {
-              title: "SSL Sertifikası",
-              description: "Otomatik HTTPS, güvenli bağlantı her zaman aktif",
-              icon: "🔒",
-              gradient: "from-green-500 to-emerald-500",
-            },
-            {
-              title: "Özel Subdomain",
-              description: "isminiz.sitebuilder.com gibi profesyonel subdomain",
-              icon: "🌐",
-              gradient: "from-orange-500 to-red-500",
-            },
-            {
-              title: "1 Ücretsiz Revize",
-              description: "İlk denemede beğenmediniz mi? 1 kez ücretsiz değişiklik",
-              icon: "✏️",
-              gradient: "from-yellow-500 to-orange-500",
-            },
-            {
-              title: "LinkedIn & GitHub",
-              description: "Sosyal profil linklerini kolayca ekleyin",
-              icon: "🔗",
-              gradient: "from-indigo-500 to-purple-500",
-            },
-          ].map((feature, index) => (
-            <div
-              key={feature.title}
-              className="bg-gray-800 rounded-2xl p-8 border border-gray-700 shadow-xl hover:shadow-2xl hover:scale-110 transition-all duration-300 transform hover:-translate-y-2 animate-fade-in group"
-              style={{animationDelay: `${index * 100}ms`}}
-            >
-              <div className={`w-16 h-16 bg-gradient-to-r ${feature.gradient} rounded-xl flex items-center justify-center text-3xl mb-4 shadow-lg transform group-hover:rotate-6 group-hover:scale-110 transition-all duration-300`}>
-                {feature.icon}
+          <div className="grid md:grid-cols-3 gap-8">
+            {[
+              {
+                icon: <Upload className="w-6 h-6 text-purple-400" />,
+                title: "1. İçerik Sağlayın",
+                desc: "CV'nizi yükleyin veya kendinizi kısaca anlatın."
+              },
+              {
+                icon: <Zap className="w-6 h-6 text-blue-400" />,
+                title: "2. AI Analizi",
+                desc: "Yapay zeka içeriğinizi analiz eder ve en uygun yapıyı kurgular."
+              },
+              {
+                icon: <Layout className="w-6 h-6 text-pink-400" />,
+                title: "3. Canlıya Alın",
+                desc: "Siteniz saniyeler içinde oluşturulur ve yayınlanır."
+              }
+            ].map((step, i) => (
+              <div key={i} className="group p-8 rounded-3xl bg-white/5 border border-white/5 hover:bg-white/10 transition-all duration-300">
+                <div className="w-12 h-12 rounded-2xl bg-white/5 flex items-center justify-center mb-6 group-hover:scale-110 transition-transform">
+                  {step.icon}
+                </div>
+                <h3 className="text-xl font-bold text-white mb-3">{step.title}</h3>
+                <p className="text-gray-400 leading-relaxed">{step.desc}</p>
               </div>
-              <h3 className="text-xl font-bold text-white mb-3">{feature.title}</h3>
-              <p className="text-gray-300">{feature.description}</p>
-            </div>
-          ))}
+            ))}
+          </div>
         </div>
       </section>
 
       {/* Pricing Section */}
-      <section id="pricing" className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-20 sm:py-32">
-        <div className="text-center mb-16">
-          <h2 className="text-4xl sm:text-5xl font-bold text-white mb-4">
-            Fiyatlandırma
-          </h2>
-          <p className="text-xl text-gray-300">
-            Herkes için uygun planlar
-          </p>
-        </div>
-        <div className="grid md:grid-cols-3 gap-8 max-w-5xl mx-auto">
-          {/* Free Plan */}
-          <div className="bg-gray-800 rounded-2xl p-8 border border-gray-700 shadow-xl hover:shadow-2xl hover:scale-105 transition-all duration-300 transform hover:-translate-y-2 animate-slide-up animation-delay-100">
-            <h3 className="text-2xl font-bold text-white mb-2">Ücretsiz</h3>
-            <div className="mb-6">
-              <span className="text-5xl font-bold text-white">₺0</span>
-              <span className="text-gray-400 ml-2">/ay</span>
-            </div>
-            <ul className="space-y-4 mb-8">
-              <li className="flex items-start gap-3">
-                <svg className="w-6 h-6 text-green-500 flex-shrink-0 mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
-                </svg>
-                <span className="text-gray-300">1 web sitesi</span>
-              </li>
-              <li className="flex items-start gap-3">
-                <svg className="w-6 h-6 text-green-500 flex-shrink-0 mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
-                </svg>
-                <span className="text-gray-300">AI ile otomatik oluşturma</span>
-              </li>
-              <li className="flex items-start gap-3">
-                <svg className="w-6 h-6 text-green-500 flex-shrink-0 mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
-                </svg>
-                <span className="text-gray-300">Ücretsiz subdomain</span>
-              </li>
-              <li className="flex items-start gap-3">
-                <svg className="w-6 h-6 text-green-500 flex-shrink-0 mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
-                </svg>
-                <span className="text-gray-300">SSL sertifikası</span>
-              </li>
-              <li className="flex items-start gap-3">
-                <svg className="w-6 h-6 text-green-500 flex-shrink-0 mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
-                </svg>
-                <span className="text-gray-300">1 ücretsiz revize</span>
-              </li>
-            </ul>
-            <Link
-              href="/register"
-              className="block w-full text-center px-6 py-3 bg-gray-700 hover:bg-gray-600 text-white font-semibold rounded-lg transition-all duration-200"
-            >
-              Başla
-            </Link>
+      <section id="pricing" className="py-24 px-4 bg-gradient-to-b from-[#0a0a0a] to-[#111]">
+        <div className="max-w-5xl mx-auto">
+          <div className="text-center mb-16">
+            <h2 className="text-3xl md:text-5xl font-bold text-white mb-6">Basit Fiyatlandırma</h2>
+            <p className="text-gray-400">Gizli ücret yok, taahhüt yok.</p>
           </div>
 
-          {/* Pro Plan */}
-          <div className="bg-gradient-to-br from-purple-600 to-blue-600 rounded-2xl p-8 shadow-2xl hover:shadow-purple-500/50 hover:scale-110 transition-all duration-300 relative transform hover:-translate-y-3 animate-slide-up animation-delay-200 ring-4 ring-purple-500/20 hover:ring-purple-500/50">
-            <div className="absolute -top-4 left-1/2 transform -translate-x-1/2 bg-yellow-500 text-gray-900 px-4 py-1 rounded-full text-sm font-bold">
-              Popüler
-            </div>
-            <h3 className="text-2xl font-bold text-white mb-2">Pro</h3>
-            <div className="mb-6">
-              <span className="text-5xl font-bold text-white">₺99</span>
-              <span className="text-purple-200 ml-2">/ay</span>
-            </div>
-            <ul className="space-y-4 mb-8">
-              <li className="flex items-start gap-3">
-                <svg className="w-6 h-6 text-white flex-shrink-0 mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
-                </svg>
-                <span className="text-white">5 web sitesi</span>
-              </li>
-              <li className="flex items-start gap-3">
-                <svg className="w-6 h-6 text-white flex-shrink-0 mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
-                </svg>
-                <span className="text-white">AI ile otomatik oluşturma</span>
-              </li>
-              <li className="flex items-start gap-3">
-                <svg className="w-6 h-6 text-white flex-shrink-0 mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
-                </svg>
-                <span className="text-white">Özel domain desteği</span>
-              </li>
-              <li className="flex items-start gap-3">
-                <svg className="w-6 h-6 text-white flex-shrink-0 mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
-                </svg>
-                <span className="text-white">Sınırsız revize</span>
-              </li>
-              <li className="flex items-start gap-3">
-                <svg className="w-6 h-6 text-white flex-shrink-0 mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
-                </svg>
-                <span className="text-white">Öncelikli destek</span>
-              </li>
-              <li className="flex items-start gap-3">
-                <svg className="w-6 h-6 text-white flex-shrink-0 mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
-                </svg>
-                <span className="text-white">Gelişmiş analytics</span>
-              </li>
-            </ul>
-            <Link
-              href="/register"
-              className="block w-full text-center px-6 py-3 bg-white hover:bg-gray-100 text-purple-600 font-bold rounded-lg transition-all duration-200"
-            >
-              Şimdi Başla
-            </Link>
-          </div>
+          <div className="grid md:grid-cols-2 gap-8 max-w-4xl mx-auto">
+            {/* Free Plan */}
+            <div className="p-10 rounded-3xl bg-[#0a0a0a] border border-white/10 hover:border-white/20 transition-all relative overflow-hidden group">
+              <div className="absolute top-0 right-0 w-32 h-32 bg-gray-500/10 rounded-full blur-3xl -mr-16 -mt-16 transition-all group-hover:bg-gray-500/20"></div>
 
-          {/* Enterprise Plan */}
-          <div className="bg-gray-800 rounded-2xl p-8 border border-gray-700 shadow-xl hover:shadow-2xl hover:scale-105 transition-all duration-300 transform hover:-translate-y-2 animate-slide-up animation-delay-300">
-            <h3 className="text-2xl font-bold text-white mb-2">Kurumsal</h3>
-            <div className="mb-6">
-              <span className="text-5xl font-bold text-white">Özel</span>
+              <h3 className="text-xl font-medium text-gray-400 mb-2">Başlangıç</h3>
+              <div className="flex items-baseline gap-1 mb-8">
+                <span className="text-4xl font-bold text-white">₺0</span>
+                <span className="text-gray-500">/ay</span>
+              </div>
+
+              <ul className="space-y-4 mb-8">
+                <li className="flex items-center gap-3 text-gray-300">
+                  <CheckCircle2 className="w-5 h-5 text-gray-500" />
+                  <span>1 Web Sitesi</span>
+                </li>
+                <li className="flex items-center gap-3 text-gray-300">
+                  <CheckCircle2 className="w-5 h-5 text-gray-500" />
+                  <span>Profilly Subdomain</span>
+                </li>
+                <li className="flex items-center gap-3 text-gray-300">
+                  <CheckCircle2 className="w-5 h-5 text-gray-500" />
+                  <span>Aylık Düzenleme Hakkı</span>
+                </li>
+                <li className="flex items-center gap-3 text-gray-300">
+                  <CheckCircle2 className="w-5 h-5 text-gray-500" />
+                  <span>5 Versiyon Geçmişi</span>
+                </li>
+                <li className="flex items-center gap-3 text-gray-300">
+                  <CheckCircle2 className="w-5 h-5 text-gray-500" />
+                  <span>Tek Sayfa Tasarım</span>
+                </li>
+              </ul>
+
+              <Link href="/register" className="block w-full py-4 rounded-xl bg-white/5 text-white text-center font-semibold hover:bg-white/10 transition-colors border border-white/5">
+                Ücretsiz Başla
+              </Link>
             </div>
-            <ul className="space-y-4 mb-8">
-              <li className="flex items-start gap-3">
-                <svg className="w-6 h-6 text-green-500 flex-shrink-0 mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
-                </svg>
-                <span className="text-gray-300">Sınırsız web sitesi</span>
-              </li>
-              <li className="flex items-start gap-3">
-                <svg className="w-6 h-6 text-green-500 flex-shrink-0 mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
-                </svg>
-                <span className="text-gray-300">Özel AI modeli</span>
-              </li>
-              <li className="flex items-start gap-3">
-                <svg className="w-6 h-6 text-green-500 flex-shrink-0 mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
-                </svg>
-                <span className="text-gray-300">API erişimi</span>
-              </li>
-              <li className="flex items-start gap-3">
-                <svg className="w-6 h-6 text-green-500 flex-shrink-0 mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
-                </svg>
-                <span className="text-gray-300">Özel eğitim</span>
-              </li>
-              <li className="flex items-start gap-3">
-                <svg className="w-6 h-6 text-green-500 flex-shrink-0 mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
-                </svg>
-                <span className="text-gray-300">Özel SLA</span>
-              </li>
-            </ul>
-            <Link
-              href="/contact"
-              className="block w-full text-center px-6 py-3 bg-gray-700 hover:bg-gray-600 text-white font-semibold rounded-lg transition-all duration-200"
-            >
-              İletişime Geç
-            </Link>
+
+            {/* Paid Plan */}
+            <div className="p-10 rounded-3xl bg-[#0f0f0f] border border-purple-500/30 hover:border-purple-500/50 transition-all relative overflow-hidden group shadow-2xl shadow-purple-900/10">
+              <div className="absolute top-0 right-0 w-40 h-40 bg-purple-500/20 rounded-full blur-3xl -mr-20 -mt-20 transition-all group-hover:bg-purple-500/30"></div>
+              <div className="absolute top-6 right-6 px-3 py-1 bg-purple-500/20 text-purple-300 text-xs font-bold rounded-full border border-purple-500/30">
+                POPÜLER
+              </div>
+
+              <h3 className="text-xl font-medium text-white mb-2">Pro</h3>
+              <div className="flex items-baseline gap-1 mb-8">
+                <span className="text-4xl font-bold text-white">₺99</span>
+                <span className="text-gray-500">/ay</span>
+              </div>
+
+              <ul className="space-y-4 mb-8">
+                <li className="flex items-center gap-3 text-white">
+                  <CheckCircle2 className="w-5 h-5 text-purple-400" />
+                  <span>Sınırsız Web Sitesi</span>
+                </li>
+                <li className="flex items-center gap-3 text-white">
+                  <CheckCircle2 className="w-5 h-5 text-purple-400" />
+                  <span>Özel Domain Bağlama</span>
+                </li>
+                <li className="flex items-center gap-3 text-white">
+                  <CheckCircle2 className="w-5 h-5 text-purple-400" />
+                  <span>Daha Fazla Düzenleme Hakkı</span>
+                </li>
+                <li className="flex items-center gap-3 text-white">
+                  <CheckCircle2 className="w-5 h-5 text-purple-400" />
+                  <span>Blog Sayfası & Editör</span>
+                </li>
+                <li className="flex items-center gap-3 text-white">
+                  <CheckCircle2 className="w-5 h-5 text-purple-400" />
+                  <span>Çok Sayfalı Tasarım</span>
+                </li>
+                <li className="flex items-center gap-3 text-white">
+                  <CheckCircle2 className="w-5 h-5 text-purple-400" />
+                  <span>Daha Fazla Versiyon Geçmişi</span>
+                </li>
+              </ul>
+
+              <Link href="/register" className="block w-full py-4 rounded-xl bg-gradient-to-r from-purple-600 to-blue-600 text-white text-center font-bold hover:shadow-lg hover:shadow-purple-500/25 transition-all transform hover:-translate-y-1">
+                Hemen Yükselt
+              </Link>
+            </div>
           </div>
         </div>
       </section>
 
-      {/* Contact Section */}
-      <section id="contact" className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-20 sm:py-32">
+      {/* FAQ Section */}
+      <section className="py-24 px-4 bg-[#0a0a0a]">
         <div className="max-w-3xl mx-auto">
-          <div className="text-center mb-12">
-            <h2 className="text-4xl sm:text-5xl font-bold text-white mb-4">
-              İletişime Geçin
-            </h2>
-            <p className="text-xl text-gray-300">
-              Sorularınız mı var? Size yardımcı olmaktan mutluluk duyarız!
-            </p>
+          <div className="text-center mb-16">
+            <h2 className="text-3xl md:text-5xl font-bold text-white mb-6">Sıkça Sorulan Sorular</h2>
+            <p className="text-gray-400">Akıllardaki soru işaretlerini giderelim.</p>
           </div>
 
-          {/* Contact Form */}
-          <div className="bg-gray-800 rounded-2xl p-8 border border-gray-700 shadow-xl mb-12 animate-slide-up animation-delay-200">
-            <form className="space-y-6">
-              <div>
-                <label htmlFor="name" className="block text-sm font-medium text-gray-300 mb-2">
-                  Adınız
-                </label>
-                <input
-                  type="text"
-                  id="name"
-                  name="name"
-                  className="w-full px-4 py-3 bg-gray-900 border border-gray-700 rounded-lg text-white placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent transition-all"
-                  placeholder="Adınız Soyadınız"
-                  required
-                />
+          <div className="space-y-4">
+            {[
+              { q: "Profilly nasıl çalışır?", a: "CV'nizi yükleyin veya kısa bir açıklama yazın. Yapay zekamız içeriğinizi analiz eder ve size özel, profesyonel bir web sitesi oluşturur. Kodlama bilgisine ihtiyacınız yok!" },
+              { q: "Ücretsiz planda neler var?", a: "Ücretsiz planda 1 web sitesi, Profilly subdomain, aylık düzenleme hakkı ve 5 versiyon geçmişi bulunur. Kredi kartı gerektirmez." },
+              { q: "Kendi domain adımı kullanabilir miyim?", a: "Evet! Pro plana geçtiğinizde kendi .com, .net gibi özel alan adlarınızı bağlayabilirsiniz." },
+              { q: "Sitemi sonradan düzenleyebilir miyim?", a: "Kesinlikle! Editör panelimizden istediğiniz zaman sitenizi güncelleyebilir, içerik ekleyip çıkarabilirsiniz. Değişiklikleriniz anında yayına alınır." },
+              { q: "Versiyon geçmişi ne işe yarar?", a: "Yaptığınız değişiklikleri geri alabilir, önceki versiyonlara dönebilirsiniz. Ücretsiz planda 5, Pro planda daha fazla versiyon saklanır." }
+            ].map((faq, i) => (
+              <div key={i} className="group rounded-2xl bg-white/5 border border-white/5 hover:border-white/10 overflow-hidden transition-colors">
+                <details className="group">
+                  <summary className="flex cursor-pointer items-center justify-between gap-1.5 p-6 text-white font-medium list-none">
+                    <span>{faq.q}</span>
+                    <span className="relative size-5 shrink-0">
+                      <ChevronDown className="absolute inset-0 size-5 transition-transform duration-300 group-open:-rotate-180" />
+                    </span>
+                  </summary>
+                  <div className="px-6 pb-6 text-gray-400 leading-relaxed">
+                    <p>{faq.a}</p>
+                  </div>
+                </details>
               </div>
-
-              <div>
-                <label htmlFor="email" className="block text-sm font-medium text-gray-300 mb-2">
-                  E-posta
-                </label>
-                <input
-                  type="email"
-                  id="email"
-                  name="email"
-                  className="w-full px-4 py-3 bg-gray-900 border border-gray-700 rounded-lg text-white placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent transition-all"
-                  placeholder="ornek@email.com"
-                  required
-                />
-              </div>
-
-              <div>
-                <label htmlFor="subject" className="block text-sm font-medium text-gray-300 mb-2">
-                  Konu
-                </label>
-                <input
-                  type="text"
-                  id="subject"
-                  name="subject"
-                  className="w-full px-4 py-3 bg-gray-900 border border-gray-700 rounded-lg text-white placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent transition-all"
-                  placeholder="Mesajınızın konusu"
-                  required
-                />
-              </div>
-
-              <div>
-                <label htmlFor="message" className="block text-sm font-medium text-gray-300 mb-2">
-                  Mesajınız
-                </label>
-                <textarea
-                  id="message"
-                  name="message"
-                  rows={6}
-                  className="w-full px-4 py-3 bg-gray-900 border border-gray-700 rounded-lg text-white placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent transition-all resize-none"
-                  placeholder="Mesajınızı buraya yazın..."
-                  required
-                ></textarea>
-              </div>
-
-              <button
-                type="submit"
-                className="w-full px-8 py-4 bg-gradient-to-r from-purple-600 to-blue-600 hover:from-purple-700 hover:to-blue-700 text-white font-semibold rounded-lg transition-all duration-200 shadow-lg hover:shadow-xl hover:scale-105"
-              >
-                Mesaj Gönder
-              </button>
-            </form>
-          </div>
-
-          {/* Contact Info */}
-          <div className="grid md:grid-cols-3 gap-6">
-            <div className="bg-gray-800 rounded-xl p-6 border border-gray-700 text-center">
-              <div className="w-12 h-12 bg-gradient-to-r from-purple-600 to-blue-600 rounded-full flex items-center justify-center mx-auto mb-4">
-                <svg className="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" />
-                </svg>
-              </div>
-              <h3 className="text-white font-semibold mb-2">E-posta</h3>
-              <a href="mailto:support@sitebuilder.ai" className="text-gray-400 hover:text-purple-400 transition-colors">
-                support@sitebuilder.ai
-              </a>
-            </div>
-
-            <div className="bg-gray-800 rounded-xl p-6 border border-gray-700 text-center">
-              <div className="w-12 h-12 bg-gradient-to-r from-purple-600 to-blue-600 rounded-full flex items-center justify-center mx-auto mb-4">
-                <svg className="w-6 h-6 text-white" fill="currentColor" viewBox="0 0 24 24">
-                  <path d="M12 0c-6.626 0-12 5.373-12 12 0 5.302 3.438 9.8 8.207 11.387.599.111.793-.261.793-.577v-2.234c-3.338.726-4.033-1.416-4.033-1.416-.546-1.387-1.333-1.756-1.333-1.756-1.089-.745.083-.729.083-.729 1.205.084 1.839 1.237 1.839 1.237 1.07 1.834 2.807 1.304 3.492.997.107-.775.418-1.305.762-1.604-2.665-.305-5.467-1.334-5.467-5.931 0-1.311.469-2.381 1.236-3.221-.124-.303-.535-1.524.117-3.176 0 0 1.008-.322 3.301 1.23.957-.266 1.983-.399 3.003-.404 1.02.005 2.047.138 3.006.404 2.291-1.552 3.297-1.23 3.297-1.23.653 1.653.242 2.874.118 3.176.77.84 1.235 1.911 1.235 3.221 0 4.609-2.807 5.624-5.479 5.921.43.372.823 1.102.823 2.222v3.293c0 .319.192.694.801.576 4.765-1.589 8.199-6.086 8.199-11.386 0-6.627-5.373-12-12-12z"/>
-                </svg>
-              </div>
-              <h3 className="text-white font-semibold mb-2">GitHub</h3>
-              <a href="https://github.com/erdoganeray/personal-site-builder" target="_blank" rel="noopener noreferrer" className="text-gray-400 hover:text-purple-400 transition-colors">
-                @erdoganeray
-              </a>
-            </div>
-
-            <div className="bg-gray-800 rounded-xl p-6 border border-gray-700 text-center">
-              <div className="w-12 h-12 bg-gradient-to-r from-purple-600 to-blue-600 rounded-full flex items-center justify-center mx-auto mb-4">
-                <svg className="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
-                </svg>
-              </div>
-              <h3 className="text-white font-semibold mb-2">Yanıt Süresi</h3>
-              <p className="text-gray-400">24 saat içinde</p>
-            </div>
+            ))}
           </div>
         </div>
       </section>
 
-      {/* CTA Section */}
-      <section className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-20 sm:py-32">
-        <div className="bg-gradient-to-r from-purple-600 to-blue-600 rounded-3xl p-12 sm:p-16 text-center shadow-2xl">
-          <h2 className="text-4xl sm:text-5xl font-bold text-white mb-6">
-            Kişisel Web Sitenizi Bugün Oluşturun
-          </h2>
-          <p className="text-xl text-purple-100 mb-8 max-w-2xl mx-auto">
-            Binlerce profesyonel gibi siz de yapay zeka destekli web sitesi oluşturmanın tadını çıkarın. 
-            Tamamen ücretsiz, kredi kartı gerektirmez.
-          </p>
-          <Link
-            href="/register"
-            className="inline-block px-12 py-5 bg-white hover:bg-gray-100 text-purple-600 text-xl font-bold rounded-lg transition-all duration-200 shadow-2xl hover:scale-105"
-          >
-            Hemen Başla - Ücretsiz →
-          </Link>
-          <p className="mt-6 text-purple-200 text-sm">
-            60 saniyede hazır • Kodlama gerektirmez • SSL dahil
-          </p>
+      {/* Pre-Footer CTA */}
+      <section className="py-20 px-4">
+        <div className="max-w-5xl mx-auto bg-gradient-to-r from-gray-900 to-gray-800 rounded-[2.5rem] p-12 md:p-20 text-center border border-white/5 relative overflow-hidden">
+
+          <div className="absolute -top-24 -left-24 w-64 h-64 bg-purple-500/20 rounded-full blur-[80px]"></div>
+          <div className="absolute -bottom-24 -right-24 w-64 h-64 bg-blue-500/20 rounded-full blur-[80px]"></div>
+
+          <div className="relative z-10">
+            <h2 className="text-3xl md:text-5xl font-bold text-white mb-6">
+              Kariyerinizi Bir Sonraki Seviyeye Taşıyın
+            </h2>
+            <p className="text-lg text-gray-400 mb-10 max-w-2xl mx-auto">
+              Profilly ile oluşturulan profesyonel bir web sitesi ile işverenlerin ve müşterilerin dikkatini çekin.
+            </p>
+            <Link
+              href="/register"
+              className="inline-flex items-center gap-2 px-8 py-4 bg-white text-black font-bold rounded-full text-lg hover:bg-gray-100 transition-all transform hover:scale-105"
+            >
+              Ücretsiz Başla
+              <ArrowRight className="w-5 h-5" />
+            </Link>
+          </div>
         </div>
       </section>
 
       {/* Footer */}
-      <footer className="border-t border-gray-700 bg-gray-800/50">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
-          <div className="grid md:grid-cols-3 gap-8 mb-8">
-            <div>
-              <h3 className="text-xl font-bold bg-gradient-to-r from-purple-400 to-blue-400 bg-clip-text text-transparent mb-4">
-                SiteBuilder AI
-              </h3>
-              <p className="text-gray-400">
-                Yapay zeka ile kişisel web sitenizi dakikalar içinde oluşturun.
-              </p>
+      <footer className="border-t border-white/5 py-12 bg-[#050505]">
+        <div className="max-w-6xl mx-auto px-4 flex flex-col md:flex-row justify-between items-center gap-6">
+          <div className="flex items-center gap-2">
+            <div className="w-8 h-8 rounded-lg bg-white/10 flex items-center justify-center">
+              <span className="text-white font-bold">P</span>
             </div>
-            <div>
-              <h4 className="text-white font-semibold mb-4">Hızlı Bağlantılar</h4>
-              <ul className="space-y-2">
-                <li>
-                  <Link href="/" className="text-gray-400 hover:text-white transition-colors">
-                    Ana Sayfa
-                  </Link>
-                </li>
-                <li>
-                  <Link href="#features" className="text-gray-400 hover:text-white transition-colors">
-                    Özellikler
-                  </Link>
-                </li>
-                <li>
-                  <Link href="#pricing" className="text-gray-400 hover:text-white transition-colors">
-                    Fiyatlandırma
-                  </Link>
-                </li>
-                <li>
-                  <Link href="#how-it-works" className="text-gray-400 hover:text-white transition-colors">
-                    Nasıl Çalışır
-                  </Link>
-                </li>
-              </ul>
-            </div>
-            <div>
-              <h4 className="text-white font-semibold mb-4">İletişim</h4>
-              <ul className="space-y-2">
-                <li>
-                  <Link href="#contact" className="text-gray-400 hover:text-white transition-colors">
-                    Bize Ulaşın
-                  </Link>
-                </li>
-                <li>
-                  <a href="https://github.com/erdoganeray/personal-site-builder" target="_blank" rel="noopener noreferrer" className="text-gray-400 hover:text-white transition-colors">
-                    GitHub
-                  </a>
-                </li>
-                <li>
-                  <a href="mailto:support@sitebuilder.ai" className="text-gray-400 hover:text-white transition-colors">
-                    Destek
-                  </a>
-                </li>
-              </ul>
-            </div>
+            <span className="text-xl font-bold text-white">Profilly</span>
           </div>
-          <div className="border-t border-gray-700 pt-8 text-center text-gray-400 text-sm">
-            <p>© 2025 SiteBuilder AI. Tüm hakları saklıdır.</p>
+
+          <div className="flex items-center gap-8 text-sm text-gray-400">
+            <Link href="#" className="hover:text-white transition-colors">Gizlilik</Link>
+            <Link href="#" className="hover:text-white transition-colors">Kullanım Şartları</Link>
+            <Link href="mailto:support@profilly.com" className="hover:text-white transition-colors">İletişim</Link>
+          </div>
+
+          <div className="text-sm text-gray-500">
+            © 2025 Profilly. Tüm hakları saklıdır.
           </div>
         </div>
       </footer>

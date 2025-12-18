@@ -5,7 +5,6 @@
 # Paid Plans Options
 
 ## Free Plan (MVP)
-- static site oluşturma
 - haftalık/aylık belirli token/sayıda düzenleme hakkı
 - belirli recreate hakkı
 - subdomain
@@ -17,8 +16,7 @@
 - portfolio da sadece fotoğraf
 - belki belirli mb storage
 
-## Paid Plan 
-- react, vue ya da next.js gibi daha komplike teknolojiler ile web sitesi oluşturma
+## Paid Plan
 - haftalık/aylık more belirli token/sayıda düzenleme hakkı
 - more belirli recreate hakkı
 - custom domain connection
