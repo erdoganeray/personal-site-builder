@@ -1,4 +1,4 @@
-"use client";
+﻿"use client";
 
 import { useState, useEffect, useCallback, useRef } from "react";
 import CVUploader from "@/components/CVUploader";
@@ -6,7 +6,7 @@ import type { CVData, CVPortfolioItem, CVSkill, CVLanguage } from "@/lib/gemini-
 import { hasUnpublishedChanges } from "@/lib/change-detection";
 import PortfolioUploader from "@/components/dashboard/PortfolioUploader";
 import PortfolioMetadataEditor from "@/components/dashboard/PortfolioMetadataEditor";
-import StorageIndicator from "@/components/dashboard/StorageIndicator";
+
 import ChangeDetailsPanel from "./ChangeDetailsPanel";
 import { toast } from "@/components/ui/Toast";
 import ConfirmDialog from "@/components/ui/ConfirmDialog";
@@ -26,6 +26,18 @@ export default function MyInfo({ site, cvData, onDelete, onCVAnalyzed, deleting 
 
     // Original state backup for cancel functionality
     const originalStateRef = useRef<any>(null);
+
+    // Section refs for scroll-to navigation
+    const personalInfoRef = useRef<HTMLDivElement>(null);
+    const experienceRef = useRef<HTMLDivElement>(null);
+    const educationRef = useRef<HTMLDivElement>(null);
+    const portfolioRef = useRef<HTMLDivElement>(null);
+    const skillsRef = useRef<HTMLDivElement>(null);
+    const languagesRef = useRef<HTMLDivElement>(null);
+
+    const scrollToSection = (ref: React.RefObject<HTMLDivElement | null>) => {
+        ref.current?.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    };
 
     // Form state
     const [name, setName] = useState("");
@@ -67,9 +79,7 @@ export default function MyInfo({ site, cvData, onDelete, onCVAnalyzed, deleting 
     const [portfolioMarkedForDeletion, setPortfolioMarkedForDeletion] = useState<string[]>([]); // Array of imageUrls to delete
 
 
-    // Storage refresh key - increment to force StorageIndicator to refresh
-    const [storageRefreshKey, setStorageRefreshKey] = useState(0);
-    const refreshStorage = () => setStorageRefreshKey(prev => prev + 1);
+
 
 
     // Helper function to normalize skills array - converts all strings to CVSkill objects
@@ -188,7 +198,7 @@ export default function MyInfo({ site, cvData, onDelete, onCVAnalyzed, deleting 
         }
     }, [site, cvData]);
 
-    // URL'lerin başına https:// ekleyen yardımcı fonksiyon
+    // URL'lerin baÅŸÄ±na https:// ekleyen yardÄ±mcÄ± fonksiyon
     const ensureHttps = (url: string) => {
         if (!url || url.trim() === '') return '';
         const trimmedUrl = url.trim();
@@ -214,8 +224,7 @@ export default function MyInfo({ site, cvData, onDelete, onCVAnalyzed, deleting 
                     const data = await response.json();
 
                     if (response.ok) {
-                        console.log("✅ Profile photo deleted from Cloudflare");
-                        refreshStorage(); // Refresh storage indicator
+                        console.log("Profile photo deleted from Cloudflare");
                     } else {
                         console.error("Profile photo deletion failed:", data.error);
                         // Continue with save even if deletion fails
@@ -245,7 +254,7 @@ export default function MyInfo({ site, cvData, onDelete, onCVAnalyzed, deleting 
 
                     if (photoResponse.ok) {
                         finalProfilePhotoUrl = photoData.url;
-                        console.log("✅ Profile photo uploaded:", finalProfilePhotoUrl);
+                        console.log("âœ… Profile photo uploaded:", finalProfilePhotoUrl);
 
                         // Delete old photo from Cloudflare if it exists
                         if (originalStateRef.current?.profilePhotoUrl) {
@@ -255,7 +264,7 @@ export default function MyInfo({ site, cvData, onDelete, onCVAnalyzed, deleting 
                                 });
 
                                 if (deleteResponse.ok) {
-                                    console.log("✅ Old profile photo deleted from Cloudflare");
+                                    console.log("âœ… Old profile photo deleted from Cloudflare");
                                 } else {
                                     console.error("Old profile photo deletion failed");
                                     // Continue with save even if old photo deletion fails
@@ -290,7 +299,7 @@ export default function MyInfo({ site, cvData, onDelete, onCVAnalyzed, deleting 
                             });
 
                             if (response.ok) {
-                                console.log("✅ Portfolio image deleted from Cloudflare:", imageUrl);
+                                console.log("âœ… Portfolio image deleted from Cloudflare:", imageUrl);
                             } else {
                                 const data = await response.json();
                                 console.error("Portfolio image deletion failed:", data.error);
@@ -331,7 +340,7 @@ export default function MyInfo({ site, cvData, onDelete, onCVAnalyzed, deleting 
                             const url = portfolioData.uploads?.[0]?.url || portfolioData.url;
                             if (url) {
                                 uploadedUrls.push(url);
-                                console.log(`✅ Portfolio image ${i + 1}/${pendingPortfolio.length} uploaded:`, url);
+                                console.log(`âœ… Portfolio image ${i + 1}/${pendingPortfolio.length} uploaded:`, url);
                             }
                         } else {
                             console.error(`Portfolio image ${i + 1} upload failed:`, portfolioData.error);
@@ -342,7 +351,7 @@ export default function MyInfo({ site, cvData, onDelete, onCVAnalyzed, deleting 
                     // Add uploaded URLs to portfolio
                     const newPortfolioItems: CVPortfolioItem[] = uploadedUrls.map(url => ({ imageUrl: url }));
                     finalPortfolio = [...finalPortfolio, ...newPortfolioItems];
-                    console.log(`✅ ${uploadedUrls.length}/${pendingPortfolio.length} portfolio images uploaded`);
+                    console.log(`âœ… ${uploadedUrls.length}/${pendingPortfolio.length} portfolio images uploaded`);
                 } catch (error) {
                     console.error("Portfolio upload error:", error);
                     toast.error("Portfolio fotoğrafları yüklenirken hata oluştu. Bazı fotoğraflar yüklenmemiş olabilir.");
@@ -744,12 +753,12 @@ export default function MyInfo({ site, cvData, onDelete, onCVAnalyzed, deleting 
             });
             const data = await response.json();
             if (response.ok) {
-                toast.success(`Site başarıyla yeniden yayınlandı!`, {
+                toast.success(`Site başarıyla yeniden yayındırıldı!`, {
                     description: data.cloudflareUrl
                 });
                 window.location.reload();
             } else {
-                toast.error(data.error || "Site yayınlanamadı");
+                toast.error(data.error || "Site yayındırılamadı");
             }
         } catch (error) {
             console.error("Yayınlama hatası:", error);
@@ -808,975 +817,522 @@ export default function MyInfo({ site, cvData, onDelete, onCVAnalyzed, deleting 
 
     return (
         <>
-        <div className="space-y-6">
-            <div>
-                <h2 className="text-2xl font-bold text-white mb-2">Bilgilerim</h2>
+            {/* Page Header - Outside flex container */}
+            <div className="mb-6">
+                <h2 className="text-3xl font-bold text-white mb-2 bg-clip-text text-transparent bg-gradient-to-r from-white to-gray-300">Bilgilerim</h2>
                 <p className="text-gray-400">
                     CV'nizi yükleyin veya mevcut CV bilgilerinizi görüntüleyin/düzenleyin
                 </p>
             </div>
 
-            {/* Storage Indicator - Always show at top */}
-            <StorageIndicator key={storageRefreshKey} />
+            {/* Main 2-column layout: Content (scroll) + Navigation Sidebar */}
+            <div className="flex gap-6 items-start">
+                {/* Left: Scrollable Content Area */}
+                <div className="flex-1 space-y-6">
 
-            {/* Unpublished Changes Warning - Only show when site is published and has changes */}
-            {site && site.status === "published" && hasUnpublishedChanges(site) && (
-                <div className="bg-yellow-900/30 border border-yellow-700 rounded-lg p-4">
-                    <div className="flex items-start gap-3">
-                        <svg className="w-6 h-6 text-yellow-400 flex-shrink-0 mt-0.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
-                        </svg>
-                        <div className="flex-1">
-                            <p className="text-yellow-300 font-semibold mb-1">
-                                ⚠️ Yayınlanan site son değişiklikleri içermiyor
-                            </p>
-                            <p className="text-yellow-200 text-sm mb-3">
-                                Yayınlanan sitenizi güncellemek veya değişiklikleri geri almak için aşağıdaki butonları kullanın.
-                            </p>
-                            <div className="flex gap-2">
-                                <button
-                                    onClick={handleRepublish}
-                                    disabled={publishing}
-                                    className="bg-yellow-600 hover:bg-yellow-700 disabled:bg-gray-400 text-white font-semibold py-2 px-4 rounded-lg transition-colors duration-200 text-sm"
-                                >
-                                    {publishing ? "Yayınlanıyor..." : "Yeniden Yayınla"}
-                                </button>
-                                <button
-                                    onClick={handleRollback}
-                                    className="bg-gray-600 hover:bg-gray-700 text-white font-semibold py-2 px-4 rounded-lg transition-colors duration-200 text-sm"
-                                >
-                                    ← Geri Dön
-                                </button>
-                            </div>
-
-                            {/* Change Details Panel */}
-                            <ChangeDetailsPanel site={site} />
-                        </div>
-                    </div>
-                </div>
-            )}
-
-            {/* Published Site Warning */}
-            {site && site.status === "published" && isEditing && !hasUnpublishedChanges(site) && (
-                <div className="bg-blue-900/30 border border-blue-700 rounded-lg p-4">
-                    <div className="flex items-start gap-3">
-                        <svg className="w-5 h-5 text-blue-400 flex-shrink-0 mt-0.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
-                        </svg>
-                        <div className="flex-1">
-                            <p className="text-blue-300 text-sm">
-                                <strong>💡 Not:</strong> Bu değişiklikler önizleme sitenize yansıyacak. Yayınlanan sitenizi güncellemek için <strong>"Sitem"</strong> sekmesinden <strong>"Yeniden Yayınla"</strong> butonuna tıklayın.
-                            </p>
-                        </div>
-                    </div>
-                </div>
-            )}
-
-
-
-            {!site || !cvData ? (
-                <CVUploader onAnalyzed={onCVAnalyzed} />
-            ) : (
-                <div className="bg-gray-800 rounded-xl border border-gray-700 p-6">
-                    <div className="flex justify-between items-center mb-6">
-                        <h3 className="text-xl font-bold text-white">CV'im</h3>
-                        <div className="flex gap-2">
-                            {!isEditing ? (
-                                <button
-                                    onClick={handleEdit}
-                                    className="flex items-center gap-2 px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-lg transition-colors duration-200"
-                                >
-                                    <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
-                                    </svg>
-                                    <span>Düzenle</span>
-                                </button>
-                            ) : (
-                                <>
-                                    <button
-                                        onClick={handleSave}
-                                        disabled={saving}
-                                        className="flex items-center gap-2 px-4 py-2 bg-green-600 hover:bg-green-700 disabled:bg-gray-400 text-white rounded-lg transition-colors duration-200"
-                                    >
-                                        {saving ? (
-                                            <>
-                                                <svg className="animate-spin h-4 w-4" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
-                                                    <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
-                                                    <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
-                                                </svg>
-                                                <span>Kaydediliyor...</span>
-                                            </>
-                                        ) : (
-                                            <>
-                                                <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
-                                                </svg>
-                                                <span>Kaydet</span>
-                                            </>
-                                        )}
-                                    </button>
-                                    <button
-                                        onClick={handleCancel}
-                                        disabled={saving}
-                                        className="flex items-center gap-2 px-4 py-2 bg-gray-600 hover:bg-gray-700 disabled:bg-gray-400 text-white rounded-lg transition-colors duration-200"
-                                    >
-                                        <span>İptal</span>
-                                    </button>
-                                </>
-                            )}
-                            <button
-                                onClick={onDelete}
-                                disabled={deleting || isEditing}
-                                className="flex items-center gap-2 px-4 py-2 bg-red-600 hover:bg-red-700 disabled:bg-gray-400 text-white rounded-lg transition-colors duration-200"
-                            >
-                                {deleting ? (
-                                    <>
-                                        <svg className="animate-spin h-4 w-4" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
-                                            <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
-                                            <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
-                                        </svg>
-                                        <span>Siliniyor...</span>
-                                    </>
-                                ) : (
-                                    <>
-                                        <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
-                                        </svg>
-                                        <span>CV'yi Sil</span>
-                                    </>
-                                )}
-                            </button>
-                        </div>
-                    </div>
-
-                    <div className="space-y-4">
-                        {/* Personal Info */}
-                        <div className="bg-gray-700/50 rounded-lg p-4">
-                            <h4 className="text-lg font-semibold text-white mb-3">Kişisel Bilgiler</h4>
-
-                            {/* Profile Photo Section */}
-                            <div className="mb-6 flex flex-col items-center">
-                                <div className="w-32 h-32 rounded-full bg-gray-600 flex items-center justify-center mb-3 overflow-hidden border-4 border-gray-500">
-                                    {/* Show preview if pending photo exists, otherwise show saved photo (unless marked for deletion) */}
-                                    {profilePhotoPreview || (!photoMarkedForDeletion && profilePhotoUrl) ? (
-                                        <img
-                                            src={profilePhotoPreview || profilePhotoUrl}
-                                            alt="Profile"
-                                            className="w-full h-full object-cover"
-                                        />
-                                    ) : (
-                                        <span className="text-4xl text-gray-400 font-semibold">
-                                            {name ? name.split(' ').map(n => n[0]).join('').toUpperCase().slice(0, 2) : '?'}
-                                        </span>
-                                    )}
-                                </div>
-                                {isEditing && (
+                    {/* Unpublished Changes Warning */}
+                    {site && site.status === "published" && hasUnpublishedChanges(site) && (
+                        <div className="bg-yellow-900/20 backdrop-blur-sm border border-yellow-500/30 rounded-2xl p-4">
+                            <div className="flex items-start gap-3">
+                                <svg className="w-6 h-6 text-yellow-400 flex-shrink-0 mt-0.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
+                                </svg>
+                                <div className="flex-1">
+                                    <p className="text-yellow-300 font-semibold mb-1">Yayınlanan site son değişiklikleri içeriyor</p>
+                                    <p className="text-yellow-200 text-sm mb-3">Yayınlanan sitenizi güncellemek veya değişiklikleri geri almak için aşağıdaki butonları kullanın.</p>
                                     <div className="flex gap-2">
-                                        <label className="cursor-pointer">
-                                            <input
-                                                type="file"
-                                                accept="image/jpeg,image/jpg,image/png,image/webp"
-                                                onChange={handlePhotoUpload}
-                                                disabled={uploadingPhoto}
-                                                className="hidden"
-                                            />
-                                            <span className={`inline-flex items-center gap-2 px-4 py-2 rounded-lg text-sm font-medium transition-colors ${uploadingPhoto
-                                                ? 'bg-gray-600 text-gray-400 cursor-not-allowed'
-                                                : 'bg-blue-600 hover:bg-blue-700 text-white'
-                                                }`}>
-                                                {uploadingPhoto ? (
-                                                    <>
-                                                        <svg className="animate-spin h-4 w-4" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
-                                                            <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
-                                                            <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
-                                                        </svg>
-                                                        Yükleniyor...
-                                                    </>
-                                                ) : (
-                                                    <>
-                                                        <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" />
-                                                        </svg>
-                                                        Fotoğraf Ekle
-                                                    </>
-                                                )}
+                                        <button onClick={handleRepublish} disabled={publishing} className="bg-gradient-to-r from-yellow-600 to-orange-600 hover:from-yellow-500 hover:to-orange-500 disabled:from-gray-500 disabled:to-gray-600 text-white font-semibold py-2 px-4 rounded-xl transition-all text-sm">
+                                            {publishing ? "Yayınlanıyor..." : "Yeniden Yayınla"}
+                                        </button>
+                                        <button onClick={handleRollback} className="bg-white/10 hover:bg-white/20 text-white font-semibold py-2 px-4 rounded-xl transition-all text-sm border border-white/10">
+                                            Geri Dön
+                                        </button>
+                                    </div>
+                                    <ChangeDetailsPanel site={site} />
+                                </div>
+                            </div>
+                        </div>
+                    )}
+
+                    {/* Published Site Edit Warning */}
+                    {site && site.status === "published" && isEditing && !hasUnpublishedChanges(site) && (
+                        <div className="bg-blue-900/20 backdrop-blur-sm border border-blue-500/30 rounded-2xl p-4">
+                            <div className="flex items-start gap-3">
+                                <svg className="w-5 h-5 text-blue-400 flex-shrink-0 mt-0.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                                </svg>
+                                <p className="text-blue-300 text-sm">
+                                    <strong>Not:</strong> Bu değişiklikler önizleme sitenize yansıyacak. Yayınlanan sitenizi güncellemek için <strong>"Sitem"</strong> sekmesinden <strong>"Yeniden Yayınla"</strong> butonuna tıklayınız.
+                                </p>
+                            </div>
+                        </div>
+                    )}
+
+                    {/* CV Content */}
+                    {!site || !cvData ? (
+                        <CVUploader onAnalyzed={onCVAnalyzed} />
+                    ) : (
+                        <div className="space-y-6">
+                            {/* Profile Photo Card */}
+                            <div className="bg-[#111]/80 backdrop-blur-sm rounded-2xl border border-white/10 p-6 hover:border-purple-500/30 transition-all">
+                                <h3 className="text-lg font-semibold text-white mb-4 flex items-center gap-2">
+                                    <span className="w-2 h-2 rounded-full bg-gradient-to-r from-purple-500 to-blue-500"></span>
+                                    Profil Fotoğrafı
+                                </h3>
+                                <div className="flex flex-col items-center">
+                                    <div className="w-32 h-32 rounded-full bg-gradient-to-br from-purple-500/20 to-blue-500/20 flex items-center justify-center mb-4 overflow-hidden border-4 border-white/10">
+                                        {profilePhotoPreview || (!photoMarkedForDeletion && profilePhotoUrl) ? (
+                                            <img src={profilePhotoPreview || profilePhotoUrl} alt="Profile" className="w-full h-full object-cover" />
+                                        ) : (
+                                            <span className="text-4xl text-gray-400 font-semibold">
+                                                {name ? name.split(' ').map(n => n[0]).join('').toUpperCase().slice(0, 2) : '?'}
                                             </span>
-                                        </label>
-                                        {/* Show delete button if there's a saved photo (not marked for deletion) OR a pending photo */}
-                                        {((profilePhotoUrl && !photoMarkedForDeletion) || pendingProfilePhoto) && !uploadingPhoto && (
-                                            <button
-                                                onClick={handlePhotoDelete}
-                                                className="inline-flex items-center gap-2 px-4 py-2 bg-red-600 hover:bg-red-700 text-white rounded-lg text-sm font-medium transition-colors"
-                                            >
-                                                <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
-                                                </svg>
-                                                Fotoğrafı Sil
-                                            </button>
                                         )}
                                     </div>
-                                )}
-                            </div>
-
-                            <div className="space-y-3">
-                                <div>
-                                    <label className="block text-sm font-medium text-gray-300 mb-1">Ad Soyad</label>
-                                    {isEditing ? (
-                                        <input
-                                            type="text"
-                                            value={name}
-                                            onChange={(e) => setName(e.target.value)}
-                                            className="w-full px-3 py-2 bg-gray-600 border border-gray-500 text-white rounded-lg focus:ring-2 focus:ring-blue-500"
-                                        />
-                                    ) : (
-                                        <p className="text-gray-300">{name || "-"}</p>
-                                    )}
-                                </div>
-                                <div>
-                                    <label className="block text-sm font-medium text-gray-300 mb-1">Ünvan</label>
-                                    {isEditing ? (
-                                        <input
-                                            type="text"
-                                            value={jobTitle}
-                                            onChange={(e) => setJobTitle(e.target.value)}
-                                            className="w-full px-3 py-2 bg-gray-600 border border-gray-500 text-white rounded-lg focus:ring-2 focus:ring-blue-500"
-                                        />
-                                    ) : (
-                                        <p className="text-gray-300">{jobTitle || "-"}</p>
-                                    )}
-                                </div>
-                                <div>
-                                    <label className="block text-sm font-medium text-gray-300 mb-1">Email</label>
-                                    {isEditing ? (
-                                        <input
-                                            type="email"
-                                            value={email}
-                                            onChange={(e) => setEmail(e.target.value)}
-                                            className="w-full px-3 py-2 bg-gray-600 border border-gray-500 text-white rounded-lg focus:ring-2 focus:ring-blue-500"
-                                        />
-                                    ) : (
-                                        <p className="text-gray-300">{email || "-"}</p>
-                                    )}
-                                </div>
-                                <div>
-                                    <label className="block text-sm font-medium text-gray-300 mb-1">Telefon</label>
-                                    {isEditing ? (
-                                        <input
-                                            type="tel"
-                                            value={phone}
-                                            onChange={(e) => setPhone(e.target.value)}
-                                            className="w-full px-3 py-2 bg-gray-600 border border-gray-500 text-white rounded-lg focus:ring-2 focus:ring-blue-500"
-                                        />
-                                    ) : (
-                                        <p className="text-gray-300">{phone || "-"}</p>
-                                    )}
-                                </div>
-                                <div>
-                                    <label className="block text-sm font-medium text-gray-300 mb-1">Konum</label>
-                                    {isEditing ? (
-                                        <input
-                                            type="text"
-                                            value={location}
-                                            onChange={(e) => setLocation(e.target.value)}
-                                            className="w-full px-3 py-2 bg-gray-600 border border-gray-500 text-white rounded-lg focus:ring-2 focus:ring-blue-500"
-                                        />
-                                    ) : (
-                                        <p className="text-gray-300">{location || "-"}</p>
-                                    )}
-                                </div>
-                                <div>
-                                    <label className="block text-sm font-medium text-gray-300 mb-1">LinkedIn URL</label>
-                                    {isEditing ? (
-                                        <input
-                                            type="url"
-                                            value={linkedinUrl}
-                                            onChange={(e) => setLinkedinUrl(e.target.value)}
-                                            placeholder="https://linkedin.com/in/kullaniciadi"
-                                            className="w-full px-3 py-2 bg-gray-600 border border-gray-500 text-white rounded-lg focus:ring-2 focus:ring-blue-500"
-                                        />
-                                    ) : (
-                                        <p className="text-gray-300">{linkedinUrl || "-"}</p>
-                                    )}
-                                </div>
-                                <div>
-                                    <label className="block text-sm font-medium text-gray-300 mb-1">GitHub URL</label>
-                                    {isEditing ? (
-                                        <input
-                                            type="url"
-                                            value={githubUrl}
-                                            onChange={(e) => setGithubUrl(e.target.value)}
-                                            placeholder="https://github.com/kullaniciadi"
-                                            className="w-full px-3 py-2 bg-gray-600 border border-gray-500 text-white rounded-lg focus:ring-2 focus:ring-blue-500"
-                                        />
-                                    ) : (
-                                        <p className="text-gray-300">{githubUrl || "-"}</p>
-                                    )}
-                                </div>
-                                <div>
-                                    <label className="block text-sm font-medium text-gray-300 mb-1">Facebook URL</label>
-                                    {isEditing ? (
-                                        <input
-                                            type="url"
-                                            value={facebookUrl}
-                                            onChange={(e) => setFacebookUrl(e.target.value)}
-                                            placeholder="https://facebook.com/kullaniciadi"
-                                            className="w-full px-3 py-2 bg-gray-600 border border-gray-500 text-white rounded-lg focus:ring-2 focus:ring-blue-500"
-                                        />
-                                    ) : (
-                                        <p className="text-gray-300">{facebookUrl || "-"}</p>
-                                    )}
-                                </div>
-                                <div>
-                                    <label className="block text-sm font-medium text-gray-300 mb-1">Instagram URL</label>
-                                    {isEditing ? (
-                                        <input
-                                            type="url"
-                                            value={instagramUrl}
-                                            onChange={(e) => setInstagramUrl(e.target.value)}
-                                            placeholder="https://instagram.com/kullaniciadi"
-                                            className="w-full px-3 py-2 bg-gray-600 border border-gray-500 text-white rounded-lg focus:ring-2 focus:ring-blue-500"
-                                        />
-                                    ) : (
-                                        <p className="text-gray-300">{instagramUrl || "-"}</p>
-                                    )}
-                                </div>
-                                <div>
-                                    <label className="block text-sm font-medium text-gray-300 mb-1">X (Twitter) URL</label>
-                                    {isEditing ? (
-                                        <input
-                                            type="url"
-                                            value={xUrl}
-                                            onChange={(e) => setXUrl(e.target.value)}
-                                            placeholder="https://x.com/kullaniciadi"
-                                            className="w-full px-3 py-2 bg-gray-600 border border-gray-500 text-white rounded-lg focus:ring-2 focus:ring-blue-500"
-                                        />
-                                    ) : (
-                                        <p className="text-gray-300">{xUrl || "-"}</p>
-                                    )}
-                                </div>
-                                <div>
-                                    <label className="block text-sm font-medium text-gray-300 mb-1">Web Site URL</label>
-                                    {isEditing ? (
-                                        <input
-                                            type="url"
-                                            value={websiteUrl}
-                                            onChange={(e) => setWebsiteUrl(e.target.value)}
-                                            placeholder="https://www.websitesi.com"
-                                            className="w-full px-3 py-2 bg-gray-600 border border-gray-500 text-white rounded-lg focus:ring-2 focus:ring-blue-500"
-                                        />
-                                    ) : (
-                                        <p className="text-gray-300">{websiteUrl || "-"}</p>
-                                    )}
-                                </div>
-                            </div>
-                        </div>
-
-                        {/* Summary */}
-                        <div className="bg-gray-700/50 rounded-lg p-4">
-                            <h4 className="text-lg font-semibold text-white mb-3">Özet</h4>
-                            {isEditing ? (
-                                <textarea
-                                    value={summary}
-                                    onChange={(e) => setSummary(e.target.value)}
-                                    rows={4}
-                                    className="w-full px-3 py-2 bg-gray-600 border border-gray-500 text-white rounded-lg focus:ring-2 focus:ring-blue-500 resize-none"
-                                />
-                            ) : (
-                                <p className="text-sm text-gray-300">{summary || "-"}</p>
-                            )}
-                        </div>
-
-                        {/* Experience */}
-                        <div className="bg-gray-700/50 rounded-lg p-4">
-                            <div className="flex justify-between items-center mb-3">
-                                <h4 className="text-lg font-semibold text-white">
-                                    İş Deneyimi ({experience.length})
-                                </h4>
-                                {isEditing && (
-                                    <button
-                                        onClick={addExperience}
-                                        className="px-3 py-1 bg-blue-600 hover:bg-blue-700 text-white text-sm rounded transition-colors"
-                                    >
-                                        + Ekle
-                                    </button>
-                                )}
-                            </div>
-                            <div className="space-y-3">
-                                {experience.map((exp, index) => (
-                                    <div key={index} className="bg-gray-600/50 rounded p-3">
-                                        {isEditing ? (
-                                            <div className="space-y-2">
-                                                <div className="flex justify-end">
-                                                    <button
-                                                        onClick={() => removeExperience(index)}
-                                                        className="text-red-400 hover:text-red-300 text-sm"
-                                                    >
-                                                        Sil
-                                                    </button>
-                                                </div>
-                                                <input
-                                                    type="text"
-                                                    placeholder="Pozisyon"
-                                                    value={exp.position || ""}
-                                                    onChange={(e) => updateExperience(index, "position", e.target.value)}
-                                                    className="w-full px-2 py-1 bg-gray-700 border border-gray-600 text-white rounded text-sm"
-                                                />
-                                                <input
-                                                    type="text"
-                                                    placeholder="Şirket"
-                                                    value={exp.company || ""}
-                                                    onChange={(e) => updateExperience(index, "company", e.target.value)}
-                                                    className="w-full px-2 py-1 bg-gray-700 border border-gray-600 text-white rounded text-sm"
-                                                />
-                                                <input
-                                                    type="text"
-                                                    placeholder="Süre (ör: 2020-2022)"
-                                                    value={exp.duration || ""}
-                                                    onChange={(e) => updateExperience(index, "duration", e.target.value)}
-                                                    className="w-full px-2 py-1 bg-gray-700 border border-gray-600 text-white rounded text-sm"
-                                                />
-                                                <textarea
-                                                    placeholder="Açıklama (opsiyonel)"
-                                                    value={exp.description || ""}
-                                                    onChange={(e) => updateExperience(index, "description", e.target.value)}
-                                                    rows={2}
-                                                    className="w-full px-2 py-1 bg-gray-700 border border-gray-600 text-white rounded text-sm resize-none"
-                                                />
-                                            </div>
-                                        ) : (
-                                            <div className="text-sm">
-                                                <p className="font-medium text-white">
-                                                    {exp.position} - {exp.company}
-                                                </p>
-                                                <p className="text-gray-400">{exp.duration}</p>
-                                                {exp.description && (
-                                                    <p className="text-gray-300 mt-1">{exp.description}</p>
-                                                )}
-                                            </div>
-                                        )}
-                                    </div>
-                                ))}
-                                {experience.length === 0 && <p className="text-gray-400 text-sm">Henüz iş deneyimi eklenmemiş</p>}
-                            </div>
-                        </div>
-
-                        {/* Education */}
-                        <div className="bg-gray-700/50 rounded-lg p-4">
-                            <div className="flex justify-between items-center mb-3">
-                                <h4 className="text-lg font-semibold text-white">
-                                    Eğitim ({education.length})
-                                </h4>
-                                {isEditing && (
-                                    <button
-                                        onClick={addEducation}
-                                        className="px-3 py-1 bg-blue-600 hover:bg-blue-700 text-white text-sm rounded transition-colors"
-                                    >
-                                        + Ekle
-                                    </button>
-                                )}
-                            </div>
-                            <div className="space-y-3">
-                                {education.map((edu, index) => (
-                                    <div key={index} className="bg-gray-600/50 rounded p-3">
-                                        {isEditing ? (
-                                            <div className="space-y-2">
-                                                <div className="flex justify-end">
-                                                    <button
-                                                        onClick={() => removeEducation(index)}
-                                                        className="text-red-400 hover:text-red-300 text-sm"
-                                                    >
-                                                        Sil
-                                                    </button>
-                                                </div>
-                                                <input
-                                                    type="text"
-                                                    placeholder="Derece (ör: Lisans)"
-                                                    value={edu.degree || ""}
-                                                    onChange={(e) => updateEducation(index, "degree", e.target.value)}
-                                                    className="w-full px-2 py-1 bg-gray-700 border border-gray-600 text-white rounded text-sm"
-                                                />
-                                                <input
-                                                    type="text"
-                                                    placeholder="Alan (ör: Bilgisayar Mühendisliği)"
-                                                    value={edu.field || ""}
-                                                    onChange={(e) => updateEducation(index, "field", e.target.value)}
-                                                    className="w-full px-2 py-1 bg-gray-700 border border-gray-600 text-white rounded text-sm"
-                                                />
-                                                <input
-                                                    type="text"
-                                                    placeholder="Okul"
-                                                    value={edu.school || ""}
-                                                    onChange={(e) => updateEducation(index, "school", e.target.value)}
-                                                    className="w-full px-2 py-1 bg-gray-700 border border-gray-600 text-white rounded text-sm"
-                                                />
-                                                <input
-                                                    type="text"
-                                                    placeholder="Yıl (ör: 2018-2022)"
-                                                    value={edu.year || ""}
-                                                    onChange={(e) => updateEducation(index, "year", e.target.value)}
-                                                    className="w-full px-2 py-1 bg-gray-700 border border-gray-600 text-white rounded text-sm"
-                                                />
-                                                <input
-                                                    type="text"
-                                                    placeholder="GPA (opsiyonel, ör: 3.8/4.0, 85/100)"
-                                                    value={edu.gpa || ""}
-                                                    onChange={(e) => updateEducation(index, "gpa", e.target.value)}
-                                                    className="w-full px-2 py-1 bg-gray-700 border border-gray-600 text-white rounded text-sm"
-                                                />
-                                            </div>
-                                        ) : (
-                                            <div className="text-sm">
-                                                <p className="font-medium text-white">
-                                                    {edu.degree} - {edu.field}
-                                                </p>
-                                                <p className="text-gray-400">
-                                                    {edu.school} ({edu.year})
-                                                    {edu.gpa && <span className="ml-2 text-green-400">• GPA: {edu.gpa}</span>}
-                                                </p>
-                                            </div>
-                                        )}
-                                    </div>
-                                ))}
-                                {education.length === 0 && <p className="text-gray-400 text-sm">Henüz eğitim bilgisi eklenmemiş</p>}
-                            </div>
-                        </div>
-
-                        {/* Portfolio */}
-                        <div className="bg-gray-700/50 rounded-lg p-4">
-                            <div className="flex justify-between items-center mb-3">
-                                <h4 className="text-lg font-semibold text-white">
-                                    Portfolio ({portfolio.length}/10)
-                                </h4>
-                            </div>
-
-                            {/* Portfolio Uploader - Only show in edit mode */}
-                            {isEditing && (
-                                <div className="mb-4">
-                                    <PortfolioUploader
-                                        currentCount={portfolio.length + pendingPortfolio.length}
-                                        maxCount={10}
-                                        onFilesSelected={handlePortfolioFilesSelected}
-                                        deferredMode={true}
-                                        disabled={uploadingPortfolio}
-                                        existingFiles={portfolio
-                                            .filter(item => item?.imageUrl)
-                                            .map(item => ({
-                                                fileName: item.imageUrl.split('/').pop() || '',
-                                                fileSize: 0 // We don't have size info, but name check is still useful
-                                            }))}
-                                    />
-                                </div>
-                            )}
-
-                            {/* Portfolio Grid */}
-                            <div className="grid grid-cols-2 md:grid-cols-3 gap-3">
-                                {/* Show saved portfolio items */}
-                                {portfolio.map((item, index) => (
-                                    <div key={index} className="relative group aspect-square rounded-lg overflow-hidden bg-gray-600">
-                                        <img
-                                            src={item.imageUrl}
-                                            alt={item.title || `Portfolio ${index + 1}`}
-                                            className="w-full h-full object-cover"
-                                        />
-
-                                        {/* Metadata Overlay */}
-                                        {(item.title || item.category) && (
-                                            <div className="absolute bottom-0 left-0 right-0 bg-gradient-to-t from-black/80 to-transparent p-2">
-                                                {item.title && (
-                                                    <p className="text-white text-xs font-semibold truncate">{item.title}</p>
-                                                )}
-                                                {item.category && (
-                                                    <p className="text-gray-300 text-xs truncate">{item.category}</p>
-                                                )}
-                                            </div>
-                                        )}
-
-                                        {/* Action Buttons */}
-                                        {isEditing && !uploadingPortfolio && (
-                                            <div className="absolute top-2 right-2 flex gap-2 opacity-0 group-hover:opacity-100 transition-opacity">
-                                                <button
-                                                    onClick={() => setEditingPortfolioIndex(index)}
-                                                    className="p-2 bg-blue-600 hover:bg-blue-700 text-white rounded-full"
-                                                    title="Detayları düzenle"
-                                                >
-                                                    <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
-                                                    </svg>
+                                    {isEditing && (
+                                        <div className="flex gap-2">
+                                            <label className="cursor-pointer">
+                                                <input type="file" accept="image/jpeg,image/jpg,image/png,image/webp" onChange={handlePhotoUpload} disabled={uploadingPhoto} className="hidden" />
+                                                <span className={`inline-flex items-center gap-2 px-4 py-2 rounded-xl text-sm font-medium transition-all ${uploadingPhoto ? 'bg-gray-600 text-gray-400 cursor-not-allowed' : 'bg-gradient-to-r from-purple-600 to-blue-600 hover:from-purple-500 hover:to-blue-500 text-white'}`}>
+                                                    {uploadingPhoto ? (
+                                                        <><svg className="animate-spin h-4 w-4" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"><circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle><path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path></svg>Yükleniyor...</>
+                                                    ) : (
+                                                        <>Fotoğraf Ekle</>
+                                                    )}
+                                                </span>
+                                            </label>
+                                            {((profilePhotoUrl && !photoMarkedForDeletion) || pendingProfilePhoto) && !uploadingPhoto && (
+                                                <button onClick={handlePhotoDelete} className="inline-flex items-center gap-2 px-4 py-2 bg-red-500/20 hover:bg-red-500/30 text-red-400 rounded-xl text-sm font-medium transition-all border border-red-500/30">
+                                                    Sil
                                                 </button>
-                                                <button
-                                                    onClick={() => handlePortfolioDelete(item.imageUrl, index)}
-                                                    className="p-2 bg-red-600 hover:bg-red-700 text-white rounded-full"
-                                                    title="Sil"
-                                                >
-                                                    <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
-                                                    </svg>
-                                                </button>
-                                            </div>
-                                        )}
-                                    </div>
-                                ))}
-
-                                {/* Show pending portfolio items (previews) */}
-                                {pendingPortfolio.map((item, index) => (
-                                    <div key={`pending-${index}`} className="relative group aspect-square rounded-lg overflow-hidden bg-gray-600 border-2 border-yellow-500">
-                                        <img
-                                            src={item.preview}
-                                            alt={`Pending ${index + 1}`}
-                                            className="w-full h-full object-cover"
-                                        />
-
-                                        {/* Pending indicator */}
-                                        <div className="absolute top-2 left-2 bg-yellow-500 text-black text-xs px-2 py-1 rounded font-semibold">
-                                            Kaydedilmedi
+                                            )}
                                         </div>
-
-                                        {/* Delete button for pending items */}
-                                        {isEditing && (
-                                            <div className="absolute inset-0 bg-black/50 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center gap-2">
-                                                <button
-                                                    onClick={() => {
-                                                        // Remove from pending
-                                                        URL.revokeObjectURL(item.preview);
-                                                        setPendingPortfolio(prev => prev.filter((_, i) => i !== index));
-                                                    }}
-                                                    className="bg-red-600 hover:bg-red-700 text-white p-2 rounded-lg transition-colors"
-                                                    title="Kaldır"
-                                                >
-                                                    <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
-                                                    </svg>
-                                                </button>
-                                            </div>
-                                        )}
-                                    </div>
-                                ))}
-
-                                {portfolio.length === 0 && pendingPortfolio.length === 0 && (
-                                    <div className="col-span-2 md:grid-cols-3 text-center py-8">
-                                        <p className="text-gray-400 text-sm">Henüz portfolio fotoğrafı eklenmemiş</p>
-                                        {isEditing && (
-                                            <p className="text-gray-500 text-xs mt-2">Maksimum 10 adet fotoğraf ekleyebilirsiniz</p>
-                                        )}
-                                    </div>
-                                )}
-                            </div>
-                        </div>
-
-                        {/* Portfolio Metadata Editor Modal */}
-                        {editingPortfolioIndex !== null && (
-                            <PortfolioMetadataEditor
-                                item={portfolio[editingPortfolioIndex]}
-                                index={editingPortfolioIndex}
-                                onSave={handlePortfolioMetadataSave}
-                                onCancel={() => setEditingPortfolioIndex(null)}
-                            />
-                        )}
-
-                        {/* Skills */}
-                        <div className="bg-gray-700/50 rounded-lg p-4">
-                            <div className="flex justify-between items-center mb-3">
-                                <h4 className="text-lg font-semibold text-white">Yetenekler</h4>
-                                {isEditing && (
-                                    <button
-                                        onClick={addSkill}
-                                        className="px-3 py-1 bg-blue-600 hover:bg-blue-700 text-white text-sm rounded transition-colors"
-                                    >
-                                        + Ekle
-                                    </button>
-                                )}
-                            </div>
-                            {isEditing ? (
-                                <div className="space-y-2">
-                                    {skills.map((skill, index) => {
-                                        const skillObj = typeof skill === 'string'
-                                            ? { name: skill, level: 'intermediate' as const, percentage: 70, category: '' }
-                                            : skill;
-
-                                        return (
-                                            <div key={index} className="bg-gray-600/30 rounded p-3 space-y-2">
-                                                {/* Row 1: Name and Level */}
-                                                <div className="flex gap-2 items-center">
-                                                    <input
-                                                        type="text"
-                                                        value={skillObj.name}
-                                                        onChange={(e) => updateSkill(index, 'name', e.target.value)}
-                                                        placeholder="Yetenek adı"
-                                                        className="flex-1 px-2 py-1.5 bg-gray-700 border border-gray-600 text-white rounded text-sm focus:ring-1 focus:ring-blue-500"
-                                                    />
-                                                    <select
-                                                        value={skillObj.level || 'intermediate'}
-                                                        onChange={(e) => updateSkill(index, 'level', e.target.value as CVSkill['level'])}
-                                                        className="px-2 py-1.5 bg-gray-700 border border-gray-600 text-white rounded text-sm focus:ring-1 focus:ring-blue-500"
-                                                    >
-                                                        <option value="beginner">Başlangıç</option>
-                                                        <option value="intermediate">Orta</option>
-                                                        <option value="advanced">İleri</option>
-                                                        <option value="expert">Uzman</option>
-                                                    </select>
-                                                    <button
-                                                        onClick={() => removeSkill(index)}
-                                                        className="px-2 py-1.5 text-red-400 hover:text-red-300 text-sm"
-                                                        title="Sil"
-                                                    >
-                                                        ✕
-                                                    </button>
-                                                </div>
-
-                                                {/* Row 2: Category */}
-                                                <div>
-                                                    <input
-                                                        type="text"
-                                                        value={skillObj.category || ''}
-                                                        onChange={(e) => updateSkill(index, 'category', e.target.value)}
-                                                        placeholder="Kategori (örn: Frontend, Backend, Tools)"
-                                                        className="w-full px-2 py-1.5 bg-gray-700 border border-gray-600 text-white rounded text-sm focus:ring-1 focus:ring-blue-500 placeholder-gray-500"
-                                                    />
-                                                </div>
-                                            </div>
-                                        );
-                                    })}
-                                    {skills.length === 0 && <p className="text-gray-400 text-sm">Yetenek ekleyin</p>}
+                                    )}
                                 </div>
-                            ) : (
+                            </div>
+
+                            {/* Personal Info Card */}
+                            <div ref={personalInfoRef} className="bg-[#111]/80 backdrop-blur-sm rounded-2xl border border-white/10 p-6 hover:border-purple-500/30 transition-all">
+                                <h3 className="text-lg font-semibold text-white mb-4 flex items-center gap-2">
+                                    <span className="w-2 h-2 rounded-full bg-gradient-to-r from-purple-500 to-blue-500"></span>
+                                    Kişisel Bilgiler
+                                </h3>
+                                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                                    <div>
+                                        <label className="block text-sm font-medium text-gray-400 mb-1">Ad Soyad</label>
+                                        {isEditing ? (
+                                            <input type="text" value={name} onChange={(e) => setName(e.target.value)} className="w-full px-4 py-2.5 bg-white/5 border border-white/10 text-white rounded-xl focus:ring-2 focus:ring-purple-500 focus:border-transparent transition-all" />
+                                        ) : (
+                                            <p className="text-white py-2">{name || "-"}</p>
+                                        )}
+                                    </div>
+                                    <div>
+                                        <label className="block text-sm font-medium text-gray-400 mb-1">Ünvan</label>
+                                        {isEditing ? (
+                                            <input type="text" value={jobTitle} onChange={(e) => setJobTitle(e.target.value)} className="w-full px-4 py-2.5 bg-white/5 border border-white/10 text-white rounded-xl focus:ring-2 focus:ring-purple-500 focus:border-transparent transition-all" />
+                                        ) : (
+                                            <p className="text-white py-2">{jobTitle || "-"}</p>
+                                        )}
+                                    </div>
+                                    <div>
+                                        <label className="block text-sm font-medium text-gray-400 mb-1">Email</label>
+                                        {isEditing ? (
+                                            <input type="email" value={email} onChange={(e) => setEmail(e.target.value)} className="w-full px-4 py-2.5 bg-white/5 border border-white/10 text-white rounded-xl focus:ring-2 focus:ring-purple-500 focus:border-transparent transition-all" />
+                                        ) : (
+                                            <p className="text-white py-2">{email || "-"}</p>
+                                        )}
+                                    </div>
+                                    <div>
+                                        <label className="block text-sm font-medium text-gray-400 mb-1">Telefon</label>
+                                        {isEditing ? (
+                                            <input type="tel" value={phone} onChange={(e) => setPhone(e.target.value)} className="w-full px-4 py-2.5 bg-white/5 border border-white/10 text-white rounded-xl focus:ring-2 focus:ring-purple-500 focus:border-transparent transition-all" />
+                                        ) : (
+                                            <p className="text-white py-2">{phone || "-"}</p>
+                                        )}
+                                    </div>
+                                    <div className="md:col-span-2">
+                                        <label className="block text-sm font-medium text-gray-400 mb-1">Konum</label>
+                                        {isEditing ? (
+                                            <input type="text" value={location} onChange={(e) => setLocation(e.target.value)} className="w-full px-4 py-2.5 bg-white/5 border border-white/10 text-white rounded-xl focus:ring-2 focus:ring-purple-500 focus:border-transparent transition-all" />
+                                        ) : (
+                                            <p className="text-white py-2">{location || "-"}</p>
+                                        )}
+                                    </div>
+                                    <div className="md:col-span-2">
+                                        <label className="block text-sm font-medium text-gray-400 mb-1">Ã–zet</label>
+                                        {isEditing ? (
+                                            <textarea value={summary} onChange={(e) => setSummary(e.target.value)} rows={3} className="w-full px-4 py-2.5 bg-white/5 border border-white/10 text-white rounded-xl focus:ring-2 focus:ring-purple-500 focus:border-transparent transition-all resize-none" />
+                                        ) : (
+                                            <p className="text-gray-300 py-2">{summary || "-"}</p>
+                                        )}
+                                    </div>
+                                </div>
+                            </div>
+
+                            {/* Social Media Card */}
+                            <div className="bg-[#111]/80 backdrop-blur-sm rounded-2xl border border-white/10 p-6 hover:border-purple-500/30 transition-all">
+                                <h3 className="text-lg font-semibold text-white mb-4 flex items-center gap-2">
+                                    <span className="w-2 h-2 rounded-full bg-gradient-to-r from-purple-500 to-blue-500"></span>
+                                    Sosyal Medya
+                                </h3>
+                                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                                    {[
+                                        { label: "LinkedIn URL", value: linkedinUrl, setter: setLinkedinUrl, placeholder: "https://linkedin.com/in/kullaniciadi" },
+                                        { label: "GitHub URL", value: githubUrl, setter: setGithubUrl, placeholder: "https://github.com/kullaniciadi" },
+                                        { label: "Facebook URL", value: facebookUrl, setter: setFacebookUrl, placeholder: "https://facebook.com/kullaniciadi" },
+                                        { label: "Instagram URL", value: instagramUrl, setter: setInstagramUrl, placeholder: "https://instagram.com/kullaniciadi" },
+                                        { label: "X (Twitter) URL", value: xUrl, setter: setXUrl, placeholder: "https://x.com/kullaniciadi" },
+                                        { label: "Web Site URL", value: websiteUrl, setter: setWebsiteUrl, placeholder: "https://www.websitesi.com" },
+                                    ].map((field, idx) => (
+                                        <div key={idx}>
+                                            <label className="block text-sm font-medium text-gray-400 mb-1">{field.label}</label>
+                                            {isEditing ? (
+                                                <input type="url" value={field.value} onChange={(e) => field.setter(e.target.value)} placeholder={field.placeholder} className="w-full px-4 py-2.5 bg-white/5 border border-white/10 text-white rounded-xl focus:ring-2 focus:ring-purple-500 focus:border-transparent transition-all placeholder-gray-600" />
+                                            ) : (
+                                                <p className="text-white py-2 truncate">{field.value || "-"}</p>
+                                            )}
+                                        </div>
+                                    ))}
+                                </div>
+                            </div>
+
+                            {/* Experience Card */}
+                            {/* Experience Card */}
+                            <div ref={experienceRef} className="bg-[#111]/80 backdrop-blur-sm rounded-2xl border border-white/10 p-6 hover:border-purple-500/30 transition-all">
+                                <div className="flex justify-between items-center mb-4">
+                                    <h3 className="text-lg font-semibold text-white flex items-center gap-2">
+                                        <span className="w-2 h-2 rounded-full bg-gradient-to-r from-purple-500 to-blue-500"></span>
+                                        Deneyimler ({experience.length})
+                                    </h3>
+                                    {isEditing && (
+                                        <button onClick={addExperience} className="px-3 py-1.5 bg-gradient-to-r from-purple-600 to-blue-600 hover:from-purple-500 hover:to-blue-500 text-white text-sm rounded-xl transition-all">
+                                            + Ekle
+                                        </button>
+                                    )}
+                                </div>
+                                <div className="space-y-3">
+                                    {experience.map((exp, index) => (
+                                        <div key={index} className="bg-white/5 rounded-xl p-4 border border-white/5">
+                                            {isEditing ? (
+                                                <div className="space-y-2">
+                                                    <div className="flex justify-end">
+                                                        <button onClick={() => removeExperience(index)} className="text-red-400 hover:text-red-300 text-sm">Sil</button>
+                                                    </div>
+                                                    <input type="text" placeholder="Pozisyon" value={exp.position || ""} onChange={(e) => updateExperience(index, "position", e.target.value)} className="w-full px-3 py-2 bg-white/5 border border-white/10 text-white rounded-xl text-sm focus:ring-2 focus:ring-purple-500" />
+                                                    <input type="text" placeholder="Åirket" value={exp.company || ""} onChange={(e) => updateExperience(index, "company", e.target.value)} className="w-full px-3 py-2 bg-white/5 border border-white/10 text-white rounded-xl text-sm focus:ring-2 focus:ring-purple-500" />
+                                                    <input type="text" placeholder="SÃ¼re (Ã¶r: 2020-2022)" value={exp.duration || ""} onChange={(e) => updateExperience(index, "duration", e.target.value)} className="w-full px-3 py-2 bg-white/5 border border-white/10 text-white rounded-xl text-sm focus:ring-2 focus:ring-purple-500" />
+                                                    <textarea placeholder="AÃ§Ä±klama (opsiyonel)" value={exp.description || ""} onChange={(e) => updateExperience(index, "description", e.target.value)} rows={2} className="w-full px-3 py-2 bg-white/5 border border-white/10 text-white rounded-xl text-sm resize-none focus:ring-2 focus:ring-purple-500" />
+                                                </div>
+                                            ) : (
+                                                <div className="text-sm">
+                                                    <p className="font-medium text-white">{exp.position} - {exp.company}</p>
+                                                    <p className="text-gray-400">{exp.duration}</p>
+                                                    {exp.description && <p className="text-gray-300 mt-1">{exp.description}</p>}
+                                                </div>
+                                            )}
+                                        </div>
+                                    ))}
+                                    {experience.length === 0 && <p className="text-gray-400 text-sm">Henüz i̇ş deneyimi eklenmemiş</p>}
+                                </div>
+                            </div>
+
+                            {/* Education Card */}
+                            <div ref={educationRef} className="bg-[#111]/80 backdrop-blur-sm rounded-2xl border border-white/10 p-6 hover:border-purple-500/30 transition-all">
+                                <div className="flex justify-between items-center mb-4">
+                                    <h3 className="text-lg font-semibold text-white flex items-center gap-2">
+                                        <span className="w-2 h-2 rounded-full bg-gradient-to-r from-purple-500 to-blue-500"></span>
+                                        EÄŸitim ({education.length})
+                                    </h3>
+                                    {isEditing && (
+                                        <button onClick={addEducation} className="px-3 py-1.5 bg-gradient-to-r from-purple-600 to-blue-600 hover:from-purple-500 hover:to-blue-500 text-white text-sm rounded-xl transition-all">
+                                            + Ekle
+                                        </button>
+                                    )}
+                                </div>
+                                <div className="space-y-3">
+                                    {education.map((edu, index) => (
+                                        <div key={index} className="bg-white/5 rounded-xl p-4 border border-white/5">
+                                            {isEditing ? (
+                                                <div className="space-y-2">
+                                                    <div className="flex justify-end">
+                                                        <button onClick={() => removeEducation(index)} className="text-red-400 hover:text-red-300 text-sm">Sil</button>
+                                                    </div>
+                                                    <input type="text" placeholder="Derece (Ã¶r: Lisans)" value={edu.degree || ""} onChange={(e) => updateEducation(index, "degree", e.target.value)} className="w-full px-3 py-2 bg-white/5 border border-white/10 text-white rounded-xl text-sm focus:ring-2 focus:ring-purple-500" />
+                                                    <input type="text" placeholder="Alan (Ã¶r: Bilgisayar MÃ¼hendisliÄŸi)" value={edu.field || ""} onChange={(e) => updateEducation(index, "field", e.target.value)} className="w-full px-3 py-2 bg-white/5 border border-white/10 text-white rounded-xl text-sm focus:ring-2 focus:ring-purple-500" />
+                                                    <input type="text" placeholder="Okul" value={edu.school || ""} onChange={(e) => updateEducation(index, "school", e.target.value)} className="w-full px-3 py-2 bg-white/5 border border-white/10 text-white rounded-xl text-sm focus:ring-2 focus:ring-purple-500" />
+                                                    <input type="text" placeholder="YÄ±l (Ã¶r: 2018-2022)" value={edu.year || ""} onChange={(e) => updateEducation(index, "year", e.target.value)} className="w-full px-3 py-2 bg-white/5 border border-white/10 text-white rounded-xl text-sm focus:ring-2 focus:ring-purple-500" />
+                                                    <input type="text" placeholder="GPA (opsiyonel)" value={edu.gpa || ""} onChange={(e) => updateEducation(index, "gpa", e.target.value)} className="w-full px-3 py-2 bg-white/5 border border-white/10 text-white rounded-xl text-sm focus:ring-2 focus:ring-purple-500" />
+                                                </div>
+                                            ) : (
+                                                <div className="text-sm">
+                                                    <p className="font-medium text-white">{edu.degree} - {edu.field}</p>
+                                                    <p className="text-gray-400">{edu.school} ({edu.year}){edu.gpa && <span className="ml-2 text-green-400">â€¢ GPA: {edu.gpa}</span>}</p>
+                                                </div>
+                                            )}
+                                        </div>
+                                    ))}
+                                    {education.length === 0 && <p className="text-gray-400 text-sm">Henüz ėitim bilgisi eklenmemiş</p>}
+                                </div>
+                            </div>
+
+                            {/* Portfolio Card */}
+                            <div ref={portfolioRef} className="bg-[#111]/80 backdrop-blur-sm rounded-2xl border border-white/10 p-6 hover:border-purple-500/30 transition-all">
+                                <div className="flex justify-between items-center mb-4">
+                                    <h3 className="text-lg font-semibold text-white flex items-center gap-2">
+                                        <span className="w-2 h-2 rounded-full bg-gradient-to-r from-purple-500 to-blue-500"></span>
+                                        Portfolyo ({portfolio.length}/10)
+                                    </h3>
+                                </div>
+                                {isEditing && (
+                                    <div className="mb-4">
+                                        <PortfolioUploader currentCount={portfolio.length + pendingPortfolio.length} maxCount={10} onFilesSelected={handlePortfolioFilesSelected} deferredMode={true} disabled={uploadingPortfolio} existingFiles={portfolio.filter(item => item?.imageUrl).map(item => ({ fileName: item.imageUrl.split('/').pop() || '', fileSize: 0 }))} />
+                                    </div>
+                                )}
+                                <div className="grid grid-cols-2 md:grid-cols-3 gap-3">
+                                    {portfolio.map((item, index) => (
+                                        <div key={index} className="relative group aspect-square rounded-xl overflow-hidden bg-white/5 border border-white/10">
+                                            <img src={item.imageUrl} alt={item.title || `Portfolio ${index + 1}`} className="w-full h-full object-cover" />
+                                            {(item.title || item.category) && (
+                                                <div className="absolute bottom-0 left-0 right-0 bg-gradient-to-t from-black/80 to-transparent p-2">
+                                                    {item.title && <p className="text-white text-xs font-semibold truncate">{item.title}</p>}
+                                                    {item.category && <p className="text-gray-300 text-xs truncate">{item.category}</p>}
+                                                </div>
+                                            )}
+                                            {isEditing && !uploadingPortfolio && (
+                                                <div className="absolute top-2 right-2 flex gap-2 opacity-0 group-hover:opacity-100 transition-opacity">
+                                                    <button onClick={() => setEditingPortfolioIndex(index)} className="p-2 bg-blue-600 hover:bg-blue-700 text-white rounded-full" title="DetaylarÄ± dÃ¼zenle">âœï¸</button>
+                                                    <button onClick={() => handlePortfolioDelete(item.imageUrl, index)} className="p-2 bg-red-600 hover:bg-red-700 text-white rounded-full" title="Sil">ğŸ—‘ï¸</button>
+                                                </div>
+                                            )}
+                                        </div>
+                                    ))}
+                                    {pendingPortfolio.map((item, index) => (
+                                        <div key={`pending-${index}`} className="relative group aspect-square rounded-xl overflow-hidden bg-white/5 border-2 border-yellow-500">
+                                            <img src={item.preview} alt={`Pending ${index + 1}`} className="w-full h-full object-cover" />
+                                            <div className="absolute top-2 left-2 bg-yellow-500 text-black text-xs px-2 py-1 rounded font-semibold">Kaydedilmedi</div>
+                                            {isEditing && (
+                                                <div className="absolute inset-0 bg-black/50 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center">
+                                                    <button onClick={() => { URL.revokeObjectURL(item.preview); setPendingPortfolio(prev => prev.filter((_, i) => i !== index)); }} className="bg-red-600 hover:bg-red-700 text-white p-2 rounded-lg" title="KaldÄ±r">ğŸ—‘ï¸</button>
+                                                </div>
+                                            )}
+                                        </div>
+                                    ))}
+                                    {portfolio.length === 0 && pendingPortfolio.length === 0 && (
+                                        <div className="col-span-2 md:col-span-3 text-center py-8">
+                                            <p className="text-gray-400 text-sm">Henüz portfolio fotoğrafı eklenmemiş</p>
+                                            {isEditing && <p className="text-gray-500 text-xs mt-2">Maksimum 10 adet fotoğraf ekleyebilirsiniz</p>}
+                                        </div>
+                                    )}
+                                </div>
+                            </div>
+
+                            {/* Portfolio Metadata Editor Modal */}
+                            {editingPortfolioIndex !== null && (
+                                <PortfolioMetadataEditor item={portfolio[editingPortfolioIndex]} index={editingPortfolioIndex} onSave={handlePortfolioMetadataSave} onCancel={() => setEditingPortfolioIndex(null)} />
+                            )}
+
+                            {/* Skills Card */}
+                            <div ref={skillsRef} className="bg-[#111]/80 backdrop-blur-sm rounded-2xl border border-white/10 p-6 hover:border-purple-500/30 transition-all">
+                                <div className="flex justify-between items-center mb-4">
+                                    <h3 className="text-lg font-semibold text-white flex items-center gap-2">
+                                        <span className="w-2 h-2 rounded-full bg-gradient-to-r from-purple-500 to-blue-500"></span>
+                                        Yetenekler ({skills.length})
+                                    </h3>
+                                    {isEditing && (
+                                        <button onClick={addSkill} className="px-3 py-1.5 bg-gradient-to-r from-purple-600 to-blue-600 hover:from-purple-500 hover:to-blue-500 text-white text-sm rounded-xl transition-all">
+                                            + Ekle
+                                        </button>
+                                    )}
+                                </div>
                                 <div className="space-y-2">
                                     {skills.map((skill, index) => {
-                                        const skillObj = typeof skill === 'string'
-                                            ? { name: skill, level: 'intermediate' as const, percentage: 70, category: '' }
-                                            : skill;
-
-                                        // Level to percentage mapping for display
-                                        const levelPercentages: Record<string, number> = {
-                                            'beginner': 40,
-                                            'intermediate': 70,
-                                            'advanced': 85,
-                                            'expert': 95
-                                        };
-
+                                        const skillObj = typeof skill === 'string' ? { name: skill, level: 'intermediate' as const, percentage: 70, category: '' } : skill;
+                                        const levelPercentages: Record<string, number> = { 'beginner': 40, 'intermediate': 70, 'advanced': 85, 'expert': 95 };
                                         const displayPercentage = skillObj.percentage || levelPercentages[skillObj.level || 'intermediate'];
-
                                         return (
-                                            <div key={index} className="bg-gray-600/30 rounded-lg p-3">
-                                                <div className="flex items-start gap-3">
-                                                    <div className="flex-1">
+                                            <div key={index} className="bg-white/5 rounded-xl p-3 border border-white/5">
+                                                {isEditing ? (
+                                                    <div className="space-y-2">
+                                                        <div className="flex gap-2 items-center">
+                                                            <input type="text" value={skillObj.name} onChange={(e) => updateSkill(index, 'name', e.target.value)} placeholder="Yetenek adı" className="flex-1 px-3 py-2 bg-white/5 border border-white/10 text-white rounded-xl text-sm focus:ring-2 focus:ring-purple-500" />
+                                                            <select value={skillObj.level || 'intermediate'} onChange={(e) => updateSkill(index, 'level', e.target.value as CVSkill['level'])} className="px-3 py-2 bg-white/5 border border-white/10 text-white rounded-xl text-sm focus:ring-2 focus:ring-purple-500">
+                                                                <option value="beginner">Başlangıç</option>
+                                                                <option value="intermediate">Orta</option>
+                                                                <option value="advanced">İleri</option>
+                                                                <option value="expert">Uzman</option>
+                                                            </select>
+                                                            <button onClick={() => removeSkill(index)} className="px-2 py-1 text-red-400 hover:text-red-300 text-sm">âœ•</button>
+                                                        </div>
+                                                        <input type="text" value={skillObj.category || ''} onChange={(e) => updateSkill(index, 'category', e.target.value)} placeholder="Kategori (Ã¶r: Frontend)" className="w-full px-3 py-2 bg-white/5 border border-white/10 text-white rounded-xl text-sm placeholder-gray-500 focus:ring-2 focus:ring-purple-500" />
+                                                    </div>
+                                                ) : (
+                                                    <div>
                                                         <div className="flex items-center gap-2 mb-1">
                                                             <span className="font-medium text-white">{skillObj.name}</span>
-                                                            {skillObj.category && (
-                                                                <span className="px-2 py-0.5 text-xs bg-blue-600/30 text-blue-300 rounded-full">
-                                                                    {skillObj.category}
-                                                                </span>
-                                                            )}
+                                                            {skillObj.category && <span className="px-2 py-0.5 text-xs bg-purple-500/20 text-purple-300 rounded-full">{skillObj.category}</span>}
                                                         </div>
                                                         <div className="flex items-center gap-3 text-sm text-gray-400">
                                                             <span className="capitalize">{skillObj.level || 'intermediate'}</span>
-                                                            <span>•</span>
+                                                            <span>â€¢</span>
                                                             <span>{displayPercentage}%</span>
                                                         </div>
-                                                        {/* Progress bar */}
-                                                        <div className="mt-2 h-1.5 bg-gray-700 rounded-full overflow-hidden">
-                                                            <div
-                                                                className="h-full bg-blue-500 rounded-full transition-all"
-                                                                style={{ width: `${displayPercentage}%` }}
-                                                            />
+                                                        <div className="mt-2 h-1.5 bg-white/10 rounded-full overflow-hidden">
+                                                            <div className="h-full bg-gradient-to-r from-purple-500 to-blue-500 rounded-full transition-all" style={{ width: `${displayPercentage}%` }} />
                                                         </div>
                                                     </div>
-                                                </div>
+                                                )}
                                             </div>
                                         );
                                     })}
                                     {skills.length === 0 && <p className="text-gray-400 text-sm">Henüz yetenek eklenmemiş</p>}
                                 </div>
-                            )}
-                        </div>
-
-                        {/* Languages */}
-                        <div className="bg-gray-700/50 rounded-lg p-4">
-                            <div className="flex justify-between items-center mb-3">
-                                <h4 className="text-lg font-semibold text-white">
-                                    Diller ({languages.length})
-                                </h4>
-                                {isEditing && (
-                                    <button
-                                        onClick={addLanguage}
-                                        className="px-3 py-1 bg-blue-600 hover:bg-blue-700 text-white text-sm rounded transition-colors"
-                                    >
-                                        + Ekle
-                                    </button>
-                                )}
                             </div>
-                            {isEditing ? (
-                                <div className="space-y-4">
-                                    {languages.map((lang, index) => {
-                                        const langObj = typeof lang === 'string'
-                                            ? { name: lang, level: 'intermediate' as const, percentage: 60, certifications: undefined, cefr: undefined }
-                                            : lang;
 
-                                        return (
-                                            <div key={index} className="bg-gray-600/30 rounded-lg p-3 space-y-2">
-                                                {/* Row 1: Name, Level, and Delete */}
-                                                <div className="flex gap-2 items-center">
-                                                    <input
-                                                        type="text"
-                                                        value={langObj.name}
-                                                        onChange={(e) => updateLanguage(index, 'name', e.target.value)}
-                                                        placeholder="Dil adı (örn: İngilizce)"
-                                                        className="flex-1 px-2 py-1.5 bg-gray-700 border border-gray-600 text-white rounded text-sm focus:ring-1 focus:ring-blue-500"
-                                                    />
-                                                    <select
-                                                        value={langObj.level || 'intermediate'}
-                                                        onChange={(e) => updateLanguage(index, 'level', e.target.value as CVLanguage['level'])}
-                                                        className="px-2 py-1.5 bg-gray-700 border border-gray-600 text-white rounded text-sm focus:ring-1 focus:ring-blue-500"
-                                                    >
-                                                        <option value="native">Ana Dil</option>
-                                                        <option value="fluent">Akıcı</option>
-                                                        <option value="advanced">İleri</option>
-                                                        <option value="intermediate">Orta</option>
-                                                        <option value="basic">Başlangıç</option>
-                                                    </select>
-                                                    <button
-                                                        onClick={() => removeLanguage(index)}
-                                                        className="px-2 py-1.5 text-red-400 hover:text-red-300 text-sm"
-                                                        title="Sil"
-                                                    >
-                                                        ✕
-                                                    </button>
-                                                </div>
-
-                                                {/* Row 2: CEFR Level */}
-                                                <div>
-                                                    <select
-                                                        value={langObj.cefr || ''}
-                                                        onChange={(e) => updateLanguage(index, 'cefr', e.target.value || undefined)}
-                                                        className="w-full px-2 py-1.5 bg-gray-700 border border-gray-600 text-white rounded text-sm focus:ring-1 focus:ring-blue-500"
-                                                    >
-                                                        <option value="">CEFR Seviyesi (Opsiyonel)</option>
-                                                        <option value="A1">A1 - Başlangıç</option>
-                                                        <option value="A2">A2 - Temel</option>
-                                                        <option value="B1">B1 - Orta Seviye</option>
-                                                        <option value="B2">B2 - Orta-İleri Seviye</option>
-                                                        <option value="C1">C1 - İleri Seviye</option>
-                                                        <option value="C2">C2 - Üst Düzey</option>
-                                                    </select>
-                                                </div>
-
-                                                {/* Row 3: Certifications */}
-                                                <div>
-                                                    <div className="flex items-center justify-between mb-1">
-                                                        <label className="text-xs text-gray-400">Sertifikalar (Opsiyonel)</label>
-                                                        <button
-                                                            onClick={() => addCertification(index)}
-                                                            className="text-xs text-blue-400 hover:text-blue-300"
-                                                        >
-                                                            + Sertifika Ekle
-                                                        </button>
-                                                    </div>
-                                                    {langObj.certifications && langObj.certifications.length > 0 && (
-                                                        <div className="space-y-1">
-                                                            {langObj.certifications.map((cert, certIndex) => (
-                                                                <div key={certIndex} className="flex gap-1">
-                                                                    <input
-                                                                        type="text"
-                                                                        value={cert}
-                                                                        onChange={(e) => updateCertification(index, certIndex, e.target.value)}
-                                                                        placeholder="örn: TOEFL 110/120, IELTS 8.5"
-                                                                        className="flex-1 px-2 py-1 bg-gray-700 border border-gray-600 text-white rounded text-xs focus:ring-1 focus:ring-blue-500 placeholder-gray-500"
-                                                                    />
-                                                                    <button
-                                                                        onClick={() => removeCertification(index, certIndex)}
-                                                                        className="px-2 text-red-400 hover:text-red-300 text-xs"
-                                                                    >
-                                                                        ✕
-                                                                    </button>
-                                                                </div>
-                                                            ))}
-                                                        </div>
-                                                    )}
-                                                </div>
-                                            </div>
-                                        );
-                                    })}
-                                    {languages.length === 0 && <p className="text-gray-400 text-sm">Dil ekleyin</p>}
+                            {/* Languages Card */}
+                            <div ref={languagesRef} className="bg-[#111]/80 backdrop-blur-sm rounded-2xl border border-white/10 p-6 hover:border-purple-500/30 transition-all">
+                                <div className="flex justify-between items-center mb-4">
+                                    <h3 className="text-lg font-semibold text-white flex items-center gap-2">
+                                        <span className="w-2 h-2 rounded-full bg-gradient-to-r from-purple-500 to-blue-500"></span>
+                                        Diller ({languages.length})
+                                    </h3>
+                                    {isEditing && (
+                                        <button onClick={addLanguage} className="px-3 py-1.5 bg-gradient-to-r from-purple-600 to-blue-600 hover:from-purple-500 hover:to-blue-500 text-white text-sm rounded-xl transition-all">
+                                            + Ekle
+                                        </button>
+                                    )}
                                 </div>
-                            ) : (
-                                <div className="space-y-2">
+                                <div className="space-y-3">
                                     {languages.map((lang, index) => {
-                                        const langObj = typeof lang === 'string'
-                                            ? { name: lang, level: 'intermediate' as const, percentage: 60, certifications: undefined, cefr: undefined }
-                                            : lang;
-
+                                        const langObj = typeof lang === 'string' ? { name: lang, level: 'intermediate' as const, percentage: 60, certifications: undefined, cefr: undefined } : lang;
                                         return (
-                                            <div key={index} className="bg-gray-600/30 rounded-lg p-3">
-                                                <div className="flex items-start gap-3">
-                                                    <div className="flex-1">
+                                            <div key={index} className="bg-white/5 rounded-xl p-3 border border-white/5">
+                                                {isEditing ? (
+                                                    <div className="space-y-2">
+                                                        <div className="flex gap-2 items-center">
+                                                            <input type="text" value={langObj.name} onChange={(e) => updateLanguage(index, 'name', e.target.value)} placeholder="Dil adı (ör: İngilizce)" className="flex-1 px-3 py-2 bg-white/5 border border-white/10 text-white rounded-xl text-sm focus:ring-2 focus:ring-purple-500" />
+                                                            <select value={langObj.level || 'intermediate'} onChange={(e) => updateLanguage(index, 'level', e.target.value as CVLanguage['level'])} className="px-3 py-2 bg-white/5 border border-white/10 text-white rounded-xl text-sm focus:ring-2 focus:ring-purple-500">
+                                                                <option value="native">Ana Dil</option>
+                                                                <option value="fluent">Akıcı</option>
+                                                                <option value="advanced">İleri</option>
+                                                                <option value="intermediate">Orta</option>
+                                                                <option value="basic">Başlangıç</option>
+                                                            </select>
+                                                            <button onClick={() => removeLanguage(index)} className="px-2 py-1 text-red-400 hover:text-red-300 text-sm">âœ•</button>
+                                                        </div>
+                                                        <select value={langObj.cefr || ''} onChange={(e) => updateLanguage(index, 'cefr', e.target.value || undefined)} className="w-full px-3 py-2 bg-white/5 border border-white/10 text-white rounded-xl text-sm focus:ring-2 focus:ring-purple-500">
+                                                            <option value="">CEFR Seviyesi (Opsiyonel)</option>
+                                                            <option value="A1">A1 - Başlangıç</option>
+                                                            <option value="A2">A2 - Temel</option>
+                                                            <option value="B1">B1 - Orta Seviye</option>
+                                                            <option value="B2">B2 - Orta-İleri</option>
+                                                            <option value="C1">C1 - İleri</option>
+                                                            <option value="C2">C2 - Üst Düzey</option>
+                                                        </select>
+                                                    </div>
+                                                ) : (
+                                                    <div>
                                                         <div className="flex items-center gap-2 mb-1">
                                                             <span className="font-medium text-white">{langObj.name}</span>
-                                                            {langObj.cefr && (
-                                                                <span className="px-2 py-0.5 text-xs bg-purple-600/30 text-purple-300 rounded-full">
-                                                                    CEFR: {langObj.cefr}
-                                                                </span>
-                                                            )}
+                                                            {langObj.cefr && <span className="px-2 py-0.5 text-xs bg-purple-500/20 text-purple-300 rounded-full">CEFR: {langObj.cefr}</span>}
                                                         </div>
-                                                        <div className="flex items-center gap-3 text-sm text-gray-400">
-                                                            <span className="capitalize">{langObj.level || 'intermediate'}</span>
-                                                        </div>
+                                                        <div className="text-sm text-gray-400 capitalize">{langObj.level || 'intermediate'}</div>
                                                         {langObj.certifications && langObj.certifications.length > 0 && (
                                                             <div className="mt-2 flex flex-wrap gap-1">
                                                                 {langObj.certifications.map((cert, certIndex) => (
-                                                                    <span key={certIndex} className="px-2 py-0.5 text-xs bg-green-600/30 text-green-300 rounded">
-                                                                        🏆 {cert}
-                                                                    </span>
+                                                                    <span key={certIndex} className="px-2 py-0.5 text-xs bg-green-500/20 text-green-300 rounded">ğŸ† {cert}</span>
                                                                 ))}
                                                             </div>
                                                         )}
                                                     </div>
-                                                </div>
+                                                )}
                                             </div>
                                         );
                                     })}
                                     {languages.length === 0 && <p className="text-gray-400 text-sm">Henüz dil eklenmemiş</p>}
                                 </div>
-                            )}
+                            </div>
+                        </div>
+                    )}
+                </div>
+
+                {/* Right: Navigation Sidebar (Bölümler) */}
+                {site && cvData && (
+                    <div className="w-64 flex-shrink-0 self-start sticky top-6">
+                        <div className="bg-[#111]/80 backdrop-blur-sm rounded-2xl border border-white/10 p-5">
+                            <h3 className="text-lg font-semibold text-white mb-4 flex items-center gap-2">
+                                <span className="w-2 h-2 rounded-full bg-gradient-to-r from-purple-500 to-blue-500"></span>
+                                Bölümler
+                            </h3>
+                            <nav className="space-y-2 mb-6">
+                                {[
+                                    { label: "Kişisel Bilgiler", ref: personalInfoRef },
+                                    { label: "Deneyimler", ref: experienceRef },
+                                    { label: "Eğitim", ref: educationRef },
+                                    { label: "Portfolyo", ref: portfolioRef },
+                                    { label: "Yetenekler", ref: skillsRef },
+                                    { label: "Diller", ref: languagesRef },
+                                ].map((item, idx) => (
+                                    <button key={idx} onClick={() => scrollToSection(item.ref)} className="w-full text-left px-3 py-2 text-sm text-gray-400 hover:text-white hover:bg-white/5 rounded-xl transition-all">
+                                        {item.label}
+                                    </button>
+                                ))}
+                            </nav>
+
+                            <div className="border-t border-white/10 pt-4 space-y-2">
+                                {!isEditing ? (
+                                    <button onClick={handleEdit} className="w-full flex items-center justify-center gap-2 px-4 py-2.5 bg-gradient-to-r from-purple-600 to-blue-600 hover:from-purple-500 hover:to-blue-500 text-white rounded-xl transition-all font-medium">
+                                        ✍️ Düzenle
+                                    </button>
+                                ) : (
+                                    <>
+                                        <button onClick={handleSave} disabled={saving} className="w-full flex items-center justify-center gap-2 px-4 py-2.5 bg-gradient-to-r from-green-600 to-emerald-600 hover:from-green-500 hover:to-emerald-500 disabled:from-gray-500 disabled:to-gray-600 text-white rounded-xl transition-all font-medium">
+                                            {saving ? "Kaydediliyor..." : "Kaydet"}
+                                        </button>
+                                        <button onClick={handleCancel} disabled={saving} className="w-full flex items-center justify-center gap-2 px-4 py-2.5 bg-white/10 hover:bg-white/20 text-white rounded-xl transition-all font-medium border border-white/10">
+                                            İptal Et
+                                        </button>
+                                    </>
+                                )}
+                                <button onClick={onDelete} disabled={deleting || isEditing} className="w-full flex items-center justify-center gap-2 px-4 py-2.5 bg-red-500/20 hover:bg-red-500/30 text-red-400 rounded-xl transition-all font-medium border border-red-500/30 disabled:opacity-50 disabled:cursor-not-allowed">
+                                    {deleting ? "Siliniyor..." : "CV'yi Sil"}
+                                </button>
+                            </div>
                         </div>
                     </div>
-                </div>
-            )}
-        </div>
+                )}
+            </div>
 
-            {/* Confirm Dialog */ }
-    <ConfirmDialog
-        isOpen={confirmDialog.isOpen}
-        onClose={() => setConfirmDialog({ isOpen: false, type: null })}
-        onConfirm={handleConfirmAction}
-        title={
-            confirmDialog.type === "deletePendingPhoto" ? "Seçili Fotoğrafı Kaldır" :
-                confirmDialog.type === "deleteSavedPhoto" ? "Profil Fotoğrafını Sil" :
-                    confirmDialog.type === "deletePortfolio" ? "Portfolio Fotoğrafını Sil" :
-                        confirmDialog.type === "republish" ? "Siteyi Yeniden Yayınla" :
-                            "Değişiklikleri Geri Al"
-        }
-        message={
-            confirmDialog.type === "deletePendingPhoto"
-                ? "Seçilen fotoğrafı kaldırmak istediğinizden emin misiniz?"
-                : confirmDialog.type === "deleteSavedPhoto"
-                    ? "Profil fotoğrafını silmek istediğinizden emin misiniz?"
-                    : confirmDialog.type === "deletePortfolio"
-                        ? "Bu portfolio fotoğrafını silmek istediğinizden emin misiniz?"
-                        : confirmDialog.type === "republish"
-                            ? "Sitenizi yeniden yayınlamak istediğinizden emin misiniz?"
-                            : "Değişiklikleri geri almak istediğinizden emin misiniz? Bu işlem geri alınamaz."
-        }
-        confirmText={
-            confirmDialog.type === "republish" ? "Yayınla" :
-                confirmDialog.type === "rollback" ? "Geri Al" :
-                    "Sil"
-        }
-        variant={
-            confirmDialog.type === "rollback" ? "danger" :
-                confirmDialog.type === "republish" ? "info" :
-                    "warning"
-        }
-        loading={publishing}
-    />
+            {/* Confirm Dialog */}
+            <ConfirmDialog
+                isOpen={confirmDialog.isOpen}
+                onClose={() => setConfirmDialog({ isOpen: false, type: null })}
+                onConfirm={handleConfirmAction}
+                title={
+                    confirmDialog.type === "deletePendingPhoto" ? "Seçili Fotoğrafı Kaldır" :
+                        confirmDialog.type === "deleteSavedPhoto" ? "Profil Fotoğrafını Sil" :
+                            confirmDialog.type === "deletePortfolio" ? "Portfolio Fotoğrafını Sil" :
+                                confirmDialog.type === "republish" ? "Siteyi Yeniden Yayınla" :
+                                    "Değişiklikleri Geri Al"
+                }
+                message={
+                    confirmDialog.type === "deletePendingPhoto" ? "Seçilen fotoğrafı kaldırmak istediğinizden emin misiniz?" :
+                        confirmDialog.type === "deleteSavedPhoto" ? "Profil fotoğrafını silmek istediğinizden emin misiniz?" :
+                            confirmDialog.type === "deletePortfolio" ? "Bu portfolio fotoğrafını silmek istediğinizden emin misiniz?" :
+                                confirmDialog.type === "republish" ? "Sitenizi yeniden yayınlamak istediğinizden emin misiniz?" :
+                                    "Değişiklikleri geri almak istediğinizden emin misiniz? Bu işlem geri alınamaz."
+                }
+                confirmText={
+                    confirmDialog.type === "republish" ? "Yayınla" :
+                        confirmDialog.type === "rollback" ? "Geri Al" :
+                            "Sil"
+                }
+                variant={
+                    confirmDialog.type === "rollback" ? "danger" :
+                        confirmDialog.type === "republish" ? "info" :
+                            "warning"
+                }
+                loading={publishing}
+            />
         </>
     );
 }

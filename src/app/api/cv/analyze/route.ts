@@ -15,7 +15,7 @@ export async function POST(req: NextRequest) {
   try {
     // Authentication kontrolü
     const session = await getServerSession(authOptions);
-    
+
     if (!session || !session.user?.email) {
       return NextResponse.json(
         { success: false, error: "Giriş yapmalısınız" },
@@ -74,7 +74,7 @@ export async function POST(req: NextRequest) {
         where: { id: siteId },
         data: {
           cvUrl,
-          cvContent: cvData,
+          cvContent: JSON.parse(JSON.stringify(cvData)),
         }
       });
 
@@ -91,14 +91,14 @@ export async function POST(req: NextRequest) {
     console.error("CV analysis error:", error);
 
     // Hata mesajını kullanıcıya dön
-    const errorMessage = error instanceof Error 
-      ? error.message 
+    const errorMessage = error instanceof Error
+      ? error.message
       : "CV analizi sırasında bir hata oluştu";
 
     return NextResponse.json(
-      { 
-        success: false, 
-        error: errorMessage 
+      {
+        success: false,
+        error: errorMessage
       },
       { status: 500 }
     );
@@ -113,7 +113,7 @@ export async function GET(req: NextRequest) {
   try {
     // Authentication kontrolü
     const session = await getServerSession(authOptions);
-    
+
     if (!session || !session.user?.email) {
       return NextResponse.json(
         { success: false, error: "Giriş yapmalısınız" },
@@ -174,9 +174,9 @@ export async function GET(req: NextRequest) {
     console.error("Error fetching CV data:", error);
 
     return NextResponse.json(
-      { 
-        success: false, 
-        error: "CV verisi alınırken hata oluştu" 
+      {
+        success: false,
+        error: "CV verisi alınırken hata oluştu"
       },
       { status: 500 }
     );

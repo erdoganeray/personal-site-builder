@@ -238,7 +238,7 @@ function DashboardContent() {
                 </div>
 
                 {/* Right Content */}
-                <main className="flex-1 p-8 overflow-y-auto">
+                <main className="flex-1 p-8">
                     {renderContent()}
                 </main>
             </div>
