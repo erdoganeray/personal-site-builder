@@ -226,7 +226,7 @@ function DashboardContent() {
         <>
             <div className="min-h-screen bg-[#0a0a0a] flex">
                 {/* Left Menu */}
-                <div className={`relative transition-all duration-300 flex-shrink-0 ${isMenuCollapsed ? 'w-16' : 'w-64'}`}>
+                <div className={`relative h-screen transition-all duration-300 flex-shrink-0 ${isMenuCollapsed ? 'w-16' : 'w-64'}`}>
                     <DashboardMenu
                         activeTab={activeTab}
                         onTabChange={handleTabChange}
@@ -235,6 +235,22 @@ function DashboardContent() {
                         userName={session.user?.name || session.user?.email || ""}
                         userImage={session.user?.image || undefined}
                     />
+                    {/* Collapse Toggle Button - Outside DashboardMenu to avoid overflow issues */}
+                    <button
+                        onClick={() => setIsMenuCollapsed(!isMenuCollapsed)}
+                        className="absolute top-1/2 -right-3 transform -translate-y-1/2 w-6 h-6 rounded-full bg-[#1a1a1a] border border-white/10 flex items-center justify-center text-gray-400 hover:text-white hover:bg-[#2a2a2a] transition-all duration-300 z-20"
+                        title={isMenuCollapsed ? "Menüyü Genişlet" : "Menüyü Daralt"}
+                    >
+                        <svg
+                            xmlns="http://www.w3.org/2000/svg"
+                            className={`h-3 w-3 transition-transform duration-300 ease-in-out ${isMenuCollapsed ? 'rotate-180' : ''}`}
+                            fill="none"
+                            viewBox="0 0 24 24"
+                            stroke="currentColor"
+                        >
+                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
+                        </svg>
+                    </button>
                 </div>
 
                 {/* Right Content */}

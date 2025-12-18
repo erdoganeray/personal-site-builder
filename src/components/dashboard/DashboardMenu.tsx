@@ -91,7 +91,7 @@ export default function DashboardMenu({
     };
 
     return (
-        <div className="bg-[#0a0a0a] h-screen flex flex-col border-r border-white/10 overflow-hidden">
+        <div className="relative bg-[#0a0a0a] h-screen flex flex-col border-r border-white/10 overflow-hidden">
             {/* Profile Section */}
             <div className="p-4 border-b border-white/10">
                 <div className="flex items-center gap-3">
@@ -202,22 +202,6 @@ export default function DashboardMenu({
                 </div>
             </div>
 
-            {/* Collapse Toggle Button */}
-            <button
-                onClick={onToggleCollapse}
-                className="absolute top-1/2 -right-3 transform -translate-y-1/2 w-6 h-6 rounded-full bg-[#1a1a1a] border border-white/10 flex items-center justify-center text-gray-400 hover:text-white hover:bg-[#2a2a2a] transition-all duration-300 z-10"
-                title={isCollapsed ? "Menüyü Genişlet" : "Menüyü Daralt"}
-            >
-                <svg
-                    xmlns="http://www.w3.org/2000/svg"
-                    className={`h-3 w-3 transition-transform duration-300 ease-in-out ${isCollapsed ? 'rotate-180' : ''}`}
-                    fill="none"
-                    viewBox="0 0 24 24"
-                    stroke="currentColor"
-                >
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
-                </svg>
-            </button>
         </div>
     );
 }

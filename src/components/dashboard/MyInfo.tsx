@@ -959,9 +959,9 @@ export default function MyInfo({ site, cvData, onDelete, onCVAnalyzed, deleting 
                                         )}
                                     </div>
                                     <div className="md:col-span-2">
-                                        <label className="block text-sm font-medium text-gray-400 mb-1">Ã–zet</label>
+                                        <label className="block text-sm font-medium text-gray-400 mb-1">Özet</label>
                                         {isEditing ? (
-                                            <textarea value={summary} onChange={(e) => setSummary(e.target.value)} rows={3} className="w-full px-4 py-2.5 bg-white/5 border border-white/10 text-white rounded-xl focus:ring-2 focus:ring-purple-500 focus:border-transparent transition-all resize-none" />
+                                            <textarea value={summary} onChange={(e) => setSummary(e.target.value)} rows={5} className="w-full px-4 py-2.5 bg-white/5 border border-white/10 text-white rounded-xl focus:ring-2 focus:ring-purple-500 focus:border-transparent transition-all resize-none" />
                                         ) : (
                                             <p className="text-gray-300 py-2">{summary || "-"}</p>
                                         )}
@@ -1019,9 +1019,9 @@ export default function MyInfo({ site, cvData, onDelete, onCVAnalyzed, deleting 
                                                         <button onClick={() => removeExperience(index)} className="text-red-400 hover:text-red-300 text-sm">Sil</button>
                                                     </div>
                                                     <input type="text" placeholder="Pozisyon" value={exp.position || ""} onChange={(e) => updateExperience(index, "position", e.target.value)} className="w-full px-3 py-2 bg-white/5 border border-white/10 text-white rounded-xl text-sm focus:ring-2 focus:ring-purple-500" />
-                                                    <input type="text" placeholder="Åirket" value={exp.company || ""} onChange={(e) => updateExperience(index, "company", e.target.value)} className="w-full px-3 py-2 bg-white/5 border border-white/10 text-white rounded-xl text-sm focus:ring-2 focus:ring-purple-500" />
-                                                    <input type="text" placeholder="SÃ¼re (Ã¶r: 2020-2022)" value={exp.duration || ""} onChange={(e) => updateExperience(index, "duration", e.target.value)} className="w-full px-3 py-2 bg-white/5 border border-white/10 text-white rounded-xl text-sm focus:ring-2 focus:ring-purple-500" />
-                                                    <textarea placeholder="AÃ§Ä±klama (opsiyonel)" value={exp.description || ""} onChange={(e) => updateExperience(index, "description", e.target.value)} rows={2} className="w-full px-3 py-2 bg-white/5 border border-white/10 text-white rounded-xl text-sm resize-none focus:ring-2 focus:ring-purple-500" />
+                                                    <input type="text" placeholder="Şirket" value={exp.company || ""} onChange={(e) => updateExperience(index, "company", e.target.value)} className="w-full px-3 py-2 bg-white/5 border border-white/10 text-white rounded-xl text-sm focus:ring-2 focus:ring-purple-500" />
+                                                    <input type="text" placeholder="Süre (ör: 2020-2022)" value={exp.duration || ""} onChange={(e) => updateExperience(index, "duration", e.target.value)} className="w-full px-3 py-2 bg-white/5 border border-white/10 text-white rounded-xl text-sm focus:ring-2 focus:ring-purple-500" />
+                                                    <textarea placeholder="Açıklama (opsiyonel)" value={exp.description || ""} onChange={(e) => updateExperience(index, "description", e.target.value)} rows={2} className="w-full px-3 py-2 bg-white/5 border border-white/10 text-white rounded-xl text-sm resize-none focus:ring-2 focus:ring-purple-500" />
                                                 </div>
                                             ) : (
                                                 <div className="text-sm">
@@ -1041,7 +1041,7 @@ export default function MyInfo({ site, cvData, onDelete, onCVAnalyzed, deleting 
                                 <div className="flex justify-between items-center mb-4">
                                     <h3 className="text-lg font-semibold text-white flex items-center gap-2">
                                         <span className="w-2 h-2 rounded-full bg-gradient-to-r from-purple-500 to-blue-500"></span>
-                                        EÄŸitim ({education.length})
+                                        Eğitim ({education.length})
                                     </h3>
                                     {isEditing && (
                                         <button onClick={addEducation} className="px-3 py-1.5 bg-gradient-to-r from-purple-600 to-blue-600 hover:from-purple-500 hover:to-blue-500 text-white text-sm rounded-xl transition-all">
@@ -1057,10 +1057,10 @@ export default function MyInfo({ site, cvData, onDelete, onCVAnalyzed, deleting 
                                                     <div className="flex justify-end">
                                                         <button onClick={() => removeEducation(index)} className="text-red-400 hover:text-red-300 text-sm">Sil</button>
                                                     </div>
-                                                    <input type="text" placeholder="Derece (Ã¶r: Lisans)" value={edu.degree || ""} onChange={(e) => updateEducation(index, "degree", e.target.value)} className="w-full px-3 py-2 bg-white/5 border border-white/10 text-white rounded-xl text-sm focus:ring-2 focus:ring-purple-500" />
-                                                    <input type="text" placeholder="Alan (Ã¶r: Bilgisayar MÃ¼hendisliÄŸi)" value={edu.field || ""} onChange={(e) => updateEducation(index, "field", e.target.value)} className="w-full px-3 py-2 bg-white/5 border border-white/10 text-white rounded-xl text-sm focus:ring-2 focus:ring-purple-500" />
+                                                    <input type="text" placeholder="Derece (örn: Lisans)" value={edu.degree || ""} onChange={(e) => updateEducation(index, "degree", e.target.value)} className="w-full px-3 py-2 bg-white/5 border border-white/10 text-white rounded-xl text-sm focus:ring-2 focus:ring-purple-500" />
+                                                    <input type="text" placeholder="Alan (örn: Bilgisayar Mühendisliği)" value={edu.field || ""} onChange={(e) => updateEducation(index, "field", e.target.value)} className="w-full px-3 py-2 bg-white/5 border border-white/10 text-white rounded-xl text-sm focus:ring-2 focus:ring-purple-500" />
                                                     <input type="text" placeholder="Okul" value={edu.school || ""} onChange={(e) => updateEducation(index, "school", e.target.value)} className="w-full px-3 py-2 bg-white/5 border border-white/10 text-white rounded-xl text-sm focus:ring-2 focus:ring-purple-500" />
-                                                    <input type="text" placeholder="YÄ±l (Ã¶r: 2018-2022)" value={edu.year || ""} onChange={(e) => updateEducation(index, "year", e.target.value)} className="w-full px-3 py-2 bg-white/5 border border-white/10 text-white rounded-xl text-sm focus:ring-2 focus:ring-purple-500" />
+                                                    <input type="text" placeholder="Yıl (örn: 2018-2022)" value={edu.year || ""} onChange={(e) => updateEducation(index, "year", e.target.value)} className="w-full px-3 py-2 bg-white/5 border border-white/10 text-white rounded-xl text-sm focus:ring-2 focus:ring-purple-500" />
                                                     <input type="text" placeholder="GPA (opsiyonel)" value={edu.gpa || ""} onChange={(e) => updateEducation(index, "gpa", e.target.value)} className="w-full px-3 py-2 bg-white/5 border border-white/10 text-white rounded-xl text-sm focus:ring-2 focus:ring-purple-500" />
                                                 </div>
                                             ) : (
@@ -1100,8 +1100,8 @@ export default function MyInfo({ site, cvData, onDelete, onCVAnalyzed, deleting 
                                             )}
                                             {isEditing && !uploadingPortfolio && (
                                                 <div className="absolute top-2 right-2 flex gap-2 opacity-0 group-hover:opacity-100 transition-opacity">
-                                                    <button onClick={() => setEditingPortfolioIndex(index)} className="p-2 bg-blue-600 hover:bg-blue-700 text-white rounded-full" title="DetaylarÄ± dÃ¼zenle">âœï¸</button>
-                                                    <button onClick={() => handlePortfolioDelete(item.imageUrl, index)} className="p-2 bg-red-600 hover:bg-red-700 text-white rounded-full" title="Sil">ğŸ—‘ï¸</button>
+                                                    <button onClick={() => setEditingPortfolioIndex(index)} className="p-2 bg-blue-600 hover:bg-blue-700 text-white rounded-full" title="Detayları düzenle">Düzenle</button>
+                                                    <button onClick={() => handlePortfolioDelete(item.imageUrl, index)} className="p-2 bg-red-600 hover:bg-red-700 text-white rounded-full" title="Sil">Sil</button>
                                                 </div>
                                             )}
                                         </div>
@@ -1161,9 +1161,9 @@ export default function MyInfo({ site, cvData, onDelete, onCVAnalyzed, deleting 
                                                                 <option value="advanced">İleri</option>
                                                                 <option value="expert">Uzman</option>
                                                             </select>
-                                                            <button onClick={() => removeSkill(index)} className="px-2 py-1 text-red-400 hover:text-red-300 text-sm">âœ•</button>
+                                                            <button onClick={() => removeSkill(index)} className="px-2 py-1 text-red-400 hover:text-red-300 text-sm">Sil</button>
                                                         </div>
-                                                        <input type="text" value={skillObj.category || ''} onChange={(e) => updateSkill(index, 'category', e.target.value)} placeholder="Kategori (Ã¶r: Frontend)" className="w-full px-3 py-2 bg-white/5 border border-white/10 text-white rounded-xl text-sm placeholder-gray-500 focus:ring-2 focus:ring-purple-500" />
+                                                        <input type="text" value={skillObj.category || ''} onChange={(e) => updateSkill(index, 'category', e.target.value)} placeholder="Kategori (örn: Frontend)" className="w-full px-3 py-2 bg-white/5 border border-white/10 text-white rounded-xl text-sm placeholder-gray-500 focus:ring-2 focus:ring-purple-500" />
                                                     </div>
                                                 ) : (
                                                     <div>
@@ -1173,7 +1173,7 @@ export default function MyInfo({ site, cvData, onDelete, onCVAnalyzed, deleting 
                                                         </div>
                                                         <div className="flex items-center gap-3 text-sm text-gray-400">
                                                             <span className="capitalize">{skillObj.level || 'intermediate'}</span>
-                                                            <span>â€¢</span>
+                                                            <span>•</span>
                                                             <span>{displayPercentage}%</span>
                                                         </div>
                                                         <div className="mt-2 h-1.5 bg-white/10 rounded-full overflow-hidden">
@@ -1217,7 +1217,7 @@ export default function MyInfo({ site, cvData, onDelete, onCVAnalyzed, deleting 
                                                                 <option value="intermediate">Orta</option>
                                                                 <option value="basic">Başlangıç</option>
                                                             </select>
-                                                            <button onClick={() => removeLanguage(index)} className="px-2 py-1 text-red-400 hover:text-red-300 text-sm">âœ•</button>
+                                                            <button onClick={() => removeLanguage(index)} className="px-2 py-1 text-red-400 hover:text-red-300 text-sm">Sil</button>
                                                         </div>
                                                         <select value={langObj.cefr || ''} onChange={(e) => updateLanguage(index, 'cefr', e.target.value || undefined)} className="w-full px-3 py-2 bg-white/5 border border-white/10 text-white rounded-xl text-sm focus:ring-2 focus:ring-purple-500">
                                                             <option value="">CEFR Seviyesi (Opsiyonel)</option>
@@ -1281,7 +1281,10 @@ export default function MyInfo({ site, cvData, onDelete, onCVAnalyzed, deleting 
                             <div className="border-t border-white/10 pt-4 space-y-2">
                                 {!isEditing ? (
                                     <button onClick={handleEdit} className="w-full flex items-center justify-center gap-2 px-4 py-2.5 bg-gradient-to-r from-purple-600 to-blue-600 hover:from-purple-500 hover:to-blue-500 text-white rounded-xl transition-all font-medium">
-                                        ✍️ Düzenle
+                                        <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
+                                        </svg>
+                                        Düzenle
                                     </button>
                                 ) : (
                                     <>
@@ -1294,6 +1297,9 @@ export default function MyInfo({ site, cvData, onDelete, onCVAnalyzed, deleting 
                                     </>
                                 )}
                                 <button onClick={onDelete} disabled={deleting || isEditing} className="w-full flex items-center justify-center gap-2 px-4 py-2.5 bg-red-500/20 hover:bg-red-500/30 text-red-400 rounded-xl transition-all font-medium border border-red-500/30 disabled:opacity-50 disabled:cursor-not-allowed">
+                                    <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
+                                    </svg>
                                     {deleting ? "Siliniyor..." : "CV'yi Sil"}
                                 </button>
                             </div>
