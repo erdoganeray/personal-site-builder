@@ -204,7 +204,7 @@ export default function EditorPage() {
 
     if (status === "loading" || loading) {
         return (
-            <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-gray-900 via-gray-800 to-gray-900">
+            <div className="min-h-screen flex items-center justify-center bg-[#0a0a0a]">
                 <div className="text-white text-xl">Loading...</div>
             </div>
         );
@@ -370,9 +370,9 @@ export default function EditorPage() {
 
     return (
         <>
-            <div className="h-screen flex flex-col bg-gray-900">
+            <div className="h-screen flex flex-col bg-[#0a0a0a]">
                 {/* Top Navigation Menu */}
-                <nav className="bg-gray-800 border-b border-gray-700 px-6 py-3 flex items-center justify-between">
+                <nav className="bg-gray-900/80 backdrop-blur-md border-b border-white/10 px-6 py-3 flex items-center justify-between">
                     <div className="flex items-center gap-6">
                         <Link href="/dashboard" className="text-gray-400 hover:text-white transition-colors">
                             ← Geri
@@ -381,10 +381,10 @@ export default function EditorPage() {
 
                         {/* Device Selector */}
                         {hasPreviewContent && (
-                            <div className="flex items-center gap-2 bg-gray-700 rounded-lg p-1">
+                            <div className="flex items-center gap-2 bg-white/5 border border-white/10 rounded-xl p-1">
                                 <button
                                     onClick={() => setSelectedDevice("computer")}
-                                    className={`px-3 py-1 rounded transition-colors ${selectedDevice === "computer" ? "bg-blue-600 text-white" : "text-gray-400 hover:text-white"
+                                    className={`px-3 py-1.5 rounded-lg transition-all ${selectedDevice === "computer" ? "bg-gradient-to-r from-purple-600 to-blue-600 text-white shadow-lg shadow-purple-500/25" : "text-gray-400 hover:text-white hover:bg-white/5"
                                         }`}
                                 >
                                     <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -393,7 +393,7 @@ export default function EditorPage() {
                                 </button>
                                 <button
                                     onClick={() => setSelectedDevice("tablet")}
-                                    className={`px-3 py-1 rounded transition-colors ${selectedDevice === "tablet" ? "bg-blue-600 text-white" : "text-gray-400 hover:text-white"
+                                    className={`px-3 py-1.5 rounded-lg transition-all ${selectedDevice === "tablet" ? "bg-gradient-to-r from-purple-600 to-blue-600 text-white shadow-lg shadow-purple-500/25" : "text-gray-400 hover:text-white hover:bg-white/5"
                                         }`}
                                 >
                                     <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -402,7 +402,7 @@ export default function EditorPage() {
                                 </button>
                                 <button
                                     onClick={() => setSelectedDevice("phone")}
-                                    className={`px-3 py-1 rounded transition-colors ${selectedDevice === "phone" ? "bg-blue-600 text-white" : "text-gray-400 hover:text-white"
+                                    className={`px-3 py-1.5 rounded-lg transition-all ${selectedDevice === "phone" ? "bg-gradient-to-r from-purple-600 to-blue-600 text-white shadow-lg shadow-purple-500/25" : "text-gray-400 hover:text-white hover:bg-white/5"
                                         }`}
                                 >
                                     <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -422,12 +422,12 @@ export default function EditorPage() {
                                     ...
                                 </span>
                             ) : (
-                                <span className="text-white font-bold bg-purple-600 px-3 py-1 rounded-full text-sm">
+                                <span className="text-white font-bold bg-gradient-to-r from-purple-600 to-blue-600 px-3 py-1 rounded-full text-sm shadow-lg shadow-purple-500/25">
                                     {subscription.editsRemaining}/{subscription.editsLimit}
                                 </span>
                             )}
                         </div>
-                        <Link href="/dashboard" className="px-4 py-2 bg-gray-700 hover:bg-gray-600 text-white text-sm rounded-lg transition-colors">
+                        <Link href="/dashboard" className="px-4 py-2 bg-white/5 hover:bg-white/10 border border-white/10 text-white text-sm rounded-xl transition-all">
                             Dashboard
                         </Link>
                     </div>
@@ -436,8 +436,8 @@ export default function EditorPage() {
                 {/* Main Content Area */}
                 <div className="flex-1 flex overflow-hidden">
                     {/* Preview Area */}
-                    <div className="flex-1 flex flex-col bg-gray-800 p-3">
-                        <div className="flex-1 flex justify-center bg-gray-900 rounded-lg overflow-hidden">
+                    <div className="flex-1 flex flex-col bg-[#0d0d0d] p-3">
+                        <div className="flex-1 flex justify-center bg-[#0a0a0a] rounded-2xl overflow-hidden border border-white/5">
                             {hasPreviewContent ? (
                                 <div className={`${deviceSizes[selectedDevice]} bg-white rounded shadow-xl transition-all duration-300`}>
                                     <iframe src={iframeUrl} className="w-full h-full rounded" title="Site Preview" sandbox="allow-same-origin allow-scripts allow-forms allow-popups" />
@@ -450,7 +450,7 @@ export default function EditorPage() {
                                         </svg>
                                         <h3 className="text-2xl font-bold text-white mb-2">Henüz Site Oluşturulmamış</h3>
                                         <p className="mb-6">Site önizlemesini görmek için önce Dashboard'dan sitenizi oluşturun.</p>
-                                        <Link href="/dashboard" className="px-6 py-3 bg-gradient-to-r from-purple-600 to-blue-600 hover:from-purple-700 hover:to-blue-700 text-white font-semibold rounded-lg transition-all duration-200 inline-block">
+                                        <Link href="/dashboard" className="px-6 py-3 bg-gradient-to-r from-purple-600 to-blue-600 hover:from-purple-500 hover:to-blue-500 text-white font-semibold rounded-xl transition-all shadow-lg shadow-purple-500/25 transform hover:scale-105 active:scale-95 inline-block">
                                             Dashboard'a Git
                                         </Link>
                                     </div>
@@ -460,10 +460,10 @@ export default function EditorPage() {
                     </div>
 
                     {/* Chat/Revision Area */}
-                    <div className="w-80 bg-gray-800 border-l border-gray-700 flex flex-col">
+                    <div className="w-80 bg-[#0d0d0d] border-l border-white/10 flex flex-col">
                         {/* Unpublished Changes Warning - Only show when site is published */}
                         {site?.status === "published" && hasChanges && (
-                            <div className="bg-yellow-900/30 border-b border-yellow-700 p-4">
+                            <div className="bg-gradient-to-br from-yellow-900/20 to-orange-900/20 backdrop-blur-sm border-b border-yellow-500/20 p-4">
                                 <div className="flex items-start gap-2">
                                     <svg className="w-5 h-5 text-yellow-400 flex-shrink-0 mt-0.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                                         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
@@ -490,7 +490,7 @@ export default function EditorPage() {
                         )}
 
                         {/* Chat Header */}
-                        <div className="p-4 border-b border-gray-700">
+                        <div className="p-4 border-b border-white/10">
                             <h2 className="text-lg font-semibold text-white">Site Düzenleyici</h2>
                             <p className="text-sm text-gray-400 mt-1">Sitenizde değişiklik yapmak için mesaj gönderin</p>
                         </div>
@@ -504,7 +504,7 @@ export default function EditorPage() {
 
                                     {/* Smart Suggestions */}
                                     {suggestions && (
-                                        <div className="mt-6 text-left bg-gray-700 p-4 rounded-lg text-xs space-y-3">
+                                        <div className="mt-6 text-left bg-white/5 border border-white/10 backdrop-blur-sm p-4 rounded-xl text-xs space-y-3">
                                             <p className="text-white font-semibold mb-2">💡 Önerilen değişiklikler:</p>
 
                                             {suggestions.componentOperations.length > 0 && (
@@ -514,7 +514,7 @@ export default function EditorPage() {
                                                         <button
                                                             key={idx}
                                                             onClick={() => setInputValue(suggestion)}
-                                                            className="block w-full text-left text-gray-300 hover:text-white hover:bg-gray-600 p-2 rounded transition-colors"
+                                                            className="block w-full text-left text-gray-300 hover:text-white hover:bg-purple-500/20 p-2 rounded-lg transition-all border border-transparent hover:border-purple-500/30"
                                                         >
                                                             • {suggestion}
                                                         </button>
@@ -529,7 +529,7 @@ export default function EditorPage() {
                                                         <button
                                                             key={idx}
                                                             onClick={() => setInputValue(suggestion)}
-                                                            className="block w-full text-left text-gray-300 hover:text-white hover:bg-gray-600 p-2 rounded transition-colors"
+                                                            className="block w-full text-left text-gray-300 hover:text-white hover:bg-purple-500/20 p-2 rounded-lg transition-all border border-transparent hover:border-purple-500/30"
                                                         >
                                                             • {suggestion}
                                                         </button>
@@ -541,13 +541,13 @@ export default function EditorPage() {
                                 </div>
                             ) : (
                                 messages.map((message, index) => (
-                                    <div key={index} className={`p-3 rounded-lg ${message.role === "user" ? "bg-purple-600 text-white ml-4" : "bg-gray-700 text-gray-200 mr-4"}`}>
+                                    <div key={index} className={`p-3 rounded-xl ${message.role === "user" ? "bg-gradient-to-r from-purple-600 to-blue-600 text-white ml-4 shadow-lg shadow-purple-500/20" : "bg-white/5 border border-white/10 text-gray-200 mr-4"}`}>
                                         <p className="text-sm whitespace-pre-line">{message.content}</p>
                                     </div>
                                 ))
                             )}
                             {isRevising && (
-                                <div className="bg-gray-700 text-gray-200 mr-4 p-3 rounded-lg">
+                                <div className="bg-white/5 border border-white/10 text-gray-200 mr-4 p-3 rounded-xl">
                                     <p className="text-sm">İşleniyor...</p>
                                 </div>
                             )}
@@ -585,7 +585,7 @@ export default function EditorPage() {
                         </div>
 
                         {/* Input Area */}
-                        <div className="p-4 border-t border-gray-700">
+                        <div className="p-4 border-t border-white/10">
                             <div className="space-y-2">
                                 <textarea
                                     value={inputValue}
@@ -601,7 +601,7 @@ export default function EditorPage() {
                                         }
                                     }}
                                     placeholder="Değişiklik talebinizi yazın... (Ör: Portfolio bölümünü kaldır, renkleri mavi yap)"
-                                    className="w-full px-4 py-2 bg-gray-700 text-white rounded-lg border border-gray-600 focus:outline-none focus:border-purple-500 placeholder-gray-400 resize-none"
+                                    className="w-full px-4 py-3 bg-[#1a1a1a] text-white rounded-xl border border-white/10 focus:outline-none focus:border-purple-500/50 focus:ring-1 focus:ring-purple-500/30 placeholder-gray-500 resize-none transition-all"
                                     rows={3}
                                     disabled={isRevising || !site?.htmlContent}
                                 />
@@ -612,7 +612,7 @@ export default function EditorPage() {
                                     <button
                                         onClick={handleSendMessage}
                                         disabled={!inputValue.trim() || isRevising || !site?.htmlContent}
-                                        className="px-4 py-2 bg-purple-600 hover:bg-purple-700 text-white rounded-lg transition-colors disabled:bg-gray-600 disabled:cursor-not-allowed text-sm"
+                                        className="px-5 py-2.5 bg-gradient-to-r from-purple-600 to-blue-600 hover:from-purple-500 hover:to-blue-500 text-white rounded-xl transition-all disabled:opacity-50 disabled:cursor-not-allowed text-sm font-semibold shadow-lg shadow-purple-500/25 transform hover:scale-105 active:scale-95"
                                     >
                                         {isRevising ? "İşleniyor..." : "Gönder"}
                                     </button>
