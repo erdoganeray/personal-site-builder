@@ -34,12 +34,8 @@
 ## Yayınlamadan Önce Son Yapılacaklar
 - bazı templateler çok basit, daha modernleştir
 - template havuzunu biraz daha geliştir
-- landing sitenin tüm makyajını güncelle
-- yeniden yayınla ui nın tasarımını unutma
-- landing page için seo geliştirmesi
-- multi languages
-- showcase
-- dashboard hemen yükselt ekranı
+- showcase i kaldır
+- landing page giriş yapmadan site oluşturma ekranı
 
 ## Versel Deploydan Sonra Yapılacaklar
 

@@ -44,11 +44,12 @@ export default async function Home() {
               <Link href="#how-it-works" className="text-sm font-medium text-gray-400 hover:text-white transition-colors">
                 Nasıl Çalışır?
               </Link>
-              <Link href="#showcase" className="text-sm font-medium text-gray-400 hover:text-white transition-colors">
-                Örnekler
-              </Link>
+
               <Link href="#pricing" className="text-sm font-medium text-gray-400 hover:text-white transition-colors">
                 Fiyatlandırma
+              </Link>
+              <Link href="#faq" className="text-sm font-medium text-gray-400 hover:text-white transition-colors">
+                SSS
               </Link>
             </div>
 
@@ -202,38 +203,7 @@ export default async function Home() {
         </div>
       </section>
 
-      {/* Showcase Section */}
-      <section id="showcase" className="py-24 px-4 bg-[#0d0d0d]">
-        <div className="max-w-7xl mx-auto">
-          <div className="flex flex-col md:flex-row justify-between items-end mb-12 gap-6">
-            <div className="max-w-2xl">
-              <h2 className="text-3xl md:text-5xl font-bold text-white mb-4">Profilly ile Yapıldı</h2>
-              <p className="text-gray-400 text-lg">Binlerce kullanıcı hayallerindeki siteye Profilly ile kavuştu. İlham alın.</p>
-            </div>
-            <Link href="/register" className="text-white flex items-center gap-2 hover:gap-3 transition-all font-medium group">
-              Daha fazlasını gör
-              <ArrowRight className="w-4 h-4 group-hover:text-purple-400 transition-colors" />
-            </Link>
-          </div>
 
-          <div className="grid md:grid-cols-3 gap-8">
-            {[1, 2, 3].map((i) => (
-              <div key={i} className="group relative aspect-[4/3] rounded-2xl overflow-hidden bg-gray-900 border border-white/5">
-                <div className="absolute inset-0 bg-gradient-to-t from-gray-900 to-transparent opacity-60 z-10" />
-                <div className="absolute bottom-0 left-0 p-6 z-20 translate-y-4 group-hover:translate-y-0 transition-transform duration-300">
-                  <h3 className="text-xl font-bold text-white mb-1">Portfolyo Tasarımı {i}</h3>
-                  <p className="text-sm text-gray-400 opacity-0 group-hover:opacity-100 transition-opacity duration-300">Creative Director • Portfolio</p>
-                </div>
-                {/* Placeholder for site screenshots - using gradients for now */}
-                <div className={`w-full h-full bg-gradient-to-br ${i === 1 ? 'from-purple-900 to-gray-900' :
-                  i === 2 ? 'from-blue-900 to-gray-900' :
-                    'from-pink-900 to-gray-900'
-                  } group-hover:scale-105 transition-transform duration-500`} />
-              </div>
-            ))}
-          </div>
-        </div>
-      </section>
 
       {/* How It Works Section */}
       <section id="how-it-works" className="py-24 px-4 relative">
@@ -369,7 +339,7 @@ export default async function Home() {
       </section>
 
       {/* FAQ Section */}
-      <section className="py-24 px-4 bg-[#0a0a0a]">
+      <section id="faq" className="py-24 px-4 bg-[#0a0a0a]">
         <div className="max-w-3xl mx-auto">
           <div className="text-center mb-16">
             <h2 className="text-3xl md:text-5xl font-bold text-white mb-6">Sıkça Sorulan Sorular</h2>
