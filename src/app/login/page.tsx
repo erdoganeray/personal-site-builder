@@ -2,16 +2,20 @@
 
 import { useState } from "react";
 import { signIn } from "next-auth/react";
-import { useRouter } from "next/navigation";
+import { useRouter, useSearchParams } from "next/navigation";
 import Link from "next/link";
 import { ArrowLeft, Sparkles } from "lucide-react";
 
 export default function LoginPage() {
     const router = useRouter();
+    const searchParams = useSearchParams();
     const [email, setEmail] = useState("");
     const [password, setPassword] = useState("");
     const [error, setError] = useState("");
     const [loading, setLoading] = useState(false);
+
+    // Get anonymous token from URL if present
+    const anonymousToken = searchParams.get("token");
 
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
@@ -27,10 +31,34 @@ export default function LoginPage() {
 
             if (result?.error) {
                 setError("Geçersiz e-posta veya şifre");
-            } else {
-                router.push("/dashboard");
-                router.refresh();
+                setLoading(false);
+                return;
             }
+
+            // If there's an anonymous token, merge the data
+            if (anonymousToken) {
+                try {
+                    const mergeResponse = await fetch("/api/anonymous/merge", {
+                        method: "POST",
+                        headers: { "Content-Type": "application/json" },
+                        body: JSON.stringify({ anonymousSessionToken: anonymousToken }),
+                    });
+
+                    if (mergeResponse.ok) {
+                        console.log("Anonymous session merged successfully");
+                        // Clear localStorage
+                        if (typeof window !== 'undefined') {
+                            localStorage.removeItem('profilly_anonymous_session');
+                        }
+                    }
+                } catch (mergeError) {
+                    console.error("Failed to merge anonymous session:", mergeError);
+                    // Continue even if merge fails
+                }
+            }
+
+            router.push("/dashboard");
+            router.refresh();
         } catch (error) {
             setError("Bir hata oluştu. Lütfen tekrar deneyin.");
         } finally {

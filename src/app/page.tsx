@@ -2,10 +2,9 @@ import Link from "next/link";
 import { getServerSession } from "next-auth/next";
 import { authOptions } from "@/lib/auth";
 import SignOutButton from "@/components/SignOutButton";
+import HeroPromptSection from "@/components/HeroPromptSection";
 import {
   FileText,
-  Sparkles,
-  Paperclip,
   Upload,
   CheckCircle2,
   Zap,
@@ -17,7 +16,6 @@ import {
   LogOut,
   LayoutDashboard,
   HelpCircle,
-  Dices
 } from "lucide-react";
 import Image from "next/image";
 
@@ -146,60 +144,8 @@ export default async function Home() {
             Kodlama veya tasarım bilgisine ihtiyacınız yok. Sadece ne istediğinizi söyleyin veya CV'nizi yükleyin, gerisini Profilly halletsin.
           </p>
 
-          {/* Simplified Prompt Input */}
-          <div className="max-w-3xl mx-auto mb-8 animate-scale-in">
-            <div className="relative group">
-              <div className="flex items-center gap-3 bg-[#1a1a1a]/80 backdrop-blur-xl border border-white/10 rounded-2xl p-2 shadow-2xl hover:border-purple-500/30 transition-all duration-300">
-                {/* Sparkles Icon */}
-                <div className="flex-shrink-0 ml-2">
-                  <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-purple-500/20 to-blue-500/20 flex items-center justify-center">
-                    <Sparkles className="w-5 h-5 text-purple-400" />
-                  </div>
-                </div>
-
-                {/* Input Field */}
-                <input
-                  type="text"
-                  placeholder="Yazılım mühendisiyim. Modern, karanlık temalı ve projelerimi vitrinleyebileceğim minimalist bir portfolyo sitesi oluştur..."
-                  className="flex-1 bg-transparent text-white text-base md:text-lg placeholder-gray-500 focus:outline-none py-2"
-                />
-
-                {/* File Upload Button */}
-                <button className="flex-shrink-0 p-2.5 rounded-xl hover:bg-white/5 transition-colors group/upload">
-                  <Paperclip className="w-5 h-5 text-gray-400 group-hover/upload:text-purple-400 transition-colors" />
-                </button>
-
-                {/* Generate Button */}
-                <button className="flex-shrink-0 flex items-center gap-2 px-6 py-3 bg-gradient-to-r from-purple-600 to-blue-600 hover:from-purple-500 hover:to-blue-500 text-white font-semibold rounded-xl transition-all transform hover:scale-105 active:scale-95 shadow-lg shadow-purple-500/25">
-                  <span className="hidden sm:inline">Oluştur</span>
-                  <ArrowRight className="w-5 h-5" />
-                </button>
-              </div>
-
-              {/* Supported formats text */}
-              <p className="text-xs text-gray-500 text-center mt-3">
-                Desteklenen formatlar: PDF (Maks 5MB)
-              </p>
-            </div>
-          </div>
-
-          {/* Role Suggestions */}
-          <div className="flex flex-wrap justify-center gap-3 max-w-4xl mx-auto animate-fade-in animation-delay-200">
-            {[
-              { icon: "💻", label: "Yazılım Mühendisi" },
-              { icon: "🎨", label: "Kreatif Direktör" },
-              { icon: "📱", label: "Pazarlama Uzmanı" },
-              { icon: "🚀", label: "Ürün Yöneticisi" }
-            ].map((role, i) => (
-              <button
-                key={i}
-                className="inline-flex items-center gap-2 px-4 py-2 bg-white/5 hover:bg-white/10 border border-white/10 hover:border-purple-500/30 rounded-full text-sm text-gray-300 hover:text-white transition-all"
-              >
-                <span>{role.icon}</span>
-                <span>{role.label}</span>
-              </button>
-            ))}
-          </div>
+          {/* Prompt Input Section */}
+          <HeroPromptSection className="mb-8 animate-scale-in" />
         </div>
       </section>
 

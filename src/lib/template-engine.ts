@@ -643,31 +643,53 @@ export function getSkillsReplacements(
 
 /**
  * CV verilerinden portfolio section için HTML items oluşturur
+ * @param useAbsoluteUrls - true ise proxy URL kullanılır (preview için), false ise relative path'e dönüştürülür (publish için)
  */
 export function generatePortfolioItems(
   cvData: CVData,
-  templateId: string
+  templateId: string,
+  useAbsoluteUrls: boolean = false
 ): string {
   if (!cvData.portfolio || cvData.portfolio.length === 0) {
     return '';
   }
 
+  // URL dönüşümü: 
+  // Preview için: R2 URL -> /api/anonymous/assets/userId/folder/fileName (proxy)
+  // Publish için: R2 URL -> /_assets/folder/fileName (relative)
+  const getImageUrl = (url: string): string => {
+    if (!url) return url;
+
+    if (useAbsoluteUrls) {
+      // R2 URL'i proxy URL'e çevir
+      // R2 format: https://pub-xxx.r2.dev/users/{userId}/portfolio/{fileName}
+      const r2Match = url.match(/https?:\/\/pub-[a-f0-9]+\.r2\.dev\/users\/([^/]+)\/(portfolio|profile)\/(.+)/);
+      if (r2Match) {
+        const [, userId, folder, fileName] = r2Match;
+        return `/api/anonymous/assets/${userId}/${folder}/${fileName}`;
+      }
+      return url; // R2 formatı değilse olduğu gibi döndür
+    } else {
+      return convertR2UrlToRelativePath(url);
+    }
+  };
+
   if (templateId === 'portfolio-grid') {
     return cvData.portfolio.map((item, index) => `
       <div class="portfolio-item" data-index="${index}">
-        <img src="${convertR2UrlToRelativePath(item.imageUrl)}" alt="${escapeHtml(item.title || `Portfolio ${index + 1}`)}" loading="lazy" />
+        <img src="${getImageUrl(item.imageUrl)}" alt="${escapeHtml(item.title || `Portfolio ${index + 1}`)}" loading="lazy" />
       </div>
     `).join('\n');
   } else if (templateId === 'portfolio-masonry') {
     return cvData.portfolio.map((item, index) => `
       <div class="portfolio-item-masonry" data-index="${index}">
-        <img src="${convertR2UrlToRelativePath(item.imageUrl)}" alt="${escapeHtml(item.title || `Portfolio ${index + 1}`)}" loading="lazy" />
+        <img src="${getImageUrl(item.imageUrl)}" alt="${escapeHtml(item.title || `Portfolio ${index + 1}`)}" loading="lazy" />
       </div>
     `).join('\n');
   } else if (templateId === 'portfolio-carousel') {
     return cvData.portfolio.map((item, index) => `
       <div class="portfolio-item-carousel" data-index="${index}">
-        <img src="${convertR2UrlToRelativePath(item.imageUrl)}" alt="${escapeHtml(item.title || `Portfolio ${index + 1}`)}" loading="lazy" />
+        <img src="${getImageUrl(item.imageUrl)}" alt="${escapeHtml(item.title || `Portfolio ${index + 1}`)}" loading="lazy" />
       </div>
     `).join('\n');
   } else if (templateId === 'portfolio-bento-grid') {
@@ -676,7 +698,7 @@ export function generatePortfolioItems(
 
       return `
       <div class="portfolio-item-bento" data-index="${index}">
-        <img src="${convertR2UrlToRelativePath(item.imageUrl)}" alt="${escapeHtml(item.title || `Portfolio ${index + 1}`)}" loading="lazy" />
+        <img src="${getImageUrl(item.imageUrl)}" alt="${escapeHtml(item.title || `Portfolio ${index + 1}`)}" loading="lazy" />
         ${item.projectUrl ? `<a href="${escapeHtml(item.projectUrl)}" target="_blank" rel="noopener noreferrer" class="portfolio-item-link" title="View Project">🔗</a>` : ''}
         ${hasMetadata ? `
         <div class="portfolio-item-metadata">
@@ -700,13 +722,15 @@ export function generatePortfolioItems(
 
 /**
  * CV verilerinden portfolio section için placeholder değerleri oluşturur
+ * @param useAbsoluteUrls - true ise R2 URL'leri olduğu gibi kullanılır (preview için)
  */
 export function getPortfolioReplacements(
   cvData: CVData,
   themeColors: ThemeColors,
-  templateId: string
+  templateId: string,
+  useAbsoluteUrls: boolean = false
 ): PlaceholderReplacements {
-  const portfolioItems = generatePortfolioItems(cvData, templateId);
+  const portfolioItems = generatePortfolioItems(cvData, templateId, useAbsoluteUrls);
 
   // Add lightbox HTML structure
   const lightboxHtml = `
@@ -1167,6 +1191,7 @@ export function getNavigationReplacements(
 
 /**
  * Component kategorisine göre doğru replacement fonksiyonunu çağırır
+ * @param useAbsoluteUrls - true ise R2 URL'leri absolute olarak kullanılır (preview için)
  */
 export function getReplacementsForComponent(
   component: ComponentTemplate,
@@ -1174,7 +1199,8 @@ export function getReplacementsForComponent(
   themeColors: ThemeColors,
   selectedComponents?: SelectedComponent[],
   iconStyle?: 'outline' | 'solid',
-  iconSizes?: { navigation: string; social: string }
+  iconSizes?: { navigation: string; social: string },
+  useAbsoluteUrls?: boolean
 ): PlaceholderReplacements {
   switch (component.category) {
     case 'navigation':
@@ -1193,7 +1219,7 @@ export function getReplacementsForComponent(
     case 'education':
       return getEducationReplacements(cvData, themeColors, component.id);
     case 'portfolio':
-      return getPortfolioReplacements(cvData, themeColors, component.id);
+      return getPortfolioReplacements(cvData, themeColors, component.id, useAbsoluteUrls);
     case 'skills':
       return getSkillsReplacements(cvData, themeColors, component.id);
     case 'languages':
@@ -1209,6 +1235,7 @@ export function getReplacementsForComponent(
 
 /**
  * Component template'ini CV verileri ile doldurur
+ * @param useAbsoluteUrls - true ise R2 URL'leri absolute olarak kullanılır (preview için)
  */
 export function populateTemplate(
   component: ComponentTemplate,
@@ -1217,7 +1244,8 @@ export function populateTemplate(
   selectedComponents?: SelectedComponent[],
   iconStyle?: 'outline' | 'solid',
   iconSizes?: { navigation: string; social: string },
-  stockImages?: { [category: string]: { url: string; alt: string; photographer?: string; pexelsId?: number; avgColor?: string; } }
+  stockImages?: { [category: string]: { url: string; alt: string; photographer?: string; pexelsId?: number; avgColor?: string; } },
+  useAbsoluteUrls?: boolean
 ): { html: string; css: string; js?: string } {
   const replacements = getReplacementsForComponent(
     component,
@@ -1225,7 +1253,8 @@ export function populateTemplate(
     themeColors,
     selectedComponents,
     iconStyle,
-    iconSizes
+    iconSizes,
+    useAbsoluteUrls
   );
 
   // Get icon style from template (default to 'outline')

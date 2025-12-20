@@ -1,18 +1,22 @@
 "use client";
 
-import { useState } from "react";
-import { useRouter } from "next/navigation";
+import { useState, useEffect } from "react";
+import { useRouter, useSearchParams } from "next/navigation";
 import Link from "next/link";
-import PasswordStrengthMeter from "@/components/ui/PasswordStrengthMeter";
+import PasswordStrengthMeter, { isPasswordStrong } from "@/components/ui/PasswordStrengthMeter";
 import { ArrowLeft, Sparkles, UserPlus } from "lucide-react";
 
 export default function RegisterPage() {
     const router = useRouter();
+    const searchParams = useSearchParams();
     const [name, setName] = useState("");
     const [email, setEmail] = useState("");
     const [password, setPassword] = useState("");
     const [error, setError] = useState("");
     const [loading, setLoading] = useState(false);
+
+    // Get anonymous token from URL if present
+    const anonymousToken = searchParams.get("token");
 
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
@@ -23,7 +27,12 @@ export default function RegisterPage() {
             const response = await fetch("/api/register", {
                 method: "POST",
                 headers: { "Content-Type": "application/json" },
-                body: JSON.stringify({ name, email, password }),
+                body: JSON.stringify({
+                    name,
+                    email,
+                    password,
+                    anonymousSessionToken: anonymousToken || undefined
+                }),
             });
 
             const data = await response.json();
@@ -31,6 +40,11 @@ export default function RegisterPage() {
             if (!response.ok) {
                 setError(data.error || "Kayıt başarısız oldu");
                 return;
+            }
+
+            // Clear anonymous session from localStorage
+            if (anonymousToken && typeof window !== 'undefined') {
+                localStorage.removeItem('profilly_anonymous_session');
             }
 
             // Redirect to login after successful registration
@@ -136,8 +150,8 @@ export default function RegisterPage() {
 
                         <button
                             type="submit"
-                            disabled={loading}
-                            className="w-full bg-gradient-to-r from-purple-600 to-blue-600 hover:from-purple-500 hover:to-blue-500 disabled:from-purple-800 disabled:to-blue-800 disabled:cursor-not-allowed text-white font-semibold py-3.5 px-4 rounded-xl transition-all duration-200 transform hover:scale-[1.02] active:scale-[0.98] shadow-lg shadow-purple-500/25 flex items-center justify-center gap-2"
+                            disabled={loading || !isPasswordStrong(password)}
+                            className="w-full bg-gradient-to-r from-purple-600 to-blue-600 hover:from-purple-500 hover:to-blue-500 disabled:from-purple-800 disabled:to-blue-800 disabled:cursor-not-allowed text-white font-semibold py-3.5 px-4 rounded-xl transition-all duration-200 transform hover:scale-[1.02] active:scale-[0.98] shadow-lg shadow-purple-500/25 flex items-center justify-center gap-2 disabled:opacity-60"
                         >
                             {loading ? (
                                 <>
@@ -151,6 +165,11 @@ export default function RegisterPage() {
                                 </>
                             )}
                         </button>
+                        {password && !isPasswordStrong(password) && (
+                            <p className="text-xs text-amber-400/80 text-center mt-2">
+                                Kayıt olabilmek için şifreniz en az "Güçlü" seviyesinde olmalıdır.
+                            </p>
+                        )}
                     </form>
 
                     {/* Sign In Link */}

@@ -62,6 +62,13 @@ export async function POST(request: NextRequest) {
         }
 
         // 4. Şifre doğrulama
+        if (!user.password) {
+            return NextResponse.json(
+                { error: "Bu hesap şifre ile korunan bir hesap değil" },
+                { status: 400 }
+            );
+        }
+
         const isPasswordValid = await bcrypt.compare(password, user.password);
 
         if (!isPasswordValid) {

@@ -20,7 +20,8 @@ export const authOptions: NextAuthOptions = {
                     where: { email: credentials.email },
                 });
 
-                if (!user || !user.password) {
+                // Anonymous users don't have password, so they can't login with credentials
+                if (!user || !user.password || !user.email) {
                     throw new Error("Invalid credentials");
                 }
 
@@ -35,7 +36,7 @@ export const authOptions: NextAuthOptions = {
 
                 return {
                     id: user.id,
-                    email: user.email,
+                    email: user.email, // Now guaranteed to be non-null
                     name: user.name,
                     planType: user.planType,
                     storageUsed: user.storageUsed,

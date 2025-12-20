@@ -9,9 +9,11 @@ datasource db {
 
 model User {
   id           String   @id @default(cuid())
-  email        String   @unique
-  password     String
+  email        String?  @unique  // Anonim kullanıcılar için null olabilir
+  password     String?           // Anonim kullanıcılar için null olabilir
   name         String?
+  isAnonymous  Boolean  @default(false)
+  anonymousSessionToken String? @unique
   createdAt    DateTime @default(now())
   updatedAt    DateTime @updatedAt
   storageUsed  BigInt   @default(0) // Storage used in bytes

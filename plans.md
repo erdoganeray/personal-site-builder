@@ -34,8 +34,6 @@
 ## Yayınlamadan Önce Son Yapılacaklar
 - bazı templateler çok basit, daha modernleştir
 - template havuzunu biraz daha geliştir
-- showcase i kaldır
-- landing page giriş yapmadan site oluşturma ekranı
 
 ## Versel Deploydan Sonra Yapılacaklar
 
@@ -54,6 +52,12 @@
 - CRON_SECRET environment variable'ı kullan (aynı secret her iki cron job için kullanılabilir)
 - DeletedAsset tablosundan 30 günden eski kayıtları bul ve ilgili R2 dosyalarını sil
 - Deploy sonrası Vercel Dashboard'dan manuel test et
+
+#### Anonim Session Temizliği
+- /api/cron/cleanup-anonymous-sessions/route.ts endpoint'i oluştur
+- Kayıt/giriş yapılmamış (isAnonymous=true) anonim session'ları belirli bir süreden sonra (örn: 7 gün) sil
+- İlgili Site kayıtlarını ve R2'deki CV dosyalarını da temizle
+- vercel.json dosyasına cron job ekle
 
 ### E posta güncelleme
 - şu anda resend api üzerinden çalışıyor

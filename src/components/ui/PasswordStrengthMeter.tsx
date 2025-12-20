@@ -68,17 +68,17 @@ export default function PasswordStrengthMeter({
                         <div
                             key={index}
                             className={`h-1.5 flex-1 rounded-full transition-all duration-300 ${index < strength.score
-                                    ? strength.color
-                                    : "bg-gray-600"
+                                ? strength.color
+                                : "bg-gray-600"
                                 }`}
                         />
                     ))}
                 </div>
                 <span className={`text-xs font-medium ${strength.score === 0 ? "text-red-400" :
-                        strength.score === 1 ? "text-orange-400" :
-                            strength.score === 2 ? "text-yellow-400" :
-                                strength.score === 3 ? "text-green-400" :
-                                    "text-emerald-400"
+                    strength.score === 1 ? "text-orange-400" :
+                        strength.score === 2 ? "text-yellow-400" :
+                            strength.score === 3 ? "text-green-400" :
+                                "text-emerald-400"
                     }`}>
                     {strength.label}
                 </span>
@@ -111,15 +111,38 @@ export default function PasswordStrengthMeter({
     );
 }
 
-// Helper function to check if password meets minimum requirements
+// Helper function to calculate password strength score
+export function getPasswordStrengthScore(password: string): number {
+    const requirements = [
+        password.length >= 6,
+        password.length >= 8,
+        /[A-Z]/.test(password),
+        /[a-z]/.test(password),
+        /[0-9]/.test(password),
+        /[^A-Za-z0-9]/.test(password)
+    ];
+
+    const metCount = requirements.filter(Boolean).length;
+
+    let score = 0;
+    if (password.length >= 6) score = 1;
+    if (password.length >= 8 && metCount >= 3) score = 2;
+    if (password.length >= 8 && metCount >= 4) score = 3;
+    if (password.length >= 10 && metCount >= 5) score = 4;
+
+    return score;
+}
+
+// Helper function to check if password meets minimum requirements (Güçlü or Çok Güçlü)
 export function isPasswordStrong(password: string): boolean {
-    return password.length >= 6;
+    return getPasswordStrengthScore(password) >= 3;
 }
 
 // Helper function to get password validation error message
 export function getPasswordError(password: string): string | null {
-    if (password.length < 6) {
-        return "Şifre en az 6 karakter olmalıdır";
+    const score = getPasswordStrengthScore(password);
+    if (score < 3) {
+        return "Şifre en az 'Güçlü' seviyesinde olmalıdır (8+ karakter, büyük/küçük harf, rakam veya özel karakter)";
     }
     return null;
 }
