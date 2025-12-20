@@ -54,9 +54,8 @@ Mevcut Component Template'ler:
 
 NAVIGATION MENU:
 1. nav-classic-horizontal: Klasik yatay navigasyon, mobilde hamburger menü
-2. nav-minimal-centered: Minimal tasarım, logo ortada, linkler iki yanda
-3. nav-sidebar-modern: Sol tarafta sabit sidebar, gradient arka plan, iconlu
-4. nav-floating-dot: Sağda floating dot navigasyon, minimal
+2. nav-sidebar-modern: Sol tarafta sabit sidebar, gradient arka plan, iconlu
+3. nav-floating-dot: Sağda floating dot navigasyon, minimal
 
 HERO SECTION:
 1. hero-modern-centered: Modern, merkezi düzen, profil fotoğrafı üstte, CTA butonları

@@ -4,6 +4,18 @@ import Link from "next/link";
 import Image from "next/image";
 import { signOut } from "next-auth/react";
 
+/**
+ * R2 URL'lerini proxy URL'e çevirir (SSL hatalarını önlemek için)
+ */
+function getProxiedImageUrl(url: string): string {
+    if (!url) return url;
+    if (url.startsWith('/api/') || url.startsWith('blob:')) return url;
+    if (url.includes('.r2.dev')) {
+        return `/api/proxy-image?url=${encodeURIComponent(url)}`;
+    }
+    return url;
+}
+
 interface DashboardMenuProps {
     activeTab: string;
     onTabChange: (tab: string) => void;
@@ -27,6 +39,9 @@ export default function DashboardMenu({
     const initials = nameParts.length >= 2
         ? `${nameParts[0]?.[0] || ""}${nameParts[nameParts.length - 1]?.[0] || ""}`.toUpperCase()
         : (nameParts[0]?.[0] || "U").toUpperCase();
+
+    // Proxied image URL for R2 images
+    const proxiedUserImage = userImage ? getProxiedImageUrl(userImage) : undefined;
 
     const menuItems = [
         {
@@ -97,12 +112,10 @@ export default function DashboardMenu({
                 <div className="flex items-center gap-3">
                     {/* Profile Image - Always visible, size transitions */}
                     <div className={`rounded-full bg-gradient-to-br from-purple-500 to-blue-500 p-[2px] overflow-hidden flex-shrink-0 transition-all duration-300 ease-in-out ${isCollapsed ? 'w-10 h-10' : 'w-12 h-12'}`}>
-                        {userImage ? (
-                            <Image
-                                src={userImage}
+                        {proxiedUserImage ? (
+                            <img
+                                src={proxiedUserImage}
                                 alt="Profile"
-                                width={48}
-                                height={48}
                                 className="rounded-full object-cover w-full h-full"
                             />
                         ) : (

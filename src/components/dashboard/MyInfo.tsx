@@ -11,6 +11,21 @@ import ChangeDetailsPanel from "./ChangeDetailsPanel";
 import { toast } from "@/components/ui/Toast";
 import ConfirmDialog from "@/components/ui/ConfirmDialog";
 
+/**
+ * R2 URL'lerini proxy URL'e çevirir (SSL hatalarını önlemek için)
+ * Tarayıcı R2'ye doğrudan erişemeyebilir, bu yüzden server-side proxy kullanıyoruz
+ */
+function getProxiedImageUrl(url: string): string {
+    if (!url) return url;
+    // Zaten proxy URL ise veya blob URL ise dokunma
+    if (url.startsWith('/api/') || url.startsWith('blob:')) return url;
+    // R2 URL ise proxy'e yönlendir
+    if (url.includes('.r2.dev')) {
+        return `/api/proxy-image?url=${encodeURIComponent(url)}`;
+    }
+    return url;
+}
+
 interface MyInfoProps {
     site: any;
     cvData: CVData | null;
@@ -882,7 +897,7 @@ export default function MyInfo({ site, cvData, onDelete, onCVAnalyzed, deleting 
                                 <div className="flex flex-col items-center">
                                     <div className="w-32 h-32 rounded-full bg-gradient-to-br from-purple-500/20 to-blue-500/20 flex items-center justify-center mb-4 overflow-hidden border-4 border-white/10">
                                         {profilePhotoPreview || (!photoMarkedForDeletion && profilePhotoUrl) ? (
-                                            <img src={profilePhotoPreview || profilePhotoUrl} alt="Profile" className="w-full h-full object-cover" />
+                                            <img src={profilePhotoPreview || getProxiedImageUrl(profilePhotoUrl)} alt="Profile" className="w-full h-full object-cover" />
                                         ) : (
                                             <span className="text-4xl text-gray-400 font-semibold">
                                                 {name ? name.split(' ').map(n => n[0]).join('').toUpperCase().slice(0, 2) : '?'}
@@ -1091,7 +1106,7 @@ export default function MyInfo({ site, cvData, onDelete, onCVAnalyzed, deleting 
                                 <div className="grid grid-cols-2 md:grid-cols-3 gap-3">
                                     {portfolio.map((item, index) => (
                                         <div key={index} className="relative group aspect-square rounded-xl overflow-hidden bg-white/5 border border-white/10">
-                                            <img src={item.imageUrl} alt={item.title || `Portfolio ${index + 1}`} className="w-full h-full object-cover" />
+                                            <img src={getProxiedImageUrl(item.imageUrl)} alt={item.title || `Portfolio ${index + 1}`} className="w-full h-full object-cover" />
                                             {(item.title || item.category) && (
                                                 <div className="absolute bottom-0 left-0 right-0 bg-gradient-to-t from-black/80 to-transparent p-2">
                                                     {item.title && <p className="text-white text-xs font-semibold truncate">{item.title}</p>}

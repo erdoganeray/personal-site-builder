@@ -29,6 +29,30 @@ export function escapeHtml(text: string | null | undefined): string {
 }
 
 /**
+ * Converts hex color to RGB string for rgba() usage
+ * @param hex - Hex color (e.g., "#ffffff" or "#fff")
+ * @returns RGB string (e.g., "255, 255, 255") or fallback
+ */
+export function hexToRgb(hex: string | null | undefined): string {
+  if (!hex) return '0, 0, 0';
+
+  // Remove # if present
+  hex = hex.replace('#', '');
+
+  // Handle shorthand hex (e.g., #fff)
+  if (hex.length === 3) {
+    hex = hex.split('').map(c => c + c).join('');
+  }
+
+  const num = parseInt(hex, 16);
+  const r = (num >> 16) & 255;
+  const g = (num >> 8) & 255;
+  const b = num & 255;
+
+  return `${r}, ${g}, ${b}`;
+}
+
+/**
  * Normalizes education year/date format
  * @param year - The year/date string to format
  * @returns Normalized year string or fallback message
@@ -1173,12 +1197,15 @@ export function getNavigationReplacements(
     '{{ICON_SIZE_NAVIGATION}}': iconSizes?.navigation || '20px',
     '{{ICON_SIZE_SOCIAL}}': iconSizes?.social || '18px',
     '{{COLOR_PRIMARY}}': themeColors.primary,
+    '{{COLOR_PRIMARY_RGB}}': hexToRgb(themeColors.primary),
     '{{COLOR_SECONDARY}}': themeColors.secondary,
     '{{COLOR_ACCENT}}': themeColors.accent,
     '{{COLOR_NEUTRAL}}': themeColors.neutral,
     '{{COLOR_BACKGROUND}}': themeColors.background,
+    '{{COLOR_BACKGROUND_RGB}}': hexToRgb(themeColors.background),
     '{{COLOR_SURFACE}}': themeColors.surface,
     '{{COLOR_TEXT}}': themeColors.text,
+    '{{COLOR_TEXT_RGB}}': hexToRgb(themeColors.text),
     '{{COLOR_TEXT_SECONDARY}}': themeColors.textSecondary,
     '{{COLOR_BORDER}}': themeColors.border,
     '{{COLOR_HOVER}}': themeColors.hover,

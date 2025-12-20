@@ -39,10 +39,41 @@ export const navigationTemplate1: ComponentTemplate = {
       top: 0;
       left: 0;
       right: 0;
-      background: {{COLOR_BACKGROUND}};
-      box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+      background: rgba({{COLOR_BACKGROUND_RGB}}, 0.85);
+      backdrop-filter: blur(20px);
+      -webkit-backdrop-filter: blur(20px);
+      border-bottom: 1px solid rgba({{COLOR_TEXT_RGB}}, 0.08);
       z-index: 1000;
-      transition: all 0.3s ease;
+      transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+    }
+
+    .nav-section::after {
+      content: '';
+      position: absolute;
+      bottom: 0;
+      left: 0;
+      right: 0;
+      height: 2px;
+      background: linear-gradient(90deg, {{COLOR_PRIMARY}}, {{COLOR_ACCENT}}, {{COLOR_PRIMARY}});
+      background-size: 200% 100%;
+      opacity: 0;
+      transition: opacity 0.3s ease;
+    }
+
+    .nav-section.scrolled::after {
+      opacity: 1;
+      animation: gradientMove 3s linear infinite;
+    }
+
+    @keyframes gradientMove {
+      0% { background-position: 0% 50%; }
+      100% { background-position: 200% 50%; }
+    }
+
+    .nav-section.scrolled {
+      padding-top: 0;
+      padding-bottom: 0;
+      box-shadow: 0 4px 30px rgba(0, 0, 0, 0.1);
     }
 
     .nav-container {
@@ -52,6 +83,11 @@ export const navigationTemplate1: ComponentTemplate = {
       display: flex;
       justify-content: space-between;
       align-items: center;
+      transition: padding 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+    }
+
+    .nav-section.scrolled .nav-container {
+      padding: 0.6rem 2rem;
     }
 
     .nav-logo a {
@@ -59,51 +95,126 @@ export const navigationTemplate1: ComponentTemplate = {
       font-weight: 700;
       color: {{COLOR_TEXT}};
       text-decoration: none;
-      transition: color 0.3s ease;
+      transition: all 0.3s ease;
+      display: inline-flex;
+      align-items: center;
+      gap: 0.5rem;
+    }
+
+    .nav-section.scrolled .nav-logo a {
+      font-size: 1.3rem;
     }
 
     .nav-logo a:hover {
       color: {{COLOR_PRIMARY}};
+      transform: scale(1.02);
     }
 
     .nav-toggle {
       display: none;
       flex-direction: column;
-      gap: 4px;
+      gap: 5px;
       background: none;
       border: none;
       cursor: pointer;
       padding: 0.5rem;
+      z-index: 1001;
     }
 
     .nav-toggle span {
-      width: 25px;
-      height: 3px;
+      width: 24px;
+      height: 2px;
       background: {{COLOR_TEXT}};
+      border-radius: 2px;
       transition: all 0.3s ease;
+      transform-origin: center;
+    }
+
+    .nav-toggle.active span:nth-child(1) {
+      transform: translateY(7px) rotate(45deg);
+    }
+
+    .nav-toggle.active span:nth-child(2) {
+      opacity: 0;
+      transform: scaleX(0);
+    }
+
+    .nav-toggle.active span:nth-child(3) {
+      transform: translateY(-7px) rotate(-45deg);
     }
 
     .nav-menu {
       display: flex;
-      gap: 2rem;
+      gap: 0.5rem;
       list-style: none;
       margin: 0;
       padding: 0;
     }
 
     .nav-link {
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
       color: {{COLOR_TEXT}};
       text-decoration: none;
       font-weight: 500;
-      padding: 0.5rem 1rem;
-      border-radius: 4px;
+      padding: 0.6rem 1rem;
+      border-radius: 8px;
+      transition: all 0.3s ease;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .nav-link-icon {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: {{COLOR_TEXT_SECONDARY}};
       transition: all 0.3s ease;
     }
 
-    .nav-link:hover,
+    .nav-link-icon svg {
+      width: 18px;
+      height: 18px;
+    }
+
+    .nav-link-text {
+      position: relative;
+    }
+
+    .nav-link-text::after {
+      content: '';
+      position: absolute;
+      bottom: -2px;
+      left: 0;
+      width: 0;
+      height: 2px;
+      background: {{COLOR_PRIMARY}};
+      transition: width 0.3s ease;
+    }
+
+    .nav-link:hover .nav-link-text::after,
+    .nav-link.active .nav-link-text::after {
+      width: 100%;
+    }
+
+    .nav-link:hover {
+      background: rgba({{COLOR_PRIMARY_RGB}}, 0.1);
+      color: {{COLOR_PRIMARY}};
+    }
+
+    .nav-link:hover .nav-link-icon {
+      color: {{COLOR_PRIMARY}};
+      transform: scale(1.1);
+    }
+
     .nav-link.active {
-      background: {{COLOR_ACCENT}};
-      color: {{COLOR_BACKGROUND}};
+      background: rgba({{COLOR_PRIMARY_RGB}}, 0.15);
+      color: {{COLOR_PRIMARY}};
+    }
+
+    .nav-link.active .nav-link-icon {
+      color: {{COLOR_PRIMARY}};
     }
 
     @media (max-width: 768px) {
@@ -112,47 +223,62 @@ export const navigationTemplate1: ComponentTemplate = {
       }
 
       .nav-menu {
-        position: absolute;
-        top: 100%;
-        left: 0;
-        right: 0;
+        position: fixed;
+        top: 0;
+        right: -100%;
+        width: 280px;
+        height: 100vh;
         flex-direction: column;
-        gap: 0;
-        background: {{COLOR_BACKGROUND}};
-        box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
-        max-height: 0;
-        overflow: hidden;
-        transition: max-height 0.3s ease;
-      }
-
-      .nav-menu.active {
-        max-height: 100vh;
+        gap: 0.5rem;
+        padding: 80px 1.5rem 2rem;
+        background: rgba({{COLOR_BACKGROUND_RGB}}, 0.98);
+        backdrop-filter: blur(20px);
+        -webkit-backdrop-filter: blur(20px);
+        box-shadow: -10px 0 40px rgba(0, 0, 0, 0.15);
+        transition: right 0.4s cubic-bezier(0.4, 0, 0.2, 1);
         overflow-y: auto;
       }
 
+      .nav-menu.active {
+        right: 0;
+      }
+
       .nav-link {
-        display: block;
-        padding: 1rem 2rem;
-        border-bottom: 1px solid {{COLOR_TEXT_SECONDARY}};
+        padding: 1rem 1.5rem;
+        border-radius: 12px;
+        font-size: 1.05rem;
+      }
+
+      .nav-link-icon svg {
+        width: 20px;
+        height: 20px;
       }
     }
   `,
   jsTemplate: `
-    // Mobile menu toggle
+    // Navigation references
+    const navSection = document.querySelector('.nav-section');
     const navToggle = document.querySelector('.nav-toggle');
     const navMenuEl = document.querySelector('.nav-menu');
     
+    // Mobile menu toggle with hamburger animation
     if (navToggle && navMenuEl) {
       navToggle.addEventListener('click', () => {
         const isExpanded = navMenuEl.classList.toggle('active');
+        navToggle.classList.toggle('active');
         navToggle.setAttribute('aria-expanded', isExpanded.toString());
+        
+        // Prevent body scroll when menu is open
+        document.body.style.overflow = isExpanded ? 'hidden' : '';
       });
 
       // Close menu when link is clicked
       document.querySelectorAll('.nav-link').forEach(link => {
         link.addEventListener('click', () => {
           navMenuEl.classList.remove('active');
+          navToggle.classList.remove('active');
           navToggle.setAttribute('aria-expanded', 'false');
+          document.body.style.overflow = '';
         });
       });
       
@@ -160,20 +286,46 @@ export const navigationTemplate1: ComponentTemplate = {
       document.addEventListener('keydown', (e) => {
         if (e.key === 'Escape' && navMenuEl.classList.contains('active')) {
           navMenuEl.classList.remove('active');
+          navToggle.classList.remove('active');
           navToggle.setAttribute('aria-expanded', 'false');
+          document.body.style.overflow = '';
+        }
+      });
+
+      // Close menu when clicking outside
+      document.addEventListener('click', (e) => {
+        if (navMenuEl.classList.contains('active') && 
+            !navMenuEl.contains(e.target) && 
+            !navToggle.contains(e.target)) {
+          navMenuEl.classList.remove('active');
+          navToggle.classList.remove('active');
+          navToggle.setAttribute('aria-expanded', 'false');
+          document.body.style.overflow = '';
         }
       });
     }
 
-    // Active link management
-    const navHeight = document.querySelector('nav')?.offsetHeight || 80;
+    // Scroll shrink effect & active link management
+    const navHeight = navSection?.offsetHeight || 80;
+    let lastScrollY = 0;
     
     window.addEventListener('scroll', () => {
-      let current = '';
+      const scrollY = window.pageYOffset;
       
+      // Add/remove scrolled class for shrink effect
+      if (navSection) {
+        if (scrollY > 50) {
+          navSection.classList.add('scrolled');
+        } else {
+          navSection.classList.remove('scrolled');
+        }
+      }
+      
+      // Active link management
+      let current = '';
       document.querySelectorAll('section[id]').forEach(section => {
         const sectionTop = section.offsetTop;
-        if (pageYOffset >= sectionTop - navHeight - 50) {
+        if (scrollY >= sectionTop - navHeight - 50) {
           current = section.getAttribute('id');
         }
       });
@@ -186,166 +338,38 @@ export const navigationTemplate1: ComponentTemplate = {
           link.setAttribute('aria-current', 'page');
         }
       });
+      
+      lastScrollY = scrollY;
+    });
+
+    // Smooth scroll for navigation links
+    document.querySelectorAll('.nav-link').forEach(link => {
+      link.addEventListener('click', (e) => {
+        e.preventDefault();
+        const targetId = link.getAttribute('href');
+        const targetSection = document.querySelector(targetId);
+        if (targetSection) {
+          const headerOffset = navHeight;
+          const elementPosition = targetSection.getBoundingClientRect().top;
+          const offsetPosition = elementPosition + window.pageYOffset - headerOffset;
+          
+          window.scrollTo({
+            top: offsetPosition,
+            behavior: 'smooth'
+          });
+        }
+      });
     });
   `,
   placeholders: [
     "{{NAME}}", "{{NAV_MENU_ITEMS}}",
-    "{{COLOR_PRIMARY}}", "{{COLOR_SECONDARY}}", "{{COLOR_ACCENT}}",
-    "{{COLOR_BACKGROUND}}", "{{COLOR_TEXT}}", "{{COLOR_TEXT_SECONDARY}}"
+    "{{COLOR_PRIMARY}}", "{{COLOR_PRIMARY_RGB}}", "{{COLOR_SECONDARY}}", "{{COLOR_ACCENT}}",
+    "{{COLOR_BACKGROUND}}", "{{COLOR_BACKGROUND_RGB}}", "{{COLOR_TEXT}}", "{{COLOR_TEXT_RGB}}", "{{COLOR_TEXT_SECONDARY}}"
   ],
-  designNotes: "Klasik yatay navigasyon. Mobilde hamburger menüye dönüşür. Menu item'ları server-side oluşturulur.",
+  designNotes: "Modern glassmorphism navigasyon. Icon destekli menü öğeleri, scroll'da küçülme efekti, mobilde slide-in drawer. Hamburger X'e dönüşür.",
 };
 
 export const navigationTemplate2: ComponentTemplate = {
-  id: "nav-minimal-centered",
-  name: "Minimal Centered Navigation",
-  category: "navigation",
-  htmlTemplate: `
-    <nav class="nav-minimal" aria-label="Main navigation">
-      <div class="nav-minimal-container">
-        <ul class="nav-minimal-menu" id="nav-minimal-menu">
-          {{NAV_MENU_ITEMS}}
-          <li class="nav-minimal-logo">
-            <a href="#hero">{{INITIALS}}</a>
-          </li>
-        </ul>
-      </div>
-    </nav>
-  `,
-  cssTemplate: `
-    /* Fixed navigation için body padding */
-    body {
-      padding-top: 80px;
-    }
-
-    .nav-minimal {
-      position: fixed;
-      top: 0;
-      left: 0;
-      right: 0;
-      background: {{COLOR_BACKGROUND}};
-      backdrop-filter: blur(10px);
-      z-index: 1000;
-      border-bottom: 1px solid rgba(0, 0, 0, 0.05);
-    }
-
-    .nav-minimal-container {
-      max-width: 1000px;
-      margin: 0 auto;
-      padding: 1.5rem 2rem;
-    }
-
-    .nav-minimal-menu {
-      display: flex;
-      justify-content: center;
-      align-items: center;
-      gap: 3rem;
-      list-style: none;
-      margin: 0;
-      padding: 0;
-    }
-
-    .nav-minimal-logo {
-      margin: 0 2rem;
-    }
-
-    .nav-minimal-logo a {
-      width: 45px;
-      height: 45px;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      background: {{COLOR_PRIMARY}};
-      color: {{COLOR_BACKGROUND}};
-      border-radius: 50%;
-      font-weight: 700;
-      font-size: 1.2rem;
-      text-decoration: none;
-      transition: all 0.3s ease;
-    }
-
-    .nav-minimal-logo a:hover {
-      background: {{COLOR_ACCENT}};
-      transform: scale(1.1);
-    }
-
-    .nav-minimal-link {
-      color: {{COLOR_TEXT}};
-      text-decoration: none;
-      font-weight: 500;
-      font-size: 0.95rem;
-      position: relative;
-      transition: color 0.3s ease;
-    }
-
-    .nav-minimal-link::after {
-      content: '';
-      position: absolute;
-      bottom: -5px;
-      left: 0;
-      width: 0;
-      height: 2px;
-      background: {{COLOR_PRIMARY}};
-      transition: width 0.3s ease;
-    }
-
-    .nav-minimal-link:hover,
-    .nav-minimal-link.active {
-      color: {{COLOR_PRIMARY}};
-    }
-
-    .nav-minimal-link:hover::after,
-    .nav-minimal-link.active::after {
-      width: 100%;
-    }
-
-    @media (max-width: 768px) {
-      .nav-minimal-menu {
-        flex-wrap: wrap;
-        gap: 1.5rem;
-      }
-
-      .nav-minimal-logo {
-        order: -1;
-        width: 100%;
-        text-align: center;
-        margin: 0 0 1rem 0;
-      }
-    }
-  `,
-  jsTemplate: `
-    // Active link management
-    const navHeight = document.querySelector('nav')?.offsetHeight || 80;
-    
-    window.addEventListener('scroll', () => {
-      let current = '';
-      
-      document.querySelectorAll('section[id]').forEach(section => {
-        const sectionTop = section.offsetTop;
-        if (pageYOffset >= sectionTop - navHeight - 50) {
-          current = section.getAttribute('id');
-        }
-      });
-
-      document.querySelectorAll('.nav-minimal-link').forEach(link => {
-        link.classList.remove('active');
-        link.removeAttribute('aria-current');
-        if (link.getAttribute('href') === '#' + current) {
-          link.classList.add('active');
-          link.setAttribute('aria-current', 'page');
-        }
-      });
-    });
-  `,
-  placeholders: [
-    "{{INITIALS}}", "{{NAV_MENU_ITEMS}}",
-    "{{COLOR_PRIMARY}}", "{{COLOR_ACCENT}}",
-    "{{COLOR_BACKGROUND}}", "{{COLOR_TEXT}}"
-  ],
-  designNotes: "Minimal tasarım. Logo ortada, linkler çevresinde. Menu item'ları server-side oluşturulur. Aktif sayfa göstergesi var.",
-};
-
-export const navigationTemplate3: ComponentTemplate = {
   id: "nav-sidebar-modern",
   name: "Modern Sidebar Navigation",
   category: "navigation",
@@ -626,7 +650,7 @@ export const navigationTemplate3: ComponentTemplate = {
   designNotes: "Modern sidebar navigasyon. Sol tarafta sabit durur. Mobilde hamburger menü ile açılır. Menu item'ları server-side oluşturulur, iconlu.",
 };
 
-export const navigationTemplate4: ComponentTemplate = {
+export const navigationTemplate3: ComponentTemplate = {
   id: "nav-floating-dot",
   name: "Floating Dot Navigation",
   category: "navigation",
@@ -766,5 +790,4 @@ export const navigationTemplates: ComponentTemplate[] = [
   navigationTemplate1,
   navigationTemplate2,
   navigationTemplate3,
-  navigationTemplate4,
 ];

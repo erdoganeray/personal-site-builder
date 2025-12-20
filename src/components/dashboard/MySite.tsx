@@ -308,13 +308,13 @@ export default function MySite({ site, onRefresh }: MySiteProps) {
 
                 {/* Preview Section */}
                 {site.htmlContent && (
-                    <div className="relative bg-[#1a1a1a]/60 backdrop-blur-xl rounded-2xl border border-white/10 p-3 pt-10 overflow-hidden">
+                    <div className="relative bg-[#1a1a1a]/60 backdrop-blur-xl rounded-2xl border border-white/10 p-3 pt-4 overflow-clip">
                         {/* Background Gradient Effects */}
                         <div className="absolute top-0 right-0 w-64 h-64 bg-purple-500/5 rounded-full blur-[80px] -mr-32 -mt-32" />
                         <div className="absolute bottom-0 left-0 w-48 h-48 bg-blue-500/5 rounded-full blur-[60px] -ml-24 -mb-24" />
 
                         <div className="relative z-10">
-                            <div className="flex items-center justify-between mb-4">
+                            <div className="sticky top-0 z-20 bg-[#1a1a1a]/95 backdrop-blur-xl -mx-3 px-3 py-3 flex items-center justify-between mb-4">
                                 <div className="flex items-center gap-3">
                                     <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-purple-500/20 to-blue-500/20 flex items-center justify-center border border-white/5">
                                         <svg xmlns="http://www.w3.org/2000/svg" className="w-5 h-5 text-purple-400" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">

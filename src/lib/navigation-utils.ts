@@ -58,7 +58,8 @@ export function generateNavigationMenuItems(
         case 'classic':
             return menuableComponents.map(comp => {
                 const name = SECTION_NAME_MAP[comp.category] || comp.category;
-                return `<li><a href="#${comp.category}" class="nav-link">${name}</a></li>`;
+                const iconSvg = getSectionIconSvg(comp.category, 18, iconStyle);
+                return `<li><a href="#${comp.category}" class="nav-link"><span class="nav-link-icon">${iconSvg}</span><span class="nav-link-text">${name}</span></a></li>`;
             }).join('');
 
         case 'minimal':

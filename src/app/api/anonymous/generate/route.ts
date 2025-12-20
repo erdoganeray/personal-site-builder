@@ -322,15 +322,17 @@ ${finalJs}`;
         }
 
         // 4. Site'ı güncelle (status: preview)
+        // ÖNEMLI: cvContent'i de güncelle çünkü portfolioUrls eklendi
         const updatedSite = await prisma.site.update({
             where: { id: siteId },
             data: {
+                cvContent: cvData as any, // Portfolio URL'leri dahil güncel cvData
                 designPlan: designPlan as any,
                 htmlContent: finalHtml,
                 cssContent: finalCss,
                 jsContent: finalJs,
                 title: cvData.personalInfo?.name || "Personal Website",
-                status: "preview"
+                status: "previewed"
             }
         });
 

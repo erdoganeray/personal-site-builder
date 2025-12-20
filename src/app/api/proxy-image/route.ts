@@ -1,10 +1,21 @@
 import { NextRequest, NextResponse } from "next/server";
 import { getServerSession } from "next-auth";
 import { authOptions } from "@/lib/auth";
+import { S3Client, GetObjectCommand } from "@aws-sdk/client-s3";
+
+const s3Client = new S3Client({
+  region: "auto",
+  endpoint: `https://${process.env.CLOUDFLARE_ACCOUNT_ID}.r2.cloudflarestorage.com`,
+  credentials: {
+    accessKeyId: process.env.R2_ACCESS_KEY_ID!,
+    secretAccessKey: process.env.R2_SECRET_ACCESS_KEY!,
+  },
+});
 
 /**
  * Preview sayfasında R2 görselleri için proxy endpoint
  * Blob iframe içinde CORS sorununu çözmek için
+ * S3 client kullanarak doğrudan R2'den çeker (SSL hatası önlenir)
  */
 export async function GET(req: NextRequest) {
   try {
@@ -35,27 +46,63 @@ export async function GET(req: NextRequest) {
       );
     }
 
-    // R2'den resmi fetch et
-    const response = await fetch(imageUrl);
+    // URL'den R2 key'i çıkar
+    // URL format: https://pub-xxx.r2.dev/users/{userId}/...
+    const urlParts = imageUrl.split("/");
+    const keyIndex = urlParts.indexOf("users");
 
-    if (!response.ok) {
+    if (keyIndex === -1) {
       return NextResponse.json(
-        { error: "Image not found" },
-        { status: 404 }
+        { error: "Invalid image URL format" },
+        { status: 400 }
       );
     }
 
-    // Resmi binary olarak al
-    const imageBuffer = await response.arrayBuffer();
-    const contentType = response.headers.get("content-type") || "image/jpeg";
+    const key = urlParts.slice(keyIndex).join("/");
 
-    // Resmi döndür
-    return new NextResponse(imageBuffer, {
-      headers: {
-        "Content-Type": contentType,
-        "Cache-Control": "public, max-age=31536000",
-      },
-    });
+    // S3 client ile R2'den çek (public URL yerine)
+    try {
+      const command = new GetObjectCommand({
+        Bucket: process.env.R2_BUCKET_NAME!,
+        Key: key,
+      });
+
+      const response = await s3Client.send(command);
+
+      if (!response.Body) {
+        return NextResponse.json(
+          { error: "Image not found" },
+          { status: 404 }
+        );
+      }
+
+      // Stream'i buffer'a çevir
+      const chunks: Uint8Array[] = [];
+      const reader = response.Body.transformToWebStream().getReader();
+
+      while (true) {
+        const { done, value } = await reader.read();
+        if (done) break;
+        chunks.push(value);
+      }
+
+      const imageBuffer = Buffer.concat(chunks);
+      const contentType = response.ContentType || "image/jpeg";
+
+      // Resmi döndür
+      return new NextResponse(imageBuffer, {
+        headers: {
+          "Content-Type": contentType,
+          "Cache-Control": "public, max-age=31536000",
+        },
+      });
+    } catch (r2Error) {
+      console.error("R2 fetch error:", r2Error);
+      return NextResponse.json(
+        { error: "Image not found in R2" },
+        { status: 404 }
+      );
+    }
   } catch (error) {
     console.error("Image proxy error:", error);
     return NextResponse.json(

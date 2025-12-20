@@ -1,8 +1,18 @@
 import { NextRequest, NextResponse } from "next/server";
 import { getServerSession } from "next-auth";
 import { authOptions } from "@/lib/auth";
-import { parseCVFromURL } from "@/lib/gemini-pdf-parser";
+import { parseCVFromPDF } from "@/lib/gemini-pdf-parser";
 import { prisma } from "@/lib/prisma";
+import { S3Client, GetObjectCommand } from "@aws-sdk/client-s3";
+
+const s3Client = new S3Client({
+  region: "auto",
+  endpoint: `https://${process.env.CLOUDFLARE_ACCOUNT_ID}.r2.cloudflarestorage.com`,
+  credentials: {
+    accessKeyId: process.env.R2_ACCESS_KEY_ID!,
+    secretAccessKey: process.env.R2_SECRET_ACCESS_KEY!,
+  },
+});
 
 /**
  * POST /api/cv/analyze
@@ -43,10 +53,59 @@ export async function POST(req: NextRequest) {
       );
     }
 
-    console.log(`Analyzing CV from URL: ${cvUrl}`);
+    console.log(`[CV Analyze] Processing CV from: ${cvUrl}`);
+
+    // CV URL'den R2 key'i çıkar
+    // URL format: https://pub-xxx.r2.dev/users/{userId}/cv/cv-xxx.pdf
+    const urlParts = cvUrl.split("/");
+    const keyIndex = urlParts.indexOf("users");
+
+    if (keyIndex === -1) {
+      return NextResponse.json(
+        { success: false, error: "Geçersiz CV URL formatı" },
+        { status: 400 }
+      );
+    }
+
+    const key = urlParts.slice(keyIndex).join("/");
+    console.log(`[CV Analyze] Fetching from R2 key: ${key}`);
+
+    // PDF'i doğrudan R2'den çek (public URL yerine S3 client kullan)
+    let pdfBuffer: Buffer;
+    try {
+      const command = new GetObjectCommand({
+        Bucket: process.env.R2_BUCKET_NAME!,
+        Key: key,
+      });
+
+      const response = await s3Client.send(command);
+
+      if (!response.Body) {
+        throw new Error("R2'den boş yanıt alındı");
+      }
+
+      // Stream'i buffer'a çevir
+      const chunks: Uint8Array[] = [];
+      const reader = response.Body.transformToWebStream().getReader();
+
+      while (true) {
+        const { done, value } = await reader.read();
+        if (done) break;
+        chunks.push(value);
+      }
+
+      pdfBuffer = Buffer.concat(chunks);
+      console.log(`[CV Analyze] PDF fetched, size: ${pdfBuffer.length} bytes`);
+    } catch (r2Error) {
+      console.error("[CV Analyze] R2 fetch error:", r2Error);
+      return NextResponse.json(
+        { success: false, error: "CV dosyası okunamadı" },
+        { status: 500 }
+      );
+    }
 
     // Gemini ile PDF'i analiz et
-    const cvData = await parseCVFromURL(cvUrl);
+    const cvData = await parseCVFromPDF(pdfBuffer);
 
     console.log(`CV analysis successful for: ${cvData.personalInfo.name}`);
 

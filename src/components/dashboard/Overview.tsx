@@ -125,8 +125,8 @@ export default function Overview({ site, userName, onTabChange }: OverviewProps)
                     <div className="space-y-3">
                         <div className="flex justify-between items-center">
                             <span className="text-gray-400 text-sm">Oluşturulma</span>
-                            <span className={`px-2 py-1 rounded-full text-xs font-medium ${site?.status === 'previewed' ? 'bg-green-500/20 text-green-400' : 'bg-gray-500/20 text-gray-400'}`}>
-                                {site?.status === 'previewed' ? '✓ Oluşturuldu' : '○ Oluşturulmadı'}
+                            <span className={`px-2 py-1 rounded-full text-xs font-medium ${site?.status === 'previewed' || site?.status === 'published' ? 'bg-green-500/20 text-green-400' : 'bg-gray-500/20 text-gray-400'}`}>
+                                {site?.status === 'previewed' || site?.status === 'published' ? '✓ Oluşturuldu' : '○ Oluşturulmadı'}
                             </span>
                         </div>
                         <div className="flex justify-between items-center">

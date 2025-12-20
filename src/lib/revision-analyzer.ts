@@ -64,7 +64,7 @@ export type RevisionOperation =
 // Available templates for each component category
 // Synced with actual template files in src/components/site-templates/
 const AVAILABLE_TEMPLATES = {
-  navigation: ["nav-classic-horizontal", "nav-minimal-centered", "nav-sidebar-modern", "nav-floating-dot"],
+  navigation: ["nav-classic-horizontal", "nav-sidebar-modern", "nav-floating-dot"],
   hero: [
     "hero-modern-centered",
     "hero-split-screen",
