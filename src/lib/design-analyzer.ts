@@ -306,6 +306,16 @@ FOOTER SECTION:
    - Çok sayıda link ve bilgi sunulacaksa
    - Kurumsal ve profesyonel görünüm öncelikli ise
    - Kullanıcıya maksimum bilgi ve navigasyon sunulacaksa
+6. footer-glass-modern: 🆕 Premium glassmorphism footer, backdrop blur, şeffaf cam efekti, modern icon'lar
+   - "Glass", "Premium", "Modern" stil isteniyorsa tercih et
+   - nav-glass-morphism veya hero-animated-gradient ile uyumlu
+   - Tasarımcılar ve modern profiller için ideal
+   - Şık ve farklı bir footer görünümü isteniyorsa
+7. footer-animated-gradient: 🆕 Dinamik animated gradient footer, hareketli arka plan, floating particles
+   - "Animated", "Dynamic", "Gradient" stil isteniyorsa tercih et
+   - hero-animated-gradient ile mükemmel uyumlu
+   - Yaratıcı ve dikkat çekici profiller için ideal
+   - 3 kolonlu detaylı layout, hızlı erişim linkleri
 
 Görevin:
 1. CV'ye ve kullanıcı isteğine en uygun 4 ana rengi belirle (primary, secondary, accent, neutral)

@@ -85,7 +85,7 @@ const AVAILABLE_TEMPLATES = {
     "contact-split-info",
     "contact-image-side"     // 🆕 Stok fotoğraf yanlı
   ],
-  footer: ["footer-modern-centered", "footer-minimal-simple", "footer-split-columns", "footer-wave-sticky", "footer-mega-columns"],
+  footer: ["footer-modern-centered", "footer-minimal-simple", "footer-split-columns", "footer-wave-sticky", "footer-mega-columns", "footer-glass-modern", "footer-animated-gradient"],
 };
 
 /**
