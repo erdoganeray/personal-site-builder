@@ -94,6 +94,12 @@ HERO SECTION:
    - Modern ve profesyonel görünüm
    - Meslekler: Designer, Developer, Engineer, Creative profiller için ideal
    - Mobilde stacked layout (görsel üstte)
+7. hero-bento-grid: 🆕 BENTO GRID - Modern Apple/Vercel tarzı grid layout
+   - Profil, stats, skills, deneyim kutuları bento grid düzeninde
+   - Modern, interaktif, bilgi yoğunluğu yüksek
+   - Startup, Tech, SaaS profilleri için ideal
+   - Çok sayıda beceri ve deneyim bilgisi olan CV'ler için mükemmel
+   - Premium ve farklı görünüm isteyenler için
 
 EXPERIENCE SECTION:
 1. experience-timeline: Zaman çizelgesi şeklinde dikey düzen, sol tarafta çizgi ve noktalar
@@ -438,6 +444,7 @@ Component Seçimi Kriterleri:
     - hero-minimal-text: Minimal, text odaklı (Developer, Writer, Engineer için)
     - hero-fullscreen-bg: 🆕 Stok fotoğraf arka planlı (Business, Marketing, Finance için) - STOK FOTOĞRAF kullanır
     - hero-split-image: 🆕 Split layout stok fotoğraf (Designer, Creative için) - STOK FOTOĞRAF kullanır
+    - hero-bento-grid: 🆕 Bento grid (Startup, Tech, SaaS için) - Modern grid layout, stats ve skills gösterimi
   * PROFİL FOTOĞRAFI VAR → Mesleğe göre seç:
     - hero-modern-centered: Profesyonel/kurumsal roller (Business Analyst, Project Manager, Consultant)
     - hero-split-screen: Yaratıcı/tasarımcı roller (Designer, Photographer, Creative Director)
@@ -445,6 +452,7 @@ Component Seçimi Kriterleri:
     - hero-animated-gradient: Modern/tech/creative roller (UI/UX Designer, Frontend Developer, Digital Marketer) - görsel odaklı
     - hero-fullscreen-bg: 🆕 Business/Corporate/Marketing roller - stok fotoğraf arka plan + profil fotoğrafı
     - hero-split-image: 🆕 Designer/Developer/Creative roller - split layout stok fotoğraf + profil fotoğrafı
+    - hero-bento-grid: 🆕 Startup/Tech/SaaS roller - Bento grid layout, çok beceri/proje olan profiller için ideal
 - Experience: CV'deki iş deneyimi sayısına göre
 - Education: CV'deki eğitim bilgisi sayısına göre (varsa mutlaka ekle)
 - Portfolio: SADECE portfolio fotoğrafları varsa ekle (${cvData.portfolio?.length || 0} adet var). Education ve Skills arasına yerleştir. Yoksa hiç ekleme!

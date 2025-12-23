@@ -71,7 +71,8 @@ const AVAILABLE_TEMPLATES = {
     "hero-minimal-text",
     "hero-animated-gradient",
     "hero-fullscreen-bg",    // 🆕 Stok fotoğraf arka planlı
-    "hero-split-image"       // 🆕 Split layout stok fotoğraf
+    "hero-split-image",      // 🆕 Split layout stok fotoğraf
+    "hero-bento-grid"        // 🆕 Bento grid layout
   ],
   experience: ["experience-timeline", "experience-cards", "experience-accordion", "experience-minimal", "experience-horizontal-timeline", "experience-tabs"],
   education: ["education-timeline", "education-cards", "education-modern", "education-accordion", "education-horizontal-timeline", "education-tabs"],
