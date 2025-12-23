@@ -1152,11 +1152,14 @@ export function getNavigationReplacements(
     .slice(0, 2);
 
   // Navigation template tipini belirle
-  let templateType: 'classic' | 'minimal' | 'sidebar' | 'floating' = 'classic';
+  let templateType: 'classic' | 'minimal' | 'sidebar' | 'floating' | 'tabbar' | 'glass' | 'pill' = 'classic';
   if (templateId) {
     if (templateId.includes('minimal')) templateType = 'minimal';
     else if (templateId.includes('sidebar')) templateType = 'sidebar';
     else if (templateId.includes('floating')) templateType = 'floating';
+    else if (templateId.includes('tabbar')) templateType = 'tabbar';
+    else if (templateId.includes('glass')) templateType = 'glass';
+    else if (templateId.includes('pill')) templateType = 'pill';
   }
 
   // Menu item'larını server-side oluştur

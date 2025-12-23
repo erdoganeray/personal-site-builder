@@ -1272,7 +1272,7 @@ export default function MyInfo({ site, cvData, onDelete, onCVAnalyzed, deleting 
 
                 {/* Right: Navigation Sidebar (Bölümler) */}
                 {site && cvData && (
-                    <div className="w-64 flex-shrink-0 self-start sticky top-6">
+                    <div className="w-56 flex-shrink-0 self-start sticky top-6">
                         <div className="bg-[#111]/80 backdrop-blur-sm rounded-2xl border border-white/10 p-5">
                             <h3 className="text-lg font-semibold text-white mb-4 flex items-center gap-2">
                                 <span className="w-2 h-2 rounded-full bg-gradient-to-r from-purple-500 to-blue-500"></span>

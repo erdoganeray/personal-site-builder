@@ -180,7 +180,7 @@ function DashboardContent() {
         return (
             <div className="min-h-screen bg-[#0a0a0a] flex">
                 {/* Sidebar Skeleton */}
-                <div className={`bg-[#0a0a0a] border-r border-white/10 transition-all duration-300 ${isMenuCollapsed ? 'w-16' : 'w-64'}`}>
+                <div className={`bg-[#0a0a0a] border-r border-white/10 transition-all duration-300 ${isMenuCollapsed ? 'w-16' : 'w-56'}`}>
                     <div className="p-4 border-b border-white/10">
                         <div className="flex items-center gap-3">
                             <div className="w-12 h-12 rounded-full bg-white/5 animate-pulse" />
@@ -226,7 +226,7 @@ function DashboardContent() {
         <>
             <div className="min-h-screen bg-[#0a0a0a] flex">
                 {/* Left Menu */}
-                <div className={`relative h-screen transition-all duration-300 flex-shrink-0 ${isMenuCollapsed ? 'w-16' : 'w-64'}`}>
+                <div className={`relative h-screen transition-all duration-300 flex-shrink-0 ${isMenuCollapsed ? 'w-16' : 'w-56'}`}>
                     <DashboardMenu
                         activeTab={activeTab}
                         onTabChange={handleTabChange}

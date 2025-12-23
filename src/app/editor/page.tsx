@@ -362,8 +362,8 @@ export default function EditorPage() {
 
     const deviceSizes = {
         computer: "w-full h-full",
-        tablet: "w-2/3 h-full",
-        phone: "w-1/3 h-full",
+        tablet: "w-[768px] h-full",
+        phone: "w-[375px] h-full",
     };
 
     const hasPreviewContent = site?.htmlContent;

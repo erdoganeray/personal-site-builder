@@ -46,7 +46,7 @@ export function getSectionIconSvg(category: string, size: number = 24, style: 'o
  */
 export function generateNavigationMenuItems(
     selectedComponents: SelectedComponent[],
-    templateType: 'classic' | 'minimal' | 'sidebar' | 'floating',
+    templateType: 'classic' | 'minimal' | 'sidebar' | 'floating' | 'tabbar' | 'glass' | 'pill',
     iconStyle: 'outline' | 'solid' = 'outline'
 ): string {
     // Navigation ve footer dışındaki tüm component'leri al
@@ -92,6 +92,50 @@ export function generateNavigationMenuItems(
             <a href="#${comp.category}" class="nav-floating-dot ${activeClass}" data-tooltip="${name}"></a>
           </li>
         `;
+            }).join('');
+
+        case 'tabbar':
+            // Generate both mobile tab items and desktop link items
+            const mobileItems = menuableComponents.map((comp, index) => {
+                const name = SECTION_NAME_MAP[comp.category] || comp.category;
+                const iconSvg = getSectionIconSvg(comp.category, 22, iconStyle);
+                const activeClass = index === 0 ? 'active' : '';
+                return `
+          <li>
+            <a href="#${comp.category}" class="nav-tabbar-tab ${activeClass}">
+              <span class="nav-tabbar-tab-icon">${iconSvg}</span>
+              <span class="nav-tabbar-tab-label">${name}</span>
+            </a>
+          </li>
+        `;
+            }).join('');
+
+            // Desktop links use same format as classic but with different class names
+            const desktopItems = menuableComponents.map((comp, index) => {
+                const name = SECTION_NAME_MAP[comp.category] || comp.category;
+                const iconSvg = getSectionIconSvg(comp.category, 18, iconStyle);
+                const activeClass = index === 0 ? 'active' : '';
+                return `<li><a href="#${comp.category}" class="nav-tabbar-desktop-link ${activeClass}"><span class="nav-tabbar-desktop-link-icon">${iconSvg}</span><span class="nav-tabbar-desktop-link-text">${name}</span></a></li>`;
+            }).join('');
+
+            // Template uses same placeholder for both, so we return a combined format
+            // The CSS will show/hide appropriate items based on viewport
+            return mobileItems + '<!-- DESKTOP_MENU -->' + desktopItems;
+
+        case 'glass':
+            return menuableComponents.map((comp, index) => {
+                const name = SECTION_NAME_MAP[comp.category] || comp.category;
+                const iconSvg = getSectionIconSvg(comp.category, 20, iconStyle);
+                const activeClass = index === 0 ? 'active' : '';
+                return `<li><a href="#${comp.category}" class="nav-glass-link ${activeClass}"><span class="nav-glass-link-icon">${iconSvg}</span><span class="nav-glass-link-text">${name}</span></a></li>`;
+            }).join('');
+
+        case 'pill':
+            return menuableComponents.map((comp, index) => {
+                const name = SECTION_NAME_MAP[comp.category] || comp.category;
+                const iconSvg = getSectionIconSvg(comp.category, 16, iconStyle);
+                const activeClass = index === 0 ? 'active' : '';
+                return `<li><a href="#${comp.category}" class="nav-pill-link ${activeClass}"><span class="nav-pill-link-icon">${iconSvg}</span><span class="nav-pill-link-text">${name}</span></a></li>`;
             }).join('');
 
         default:

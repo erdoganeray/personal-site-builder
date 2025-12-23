@@ -366,8 +366,8 @@ export default function MySite({ site, onRefresh }: MySiteProps) {
                                     className={`bg-white rounded-lg shadow-2xl shadow-purple-500/10 transition-all duration-300 ${viewMode === "desktop"
                                         ? "w-full h-[800px]"
                                         : viewMode === "tablet"
-                                            ? "w-2/3 h-[800px]"
-                                            : "w-1/3 h-[800px]"
+                                            ? "w-[768px] h-[800px]"
+                                            : "w-[375px] h-[800px]"
                                         }`}
                                 >
                                     <iframe

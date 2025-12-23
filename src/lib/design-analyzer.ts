@@ -54,8 +54,30 @@ Mevcut Component Template'ler:
 
 NAVIGATION MENU:
 1. nav-classic-horizontal: Klasik yatay navigasyon, mobilde hamburger menü
-2. nav-sidebar-modern: Sol tarafta sabit sidebar, gradient arka plan, iconlu
-3. nav-floating-dot: Sağda floating dot navigasyon, minimal
+   - Sade ve geleneksel siteler için ideal
+2. nav-sidebar-modern: Sol tarafta sabit sidebar, modern ve teknolojik görünüm
+   - Yazılımcılar ve analistler için ideal
+3. nav-floating-dot: Sağda minimal dot navigasyon, ultra minimal tasarım
+   - Tek sayfa, çok az içerikli siteler için ideal
+4. nav-glass-morphism: 🆕 Premium glassmorphism navigasyon, şeffaf/buzlu arka plan, neon glow
+   - Tasarımcılar ve modern/premium tasarım isteyenler için ideal
+5. nav-bottom-tabbar: 🆕 Mobil-first altta tab bar, icon+label, desktop'ta header'a dönüşüm
+   - Mobil odaklı portfolyolar, content creators, influencers için ideal
+   - Az section'lı siteler (5-6 bölüm) için en uygun
+6. nav-pill-modern: 🆕 Pill-shaped compact navigasyon, sliding background indicator
+   - SaaS tarzı siteler ve minimal portfolyolar için ideal
+   - Startup founders, tech professionals için uygun
+   - Kompakt ve modern tasarım isteyenler için
+
+SEÇİM KURALLARI (NAVIGATION):
+- "Modern", "Premium", "Glass" isteniyorsa → nav-glass-morphism
+- "Minimalist" isteniyorsa → nav-floating-dot
+- "Professional", "Conventional" isteniyorsa → nav-classic-horizontal
+- "Sidebar", "Tech-heavy" isteniyorsa → nav-sidebar-modern
+- "Mobile", "Tab bar", "Bottom nav", "Mobil odaklı" isteniyorsa → nav-bottom-tabbar
+- "Pill", "SaaS", "Compact", "Startup", "Minimal modern" isteniyorsa → nav-pill-modern
+- Mobil odaklı portfolyolar veya az section'lı siteler için → nav-bottom-tabbar
+- CV'de çok fazla iş deneyimi/eğitim varsa sidebar veya classic tercih et (navigasyon kolaylığı için)
 
 HERO SECTION:
 1. hero-modern-centered: Modern, merkezi düzen, profil fotoğrafı üstte, CTA butonları
@@ -80,6 +102,13 @@ EXPERIENCE SECTION:
 4. experience-minimal: Minimal liste düzeni, typography odaklı, sade ve temiz görünüm
 5. experience-horizontal-timeline: Yatay akan timeline, scroll ile gezinme, modern ve dinamik
 6. experience-tabs: Tab bazlı navigasyon, şirket adına göre organize, kompakt görünüm
+
+SEÇİM KURALLARI (EXPERIENCE):
+- 4+ deneyim varsa → experience-accordion veya experience-tabs (alan tasarrufu için)
+- 1-3 deneyim varsa → experience-cards veya experience-timeline (detaylı göstermek için)
+- Çok uzun görev tanımları varsa → experience-accordion
+- Sadece şirket adı ve tarih varsa → experience-minimal
+- Görsel/dinamik site isteniyorsa → experience-horizontal-timeline
 
 EDUCATION SECTION:
 1. education-timeline: Zaman çizelgesi şeklinde eğitim gösterimi, emoji ikonlu, sol tarafta dikey çizgi
