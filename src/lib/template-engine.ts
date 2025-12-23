@@ -1073,11 +1073,24 @@ export function getContactReplacements(
   cvData: CVData,
   themeColors: ThemeColors
 ): PlaceholderReplacements {
+  // Sosyal medya linklerini oluştur - sadece dolu olanlar görünsün
+  const { getIconSvg } = require('./icon-registry');
+
+  const socialLinks = [
+    cvData.personalInfo.linkedin ? `<a href="${cvData.personalInfo.linkedin}" target="_blank" rel="noopener noreferrer" title="LinkedIn" aria-label="LinkedIn">${getIconSvg('social', 'linkedin', 'outline', 20)}</a>` : '',
+    cvData.personalInfo.github ? `<a href="${cvData.personalInfo.github}" target="_blank" rel="noopener noreferrer" title="GitHub" aria-label="GitHub">${getIconSvg('social', 'github', 'outline', 20)}</a>` : '',
+    cvData.personalInfo.facebook ? `<a href="${cvData.personalInfo.facebook}" target="_blank" rel="noopener noreferrer" title="Facebook" aria-label="Facebook">${getIconSvg('social', 'facebook', 'outline', 20)}</a>` : '',
+    cvData.personalInfo.instagram ? `<a href="${cvData.personalInfo.instagram}" target="_blank" rel="noopener noreferrer" title="Instagram" aria-label="Instagram">${getIconSvg('social', 'instagram', 'outline', 20)}</a>` : '',
+    cvData.personalInfo.x ? `<a href="${cvData.personalInfo.x}" target="_blank" rel="noopener noreferrer" title="X (Twitter)" aria-label="X">${getIconSvg('social', 'twitter', 'outline', 20)}</a>` : '',
+    cvData.personalInfo.website ? `<a href="${cvData.personalInfo.website}" target="_blank" rel="noopener noreferrer" title="Website" aria-label="Website">${getIconSvg('social', 'globe', 'outline', 20)}</a>` : '',
+  ].filter(link => link !== '').join('\n    ');
+
   return {
     '{{EMAIL}}': escapeHtml(cvData.personalInfo.email || 'Email bulunamadı'),
     '{{PHONE}}': escapeHtml(cvData.personalInfo.phone || 'Telefon bulunamadı'),
     '{{LOCATION}}': escapeHtml(cvData.personalInfo.location || 'Konum belirtilmemiş'),
     '{{SITE_OWNER_EMAIL}}': escapeHtml(cvData.personalInfo.email || ''),
+    '{{SOCIAL_LINKS}}': socialLinks,
     '{{COLOR_PRIMARY}}': themeColors.primary,
     '{{COLOR_SECONDARY}}': themeColors.secondary,
     '{{COLOR_ACCENT}}': themeColors.accent,

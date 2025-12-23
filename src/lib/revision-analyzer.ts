@@ -83,7 +83,9 @@ const AVAILABLE_TEMPLATES = {
     "contact-modern-form",
     "contact-minimal-centered",
     "contact-split-info",
-    "contact-image-side"     // 🆕 Stok fotoğraf yanlı
+    "contact-image-side",     // 🆕 Stok fotoğraf yanlı
+    "contact-glass-modern",   // 🆕 Premium glassmorphism
+    "contact-animated-gradient" // 🆕 Animated gradient, CTA-focused
   ],
   footer: ["footer-modern-centered", "footer-minimal-simple", "footer-split-columns", "footer-wave-sticky", "footer-mega-columns", "footer-glass-modern", "footer-animated-gradient"],
 };
@@ -309,8 +311,15 @@ Aşağıdaki template'ler Pexels stok fotoğrafları kullanır ve çok etkileyic
 - contact-image-side: Sol taraf iletişim bilgileri, sağ taraf stok fotoğraf
   * "image", "görsel", "fotoğraflı", "modern" contact istekleri için
   * Form yok, sadece iletişim bilgileri kartları + CTA
+- contact-glass-modern: Premium glassmorphism formlu tasarım, backdrop blur
+  * "glass", "premium", "modern", "cam efekti" contact istekleri için
+  * nav-glass-morphism veya footer-glass-modern ile uyumlu
+- contact-animated-gradient: Dinamik animated gradient arka planlı tasarım
+  * "animated", "dynamic", "gradient", "hareketli" contact istekleri için
+  * hero-animated-gradient veya footer-animated-gradient ile uyumlu
+  * Form yok, direkt email/telefon CTA butonları odaklı
 
-Kullanıcı "fotoğraflı", "görselli", "image", "impressive" gibi kelimeler kullanırsa bu template'leri öner.
+Kullanıcı "fotoğraflı", "görselli", "image", "impressive", "glass", "gradient" gibi kelimeler kullanırsa bu template'leri öner.
 - ⚠️ DARK/LIGHT THEME DEĞİŞİKLİĞİ: Kullanıcı "dark theme", "koyu tema", "light theme", "açık tema" derse, UPDATE_THEME operasyonunda TÜM renkleri belirt (primary, secondary, accent, neutral, background, surface, text, textSecondary, border, hover, iconPrimary, iconSecondary). Sadece renk tonu değişikliği (örn: "mavi tema", "kırmızı yap") için sadece base colors (primary, secondary, accent) değiştir.
 
 ## Profil Fotoğrafı İşlemleri (ÖNEMLİ):

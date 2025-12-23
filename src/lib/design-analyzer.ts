@@ -272,7 +272,7 @@ CONTACT SECTION:
    - Basit ve odaklanmış tasarım gerekiyorsa
 3. contact-split-info: Split layout, sol taraf gradient bilgi, sağ taraf form
    - Yaratıcı ve dinamik görünüm isteniyorsa
-   - Gradient arka plan kullanılacaksa
+   - Gradient arka plan kullanılacakse
    - Form ve bilgi ayrı vurgulanmalıysa
    - Modern ve göz alıcı tasarım tercih ediliyorsa
 4. contact-image-side: 🆕 STOK FOTOĞRAF - Split layout, sol taraf iletişim bilgileri, sağ taraf stok fotoğraf
@@ -281,7 +281,15 @@ CONTACT SECTION:
    - Form yok, sadece iletişim bilgileri ve "Mesaj Gönder" linki
    - Meslekler: Designer, Creative, Marketing profilleri için ideal
    - Mobilde stacked layout (görsel üstte)
-
+5. contact-glass-modern: 🆕 Premium glassmorphism formlu tasarım, backdrop blur, cam efekti
+   - "Glass", "Premium", "Modern" stil isteniyorsa tercih et
+   - nav-glass-morphism veya footer-glass-modern ile uyumlu
+   - Tasarımcılar ve modern/premium portfolyolar için ideal
+6. contact-animated-gradient: 🆕 Dinamik animated gradient arka planlı tasarım, CTA-focused
+   - "Animated", "Dynamic", "Gradient" stil isteniyorsa tercih et
+   - hero-animated-gradient veya footer-animated-gradient ile mükemmel uyumlu
+   - Form yok, direkt email/telefon CTA butonları odaklı
+   - Yaratıcı ve dikkat çekici profiller için ideal
 
 FOOTER SECTION:
 1. footer-modern-centered: Modern merkezi düzen, responsive tasarım, sosyal medya linkleri, back to top butonu

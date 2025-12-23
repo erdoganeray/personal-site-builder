@@ -110,6 +110,7 @@ export const contactTemplate1: ComponentTemplate = {
     .contact-modern-section {
       padding: 80px 20px;
       background: {{COLOR_BACKGROUND}};
+      font-family: {{FONT_BODY}}, sans-serif;
     }
 
     .contact-modern-container {
@@ -123,6 +124,7 @@ export const contactTemplate1: ComponentTemplate = {
     }
 
     .contact-modern-title {
+      font-family: {{FONT_HEADING}}, sans-serif;
       font-size: 2.5rem;
       font-weight: 700;
       color: {{COLOR_TEXT}};
@@ -173,6 +175,12 @@ export const contactTemplate1: ComponentTemplate = {
       background: linear-gradient(135deg, {{COLOR_PRIMARY}}, {{COLOR_SECONDARY}});
       border-radius: 12px;
       flex-shrink: 0;
+    }
+
+    .contact-modern-info-icon svg {
+      width: 24px;
+      height: 24px;
+      color: white;
     }
 
     .contact-modern-info-details h3 {
@@ -301,6 +309,19 @@ export const contactTemplate1: ComponentTemplate = {
 
       .contact-modern-title {
         font-size: 2rem;
+      }
+    }
+
+    /* Reduced motion preference */
+    @media (prefers-reduced-motion: reduce) {
+      .contact-modern-info-item,
+      .contact-modern-submit-btn {
+        transition: none;
+      }
+
+      .contact-modern-info-item:hover,
+      .contact-modern-submit-btn:hover:not(:disabled) {
+        transform: none;
       }
     }
   `,
@@ -475,6 +496,8 @@ export const contactTemplate1: ComponentTemplate = {
     "{{COLOR_BACKGROUND}}",
     "{{COLOR_TEXT}}",
     "{{COLOR_TEXT_SECONDARY}}",
+    "{{FONT_HEADING}}",
+    "{{FONT_BODY}}",
   ],
 };
 
@@ -516,6 +539,7 @@ export const contactTemplate2: ComponentTemplate = {
       background: linear-gradient(135deg, {{COLOR_PRIMARY}}, {{COLOR_SECONDARY}});
       color: white;
       text-align: center;
+      font-family: {{FONT_BODY}}, sans-serif;
     }
 
     .contact-container-minimal {
@@ -524,6 +548,7 @@ export const contactTemplate2: ComponentTemplate = {
     }
 
     .contact-title-minimal {
+      font-family: {{FONT_HEADING}}, sans-serif;
       font-size: 3rem;
       font-weight: 700;
       margin-bottom: 60px;
@@ -559,6 +584,15 @@ export const contactTemplate2: ComponentTemplate = {
 
     .method-icon {
       font-size: 2.5rem;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .method-icon svg {
+      width: 32px;
+      height: 32px;
+      color: white;
     }
 
     .method-label {
@@ -587,6 +621,17 @@ export const contactTemplate2: ComponentTemplate = {
         font-size: 1.1rem;
       }
     }
+
+    /* Reduced motion preference */
+    @media (prefers-reduced-motion: reduce) {
+      .contact-method {
+        transition: none;
+      }
+
+      .contact-method:hover {
+        transform: none;
+      }
+    }
   `,
   placeholders: [
     "{{EMAIL}}",
@@ -594,6 +639,8 @@ export const contactTemplate2: ComponentTemplate = {
     "{{LOCATION}}",
     "{{COLOR_PRIMARY}}",
     "{{COLOR_SECONDARY}}",
+    "{{FONT_HEADING}}",
+    "{{FONT_BODY}}",
   ],
 };
 
@@ -703,6 +750,7 @@ export const contactTemplate3: ComponentTemplate = {
       display: grid;
       grid-template-columns: 1fr 1fr;
       min-height: 100vh;
+      font-family: {{FONT_BODY}}, sans-serif;
     }
 
     .contact-split-left {
@@ -719,6 +767,7 @@ export const contactTemplate3: ComponentTemplate = {
     }
 
     .split-title {
+      font-family: {{FONT_HEADING}}, sans-serif;
       font-size: 3rem;
       font-weight: 700;
       margin-bottom: 1.5rem;
@@ -786,6 +835,7 @@ export const contactTemplate3: ComponentTemplate = {
     }
 
     .split-form-title {
+      font-family: {{FONT_HEADING}}, sans-serif;
       font-size: 2rem;
       color: {{COLOR_TEXT}};
       margin-bottom: 1rem;
@@ -872,6 +922,17 @@ export const contactTemplate3: ComponentTemplate = {
 
       .split-title {
         font-size: 2rem;
+      }
+    }
+
+    /* Reduced motion preference */
+    @media (prefers-reduced-motion: reduce) {
+      .split-submit {
+        transition: none;
+      }
+
+      .split-submit:hover:not(:disabled) {
+        transform: none;
       }
     }
   `,
@@ -1045,6 +1106,8 @@ export const contactTemplate3: ComponentTemplate = {
     "{{COLOR_ACCENT}}",
     "{{COLOR_BACKGROUND}}",
     "{{COLOR_TEXT}}",
+    "{{FONT_HEADING}}",
+    "{{FONT_BODY}}",
   ],
 };
 
@@ -1121,6 +1184,7 @@ export const contactTemplate4: ComponentTemplate = {
       justify-content: center;
       padding: 4rem 3rem;
       background: {{COLOR_BACKGROUND}};
+      font-family: {{FONT_BODY}}, sans-serif;
     }
 
     .contact-image-inner {
@@ -1140,6 +1204,7 @@ export const contactTemplate4: ComponentTemplate = {
     }
 
     .contact-image-title {
+      font-family: {{FONT_HEADING}}, sans-serif;
       font-size: 2.75rem;
       font-weight: 800;
       color: {{COLOR_TEXT}};
@@ -1370,7 +1435,956 @@ export const contactTemplate4: ComponentTemplate = {
     "{{COLOR_TEXT_SECONDARY}}",
     "{{STOCK_IMAGE:contact}}",
     "{{STOCK_IMAGE_ALT:contact}}",
+    "{{FONT_HEADING}}",
+    "{{FONT_BODY}}",
   ],
+};
+
+/**
+ * Contact Template 5 - Glassmorphism Modern
+ * Blur arka plan efekti ve cam görünümü ile premium contact section
+ */
+export const contactTemplate5: ComponentTemplate = {
+  id: "contact-glass-modern",
+  name: "Glassmorphism Contact",
+  category: "contact",
+  iconStyle: "outline",
+  htmlTemplate: `
+    <section id="contact" class="contact-glass-section" aria-label="Contact section">
+      <div class="contact-glass-bg"></div>
+      <div class="contact-glass-container">
+        <div class="contact-glass-header">
+          <h2 class="contact-glass-title">İletişime Geçin</h2>
+          <p class="contact-glass-subtitle">Projeleriniz için benimle iletişime geçmekten çekinmeyin</p>
+        </div>
+        
+        <div class="contact-glass-content">
+          <div class="contact-glass-info">
+            <a href="mailto:{{EMAIL}}" class="contact-glass-info-item">
+              <div class="contact-glass-icon">{{ICON:mail}}</div>
+              <div class="contact-glass-details">
+                <span class="contact-glass-label">Email</span>
+                <span class="contact-glass-value">{{EMAIL}}</span>
+              </div>
+            </a>
+            
+            <a href="tel:{{PHONE}}" class="contact-glass-info-item">
+              <div class="contact-glass-icon">{{ICON:phone}}</div>
+              <div class="contact-glass-details">
+                <span class="contact-glass-label">Telefon</span>
+                <span class="contact-glass-value">{{PHONE}}</span>
+              </div>
+            </a>
+            
+            <div class="contact-glass-info-item">
+              <div class="contact-glass-icon">{{ICON:mapPin}}</div>
+              <div class="contact-glass-details">
+                <span class="contact-glass-label">Konum</span>
+                <span class="contact-glass-value">{{LOCATION}}</span>
+              </div>
+            </div>
+          </div>
+          
+          <form class="contact-glass-form">
+            <!-- Honeypot field -->
+            <input type="text" name="honeypot" style="display:none" tabindex="-1" autocomplete="off">
+            
+            <!-- Hidden field for site owner email -->
+            <input type="hidden" name="siteOwnerEmail" value="{{SITE_OWNER_EMAIL}}">
+            
+            <div class="contact-glass-form-group">
+              <label for="glass-name">İsim</label>
+              <input 
+                type="text" 
+                id="glass-name" 
+                name="name" 
+                required 
+                aria-required="true"
+                aria-invalid="false"
+                aria-describedby="glass-name-error"
+                placeholder="Adınız Soyadınız"
+              >
+              <span id="glass-name-error" class="contact-glass-error" role="alert"></span>
+            </div>
+            
+            <div class="contact-glass-form-group">
+              <label for="glass-email">Email</label>
+              <input 
+                type="email" 
+                id="glass-email" 
+                name="email" 
+                required 
+                aria-required="true"
+                aria-invalid="false"
+                aria-describedby="glass-email-error"
+                placeholder="ornek@email.com"
+              >
+              <span id="glass-email-error" class="contact-glass-error" role="alert"></span>
+            </div>
+            
+            <div class="contact-glass-form-group">
+              <label for="glass-message">Mesaj</label>
+              <textarea 
+                id="glass-message" 
+                name="message" 
+                rows="5" 
+                required 
+                aria-required="true"
+                aria-invalid="false"
+                aria-describedby="glass-message-error"
+                maxlength="5000"
+                placeholder="Mesajınızı buraya yazın..."
+              ></textarea>
+              <span id="glass-message-error" class="contact-glass-error" role="alert"></span>
+            </div>
+            
+            <button type="submit" class="contact-glass-submit">
+              <span class="contact-glass-btn-text">Gönder</span>
+              <span class="contact-glass-btn-spinner" style="display:none;">{{ICON:loader}}</span>
+            </button>
+            
+            <div class="contact-glass-form-message" style="display:none;"></div>
+          </form>
+        </div>
+      </div>
+    </section>
+  `,
+  cssTemplate: `
+    .contact-glass-section {
+      position: relative;
+      padding: 80px 20px;
+      min-height: 100vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-family: {{FONT_BODY}}, sans-serif;
+      overflow: hidden;
+    }
+
+    .contact-glass-bg {
+      position: absolute;
+      inset: 0;
+      background: linear-gradient(135deg, {{COLOR_PRIMARY}}20, {{COLOR_SECONDARY}}20, {{COLOR_PRIMARY}}10);
+      background-size: 400% 400%;
+      animation: glassGradient 15s ease infinite;
+      z-index: 0;
+    }
+
+    @keyframes glassGradient {
+      0%, 100% { background-position: 0% 50%; }
+      50% { background-position: 100% 50%; }
+    }
+
+    .contact-glass-container {
+      position: relative;
+      max-width: 1100px;
+      width: 100%;
+      margin: 0 auto;
+      background: rgba(255, 255, 255, 0.1);
+      backdrop-filter: blur(20px);
+      -webkit-backdrop-filter: blur(20px);
+      border-radius: 24px;
+      border: 1px solid rgba(255, 255, 255, 0.2);
+      padding: 3rem;
+      box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
+      z-index: 1;
+    }
+
+    .contact-glass-header {
+      text-align: center;
+      margin-bottom: 3rem;
+    }
+
+    .contact-glass-title {
+      font-family: {{FONT_HEADING}}, sans-serif;
+      font-size: 2.5rem;
+      font-weight: 700;
+      color: {{COLOR_TEXT}};
+      margin-bottom: 0.75rem;
+    }
+
+    .contact-glass-subtitle {
+      font-size: 1.1rem;
+      color: {{COLOR_TEXT_SECONDARY}};
+      margin: 0;
+    }
+
+    .contact-glass-content {
+      display: grid;
+      grid-template-columns: 1fr 1.2fr;
+      gap: 3rem;
+      align-items: start;
+    }
+
+    .contact-glass-info {
+      display: flex;
+      flex-direction: column;
+      gap: 1rem;
+    }
+
+    .contact-glass-info-item {
+      display: flex;
+      align-items: center;
+      gap: 1rem;
+      padding: 1.25rem;
+      background: rgba(255, 255, 255, 0.1);
+      backdrop-filter: blur(10px);
+      border-radius: 16px;
+      border: 1px solid rgba(255, 255, 255, 0.15);
+      text-decoration: none;
+      color: {{COLOR_TEXT}};
+      transition: all 0.3s ease;
+    }
+
+    a.contact-glass-info-item:hover {
+      background: rgba(255, 255, 255, 0.2);
+      transform: translateX(8px);
+      border-color: {{COLOR_PRIMARY}}40;
+    }
+
+    .contact-glass-icon {
+      width: 48px;
+      height: 48px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      background: linear-gradient(135deg, {{COLOR_PRIMARY}}, {{COLOR_SECONDARY}});
+      border-radius: 12px;
+      flex-shrink: 0;
+    }
+
+    .contact-glass-icon svg {
+      width: 22px;
+      height: 22px;
+      color: white;
+    }
+
+    .contact-glass-details {
+      display: flex;
+      flex-direction: column;
+      gap: 0.25rem;
+    }
+
+    .contact-glass-label {
+      font-size: 0.85rem;
+      color: {{COLOR_TEXT_SECONDARY}};
+      font-weight: 500;
+    }
+
+    .contact-glass-value {
+      font-size: 1rem;
+      font-weight: 600;
+      color: {{COLOR_TEXT}};
+    }
+
+    /* Form Styles */
+    .contact-glass-form {
+      display: flex;
+      flex-direction: column;
+      gap: 1.5rem;
+    }
+
+    .contact-glass-form-group {
+      display: flex;
+      flex-direction: column;
+      gap: 0.5rem;
+    }
+
+    .contact-glass-form-group label {
+      font-weight: 600;
+      color: {{COLOR_TEXT}};
+      font-size: 0.95rem;
+    }
+
+    .contact-glass-form-group input,
+    .contact-glass-form-group textarea {
+      padding: 1rem 1.25rem;
+      background: rgba(255, 255, 255, 0.1);
+      backdrop-filter: blur(8px);
+      border: 1px solid rgba(255, 255, 255, 0.2);
+      border-radius: 12px;
+      font-size: 1rem;
+      font-family: inherit;
+      color: {{COLOR_TEXT}};
+      transition: all 0.3s ease;
+    }
+
+    .contact-glass-form-group input::placeholder,
+    .contact-glass-form-group textarea::placeholder {
+      color: {{COLOR_TEXT_SECONDARY}};
+      opacity: 0.7;
+    }
+
+    .contact-glass-form-group input:focus,
+    .contact-glass-form-group textarea:focus {
+      outline: none;
+      border-color: {{COLOR_PRIMARY}};
+      background: rgba(255, 255, 255, 0.15);
+      box-shadow: 0 0 0 3px {{COLOR_PRIMARY}}20;
+    }
+
+    .contact-glass-form-group input[aria-invalid="true"],
+    .contact-glass-form-group textarea[aria-invalid="true"] {
+      border-color: #dc3545;
+      background: rgba(220, 53, 69, 0.1);
+    }
+
+    .contact-glass-error {
+      display: none;
+      color: #dc3545;
+      font-size: 0.85rem;
+    }
+
+    .contact-glass-error:not(:empty) {
+      display: block;
+    }
+
+    .contact-glass-submit {
+      padding: 1rem 2rem;
+      background: linear-gradient(135deg, {{COLOR_PRIMARY}}, {{COLOR_SECONDARY}});
+      color: white;
+      border: none;
+      border-radius: 12px;
+      font-size: 1.1rem;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.3s ease;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 0.5rem;
+    }
+
+    .contact-glass-submit:hover:not(:disabled) {
+      transform: translateY(-2px);
+      box-shadow: 0 8px 25px {{COLOR_PRIMARY}}40;
+    }
+
+    .contact-glass-submit:disabled {
+      opacity: 0.6;
+      cursor: not-allowed;
+      transform: none;
+    }
+
+    .contact-glass-btn-spinner svg {
+      width: 20px;
+      height: 20px;
+      animation: spin 1s linear infinite;
+    }
+
+    @keyframes spin {
+      from { transform: rotate(0deg); }
+      to { transform: rotate(360deg); }
+    }
+
+    .contact-glass-form-message {
+      padding: 1rem;
+      border-radius: 12px;
+      text-align: center;
+      font-weight: 500;
+    }
+
+    .contact-glass-form-message.success {
+      background: rgba(40, 167, 69, 0.2);
+      color: #28a745;
+      border: 1px solid rgba(40, 167, 69, 0.3);
+    }
+
+    .contact-glass-form-message.error {
+      background: rgba(220, 53, 69, 0.2);
+      color: #dc3545;
+      border: 1px solid rgba(220, 53, 69, 0.3);
+    }
+
+    /* Responsive */
+    @media (max-width: 768px) {
+      .contact-glass-section {
+        padding: 60px 15px;
+      }
+
+      .contact-glass-container {
+        padding: 2rem;
+      }
+
+      .contact-glass-content {
+        grid-template-columns: 1fr;
+        gap: 2rem;
+      }
+
+      .contact-glass-title {
+        font-size: 2rem;
+      }
+
+      .contact-glass-social {
+        justify-content: center;
+      }
+    }
+
+    @media (max-width: 480px) {
+      .contact-glass-container {
+        padding: 1.5rem;
+        border-radius: 20px;
+      }
+
+      .contact-glass-title {
+        font-size: 1.75rem;
+      }
+
+      .contact-glass-info-item {
+        padding: 1rem;
+      }
+
+      .contact-glass-icon {
+        width: 40px;
+        height: 40px;
+      }
+
+      .contact-glass-icon svg {
+        width: 18px;
+        height: 18px;
+      }
+    }
+
+    /* Reduced motion preference */
+    @media (prefers-reduced-motion: reduce) {
+      .contact-glass-bg {
+        animation: none;
+      }
+
+      .contact-glass-info-item,
+      .contact-glass-social a,
+      .contact-glass-submit {
+        transition: none;
+      }
+
+      a.contact-glass-info-item:hover,
+      .contact-glass-social a:hover,
+      .contact-glass-submit:hover:not(:disabled) {
+        transform: none;
+      }
+
+      .contact-glass-btn-spinner svg {
+        animation: none;
+      }
+    }
+  `,
+  jsTemplate: `
+    // Validation functions
+    function validateName(name) {
+      if (!name || name.trim().length === 0) {
+        return 'İsim gereklidir';
+      }
+      if (name.trim().length < 2) {
+        return 'İsim en az 2 karakter olmalıdır';
+      }
+      return '';
+    }
+
+    function validateEmail(email) {
+      if (!email || email.trim().length === 0) {
+        return 'Email gereklidir';
+      }
+      const emailRegex = /^[^\\s@]+@[^\\s@]+\\.[^\\s@]+$/;
+      if (!emailRegex.test(email)) {
+        return 'Geçerli bir email adresi giriniz';
+      }
+      return '';
+    }
+
+    function validateMessage(message) {
+      if (!message || message.trim().length === 0) {
+        return 'Mesaj gereklidir';
+      }
+      if (message.trim().length < 10) {
+        return 'Mesaj en az 10 karakter olmalıdır';
+      }
+      if (message.length > 5000) {
+        return 'Mesaj en fazla 5000 karakter olabilir';
+      }
+      return '';
+    }
+
+    function showError(inputId, errorMessage) {
+      const input = document.getElementById(inputId);
+      const errorSpan = document.getElementById(inputId + '-error');
+      
+      if (input && errorSpan) {
+        input.setAttribute('aria-invalid', 'true');
+        errorSpan.textContent = errorMessage;
+      }
+    }
+
+    function clearError(inputId) {
+      const input = document.getElementById(inputId);
+      const errorSpan = document.getElementById(inputId + '-error');
+      
+      if (input && errorSpan) {
+        input.setAttribute('aria-invalid', 'false');
+        errorSpan.textContent = '';
+      }
+    }
+
+    function validateField(inputId, validator, value) {
+      const error = validator(value);
+      if (error) {
+        showError(inputId, error);
+        return false;
+      } else {
+        clearError(inputId);
+        return true;
+      }
+    }
+
+    // Real-time validation on blur
+    document.getElementById('glass-name')?.addEventListener('blur', function(e) {
+      validateField('glass-name', validateName, e.target.value);
+    });
+
+    document.getElementById('glass-email')?.addEventListener('blur', function(e) {
+      validateField('glass-email', validateEmail, e.target.value);
+    });
+
+    document.getElementById('glass-message')?.addEventListener('blur', function(e) {
+      validateField('glass-message', validateMessage, e.target.value);
+    });
+
+    // Contact form submission handler
+    document.querySelector('.contact-glass-form')?.addEventListener('submit', async function(e) {
+      e.preventDefault();
+      
+      const form = e.target;
+      const submitBtn = form.querySelector('.contact-glass-submit');
+      const btnText = submitBtn.querySelector('.contact-glass-btn-text');
+      const btnSpinner = submitBtn.querySelector('.contact-glass-btn-spinner');
+      const messageDiv = form.querySelector('.contact-glass-form-message');
+      
+      // Validate all fields before submission
+      const formData = new FormData(form);
+      const nameValid = validateField('glass-name', validateName, formData.get('name'));
+      const emailValid = validateField('glass-email', validateEmail, formData.get('email'));
+      const messageValid = validateField('glass-message', validateMessage, formData.get('message'));
+      
+      if (!nameValid || !emailValid || !messageValid) {
+        if (!nameValid) document.getElementById('glass-name')?.focus();
+        else if (!emailValid) document.getElementById('glass-email')?.focus();
+        else if (!messageValid) document.getElementById('glass-message')?.focus();
+        return;
+      }
+      
+      // Disable form during submission
+      submitBtn.disabled = true;
+      btnText.style.display = 'none';
+      btnSpinner.style.display = 'inline-flex';
+      messageDiv.style.display = 'none';
+      
+      try {
+        const data = Object.fromEntries(formData);
+        
+        const isPreview = window.location.hostname === 'localhost' || 
+                         window.location.protocol === 'blob:' ||
+                         window.location.href.includes('blob:');
+        
+        if (isPreview) {
+          await new Promise(resolve => setTimeout(resolve, 1000));
+          messageDiv.textContent = 'Önizleme modunda mesaj gönderimi devre dışıdır. Site yayınlandığında contact formu çalışacaktır.';
+          messageDiv.className = 'contact-glass-form-message success';
+          messageDiv.style.display = 'block';
+          form.reset();
+        } else {
+          const apiUrl = window.location.origin + '/api/contact';
+          
+          const response = await fetch(apiUrl, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(data)
+          });
+          
+          const result = await response.json();
+          
+          if (!response.ok) {
+            throw new Error(result.error || 'Gönderim başarısız');
+          }
+          
+          messageDiv.textContent = 'Mesajınız başarıyla gönderildi! En kısa sürede dönüş yapacağım.';
+          messageDiv.className = 'contact-glass-form-message success';
+          messageDiv.style.display = 'block';
+          form.reset();
+        }
+        
+      } catch (error) {
+        messageDiv.textContent = error.message || 'Bir hata oluştu. Lütfen tekrar deneyin.';
+        messageDiv.className = 'contact-glass-form-message error';
+        messageDiv.style.display = 'block';
+      } finally {
+        submitBtn.disabled = false;
+        btnText.style.display = 'inline';
+        btnSpinner.style.display = 'none';
+      }
+    });
+  `,
+  placeholders: [
+    "{{EMAIL}}",
+    "{{PHONE}}",
+    "{{LOCATION}}",
+    "{{SITE_OWNER_EMAIL}}",
+    "{{COLOR_PRIMARY}}",
+    "{{COLOR_SECONDARY}}",
+    "{{COLOR_TEXT}}",
+    "{{COLOR_TEXT_SECONDARY}}",
+    "{{FONT_HEADING}}",
+    "{{FONT_BODY}}",
+  ],
+  designNotes: "Premium glassmorphism contact template. Blur(20px) arka plan, animated gradient, form validation. Mobil uyumlu ve reduced motion destekli.",
+};
+
+/**
+ * Contact Template 6 - Animated Gradient
+ * CTA-focused contact section with animated gradient background
+ * Form yok, direkt action butonları ile minimal tasarım
+ */
+export const contactTemplate6: ComponentTemplate = {
+  id: "contact-animated-gradient",
+  name: "Animated Gradient Contact",
+  category: "contact",
+  iconStyle: "solid",
+  htmlTemplate: `
+    <section id="contact" class="contact-gradient-section" aria-label="Contact section">
+      <div class="contact-gradient-bg"></div>
+      <div class="contact-gradient-overlay"></div>
+      
+      <div class="contact-gradient-container">
+        <div class="contact-gradient-header">
+          <h2 class="contact-gradient-title">Birlikte Çalışalım</h2>
+          <p class="contact-gradient-subtitle">Yeni projeler için her zaman açığım. Benimle iletişime geçin.</p>
+        </div>
+        
+        <div class="contact-gradient-cards">
+          <a href="mailto:{{EMAIL}}" class="contact-gradient-card">
+            <div class="contact-gradient-card-icon">{{ICON:mail}}</div>
+            <div class="contact-gradient-card-content">
+              <span class="contact-gradient-card-label">Email</span>
+              <span class="contact-gradient-card-value">{{EMAIL}}</span>
+            </div>
+          </a>
+          
+          <a href="tel:{{PHONE}}" class="contact-gradient-card">
+            <div class="contact-gradient-card-icon">{{ICON:phone}}</div>
+            <div class="contact-gradient-card-content">
+              <span class="contact-gradient-card-label">Telefon</span>
+              <span class="contact-gradient-card-value">{{PHONE}}</span>
+            </div>
+          </a>
+          
+          <div class="contact-gradient-card">
+            <div class="contact-gradient-card-icon">{{ICON:mapPin}}</div>
+            <div class="contact-gradient-card-content">
+              <span class="contact-gradient-card-label">Konum</span>
+              <span class="contact-gradient-card-value">{{LOCATION}}</span>
+            </div>
+          </div>
+        </div>
+        
+        <div class="contact-gradient-cta">
+          <a href="mailto:{{EMAIL}}" class="contact-gradient-cta-btn">
+            <span class="contact-gradient-cta-icon">{{ICON:mail}}</span>
+            <span>Mesaj Gönder</span>
+          </a>
+        </div>
+      </div>
+    </section>
+  `,
+  cssTemplate: `
+    .contact-gradient-section {
+      position: relative;
+      padding: 100px 20px;
+      min-height: 80vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-family: {{FONT_BODY}}, sans-serif;
+      overflow: hidden;
+    }
+
+    .contact-gradient-bg {
+      position: absolute;
+      inset: 0;
+      background: linear-gradient(
+        135deg,
+        {{COLOR_PRIMARY}},
+        {{COLOR_SECONDARY}},
+        {{COLOR_PRIMARY}}
+      );
+      background-size: 400% 400%;
+      animation: gradientMove 15s ease infinite;
+      z-index: 0;
+    }
+
+    @keyframes gradientMove {
+      0% { background-position: 0% 50%; }
+      50% { background-position: 100% 50%; }
+      100% { background-position: 0% 50%; }
+    }
+
+    .contact-gradient-overlay {
+      position: absolute;
+      inset: 0;
+      background: radial-gradient(
+        ellipse at center,
+        transparent 0%,
+        rgba(0, 0, 0, 0.2) 100%
+      );
+      z-index: 1;
+    }
+
+    .contact-gradient-container {
+      position: relative;
+      max-width: 900px;
+      width: 100%;
+      margin: 0 auto;
+      text-align: center;
+      z-index: 2;
+    }
+
+    .contact-gradient-header {
+      margin-bottom: 3.5rem;
+    }
+
+    .contact-gradient-title {
+      font-family: {{FONT_HEADING}}, sans-serif;
+      font-size: 3rem;
+      font-weight: 800;
+      color: white;
+      margin-bottom: 1rem;
+      text-shadow: 0 4px 20px rgba(0, 0, 0, 0.3);
+    }
+
+    .contact-gradient-subtitle {
+      font-size: 1.2rem;
+      color: rgba(255, 255, 255, 0.9);
+      margin: 0;
+      max-width: 600px;
+      margin-left: auto;
+      margin-right: auto;
+    }
+
+    .contact-gradient-cards {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 1.5rem;
+      margin-bottom: 3rem;
+    }
+
+    .contact-gradient-card {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 1rem;
+      padding: 2rem 1.5rem;
+      background: rgba(255, 255, 255, 0.15);
+      backdrop-filter: blur(10px);
+      -webkit-backdrop-filter: blur(10px);
+      border-radius: 20px;
+      border: 1px solid rgba(255, 255, 255, 0.25);
+      text-decoration: none;
+      color: white;
+      transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+    }
+
+    a.contact-gradient-card:hover {
+      background: rgba(255, 255, 255, 0.25);
+      transform: translateY(-10px) scale(1.02);
+      box-shadow: 0 20px 40px rgba(0, 0, 0, 0.3);
+    }
+
+    .contact-gradient-card-icon {
+      width: 60px;
+      height: 60px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      background: rgba(255, 255, 255, 0.2);
+      border-radius: 16px;
+      transition: all 0.3s ease;
+    }
+
+    a.contact-gradient-card:hover .contact-gradient-card-icon {
+      background: rgba(255, 255, 255, 0.35);
+      transform: scale(1.1);
+    }
+
+    .contact-gradient-card-icon svg {
+      width: 28px;
+      height: 28px;
+      color: white;
+    }
+
+    .contact-gradient-card-content {
+      display: flex;
+      flex-direction: column;
+      gap: 0.25rem;
+      text-align: center;
+    }
+
+    .contact-gradient-card-label {
+      font-size: 0.85rem;
+      color: rgba(255, 255, 255, 0.75);
+      text-transform: uppercase;
+      letter-spacing: 1px;
+      font-weight: 500;
+    }
+
+    .contact-gradient-card-value {
+      font-size: 1rem;
+      font-weight: 600;
+      color: white;
+    }
+
+    .contact-gradient-cta {
+      display: flex;
+      justify-content: center;
+    }
+
+    .contact-gradient-cta-btn {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.75rem;
+      padding: 1.25rem 3rem;
+      background: white;
+      color: {{COLOR_PRIMARY}};
+      text-decoration: none;
+      border-radius: 50px;
+      font-size: 1.2rem;
+      font-weight: 700;
+      transition: all 0.3s ease;
+      box-shadow: 0 8px 30px rgba(0, 0, 0, 0.2);
+      animation: pulse 2s ease-in-out infinite;
+    }
+
+    @keyframes pulse {
+      0%, 100% {
+        box-shadow: 0 8px 30px rgba(0, 0, 0, 0.2);
+      }
+      50% {
+        box-shadow: 0 8px 50px rgba(255, 255, 255, 0.3);
+      }
+    }
+
+    .contact-gradient-cta-btn:hover {
+      transform: scale(1.05);
+      box-shadow: 0 12px 40px rgba(0, 0, 0, 0.3);
+    }
+
+    .contact-gradient-cta-icon {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .contact-gradient-cta-icon svg {
+      width: 24px;
+      height: 24px;
+    }
+
+    /* Responsive */
+    @media (max-width: 768px) {
+      .contact-gradient-section {
+        padding: 80px 20px;
+        min-height: auto;
+      }
+
+      .contact-gradient-title {
+        font-size: 2.25rem;
+      }
+
+      .contact-gradient-subtitle {
+        font-size: 1.1rem;
+      }
+
+      .contact-gradient-cards {
+        grid-template-columns: 1fr;
+        gap: 1rem;
+      }
+
+      .contact-gradient-card {
+        flex-direction: row;
+        text-align: left;
+        padding: 1.5rem;
+      }
+
+      .contact-gradient-card-content {
+        text-align: left;
+      }
+
+      .contact-gradient-card-icon {
+        width: 50px;
+        height: 50px;
+      }
+
+      .contact-gradient-card-icon svg {
+        width: 24px;
+        height: 24px;
+      }
+
+      .contact-gradient-cta-btn {
+        padding: 1rem 2rem;
+        font-size: 1.1rem;
+      }
+    }
+
+    @media (max-width: 480px) {
+      .contact-gradient-title {
+        font-size: 1.85rem;
+      }
+
+      .contact-gradient-card {
+        padding: 1.25rem;
+      }
+
+      .contact-gradient-card-value {
+        font-size: 0.95rem;
+      }
+
+      .contact-gradient-cta-btn {
+        width: 100%;
+        justify-content: center;
+      }
+    }
+
+    /* Reduced motion preference */
+    @media (prefers-reduced-motion: reduce) {
+      .contact-gradient-bg {
+        animation: none;
+      }
+
+      .contact-gradient-cta-btn {
+        animation: none;
+      }
+
+      .contact-gradient-card,
+      .contact-gradient-cta-btn {
+        transition: none;
+      }
+
+      a.contact-gradient-card:hover,
+      .contact-gradient-cta-btn:hover {
+        transform: none;
+      }
+
+      a.contact-gradient-card:hover .contact-gradient-card-icon {
+        transform: none;
+      }
+    }
+  `,
+  placeholders: [
+    "{{EMAIL}}",
+    "{{PHONE}}",
+    "{{LOCATION}}",
+    "{{COLOR_PRIMARY}}",
+    "{{COLOR_SECONDARY}}",
+    "{{FONT_HEADING}}",
+    "{{FONT_BODY}}",
+  ],
+  designNotes: "CTA-focused animated gradient contact section. Form yok, minimal tasarım. 15s gradient animasyonu, floating cards, pulse CTA. Mobil uyumlu ve reduced motion destekli.",
 };
 
 /**
@@ -1381,4 +2395,6 @@ export const contactTemplates = [
   contactTemplate2,
   contactTemplate3,
   contactTemplate4,
+  contactTemplate5,
+  contactTemplate6,
 ];
