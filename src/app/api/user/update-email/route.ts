@@ -21,78 +21,78 @@ const resend = new Resend(process.env.RESEND_API_KEY);
  * - 500: Server error
  */
 export async function POST(request: NextRequest) {
+  try {
+    // 1. Session kontrolü
+    const session = await getServerSession(authOptions);
+
+    if (!session?.user?.id) {
+      return NextResponse.json(
+        { error: "Oturum bulunamadı. Lütfen giriş yapın." },
+        { status: 401 }
+      );
+    }
+
+    // 2. Request body'den yeni e-postayı al
+    const body = await request.json();
+    const { newEmail } = body;
+
+    // 3. Validasyon
+    if (!newEmail || !newEmail.includes("@")) {
+      return NextResponse.json(
+        { error: "Geçerli bir e-posta adresi girin" },
+        { status: 400 }
+      );
+    }
+
+    // Mevcut e-posta ile aynı mı kontrol et
+    const currentUser = await prisma.user.findUnique({
+      where: { id: session.user.id },
+      select: { email: true },
+    });
+
+    if (currentUser?.email === newEmail) {
+      return NextResponse.json(
+        { error: "Bu zaten mevcut e-posta adresiniz" },
+        { status: 400 }
+      );
+    }
+
+    // 4. E-posta benzersizlik kontrolü
+    const existingUser = await prisma.user.findUnique({
+      where: { email: newEmail },
+    });
+
+    if (existingUser) {
+      return NextResponse.json(
+        { error: "Bu e-posta adresi zaten kullanılıyor" },
+        { status: 400 }
+      );
+    }
+
+    // 5. Doğrulama token'ı oluştur
+    const token = crypto.randomBytes(32).toString("hex");
+    const hashedToken = crypto.createHash("sha256").update(token).digest("hex");
+    const expiresAt = new Date(Date.now() + 24 * 60 * 60 * 1000); // 24 saat
+
+    // 6. Database'de pending email ve token'ı kaydet
+    await prisma.user.update({
+      where: { id: session.user.id },
+      data: {
+        pendingEmail: newEmail,
+        emailVerificationToken: hashedToken,
+        emailTokenExpiresAt: expiresAt,
+      },
+    });
+
+    // 7. Doğrulama e-postası gönder
+    const verificationLink = `${process.env.NEXTAUTH_URL}/verify-email?token=${token}`;
+
     try {
-        // 1. Session kontrolü
-        const session = await getServerSession(authOptions);
-
-        if (!session?.user?.id) {
-            return NextResponse.json(
-                { error: "Oturum bulunamadı. Lütfen giriş yapın." },
-                { status: 401 }
-            );
-        }
-
-        // 2. Request body'den yeni e-postayı al
-        const body = await request.json();
-        const { newEmail } = body;
-
-        // 3. Validasyon
-        if (!newEmail || !newEmail.includes("@")) {
-            return NextResponse.json(
-                { error: "Geçerli bir e-posta adresi girin" },
-                { status: 400 }
-            );
-        }
-
-        // Mevcut e-posta ile aynı mı kontrol et
-        const currentUser = await prisma.user.findUnique({
-            where: { id: session.user.id },
-            select: { email: true },
-        });
-
-        if (currentUser?.email === newEmail) {
-            return NextResponse.json(
-                { error: "Bu zaten mevcut e-posta adresiniz" },
-                { status: 400 }
-            );
-        }
-
-        // 4. E-posta benzersizlik kontrolü
-        const existingUser = await prisma.user.findUnique({
-            where: { email: newEmail },
-        });
-
-        if (existingUser) {
-            return NextResponse.json(
-                { error: "Bu e-posta adresi zaten kullanılıyor" },
-                { status: 400 }
-            );
-        }
-
-        // 5. Doğrulama token'ı oluştur
-        const token = crypto.randomBytes(32).toString("hex");
-        const hashedToken = crypto.createHash("sha256").update(token).digest("hex");
-        const expiresAt = new Date(Date.now() + 24 * 60 * 60 * 1000); // 24 saat
-
-        // 6. Database'de pending email ve token'ı kaydet
-        await prisma.user.update({
-            where: { id: session.user.id },
-            data: {
-                pendingEmail: newEmail,
-                emailVerificationToken: hashedToken,
-                emailTokenExpiresAt: expiresAt,
-            },
-        });
-
-        // 7. Doğrulama e-postası gönder
-        const verificationLink = `${process.env.NEXTAUTH_URL}/verify-email?token=${token}`;
-
-        try {
-            await resend.emails.send({
-                from: "PersonaWeb <onboarding@resend.dev>",
-                to: newEmail,
-                subject: "E-posta Adresinizi Doğrulayın",
-                html: `
+      await resend.emails.send({
+        from: "PersonaWeb <info@personalweb.info>",
+        to: newEmail,
+        subject: "E-posta Adresinizi Doğrulayın",
+        html: `
           <!DOCTYPE html>
           <html>
             <head>
@@ -142,38 +142,38 @@ export async function POST(request: NextRequest) {
             </body>
           </html>
         `,
-            });
+      });
 
-            console.log(`✅ Verification email sent to ${newEmail} for user ${session.user.id}`);
-        } catch (emailError) {
-            console.error("Email sending error:", emailError);
+      console.log(`✅ Verification email sent to ${newEmail} for user ${session.user.id}`);
+    } catch (emailError) {
+      console.error("Email sending error:", emailError);
 
-            // E-posta gönderilemezse pending state'i temizle
-            await prisma.user.update({
-                where: { id: session.user.id },
-                data: {
-                    pendingEmail: null,
-                    emailVerificationToken: null,
-                    emailTokenExpiresAt: null,
-                },
-            });
+      // E-posta gönderilemezse pending state'i temizle
+      await prisma.user.update({
+        where: { id: session.user.id },
+        data: {
+          pendingEmail: null,
+          emailVerificationToken: null,
+          emailTokenExpiresAt: null,
+        },
+      });
 
-            return NextResponse.json(
-                { error: "E-posta gönderilemedi. Lütfen tekrar deneyin." },
-                { status: 500 }
-            );
-        }
-
-        // 8. Success response
-        return NextResponse.json({
-            success: true,
-            message: "Doğrulama e-postası gönderildi. Lütfen e-postanızı kontrol edin.",
-        });
-    } catch (error) {
-        console.error("Email update request error:", error);
-        return NextResponse.json(
-            { error: "E-posta güncelleme isteği başarısız oldu" },
-            { status: 500 }
-        );
+      return NextResponse.json(
+        { error: "E-posta gönderilemedi. Lütfen tekrar deneyin." },
+        { status: 500 }
+      );
     }
+
+    // 8. Success response
+    return NextResponse.json({
+      success: true,
+      message: "Doğrulama e-postası gönderildi. Lütfen e-postanızı kontrol edin.",
+    });
+  } catch (error) {
+    console.error("Email update request error:", error);
+    return NextResponse.json(
+      { error: "E-posta güncelleme isteği başarısız oldu" },
+      { status: 500 }
+    );
+  }
 }

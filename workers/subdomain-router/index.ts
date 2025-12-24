@@ -170,7 +170,7 @@ async function handleContactForm(request: Request, env: Env): Promise<Response> 
     const resend = new Resend(env.RESEND_API_KEY);
 
     const { data, error } = await resend.emails.send({
-      from: 'Contact Form <onboarding@resend.dev>',
+      from: 'PersonaWeb <info@personalweb.info>',
       to: body.siteOwnerEmail,
       replyTo: body.email,
       subject: `New Contact Form Message from ${body.name}`,

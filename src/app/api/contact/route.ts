@@ -7,63 +7,63 @@ const rateLimitStore = new Map<string, { count: number; resetTime: number }>();
 
 // Validation schema
 const contactSchema = z.object({
-    name: z.string().min(1, 'Name is required').max(100),
-    email: z.string().email('Invalid email address'),
-    message: z.string().min(10, 'Message must be at least 10 characters').max(5000, 'Message is too long'),
-    siteOwnerEmail: z.string().email('Invalid site owner email'),
-    honeypot: z.string().optional(), // Bot trap
+  name: z.string().min(1, 'Name is required').max(100),
+  email: z.string().email('Invalid email address'),
+  message: z.string().min(10, 'Message must be at least 10 characters').max(5000, 'Message is too long'),
+  siteOwnerEmail: z.string().email('Invalid site owner email'),
+  honeypot: z.string().optional(), // Bot trap
 });
 
 export async function POST(request: NextRequest) {
-    try {
-        // 1. Rate limiting check
-        const ip = request.headers.get('x-forwarded-for') || request.headers.get('x-real-ip') || 'unknown';
-        const now = Date.now();
-        const rateLimit = rateLimitStore.get(ip);
+  try {
+    // 1. Rate limiting check
+    const ip = request.headers.get('x-forwarded-for') || request.headers.get('x-real-ip') || 'unknown';
+    const now = Date.now();
+    const rateLimit = rateLimitStore.get(ip);
 
-        if (rateLimit && rateLimit.resetTime > now) {
-            if (rateLimit.count >= 5) {
-                return NextResponse.json(
-                    { error: 'Too many requests. Please try again later.' },
-                    { status: 429 }
-                );
-            }
-            rateLimit.count++;
-        } else {
-            rateLimitStore.set(ip, { count: 1, resetTime: now + 3600000 }); // 1 hour
-        }
+    if (rateLimit && rateLimit.resetTime > now) {
+      if (rateLimit.count >= 5) {
+        return NextResponse.json(
+          { error: 'Too many requests. Please try again later.' },
+          { status: 429 }
+        );
+      }
+      rateLimit.count++;
+    } else {
+      rateLimitStore.set(ip, { count: 1, resetTime: now + 3600000 }); // 1 hour
+    }
 
-        // 2. Parse and validate request body
-        const body = await request.json();
+    // 2. Parse and validate request body
+    const body = await request.json();
 
-        // 3. Honeypot check (if filled, it's a bot)
-        if (body.honeypot && body.honeypot.trim() !== '') {
-            console.log('[Contact API] Bot detected via honeypot');
-            return NextResponse.json({ success: true }); // Fake success for bots
-        }
+    // 3. Honeypot check (if filled, it's a bot)
+    if (body.honeypot && body.honeypot.trim() !== '') {
+      console.log('[Contact API] Bot detected via honeypot');
+      return NextResponse.json({ success: true }); // Fake success for bots
+    }
 
-        const validatedData = contactSchema.parse(body);
+    const validatedData = contactSchema.parse(body);
 
-        // 4. Initialize Resend
-        const resendApiKey = process.env.RESEND_API_KEY;
+    // 4. Initialize Resend
+    const resendApiKey = process.env.RESEND_API_KEY;
 
-        if (!resendApiKey) {
-            console.error('[Contact API] RESEND_API_KEY not found in environment variables');
-            return NextResponse.json(
-                { error: 'Email service is not configured. Please contact the administrator.' },
-                { status: 500 }
-            );
-        }
+    if (!resendApiKey) {
+      console.error('[Contact API] RESEND_API_KEY not found in environment variables');
+      return NextResponse.json(
+        { error: 'Email service is not configured. Please contact the administrator.' },
+        { status: 500 }
+      );
+    }
 
-        const resend = new Resend(resendApiKey);
+    const resend = new Resend(resendApiKey);
 
-        // 5. Send email
-        const { data, error } = await resend.emails.send({
-            from: 'Contact Form <onboarding@resend.dev>', // Using Resend test domain
-            to: validatedData.siteOwnerEmail,
-            replyTo: validatedData.email,
-            subject: `New Contact Form Message from ${validatedData.name}`,
-            html: `
+    // 5. Send email
+    const { data, error } = await resend.emails.send({
+      from: 'PersonaWeb <info@personalweb.info>',
+      to: validatedData.siteOwnerEmail,
+      replyTo: validatedData.email,
+      subject: `New Contact Form Message from ${validatedData.name}`,
+      html: `
         <!DOCTYPE html>
         <html>
           <head>
@@ -106,38 +106,38 @@ export async function POST(request: NextRequest) {
           </body>
         </html>
       `,
-        });
+    });
 
-        if (error) {
-            console.error('[Contact API] Resend error:', error);
-            return NextResponse.json(
-                { error: 'Failed to send email. Please try again later.' },
-                { status: 500 }
-            );
-        }
-
-        console.log('[Contact API] Email sent successfully:', data?.id);
-        return NextResponse.json({
-            success: true,
-            messageId: data?.id
-        });
-
-    } catch (error) {
-        console.error('[Contact API] Error:', error);
-
-        if (error instanceof z.ZodError) {
-            return NextResponse.json(
-                {
-                    error: 'Invalid form data',
-                    details: error.issues.map((issue) => ({ field: issue.path.join('.'), message: issue.message }))
-                },
-                { status: 400 }
-            );
-        }
-
-        return NextResponse.json(
-            { error: 'An unexpected error occurred. Please try again.' },
-            { status: 500 }
-        );
+    if (error) {
+      console.error('[Contact API] Resend error:', error);
+      return NextResponse.json(
+        { error: 'Failed to send email. Please try again later.' },
+        { status: 500 }
+      );
     }
+
+    console.log('[Contact API] Email sent successfully:', data?.id);
+    return NextResponse.json({
+      success: true,
+      messageId: data?.id
+    });
+
+  } catch (error) {
+    console.error('[Contact API] Error:', error);
+
+    if (error instanceof z.ZodError) {
+      return NextResponse.json(
+        {
+          error: 'Invalid form data',
+          details: error.issues.map((issue) => ({ field: issue.path.join('.'), message: issue.message }))
+        },
+        { status: 400 }
+      );
+    }
+
+    return NextResponse.json(
+      { error: 'An unexpected error occurred. Please try again.' },
+      { status: 500 }
+    );
+  }
 }
