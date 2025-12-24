@@ -306,7 +306,9 @@ ${seoTags}
           componentsToRender,
           designPlan.iconStyle,
           designPlan.iconSizes,
-          designPlan.stockImages // Stock images parametresi
+          designPlan.stockImages, // Stock images parametresi
+          false, // useAbsoluteUrls
+          site.user.email // siteOwnerEmail - hesap emaili
         );
 
         finalHtml += populated.html + '\n';

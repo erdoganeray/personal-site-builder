@@ -62,6 +62,7 @@
 - Resend test domain'i (onboarding@resend.dev) sadece kayıtlı e-posta adresine (erayerdogan3551@gmail.com) gönderim yapabilir; production'da personaweb.info domain'i eklendikten sonra tüm e-postalara gönderim yapılabilecek.
 
 # MVP'de Olmasına Gerek Var Mı?
+- npm run build deki lint hatalarını ignore ettik, düzeltilmesi gerek.
 - sadece cv web page değil. ürün/iş tanıtı sitesi de üretilebilir.
 - Şifremi unuttum
 - E postamı unuttum

@@ -257,7 +257,8 @@ ${seoTags}
                     designPlan.iconStyle,
                     designPlan.iconSizes,
                     designPlan.stockImages,
-                    true // useAbsoluteUrls - preview için R2 URL'lerini olduğu gibi kullan
+                    true, // useAbsoluteUrls - preview için R2 URL'lerini olduğu gibi kullan
+                    user.email || undefined // siteOwnerEmail - anonim kullanıcıda email olmayabilir
                 );
 
                 finalHtml += populated.html + '\n';

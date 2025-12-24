@@ -15,9 +15,10 @@ export async function regeneratePreviewContent(siteId: string): Promise<{
   site?: any;
 }> {
   try {
-    // 1. Get site from database
+    // 1. Get site from database with user
     const site = await prisma.site.findUnique({
       where: { id: siteId },
+      include: { user: true },
     });
 
     if (!site) {
@@ -168,7 +169,9 @@ ${seoTags}
           componentsToRender,
           designPlan.iconStyle,
           designPlan.iconSizes,
-          designPlan.stockImages // Stock images parametresi
+          designPlan.stockImages, // Stock images parametresi
+          false, // useAbsoluteUrls
+          site.user.email || undefined // siteOwnerEmail - hesap emaili
         );
 
         finalHtml += populated.html + '\n';

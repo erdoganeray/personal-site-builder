@@ -1192,10 +1192,12 @@ export function getLanguagesReplacements(
 
 /**
  * CV verilerinden contact section için placeholder değerleri oluşturur
+ * @param siteOwnerEmail - Site sahibinin hesap e-postası (contact form için)
  */
 export function getContactReplacements(
   cvData: CVData,
-  themeColors: ThemeColors
+  themeColors: ThemeColors,
+  siteOwnerEmail?: string
 ): PlaceholderReplacements {
   // Sosyal medya linklerini oluştur - sadece dolu olanlar görünsün
   const { getIconSvg } = require('./icon-registry');
@@ -1213,7 +1215,7 @@ export function getContactReplacements(
     '{{EMAIL}}': escapeHtml(cvData.personalInfo.email || 'Email bulunamadı'),
     '{{PHONE}}': escapeHtml(cvData.personalInfo.phone || 'Telefon bulunamadı'),
     '{{LOCATION}}': escapeHtml(cvData.personalInfo.location || 'Konum belirtilmemiş'),
-    '{{SITE_OWNER_EMAIL}}': escapeHtml(cvData.personalInfo.email || ''),
+    '{{SITE_OWNER_EMAIL}}': escapeHtml(siteOwnerEmail || cvData.personalInfo.email || ''),
     '{{SOCIAL_LINKS}}': socialLinks,
     '{{COLOR_PRIMARY}}': themeColors.primary,
     '{{COLOR_SECONDARY}}': themeColors.secondary,
@@ -1383,6 +1385,7 @@ export function getNavigationReplacements(
 /**
  * Component kategorisine göre doğru replacement fonksiyonunu çağırır
  * @param useAbsoluteUrls - true ise R2 URL'leri absolute olarak kullanılır (preview için)
+ * @param siteOwnerEmail - Site sahibinin hesap e-postası (contact form için)
  */
 export function getReplacementsForComponent(
   component: ComponentTemplate,
@@ -1391,7 +1394,8 @@ export function getReplacementsForComponent(
   selectedComponents?: SelectedComponent[],
   iconStyle?: 'outline' | 'solid',
   iconSizes?: { navigation: string; social: string },
-  useAbsoluteUrls?: boolean
+  useAbsoluteUrls?: boolean,
+  siteOwnerEmail?: string
 ): PlaceholderReplacements {
   switch (component.category) {
     case 'navigation':
@@ -1416,7 +1420,7 @@ export function getReplacementsForComponent(
     case 'languages':
       return getLanguagesReplacements(cvData, themeColors, component.id);
     case 'contact':
-      return getContactReplacements(cvData, themeColors);
+      return getContactReplacements(cvData, themeColors, siteOwnerEmail);
     case 'footer':
       return getFooterReplacements(cvData, themeColors, selectedComponents);
     default:
@@ -1427,6 +1431,7 @@ export function getReplacementsForComponent(
 /**
  * Component template'ini CV verileri ile doldurur
  * @param useAbsoluteUrls - true ise R2 URL'leri absolute olarak kullanılır (preview için)
+ * @param siteOwnerEmail - Site sahibinin hesap e-postası (contact form için)
  */
 export function populateTemplate(
   component: ComponentTemplate,
@@ -1436,7 +1441,8 @@ export function populateTemplate(
   iconStyle?: 'outline' | 'solid',
   iconSizes?: { navigation: string; social: string },
   stockImages?: { [category: string]: { url: string; alt: string; photographer?: string; pexelsId?: number; avgColor?: string; } },
-  useAbsoluteUrls?: boolean
+  useAbsoluteUrls?: boolean,
+  siteOwnerEmail?: string
 ): { html: string; css: string; js?: string } {
   const replacements = getReplacementsForComponent(
     component,
@@ -1445,7 +1451,8 @@ export function populateTemplate(
     selectedComponents,
     iconStyle,
     iconSizes,
-    useAbsoluteUrls
+    useAbsoluteUrls,
+    siteOwnerEmail
   );
 
   // Get icon style from template (default to 'outline')
@@ -1545,6 +1552,42 @@ export function populateTemplate(
 
     css = css.replace(/\{\{STOCK_IMAGE:([a-zA-Z0-9-_]+)\}\}/g, (match, imgCategory) => {
       return `/defaults/${imgCategory}-fallback.svg`;
+    });
+  }
+
+  // Replace icon placeholders in JS template
+  if (js) {
+    js = js.replace(/\{\{ICON:(\w+)\}\}/g, (match, iconName) => {
+      let category: 'contact' | 'ui' | 'social' = 'contact';
+
+      // UI icons
+      if (['loader', 'check', 'x', 'info', 'arrowUp', 'chevronDown'].includes(iconName)) {
+        category = 'ui';
+      }
+      // Social icons
+      else if (['linkedin', 'github', 'twitter', 'globe'].includes(iconName)) {
+        category = 'social';
+      }
+      // Contact icons (mail, phone, mapPin)
+      else {
+        category = 'contact';
+      }
+
+      // Get icon with determined category
+      let iconSvg = getIconSvg(category, iconName, templateIconStyle, 24, 'inline-icon');
+
+      // Fallback: try other categories if not found
+      if (!iconSvg || iconSvg.includes('Info')) {
+        const categories: Array<'contact' | 'ui' | 'social'> = ['contact', 'ui', 'social'];
+        for (const cat of categories) {
+          if (cat !== category && iconExists(cat, iconName)) {
+            iconSvg = getIconSvg(cat, iconName, templateIconStyle, 24, 'inline-icon');
+            break;
+          }
+        }
+      }
+
+      return iconSvg || match; // Return original if icon not found
     });
   }
 
