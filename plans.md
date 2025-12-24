@@ -31,11 +31,7 @@
 
 # Geliştime Planı
 
-## Yayınlamadan Önce Son Yapılacaklar
-- site oluşturdun, yayınladın, yayındayken öz izleme sil dedin, site yayınlamada "Subdomain'iniz henüz rezerve edilmedi. Site yayınlamadan önce subdomain'iniz korunmayacaktır." uyarısı çıkıyor? çıkmaması gerek. bir de bu durumda normalde unpublish olmalı ama node list dediğimde hala yayınlı site gözüküyor.
-- npm run build de bazı hatalar çıkıyor onlarla ilgilen.
-
-## Versel Deploydan Sonra Yapılacaklar
+## Vercel Deploydan Sonra Yapılacaklar
 
 ### Vercel Cron Job
 - landing page i vercel e deploy ettikten sonra yapılacak
