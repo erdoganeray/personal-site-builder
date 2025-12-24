@@ -94,3 +94,5 @@
     3. DeletedAsset kayıtlarını asla silme (sadece R2'den sil), rollback sırasında "dosya artık mevcut değil" uyarısı ver
     4. Tombstone pattern: Silinen dosyalar için kalıcı kayıt tut
   - **Önerilen:** Seçenek 1 + 3 kombinasyonu (DeletedAsset kayıtlarını sakla + rollback sırasında dosya kontrolü)
+
+  # Feedback

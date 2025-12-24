@@ -447,7 +447,7 @@ export const contactTemplate1: ComponentTemplate = {
         if (isPreview) {
           // Preview mode: Show info message instead of sending
           await new Promise(resolve => setTimeout(resolve, 1000)); // Simulate delay
-          messageDiv.textContent = '{{ICON:info}} Önizleme modunda mesaj gönderimi devre dışıdır. Site yayınlandığında contact formu çalışacaktır.';
+          messageDiv.innerHTML = '{{ICON:info}} Önizleme modunda mesaj gönderimi devre dışıdır. Site yayınlandığında contact formu çalışacaktır.';
           messageDiv.className = 'form-message success';
           messageDiv.style.display = 'block';
           form.reset();
@@ -468,7 +468,7 @@ export const contactTemplate1: ComponentTemplate = {
           }
           
           // Success
-          messageDiv.textContent = '{{ICON:check}} Mesajınız başarıyla gönderildi! En kısa sürede dönüş yapacağım.';
+          messageDiv.innerHTML = '{{ICON:check}} Mesajınız başarıyla gönderildi! En kısa sürede dönüş yapacağım.';
           messageDiv.className = 'form-message success';
           messageDiv.style.display = 'block';
           form.reset();
@@ -476,7 +476,7 @@ export const contactTemplate1: ComponentTemplate = {
         
       } catch (error) {
         // Error
-        messageDiv.textContent = '{{ICON:x}} ' + (error.message || 'Bir hata oluştu. Lütfen tekrar deneyin.');
+        messageDiv.innerHTML = '{{ICON:x}} ' + (error.message || 'Bir hata oluştu. Lütfen tekrar deneyin.');
         messageDiv.className = 'form-message error';
         messageDiv.style.display = 'block';
       } finally {
@@ -1057,7 +1057,7 @@ export const contactTemplate3: ComponentTemplate = {
         if (isPreview) {
           // Preview mode: Show info message instead of sending
           await new Promise(resolve => setTimeout(resolve, 1000)); // Simulate delay
-          messageDiv.textContent = '{{ICON:info}} Önizleme modunda mesaj gönderimi devre dışıdır. Site yayınlandığında contact formu çalışacaktır.';
+          messageDiv.innerHTML = '{{ICON:info}} Önizleme modunda mesaj gönderimi devre dışıdır. Site yayınlandığında contact formu çalışacaktır.';
           messageDiv.className = 'form-message-split success';
           messageDiv.style.display = 'block';
           form.reset();
@@ -1078,7 +1078,7 @@ export const contactTemplate3: ComponentTemplate = {
           }
           
           // Success
-          messageDiv.textContent = '{{ICON:check}} Teşekkürler! Mesajınız başarıyla gönderildi.';
+          messageDiv.innerHTML = '{{ICON:check}} Teşekkürler! Mesajınız başarıyla gönderildi.';
           messageDiv.className = 'form-message-split success';
           messageDiv.style.display = 'block';
           form.reset();
@@ -1086,7 +1086,7 @@ export const contactTemplate3: ComponentTemplate = {
         
       } catch (error) {
         // Error
-        messageDiv.textContent = '{{ICON:x}} ' + (error.message || 'Bir hata oluştu. Lütfen tekrar deneyin.');
+        messageDiv.innerHTML = '{{ICON:x}} ' + (error.message || 'Bir hata oluştu. Lütfen tekrar deneyin.');
         messageDiv.className = 'form-message-split error';
         messageDiv.style.display = 'block';
       } finally {
