@@ -89,7 +89,7 @@ export async function POST(request: NextRequest) {
 
     try {
       await resend.emails.send({
-        from: "PersonaWeb <info@personalweb.info>",
+        from: "PersonalWeb <info@personalweb.info>",
         to: newEmail,
         subject: "E-posta Adresinizi Doğrulayın",
         html: `

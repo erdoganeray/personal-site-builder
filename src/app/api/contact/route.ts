@@ -59,7 +59,7 @@ export async function POST(request: NextRequest) {
 
     // 5. Send email
     const { data, error } = await resend.emails.send({
-      from: 'PersonaWeb <info@personalweb.info>',
+      from: 'PersonalWeb <info@personalweb.info>',
       to: validatedData.siteOwnerEmail,
       replyTo: validatedData.email,
       subject: `New Contact Form Message from ${validatedData.name}`,

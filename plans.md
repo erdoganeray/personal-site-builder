@@ -55,11 +55,6 @@
 - İlgili Site kayıtlarını ve R2'deki CV dosyalarını da temizle
 - vercel.json dosyasına cron job ekle
 
-### E posta güncelleme
-- şu anda resend api üzerinden çalışıyor
-- info@personalweb.info maili entegre edilecek
-- contact componet formdaki mail de info@personalweb.info olarak güncellenecek
-- Resend test domain'i (onboarding@resend.dev) sadece kayıtlı e-posta adresine (erayerdogan3551@gmail.com) gönderim yapabilir; production'da personaweb.info domain'i eklendikten sonra tüm e-postalara gönderim yapılabilecek.
 
 # MVP'de Olmasına Gerek Var Mı?
 - npm run build deki lint hatalarını ignore ettik, düzeltilmesi gerek.
@@ -96,3 +91,4 @@
   - **Önerilen:** Seçenek 1 + 3 kombinasyonu (DeletedAsset kayıtlarını sakla + rollback sırasında dosya kontrolü)
 
   # Feedback
+  - site oluştururken prompt alanına hiçbir şey yazmadığımız durumunu sürekli tekrarladığımda sanki her seferinde aynı templateler seçiliyormuş gibi hissettim. (az önce farklı bir template kullanıldı)
