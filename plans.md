@@ -32,13 +32,6 @@
 # Geliştime Planı
 
 ## Yayınlamadan Önce Son Yapılacaklar
-- bazı templateler çok basit, daha modernleştir
-- template havuzunu biraz daha geliştir
-- nav a icon eklenince dashboard sitemde ve editorde nav ui hatası oldu
-- gemini hatalarını handle et, kullanıcıya böyle gösterilmesin
-"[GoogleGenerativeAI Error]: Error fetching from https://generativelanguage.googleapis.com/v1beta/models/gemini-3-flash:generateContent: [404 Not Found] models/gemini-3-flash is not found for API version v1beta, or is not supported for generateContent. Call ListModels to see the list of available models and their supported methods."
-" [GoogleGenerativeAI Error]: Error fetching from https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent: [429 Too Many Requests] You exceeded your current quota, please check your plan and billing details. For more information on this error, head to: https://ai.google.dev/gemini-api/docs/rate-limits. To monitor your current usage, head to: https://ai.dev/usage?tab=rate-limit. * Quota exceeded for metric: generativelanguage.googleapis.com/generate_content_free_tier_requests, limit: 20, model: gemini-2.5-flash Please retry in 59.32993857s. [{"@type":"type.googleapis.com/google.rpc.Help","links":[{"description":"Learn more about Gemini API quotas","url":"https://ai.google.dev/gemini-api/docs/rate-limits"}]},{"@type":"type.googleapis.com/google.rpc.QuotaFailure","violations":[{"quotaMetric":"generativelanguage.googleapis.com/generate_content_free_tier_requests","quotaId":"GenerateRequestsPerDayPerProjectPerModel-FreeTier","quotaDimensions":{"model":"gemini-2.5-flash","location":"global"},"quotaValue":"20"}]},{"@type":"type.googleapis.com/google.rpc.RetryInfo","retryDelay":"59s"}]"
-- üretilen sitelerde sürekli aynı template leri görüyorum. muhtemelen sürekli aynı cv yi kullanmamdan kaynaklı. gemi promptlarını elden geçir.
 - site oluşturdun, yayınladın, yayındayken öz izleme sil dedin, site yayınlamada "Subdomain'iniz henüz rezerve edilmedi. Site yayınlamadan önce subdomain'iniz korunmayacaktır." uyarısı çıkıyor? çıkmaması gerek. bir de bu durumda normalde unpublish olmalı ama node list dediğimde hala yayınlı site gözüküyor.
 - npm run build de bazı hatalar çıkıyor onlarla ilgilen.
 

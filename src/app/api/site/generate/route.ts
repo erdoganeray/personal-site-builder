@@ -9,6 +9,7 @@ import { getTemplateById } from "@/components/site-templates";
 import { populateTemplate } from "@/lib/template-engine";
 import { getFontPairById } from "@/lib/font-registry";
 import { generateAllSEOTags } from "@/lib/seo-generator";
+import { getGeminiErrorMessage } from "@/lib/gemini-error-handler";
 
 export async function POST(req: NextRequest) {
   try {
@@ -102,8 +103,7 @@ export async function POST(req: NextRequest) {
 
       return NextResponse.json(
         {
-          error: "Failed to analyze design requirements. Please try again.",
-          details: designError instanceof Error ? designError.message : "Unknown error",
+          error: getGeminiErrorMessage(designError),
         },
         { status: 500 }
       );
@@ -426,8 +426,7 @@ ${finalJs}
 
     return NextResponse.json(
       {
-        error: "An unexpected error occurred",
-        details: error instanceof Error ? error.message : "Unknown error",
+        error: getGeminiErrorMessage(error),
       },
       { status: 500 }
     );

@@ -4,6 +4,7 @@ import { authOptions } from "@/lib/auth";
 import { parseCVFromPDF } from "@/lib/gemini-pdf-parser";
 import { prisma } from "@/lib/prisma";
 import { S3Client, GetObjectCommand } from "@aws-sdk/client-s3";
+import { getGeminiErrorMessage } from "@/lib/gemini-error-handler";
 
 const s3Client = new S3Client({
   region: "auto",
@@ -149,15 +150,10 @@ export async function POST(req: NextRequest) {
   } catch (error) {
     console.error("CV analysis error:", error);
 
-    // Hata mesajını kullanıcıya dön
-    const errorMessage = error instanceof Error
-      ? error.message
-      : "CV analizi sırasında bir hata oluştu";
-
     return NextResponse.json(
       {
         success: false,
-        error: errorMessage
+        error: getGeminiErrorMessage(error)
       },
       { status: 500 }
     );

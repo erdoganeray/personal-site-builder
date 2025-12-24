@@ -21,6 +21,7 @@ import {
 import { regeneratePreviewContent } from "@/lib/regenerate-preview";
 import { getRedirectMessage } from "@/lib/chat-suggestions";
 import { getFontPairById } from "@/lib/font-registry";
+import { getGeminiErrorMessage } from "@/lib/gemini-error-handler";
 
 /**
  * POST /api/site/revise
@@ -103,11 +104,7 @@ export async function POST(req: NextRequest) {
       console.error("Revision analysis error:", analysisError);
       return NextResponse.json(
         {
-          error: "Talebinizi analiz edemedik. Lütfen daha açık bir şekilde belirtin.",
-          details:
-            analysisError instanceof Error
-              ? analysisError.message
-              : "Unknown error",
+          error: getGeminiErrorMessage(analysisError),
         },
         { status: 500 }
       );
@@ -659,11 +656,7 @@ export async function POST(req: NextRequest) {
         console.error("Preview regeneration error:", regenerateError);
         return NextResponse.json(
           {
-            error: "Preview oluşturulurken hata oluştu",
-            details:
-              regenerateError instanceof Error
-                ? regenerateError.message
-                : "Unknown error",
+            error: getGeminiErrorMessage(regenerateError),
           },
           { status: 500 }
         );
@@ -711,8 +704,7 @@ export async function POST(req: NextRequest) {
 
     return NextResponse.json(
       {
-        error: "Internal server error",
-        details: error instanceof Error ? error.message : "Unknown error",
+        error: getGeminiErrorMessage(error),
       },
       { status: 500 }
     );
