@@ -26,7 +26,7 @@ export async function generateWebsite(
 ): Promise<GeneratedWebsite> {
   try {
     const apiKey = process.env.GEMINI_API_KEY;
-    
+
     if (!apiKey) {
       throw new Error("GEMINI_API_KEY environment variable is not set");
     }
@@ -149,47 +149,46 @@ JSON'dan önce veya sonra hiçbir metin olmasın.
 
     // Gemini'nin döndürdüğü JSON'ı parse et
     let parsedResponse: GeneratedWebsite;
-    
+
     try {
       // JSON bloğunu temizle (markdown kod bloğu varsa)
       let cleanedText = responseText.trim();
-      
+
       // ```json veya ``` ile başlıyorsa temizle (regex ile daha güvenli)
       cleanedText = cleanedText.replace(/^```json\s*/i, '').replace(/^```\s*/, '');
       cleanedText = cleanedText.replace(/\s*```$/g, '');
       cleanedText = cleanedText.trim();
-      
+
       parsedResponse = JSON.parse(cleanedText);
-      
+
       // Gerekli alanların varlığını kontrol et
       if (!parsedResponse.html || !parsedResponse.css || !parsedResponse.js) {
         throw new Error("Generated response is missing required fields (html, css, or js)");
       }
-      
+
       // title yoksa HTML'den çıkar veya default kullan
       if (!parsedResponse.title) {
         const titleMatch = parsedResponse.html.match(/<title>(.*?)<\/title>/i);
         parsedResponse.title = titleMatch ? titleMatch[1] : "Personal Website";
       }
-      
+
     } catch (parseError) {
       console.error("Failed to parse Gemini response:", responseText);
       throw new Error(
-        `Failed to parse AI response. The AI might have returned invalid JSON. Error: ${
-          parseError instanceof Error ? parseError.message : String(parseError)
+        `Failed to parse AI response. The AI might have returned invalid JSON. Error: ${parseError instanceof Error ? parseError.message : String(parseError)
         }`
       );
     }
 
     return parsedResponse;
-    
+
   } catch (error) {
     console.error("Error generating website with Gemini:", error);
-    
+
     if (error instanceof Error) {
       throw new Error(`Website generation failed: ${error.message}`);
     }
-    
+
     throw new Error("Website generation failed due to an unknown error");
   }
 }
@@ -210,7 +209,7 @@ export async function reviseWebsite(
 ): Promise<{ html: string; css: string; js: string; changes: string }> {
   try {
     const apiKey = process.env.GEMINI_API_KEY;
-    
+
     if (!apiKey) {
       throw new Error("GEMINI_API_KEY environment variable is not set");
     }
@@ -262,30 +261,30 @@ JSON'dan önce veya sonra hiçbir metin olmasın.
     try {
       // JSON bloğunu temizle (regex ile daha güvenli)
       let cleanedText = responseText.trim();
-      
+
       cleanedText = cleanedText.replace(/^```json\s*/i, '').replace(/^```\s*/, '');
       cleanedText = cleanedText.replace(/\s*```$/g, '');
       cleanedText = cleanedText.trim();
-      
+
       // JSON5 veya relaxed JSON parsing kullanarak escape sorunlarını çöz
       let parsed;
       try {
         parsed = JSON.parse(cleanedText);
       } catch (strictParseError) {
         console.warn("Strict JSON parse failed, trying manual extraction...");
-        
-        // Manuel olarak html, css, js ve changes'i ayıkla
-        const htmlMatch = cleanedText.match(/"html"\s*:\s*"((?:[^"\\]|\\.)*)"/s);
-        const cssMatch = cleanedText.match(/"css"\s*:\s*"((?:[^"\\]|\\.)*)"/s);
-        const jsMatch = cleanedText.match(/"js"\s*:\s*"((?:[^"\\]|\\.)*)"/s);
+
+        // Manuel olarak html, css, js ve changes'i ayıkla (ES2017 uyumlu regex)
+        const htmlMatch = cleanedText.match(/"html"\s*:\s*"((?:[^"\\]|\\[\s\S])*)"/);
+        const cssMatch = cleanedText.match(/"css"\s*:\s*"((?:[^"\\]|\\[\s\S])*)"/);
+        const jsMatch = cleanedText.match(/"js"\s*:\s*"((?:[^"\\]|\\[\s\S])*)"/);
         const changesMatch = cleanedText.match(/"changes"\s*:\s*"([^"]*)"/);
-        
+
         if (!htmlMatch || !cssMatch || !jsMatch || !changesMatch) {
           // Son çare: Gemini'yi tekrar çağır ama sadece changes'i iste
           console.error("Could not extract content from malformed JSON");
           throw strictParseError;
         }
-        
+
         parsed = {
           html: htmlMatch[1].replace(/\\n/g, '\n').replace(/\\"/g, '"').replace(/\\\\/g, '\\'),
           css: cssMatch[1].replace(/\\n/g, '\n').replace(/\\"/g, '"').replace(/\\\\/g, '\\'),
@@ -293,34 +292,34 @@ JSON'dan önce veya sonra hiçbir metin olmasın.
           changes: changesMatch[1]
         };
       }
-      
+
       if (!parsed.html || !parsed.css || !parsed.js || !parsed.changes) {
         throw new Error("Revised response is missing required fields (html, css, js, or changes)");
       }
-      
+
       return {
         html: parsed.html,
         css: parsed.css,
         js: parsed.js,
         changes: parsed.changes
       };
-      
+
     } catch (parseError) {
       console.error("Failed to parse Gemini revision response:", responseText.substring(0, 500) + "...");
-      
+
       // Kullanıcıya daha anlamlı hata mesajı
       throw new Error(
         "Revize işlemi sırasında bir sorun oluştu. Lütfen talebinizi daha basit kelimelerle tekrar deneyin."
       );
     }
-    
+
   } catch (error) {
     console.error("Error revising website with Gemini:", error);
-    
+
     if (error instanceof Error && error.message.includes("Revize işlemi sırasında")) {
       throw error; // Kullanıcı dostu mesajı olduğu gibi ilet
     }
-    
+
     // Diğer hatalar için genel mesaj
     throw new Error("Revize işlemi tamamlanamadı. Lütfen daha basit bir değişiklik talebi ile tekrar deneyin.");
   }
