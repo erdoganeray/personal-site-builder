@@ -161,6 +161,27 @@ PORTFOLIO SECTION (OPTIONAL - sadece portfolio fotoğrafları varsa ekle):
    - Modern ve premium görünüm isteniyorsa
    - Tasarımcı, developer, yaratıcı roller için ideal (UI/UX Designer, Frontend Developer, Photographer, Graphic Designer)
    - Projeler hakkında detaylı bilgi gösterilmek isteniyorsa
+5. portfolio-glass-modern: 🆕 Premium glassmorphism portfolio, backdrop blur(20px), neon glow hover efektleri
+   - "Glass", "Premium", "Modern", "Futuristic" stil isteniyorsa tercih et
+   - Animated background orbs, gradient border glow on hover
+   - nav-glass-morphism, skills-glass-modern, footer-glass-modern ile uyumlu
+   - UI/UX Designer, Frontend Developer, Creative Technologist için ideal
+   - Dark tema tercih ediliyorsa özellikle uygun
+6. portfolio-animated-gradient: 🆕 Animated gradient background, shimmer efektleri, staggered entry animasyonları
+   - "Animated", "Dynamic", "Gradient", "Hareketli" stil isteniyorsa tercih et
+   - Gradient title text, shimmer overlay on hover, lightbox animasyonları
+   - hero-animated-gradient, footer-animated-gradient ile mükemmel uyumlu
+   - Creative Director, Artist, Startup founder için ideal
+   - Dikkat çekici ve dinamik görünüm isteniyorsa
+
+SEÇİM KURALLARI (PORTFOLIO):
+- Metadata bilgisi varsa → portfolio-bento-grid (en yüksek öncelik)
+- "Glass", "Premium" isteniyorsa → portfolio-glass-modern
+- "Animated", "Gradient", "Dinamik" isteniyorsa → portfolio-animated-gradient
+- nav-glass-morphism seçilmişse → portfolio-glass-modern (uyumluluk için)
+- hero-animated-gradient seçilmişse → portfolio-animated-gradient (uyumluluk için)
+- Minimal/sade isteniyorsa → portfolio-grid veya portfolio-carousel
+- Yaratıcı/modern isteniyorsa → portfolio-masonry veya portfolio-bento-grid
 
 SKILLS SECTION:
 Skill sayısına, mesleğe ve stil tercihine göre en uygun template'i seç:

@@ -78,7 +78,14 @@ const AVAILABLE_TEMPLATES = {
   education: ["education-timeline", "education-cards", "education-modern", "education-accordion", "education-horizontal-timeline", "education-tabs"],
   skills: ["skills-progress-bars", "skills-card-grid", "skills-categorized", "skills-minimal-list", "skills-tag-cloud", "skills-glass-modern"],
   languages: ["languages-progress-bars", "languages-card-grid", "languages-minimalist", "languages-certification", "languages-accordion", "languages-badge-cloud", "languages-animated-gradient"],
-  portfolio: ["portfolio-grid", "portfolio-masonry", "portfolio-carousel", "portfolio-bento-grid"],
+  portfolio: [
+    "portfolio-grid",
+    "portfolio-masonry",
+    "portfolio-carousel",
+    "portfolio-bento-grid",
+    "portfolio-glass-modern",      // 🆕 Premium glassmorphism
+    "portfolio-animated-gradient"  // 🆕 Animated gradient
+  ],
   contact: [
     "contact-modern-form",
     "contact-minimal-centered",

@@ -785,6 +785,20 @@ export function generatePortfolioItems(
       </div>
     `;
     }).join('\n');
+  } else if (templateId === 'portfolio-glass-modern') {
+    // Glass modern template - glassmorphism styling with glass items
+    return cvData.portfolio.map((item, index) => `
+      <div class="portfolio-glass-item" data-index="${index}">
+        <img src="${getImageUrl(item.imageUrl)}" alt="${escapeHtml(item.title || `Portfolio ${index + 1}`)}" loading="lazy" />
+      </div>
+    `).join('\n');
+  } else if (templateId === 'portfolio-animated-gradient') {
+    // Animated gradient template - gradient background styling
+    return cvData.portfolio.map((item, index) => `
+      <div class="portfolio-gradient-item" data-index="${index}">
+        <img src="${getImageUrl(item.imageUrl)}" alt="${escapeHtml(item.title || `Portfolio ${index + 1}`)}" loading="lazy" />
+      </div>
+    `).join('\n');
   }
 
   return '';
