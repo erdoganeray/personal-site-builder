@@ -92,3 +92,4 @@
 
   # Feedback
   - site oluştururken prompt alanına hiçbir şey yazmadığımız durumunu sürekli tekrarladığımda sanki her seferinde aynı templateler seçiliyormuş gibi hissettim. (az önce farklı bir template kullanıldı)
+  - 
