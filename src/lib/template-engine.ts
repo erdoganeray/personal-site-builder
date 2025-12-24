@@ -609,6 +609,26 @@ export function generateSkillItems(
           ${escapeHtml(normalized.name)}
         </span>
       `;
+    },
+    'skills-glass-modern': (skill) => {
+      const normalized = normalizeSkill(skill);
+      const level = normalized.level || 'intermediate';
+      const category = normalized.category || '';
+
+      return `
+        <div class="skill-glass-card">
+          <div class="skill-glass-icon">
+            <svg xmlns="http://www.w3.org/2000/svg" width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M15 14c.2-1 .7-1.7 1.5-2.5 1-.9 1.5-2.2 1.5-3.5A6 6 0 0 0 6 8c0 1 .2 2.2 1.5 3.5.7.7 1.3 1.5 1.5 2.5"/>
+              <path d="M9 18h6"/>
+              <path d="M10 22h4"/>
+            </svg>
+          </div>
+          <div class="skill-glass-name">${escapeHtml(normalized.name)}</div>
+          <span class="skill-glass-level">${escapeHtml(level)}</span>
+          ${category ? `<div class="skill-glass-category">${escapeHtml(category)}</div>` : ''}
+        </div>
+      `;
     }
   };
 
@@ -674,6 +694,7 @@ export function getSkillsReplacements(
 ): PlaceholderReplacements {
   return {
     '{{SKILL_ITEMS}}': generateSkillItems(cvData, templateId),
+    '{{SECTION_TITLE}}': 'Yeteneklerim',
     '{{COLOR_PRIMARY}}': themeColors.primary,
     '{{COLOR_SECONDARY}}': themeColors.secondary,
     '{{COLOR_ACCENT}}': themeColors.accent,
@@ -684,6 +705,7 @@ export function getSkillsReplacements(
     '{{COLOR_TEXT_SECONDARY}}': themeColors.textSecondary,
     '{{COLOR_BORDER}}': themeColors.border,
     '{{COLOR_HOVER}}': themeColors.hover,
+    '{{COLOR_ICON_PRIMARY}}': themeColors.iconPrimary || themeColors.primary,
     '{{FONT_HEADING}}': themeColors.fontHeading || 'Inter',
     '{{FONT_BODY}}': themeColors.fontBody || 'Inter',
   };
@@ -861,6 +883,13 @@ export function generateLanguageItems(
           <p class="empty-message">No language information added yet. Add your language skills to complete your profile.</p>
           <a href="/dashboard?tab=my-info" class="empty-action">Add Language</a>
         </div>
+      `,
+      'languages-animated-gradient': `
+        <div class="languages-empty-state">
+          <div class="empty-icon">🌍</div>
+          <p class="empty-message">No language information added yet. Add your language skills to complete your profile.</p>
+          <a href="/dashboard?tab=my-info" class="empty-action">Add Language</a>
+        </div>
       `
     };
 
@@ -1020,6 +1049,35 @@ export function generateLanguageItems(
         <span class="language-badge-name">${escapeHtml(lang.name)}</span>
         <span class="language-badge-level">${escapeHtml(level)}</span>
         <span class="language-badge-percentage">${percentage}%</span>
+      </div>
+    `;
+    },
+    'languages-animated-gradient': (lang, index) => {
+      const level = lang.level || 'intermediate';
+      const percentage = lang.percentage || 60;
+      const hasCefr = lang.cefr && lang.cefr.trim() !== '';
+
+      return `
+      <div class="language-gradient-card">
+        <div class="language-gradient-header">
+          <div class="language-gradient-info">
+            <span class="language-gradient-flag">
+              <svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <circle cx="12" cy="12" r="10"/>
+                <path d="M12 2a14.5 14.5 0 0 0 0 20 14.5 14.5 0 0 0 0-20"/>
+                <path d="M2 12h20"/>
+              </svg>
+            </span>
+            <div>
+              <div class="language-gradient-name">${escapeHtml(lang.name)}</div>
+              <div class="language-gradient-level">${escapeHtml(level)}</div>
+            </div>
+          </div>
+          ${hasCefr ? `<span class="language-cefr-badge">${escapeHtml(lang.cefr!)}</span>` : ''}
+        </div>
+        <div class="language-gradient-progress-wrapper">
+          <div class="language-gradient-progress" style="--progress-width: ${percentage}%" data-width="${percentage}%"></div>
+        </div>
       </div>
     `;
     }

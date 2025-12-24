@@ -76,8 +76,8 @@ const AVAILABLE_TEMPLATES = {
   ],
   experience: ["experience-timeline", "experience-cards", "experience-accordion", "experience-minimal", "experience-horizontal-timeline", "experience-tabs"],
   education: ["education-timeline", "education-cards", "education-modern", "education-accordion", "education-horizontal-timeline", "education-tabs"],
-  skills: ["skills-progress-bars", "skills-card-grid", "skills-categorized", "skills-minimal-list", "skills-tag-cloud"],
-  languages: ["languages-progress-bars", "languages-card-grid", "languages-minimalist", "languages-certification", "languages-accordion", "languages-badge-cloud"],
+  skills: ["skills-progress-bars", "skills-card-grid", "skills-categorized", "skills-minimal-list", "skills-tag-cloud", "skills-glass-modern"],
+  languages: ["languages-progress-bars", "languages-card-grid", "languages-minimalist", "languages-certification", "languages-accordion", "languages-badge-cloud", "languages-animated-gradient"],
   portfolio: ["portfolio-grid", "portfolio-masonry", "portfolio-carousel", "portfolio-bento-grid"],
   contact: [
     "contact-modern-form",

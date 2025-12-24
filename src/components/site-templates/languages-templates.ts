@@ -23,6 +23,11 @@ export const languagesTemplate1: ComponentTemplate = {
       padding: 5rem 2rem;
       background: {{COLOR_BACKGROUND}};
       color: {{COLOR_TEXT}};
+      font-family: {{FONT_BODY}}, sans-serif;
+    }
+
+    .section-title {
+      font-family: {{FONT_HEADING}}, sans-serif;
     }
 
     .languages-container {
@@ -195,7 +200,9 @@ export const languagesTemplate1: ComponentTemplate = {
     "{{COLOR_ACCENT}}",
     "{{COLOR_TEXT}}",
     "{{COLOR_TEXT_SECONDARY}}",
-    "{{COLOR_BORDER}}"
+    "{{COLOR_BORDER}}",
+    "{{FONT_HEADING}}",
+    "{{FONT_BODY}}"
   ]
 };
 
@@ -218,6 +225,11 @@ export const languagesTemplate2: ComponentTemplate = {
       padding: 5rem 2rem;
       background: {{COLOR_PRIMARY}};
       color: {{COLOR_TEXT}};
+      font-family: {{FONT_BODY}}, sans-serif;
+    }
+
+    .section-title {
+      font-family: {{FONT_HEADING}}, sans-serif;
     }
 
     .languages-grid {
@@ -240,10 +252,10 @@ export const languagesTemplate2: ComponentTemplate = {
     }
 
     .language-card.animate {
-      animation: fadeInUp 0.6s ease forwards;
+      animation: langFadeInUp 0.6s ease forwards;
     }
 
-    @keyframes fadeInUp {
+    @keyframes langFadeInUp {
       to {
         opacity: 1;
         transform: translateY(0);
@@ -428,7 +440,9 @@ export const languagesTemplate2: ComponentTemplate = {
     "{{COLOR_ACCENT}}",
     "{{COLOR_TEXT}}",
     "{{COLOR_CARD_BG}}",
-    "{{COLOR_CARD_BG_HOVER}}"
+    "{{COLOR_CARD_BG_HOVER}}",
+    "{{FONT_HEADING}}",
+    "{{FONT_BODY}}"
   ]
 };
 
@@ -451,6 +465,11 @@ export const languagesTemplate3: ComponentTemplate = {
       padding: 5rem 2rem;
       background: {{COLOR_SECONDARY}};
       color: {{COLOR_TEXT}};
+      font-family: {{FONT_BODY}}, sans-serif;
+    }
+
+    .section-title {
+      font-family: {{FONT_HEADING}}, sans-serif;
     }
 
     .languages-list {
@@ -475,10 +494,10 @@ export const languagesTemplate3: ComponentTemplate = {
     }
 
     .language-item-minimal.animate {
-      animation: slideInLeft 0.5s ease forwards;
+      animation: langSlideInLeft 0.5s ease forwards;
     }
 
-    @keyframes slideInLeft {
+    @keyframes langSlideInLeft {
       to {
         opacity: 1;
         transform: translateX(0);
@@ -649,7 +668,9 @@ export const languagesTemplate3: ComponentTemplate = {
     "{{COLOR_TEXT}}",
     "{{COLOR_CARD_BG}}",
     "{{COLOR_BADGE_BG}}",
-    "{{COLOR_SHADOW}}"
+    "{{COLOR_SHADOW}}",
+    "{{FONT_HEADING}}",
+    "{{FONT_BODY}}"
   ]
 };
 
@@ -672,6 +693,11 @@ export const languagesTemplate4: ComponentTemplate = {
       padding: 5rem 2rem;
       background: {{COLOR_BACKGROUND}};
       color: {{COLOR_TEXT}};
+      font-family: {{FONT_BODY}}, sans-serif;
+    }
+
+    .section-title {
+      font-family: {{FONT_HEADING}}, sans-serif;
     }
 
     .languages-cert-grid {
@@ -693,10 +719,10 @@ export const languagesTemplate4: ComponentTemplate = {
     }
 
     .language-cert-card.animate {
-      animation: fadeInUp 0.6s ease forwards;
+      animation: langCertFadeInUp 0.6s ease forwards;
     }
 
-    @keyframes fadeInUp {
+    @keyframes langCertFadeInUp {
       to {
         opacity: 1;
         transform: translateY(0);
@@ -944,7 +970,9 @@ export const languagesTemplate4: ComponentTemplate = {
     "{{COLOR_CARD_BG}}",
     "{{COLOR_BORDER}}",
     "{{COLOR_BADGE_BG}}",
-    "{{COLOR_SHADOW}}"
+    "{{COLOR_SHADOW}}",
+    "{{FONT_HEADING}}",
+    "{{FONT_BODY}}"
   ]
 };
 
@@ -968,6 +996,11 @@ export const languagesTemplate5: ComponentTemplate = {
       padding: 5rem 2rem;
       background: {{COLOR_BACKGROUND}};
       color: {{COLOR_TEXT}};
+      font-family: {{FONT_BODY}}, sans-serif;
+    }
+
+    .section-title {
+      font-family: {{FONT_HEADING}}, sans-serif;
     }
 
     .languages-accordion-list {
@@ -1284,7 +1317,9 @@ export const languagesTemplate5: ComponentTemplate = {
     "{{COLOR_CARD_BG}}",
     "{{COLOR_BORDER}}",
     "{{COLOR_BADGE_BG}}",
-    "{{COLOR_SHADOW}}"
+    "{{COLOR_SHADOW}}",
+    "{{FONT_HEADING}}",
+    "{{FONT_BODY}}"
   ]
 };
 
@@ -1308,6 +1343,11 @@ export const languagesTemplate6: ComponentTemplate = {
       padding: 5rem 2rem;
       background: {{COLOR_BACKGROUND}};
       color: {{COLOR_TEXT}};
+      font-family: {{FONT_BODY}}, sans-serif;
+    }
+
+    .section-title {
+      font-family: {{FONT_HEADING}}, sans-serif;
     }
 
     .languages-badge-cloud {
@@ -1335,10 +1375,10 @@ export const languagesTemplate6: ComponentTemplate = {
     }
 
     .language-badge-item.animate {
-      animation: popIn 0.4s ease forwards;
+      animation: langPopIn 0.4s ease forwards;
     }
 
-    @keyframes popIn {
+    @keyframes langPopIn {
       to {
         opacity: 1;
         transform: scale(1);
@@ -1552,8 +1592,362 @@ export const languagesTemplate6: ComponentTemplate = {
     "{{COLOR_BACKGROUND}}",
     "{{COLOR_TEXT}}",
     "{{COLOR_TEXT_SECONDARY}}",
-    "{{COLOR_ACCENT}}"
+    "{{COLOR_ACCENT}}",
+    "{{FONT_HEADING}}",
+    "{{FONT_BODY}}"
   ]
+};
+
+/**
+ * Languages Template 7 - Animated Gradient
+ * Modern animated gradient arka plan, gradient fill progress bar, CEFR badge
+ */
+export const languagesTemplate7: ComponentTemplate = {
+  id: "languages-animated-gradient",
+  name: "Animated Gradient Languages",
+  category: "languages",
+  htmlTemplate: `
+    <section class="languages-gradient" id="languages">
+      <!-- Animated gradient background -->
+      <div class="languages-gradient-bg" aria-hidden="true"></div>
+      
+      <div class="container">
+        <h2 class="section-title">{{SECTION_TITLE}}</h2>
+        <p class="section-subtitle">Konuştuğum diller ve yetkinlik seviyeleri</p>
+        <div class="languages-gradient-grid">
+          {{LANGUAGE_ITEMS}}
+        </div>
+      </div>
+    </section>
+  `,
+  cssTemplate: `
+    .languages-gradient {
+      padding: 6rem 2rem;
+      background: {{COLOR_BACKGROUND}};
+      color: {{COLOR_TEXT}};
+      font-family: {{FONT_BODY}}, sans-serif;
+      position: relative;
+      overflow: hidden;
+      isolation: isolate;
+    }
+
+    /* Animated gradient background */
+    .languages-gradient-bg {
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: linear-gradient(
+        135deg,
+        {{COLOR_PRIMARY}}10 0%,
+        transparent 40%,
+        {{COLOR_ACCENT}}10 60%,
+        transparent 100%
+      );
+      animation: langGradientShift 15s ease-in-out infinite;
+      pointer-events: none;
+      z-index: 1;
+    }
+
+    @keyframes langGradientShift {
+      0%, 100% {
+        opacity: 0.6;
+        transform: scale(1) rotate(0deg);
+      }
+      50% {
+        opacity: 0.8;
+        transform: scale(1.1) rotate(3deg);
+      }
+    }
+
+    .languages-gradient .container {
+      position: relative;
+      z-index: 2;
+      max-width: 900px;
+      margin: 0 auto;
+    }
+
+    .languages-gradient .section-title {
+      font-family: {{FONT_HEADING}}, sans-serif;
+      text-align: center;
+      font-size: 2.5rem;
+      font-weight: 700;
+      margin-bottom: 0.75rem;
+      background: linear-gradient(135deg, {{COLOR_PRIMARY}}, {{COLOR_ACCENT}});
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+    }
+
+    .languages-gradient .section-subtitle {
+      text-align: center;
+      color: {{COLOR_TEXT_SECONDARY}};
+      font-size: 1.1rem;
+      margin-bottom: 3rem;
+    }
+
+    .languages-gradient-grid {
+      display: flex;
+      flex-direction: column;
+      gap: 1.5rem;
+    }
+
+    /* Language card */
+    .language-gradient-card {
+      background: rgba(255, 255, 255, 0.05);
+      backdrop-filter: blur(10px);
+      -webkit-backdrop-filter: blur(10px);
+      border-radius: 16px;
+      padding: 1.75rem 2rem;
+      border: 1px solid rgba(255, 255, 255, 0.1);
+      transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+      opacity: 0;
+      transform: translateX(-30px);
+    }
+
+    .language-gradient-card.animate {
+      animation: slideInWave 0.6s ease forwards;
+    }
+
+    @keyframes slideInWave {
+      to {
+        opacity: 1;
+        transform: translateX(0);
+      }
+    }
+
+    .language-gradient-card:hover {
+      transform: translateX(8px);
+      background: rgba(255, 255, 255, 0.1);
+      box-shadow: 
+        0 10px 30px rgba(0, 0, 0, 0.1),
+        0 0 20px {{COLOR_PRIMARY}}15;
+    }
+
+    /* Card header */
+    .language-gradient-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 1rem;
+    }
+
+    .language-gradient-info {
+      display: flex;
+      align-items: center;
+      gap: 1rem;
+    }
+
+    .language-gradient-flag {
+      font-size: 2rem;
+      line-height: 1;
+    }
+
+    .language-gradient-name {
+      font-size: 1.25rem;
+      font-weight: 600;
+      color: {{COLOR_TEXT}};
+      font-family: {{FONT_HEADING}}, sans-serif;
+    }
+
+    .language-gradient-level {
+      font-size: 0.9rem;
+      color: {{COLOR_TEXT_SECONDARY}};
+      margin-top: 0.25rem;
+    }
+
+    /* CEFR Badge */
+    .language-cefr-badge {
+      padding: 0.5rem 1rem;
+      background: linear-gradient(135deg, {{COLOR_PRIMARY}}, {{COLOR_ACCENT}});
+      color: white;
+      border-radius: 25px;
+      font-size: 0.85rem;
+      font-weight: 700;
+      letter-spacing: 0.5px;
+      box-shadow: 0 4px 12px {{COLOR_PRIMARY}}40;
+    }
+
+    /* Progress bar */
+    .language-gradient-progress-wrapper {
+      height: 8px;
+      background: rgba(255, 255, 255, 0.1);
+      border-radius: 10px;
+      overflow: hidden;
+      position: relative;
+    }
+
+    .language-gradient-progress {
+      height: 100%;
+      background: linear-gradient(90deg, {{COLOR_PRIMARY}}, {{COLOR_ACCENT}});
+      border-radius: 10px;
+      width: 0;
+      transition: width 1.2s cubic-bezier(0.4, 0, 0.2, 1);
+      position: relative;
+    }
+
+    .language-gradient-progress.animate {
+      width: var(--progress-width);
+    }
+
+    .language-gradient-progress::after {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      background: linear-gradient(
+        90deg,
+        transparent,
+        rgba(255, 255, 255, 0.3),
+        transparent
+      );
+      animation: langProgressShimmer 2s infinite;
+    }
+
+    @keyframes langProgressShimmer {
+      0% {
+        transform: translateX(-100%);
+      }
+      100% {
+        transform: translateX(100%);
+      }
+    }
+
+    /* Certificate badges */
+    .language-gradient-certs {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 0.5rem;
+      margin-top: 1rem;
+    }
+
+    .language-cert-chip {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.4rem;
+      padding: 0.35rem 0.75rem;
+      background: {{COLOR_PRIMARY}}15;
+      border: 1px solid {{COLOR_PRIMARY}}30;
+      border-radius: 8px;
+      font-size: 0.8rem;
+      color: {{COLOR_PRIMARY}};
+      font-weight: 500;
+    }
+
+    .language-cert-chip-icon {
+      font-size: 0.9rem;
+    }
+
+    @media (max-width: 768px) {
+      .languages-gradient {
+        padding: 4rem 1rem;
+      }
+
+      .languages-gradient .section-title {
+        font-size: 2rem;
+      }
+
+      .languages-gradient .section-subtitle {
+        font-size: 1rem;
+        margin-bottom: 2rem;
+      }
+
+      .language-gradient-card {
+        padding: 1.25rem 1.5rem;
+      }
+
+      .language-gradient-header {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 0.75rem;
+      }
+
+      .language-cefr-badge {
+        align-self: flex-start;
+      }
+
+      .language-gradient-name {
+        font-size: 1.1rem;
+      }
+
+      .language-gradient-flag {
+        font-size: 1.75rem;
+      }
+    }
+
+    @media (min-width: 1440px) {
+      .languages-gradient .container {
+        max-width: 1000px;
+      }
+    }
+
+    @media (prefers-reduced-motion: reduce) {
+      .languages-gradient-bg,
+      .language-gradient-card,
+      .language-gradient-progress,
+      .language-gradient-progress::after {
+        animation: none;
+      }
+
+      .language-gradient-card {
+        opacity: 1;
+        transform: none;
+      }
+
+      .language-gradient-progress {
+        width: var(--progress-width);
+      }
+    }
+  `,
+  jsTemplate: `
+    // Wave-like stagger animation for language cards
+    document.addEventListener('DOMContentLoaded', function() {
+      const observerOptions = {
+        threshold: 0.15,
+        rootMargin: '0px 0px -50px 0px'
+      };
+
+      const observer = new IntersectionObserver((entries) => {
+        entries.forEach(entry => {
+          if (entry.isIntersecting) {
+            const cards = entry.target.querySelectorAll('.language-gradient-card');
+            cards.forEach((card, index) => {
+              setTimeout(() => {
+                card.classList.add('animate');
+                const progress = card.querySelector('.language-gradient-progress');
+                if (progress) {
+                  const width = progress.getAttribute('data-width') || progress.style.width;
+                  progress.style.setProperty('--progress-width', width);
+                  progress.classList.add('animate');
+                }
+              }, index * 120);
+            });
+            observer.unobserve(entry.target);
+          }
+        });
+      }, observerOptions);
+
+      const grid = document.querySelector('.languages-gradient-grid');
+      if (grid) {
+        observer.observe(grid);
+      }
+    });
+  `,
+  placeholders: [
+    "{{LANGUAGE_ITEMS}}",
+    "{{SECTION_TITLE}}",
+    "{{COLOR_BACKGROUND}}",
+    "{{COLOR_PRIMARY}}",
+    "{{COLOR_ACCENT}}",
+    "{{COLOR_TEXT}}",
+    "{{COLOR_TEXT_SECONDARY}}",
+    "{{FONT_HEADING}}",
+    "{{FONT_BODY}}"
+  ],
+  designNotes: "Modern animated gradient languages template. Subtle background animation, gradient-fill progress bars with shimmer effect, CEFR badges, wave-like stagger animations."
 };
 
 export const languagesTemplates = [
@@ -1563,4 +1957,5 @@ export const languagesTemplates = [
   languagesTemplate4,
   languagesTemplate5,
   languagesTemplate6,
+  languagesTemplate7,
 ];

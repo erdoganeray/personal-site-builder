@@ -267,10 +267,10 @@ export const heroTemplate1: ComponentTemplate = {
       width: 100%;
       height: 100%;
       background: linear-gradient(90deg, transparent, rgba(255,255,255,0.3), transparent);
-      animation: shimmer 3s infinite;
+      animation: heroShimmer 3s infinite;
     }
 
-    @keyframes shimmer {
+    @keyframes heroShimmer {
       0% { left: -100%; }
       50%, 100% { left: 100%; }
     }
@@ -2354,10 +2354,10 @@ export const heroTemplate5: ComponentTemplate = {
       text-align: center;
       max-width: 900px;
       padding: 2rem;
-      animation: fadeInUp 1s ease-out;
+      animation: heroFullscreenFadeInUp 1s ease-out;
     }
 
-    @keyframes fadeInUp {
+    @keyframes heroFullscreenFadeInUp {
       from {
         opacity: 0;
         transform: translateY(40px);
@@ -3302,7 +3302,7 @@ export const heroTemplate7: ComponentTemplate = {
       border-radius: 50%;
       filter: blur(80px);
       opacity: 0.5;
-      animation: orbFloat 20s ease-in-out infinite;
+      animation: heroBentoOrbFloat 20s ease-in-out infinite;
     }
 
     .orb-1 {
@@ -3332,7 +3332,7 @@ export const heroTemplate7: ComponentTemplate = {
       animation-delay: -14s;
     }
 
-    @keyframes orbFloat {
+    @keyframes heroBentoOrbFloat {
       0%, 100% {
         transform: translate(0, 0) scale(1);
       }

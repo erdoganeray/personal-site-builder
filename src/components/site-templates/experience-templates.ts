@@ -816,10 +816,10 @@ export const experienceTemplate5: ComponentTemplate = {
       scroll-snap-align: start;
       opacity: 0;
       transform: translateY(20px);
-      animation: fadeInUp 0.6s ease-out forwards;
+      animation: expFadeInUp 0.6s ease-out forwards;
     }
 
-    @keyframes fadeInUp {
+    @keyframes expFadeInUp {
       to {
         opacity: 1;
         transform: translateY(0);

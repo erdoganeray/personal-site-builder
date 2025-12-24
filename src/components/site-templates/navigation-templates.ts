@@ -413,7 +413,7 @@ export const navigationTemplate2: ComponentTemplate = {
       width: 280px;
       background: linear-gradient(-45deg, {{COLOR_PRIMARY}}, {{COLOR_SECONDARY}}, {{COLOR_ACCENT}}, {{COLOR_PRIMARY}});
       background-size: 400% 400%;
-      animation: gradientShift 15s ease infinite;
+      animation: navSidebarGradientShift 15s ease infinite;
       color: {{COLOR_TEXT}};
       padding: 2rem 0;
       display: flex;
@@ -425,7 +425,7 @@ export const navigationTemplate2: ComponentTemplate = {
       overflow: hidden;
     }
 
-    @keyframes gradientShift {
+    @keyframes navSidebarGradientShift {
       0% { background-position: 0% 50%; }
       50% { background-position: 100% 50%; }
       100% { background-position: 0% 50%; }

@@ -201,12 +201,23 @@ Skill sayısına, mesleğe ve stil tercihine göre en uygun template'i seç:
    - Meslekler: Designer, Creative Director, Artist, Startup founder
    - Stil: Creative, Dynamic, Modern, Playful
 
+6. skills-glass-modern: 🆕 Premium glassmorphism tasarım, animated orbs, neon glow
+   - "Glass", "Premium", "Modern", "Futuristic" stil isteniyorsa tercih et
+   - Blur(20px) kart efektleri, gradient border glow on hover
+   - Animated background orbs ile dinamik görünüm
+   - nav-glass-morphism, footer-glass-modern ile uyumlu
+   - Skill sayısı: 4-12 (ideal: 6-10)
+   - Meslekler: UI/UX Designer, Frontend Developer, Creative Technologist, Digital roles
+   - Stil: Premium, Glass, Modern, Futuristic, High-end
+
 SEÇİM KURALLARI:
 - Kategori bilgisi varsa → skills-categorized (en yüksek öncelik)
+- "Glass", "Premium", "Modern" isteniyorsa → skills-glass-modern
 - 10+ skill varsa → skills-categorized veya skills-tag-cloud
 - Minimal/sade isteniyorsa → skills-minimal-list
 - Yaratıcı/modern isteniyorsa → skills-tag-cloud veya skills-card-grid
 - Geleneksel/profesyonel isteniyorsa → skills-progress-bars veya skills-minimal-list
+- nav-glass-morphism seçilmişse → skills-glass-modern (uyumluluk için)
 
 LANGUAGES SECTION (OPTIONAL - sadece diller varsa ekle):
 
@@ -251,13 +262,23 @@ LANGUAGES SECTION (OPTIONAL - sadece diller varsa ekle):
    - Meslekler: Designer, Creative roles, Multilingual professionals
    - Stil: Creative, Dynamic, Modern, Colorful
 
+7. languages-animated-gradient: 🆕 Animated gradient arka plan, shimmer progress bars, CEFR badge
+   - "Animated", "Dynamic", "Gradient", "Premium" stil isteniyorsa tercih et
+   - Gradient title, shimmer effect progress bar, wave-like stagger animasyonlar
+   - hero-animated-gradient, footer-animated-gradient ile uyumlu
+   - Dil sayısı: 2-6 (ideal: 3-5)
+   - Meslekler: UI/UX Designer, Frontend Developer, Digital roles, Creative Technologist
+   - Stil: Premium, Animated, Gradient, High-end
+
 SEÇİM KURALLARI:
 - Sertifika bilgisi varsa → languages-certification (en yüksek öncelik)
+- "Animated", "Gradient", "Premium" isteniyorsa → languages-animated-gradient
 - 6+ dil varsa → languages-badge-cloud veya languages-accordion
 - Minimal/sade isteniyorsa → languages-minimalist
 - Yaratıcı/modern isteniyorsa → languages-badge-cloud veya languages-card-grid
 - Geleneksel/profesyonel isteniyorsa → languages-progress-bars veya languages-certification
 - Detaylı bilgi varsa → languages-accordion veya languages-certification
+- hero-animated-gradient seçilmişse → languages-animated-gradient (uyumluluk için)
 
 CONTACT SECTION:
 1. contact-modern-form: Modern iletişim formu ve bilgi kartları, iki kolonlu düzen
