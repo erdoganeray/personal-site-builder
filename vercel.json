@@ -1,16 +1,8 @@
 {
     "crons": [
         {
-            "path": "/api/cron/cleanup-reservations",
-            "schedule": "0 */6 * * *"
-        },
-        {
-            "path": "/api/cron/cleanup-deleted-assets",
+            "path": "/api/cron/cleanup-all",
             "schedule": "0 2 * * *"
-        },
-        {
-            "path": "/api/cron/cleanup-anonymous-sessions",
-            "schedule": "0 3 * * *"
         }
     ]
 }
