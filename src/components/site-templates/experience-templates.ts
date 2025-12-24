@@ -25,6 +25,7 @@ export const experienceTemplate1: ComponentTemplate = {
     }
 
     .section-title {
+      font-family: {{FONT_HEADING}}, sans-serif;
       font-size: 2.5rem;
       font-weight: 700;
       text-align: center;
@@ -74,6 +75,7 @@ export const experienceTemplate1: ComponentTemplate = {
     }
 
     .timeline-position {
+      font-family: {{FONT_HEADING}}, sans-serif;
       font-size: 1.5rem;
       font-weight: 600;
       color: {{COLOR_TEXT}};
@@ -87,6 +89,7 @@ export const experienceTemplate1: ComponentTemplate = {
     }
 
     .timeline-description {
+      font-family: {{FONT_BODY}}, sans-serif;
       color: {{COLOR_TEXT}};
       line-height: 1.6;
     }
@@ -181,7 +184,8 @@ export const experienceTemplate1: ComponentTemplate = {
   placeholders: [
     "{{EXPERIENCE_ITEMS}}",
     "{{COLOR_PRIMARY}}", "{{COLOR_BACKGROUND}}",
-    "{{COLOR_ACCENT}}", "{{COLOR_TEXT}}", "{{COLOR_TEXT_SECONDARY}}"
+    "{{COLOR_ACCENT}}", "{{COLOR_TEXT}}", "{{COLOR_TEXT_SECONDARY}}",
+    "{{FONT_HEADING}}", "{{FONT_BODY}}"
   ]
 };
 
@@ -234,6 +238,7 @@ export const experienceTemplate2: ComponentTemplate = {
     }
 
     .experience-position {
+      font-family: {{FONT_HEADING}}, sans-serif;
       font-size: 1.5rem;
       font-weight: 600;
       color: {{COLOR_TEXT}};
@@ -248,6 +253,7 @@ export const experienceTemplate2: ComponentTemplate = {
     }
 
     .experience-description {
+      font-family: {{FONT_BODY}}, sans-serif;
       color: {{COLOR_TEXT}};
       line-height: 1.6;
     }
@@ -349,7 +355,8 @@ export const experienceTemplate2: ComponentTemplate = {
   placeholders: [
     "{{EXPERIENCE_ITEMS}}",
     "{{COLOR_PRIMARY}}", "{{COLOR_BACKGROUND}}",
-    "{{COLOR_ACCENT}}", "{{COLOR_TEXT}}", "{{COLOR_TEXT_SECONDARY}}"
+    "{{COLOR_ACCENT}}", "{{COLOR_TEXT}}", "{{COLOR_TEXT_SECONDARY}}",
+    "{{FONT_HEADING}}", "{{FONT_BODY}}"
   ]
 };
 
@@ -427,6 +434,7 @@ export const experienceTemplate3: ComponentTemplate = {
     }
 
     .accordion-position {
+      font-family: {{FONT_HEADING}}, sans-serif;
       font-size: 1.3rem;
       font-weight: 600;
       color: {{COLOR_TEXT}};
@@ -470,6 +478,7 @@ export const experienceTemplate3: ComponentTemplate = {
     }
 
     .accordion-description {
+      font-family: {{FONT_BODY}}, sans-serif;
       color: {{COLOR_TEXT}};
       line-height: 1.6;
       padding-top: 1rem;
@@ -587,7 +596,8 @@ export const experienceTemplate3: ComponentTemplate = {
   placeholders: [
     "{{EXPERIENCE_ITEMS}}",
     "{{COLOR_PRIMARY}}", "{{COLOR_BACKGROUND}}",
-    "{{COLOR_ACCENT}}", "{{COLOR_TEXT}}", "{{COLOR_TEXT_SECONDARY}}"
+    "{{COLOR_ACCENT}}", "{{COLOR_TEXT}}", "{{COLOR_TEXT_SECONDARY}}",
+    "{{FONT_HEADING}}", "{{FONT_BODY}}"
   ]
 };
 
@@ -642,6 +652,7 @@ export const experienceTemplate4: ComponentTemplate = {
     }
 
     .experience-position-minimal {
+      font-family: {{FONT_HEADING}}, sans-serif;
       font-size: 1.2rem;
       font-weight: 600;
       color: {{COLOR_TEXT}};
@@ -662,6 +673,7 @@ export const experienceTemplate4: ComponentTemplate = {
     }
 
     .experience-description-minimal {
+      font-family: {{FONT_BODY}}, sans-serif;
       color: {{COLOR_TEXT}};
       line-height: 1.6;
       font-size: 0.95rem;
@@ -737,7 +749,8 @@ export const experienceTemplate4: ComponentTemplate = {
   placeholders: [
     "{{EXPERIENCE_ITEMS}}",
     "{{COLOR_PRIMARY}}", "{{COLOR_BACKGROUND}}",
-    "{{COLOR_ACCENT}}", "{{COLOR_TEXT}}", "{{COLOR_TEXT_SECONDARY}}"
+    "{{COLOR_ACCENT}}", "{{COLOR_TEXT}}", "{{COLOR_TEXT_SECONDARY}}",
+    "{{FONT_HEADING}}", "{{FONT_BODY}}"
   ]
 };
 
@@ -869,6 +882,7 @@ export const experienceTemplate5: ComponentTemplate = {
     }
 
     .horizontal-timeline-position {
+      font-family: {{FONT_HEADING}}, sans-serif;
       font-size: 1.2rem;
       font-weight: 600;
       color: {{COLOR_TEXT}};
@@ -884,6 +898,7 @@ export const experienceTemplate5: ComponentTemplate = {
     }
 
     .horizontal-timeline-description {
+      font-family: {{FONT_BODY}}, sans-serif;
       color: {{COLOR_TEXT}};
       line-height: 1.5;
       font-size: 0.9rem;
@@ -988,7 +1003,8 @@ export const experienceTemplate5: ComponentTemplate = {
   placeholders: [
     "{{EXPERIENCE_ITEMS}}",
     "{{COLOR_PRIMARY}}", "{{COLOR_BACKGROUND}}",
-    "{{COLOR_ACCENT}}", "{{COLOR_TEXT}}", "{{COLOR_TEXT_SECONDARY}}"
+    "{{COLOR_ACCENT}}", "{{COLOR_TEXT}}", "{{COLOR_TEXT_SECONDARY}}",
+    "{{FONT_HEADING}}", "{{FONT_BODY}}"
   ]
 };
 
@@ -1070,6 +1086,7 @@ export const experienceTemplate6: ComponentTemplate = {
     }
 
     .tab-company {
+      font-family: {{FONT_HEADING}}, sans-serif;
       font-size: 1.2rem;
       font-weight: 600;
       color: {{COLOR_TEXT}};
@@ -1116,6 +1133,7 @@ export const experienceTemplate6: ComponentTemplate = {
     }
 
     .tab-description {
+      font-family: {{FONT_BODY}}, sans-serif;
       color: {{COLOR_TEXT}};
       line-height: 1.6;
       padding-top: 1rem;
@@ -1253,8 +1271,692 @@ export const experienceTemplate6: ComponentTemplate = {
   placeholders: [
     "{{EXPERIENCE_ITEMS}}",
     "{{COLOR_PRIMARY}}", "{{COLOR_BACKGROUND}}",
-    "{{COLOR_ACCENT}}", "{{COLOR_TEXT}}", "{{COLOR_TEXT_SECONDARY}}"
+    "{{COLOR_ACCENT}}", "{{COLOR_TEXT}}", "{{COLOR_TEXT_SECONDARY}}",
+    "{{FONT_HEADING}}", "{{FONT_BODY}}"
   ]
 };
 
-export const experienceTemplates = [experienceTemplate1, experienceTemplate2, experienceTemplate3, experienceTemplate4, experienceTemplate5, experienceTemplate6];
+/**
+ * Experience Template 7 - Glass Modern (Glassmorphism)
+ * Premium glassmorphism kartları, animated orb arka plan, neon glow efektleri
+ * Uyumluluk: nav-glass-morphism, skills-glass-modern, portfolio-glass-modern, footer-glass-modern
+ */
+export const experienceTemplate7: ComponentTemplate = {
+  id: "experience-glass-modern",
+  name: "Glass Modern Experience",
+  category: "experience",
+  htmlTemplate: `
+    <section class="experience-glass" id="experience" role="region" aria-labelledby="experience-glass-heading">
+      <!-- Animated background orbs -->
+      <div class="exp-glass-orbs" aria-hidden="true">
+        <div class="exp-orb exp-orb-1"></div>
+        <div class="exp-orb exp-orb-2"></div>
+        <div class="exp-orb exp-orb-3"></div>
+      </div>
+      
+      <div class="container">
+        <h2 class="section-title" id="experience-glass-heading">İş Deneyimlerim</h2>
+        <div class="exp-glass-timeline">
+          {{EXPERIENCE_ITEMS}}
+        </div>
+      </div>
+    </section>
+  `,
+  cssTemplate: `
+    .experience-glass {
+      padding: 6rem 2rem;
+      background: {{COLOR_BACKGROUND}};
+      color: {{COLOR_TEXT}};
+      font-family: {{FONT_BODY}}, sans-serif;
+      position: relative;
+      overflow: hidden;
+      isolation: isolate;
+    }
+
+    .experience-glass .section-title {
+      font-family: {{FONT_HEADING}}, sans-serif;
+      text-align: center;
+      font-size: 2.5rem;
+      font-weight: 700;
+      margin-bottom: 3rem;
+      position: relative;
+      z-index: 2;
+      color: {{COLOR_PRIMARY}};
+    }
+
+    /* Animated background orbs */
+    .exp-glass-orbs {
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      pointer-events: none;
+      overflow: hidden;
+    }
+
+    .exp-orb {
+      position: absolute;
+      border-radius: 50%;
+      filter: blur(80px);
+      opacity: 0.35;
+      animation: expGlassOrbFloat 20s ease-in-out infinite;
+    }
+
+    .exp-orb-1 {
+      width: 400px;
+      height: 400px;
+      background: {{COLOR_PRIMARY}};
+      top: -15%;
+      right: -10%;
+      animation-delay: 0s;
+    }
+
+    .exp-orb-2 {
+      width: 300px;
+      height: 300px;
+      background: {{COLOR_ACCENT}};
+      bottom: -10%;
+      left: -8%;
+      animation-delay: -7s;
+    }
+
+    .exp-orb-3 {
+      width: 250px;
+      height: 250px;
+      background: {{COLOR_SECONDARY}};
+      top: 50%;
+      left: 40%;
+      animation-delay: -14s;
+    }
+
+    @keyframes expGlassOrbFloat {
+      0%, 100% {
+        transform: translate(0, 0) scale(1);
+      }
+      25% {
+        transform: translate(40px, -40px) scale(1.1);
+      }
+      50% {
+        transform: translate(-30px, 30px) scale(0.9);
+      }
+      75% {
+        transform: translate(25px, 15px) scale(1.05);
+      }
+    }
+
+    /* Timeline container */
+    .exp-glass-timeline {
+      max-width: 900px;
+      margin: 0 auto;
+      position: relative;
+      z-index: 2;
+      display: flex;
+      flex-direction: column;
+      gap: 2rem;
+    }
+
+    /* Glassmorphism card */
+    .exp-glass-card {
+      background: rgba(255, 255, 255, 0.08);
+      backdrop-filter: blur(20px);
+      -webkit-backdrop-filter: blur(20px);
+      border-radius: 20px;
+      padding: 2rem;
+      border: 1px solid rgba(255, 255, 255, 0.1);
+      transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+      position: relative;
+      overflow: hidden;
+      opacity: 0;
+      transform: translateY(30px);
+    }
+
+    .exp-glass-card.visible {
+      opacity: 1;
+      transform: translateY(0);
+    }
+
+    /* Staggered animation delays */
+    .exp-glass-card:nth-child(1) { transition-delay: 0.1s; }
+    .exp-glass-card:nth-child(2) { transition-delay: 0.2s; }
+    .exp-glass-card:nth-child(3) { transition-delay: 0.3s; }
+    .exp-glass-card:nth-child(4) { transition-delay: 0.4s; }
+    .exp-glass-card:nth-child(5) { transition-delay: 0.5s; }
+
+    /* Gradient border glow on hover */
+    .exp-glass-card::before {
+      content: '';
+      position: absolute;
+      inset: -2px;
+      border-radius: 22px;
+      background: linear-gradient(135deg, {{COLOR_PRIMARY}}, {{COLOR_ACCENT}});
+      z-index: -1;
+      opacity: 0;
+      transition: opacity 0.4s ease;
+    }
+
+    .exp-glass-card::after {
+      content: '';
+      position: absolute;
+      inset: 0;
+      border-radius: 20px;
+      background: {{COLOR_SURFACE}};
+      z-index: -1;
+    }
+
+    .exp-glass-card:hover {
+      transform: translateY(-8px);
+      box-shadow: 
+        0 20px 50px rgba(0, 0, 0, 0.25),
+        0 0 40px {{COLOR_PRIMARY}}15;
+    }
+
+    .exp-glass-card:hover::before {
+      opacity: 1;
+    }
+
+    /* Card header with duration badge */
+    .exp-glass-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-start;
+      margin-bottom: 1rem;
+      gap: 1rem;
+    }
+
+    .exp-glass-duration {
+      font-size: 0.85rem;
+      padding: 0.4rem 1rem;
+      background: linear-gradient(135deg, {{COLOR_PRIMARY}}25, {{COLOR_ACCENT}}25);
+      color: {{COLOR_ACCENT}};
+      border-radius: 20px;
+      font-weight: 500;
+      white-space: nowrap;
+    }
+
+    .exp-glass-position {
+      font-family: {{FONT_HEADING}}, sans-serif;
+      font-size: 1.4rem;
+      font-weight: 600;
+      color: {{COLOR_TEXT}};
+      margin-bottom: 0.25rem;
+      line-height: 1.3;
+    }
+
+    .exp-glass-company {
+      font-size: 1.1rem;
+      color: {{COLOR_PRIMARY}};
+      font-weight: 500;
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+    }
+
+    .exp-glass-company::before {
+      content: '';
+      width: 8px;
+      height: 8px;
+      border-radius: 50%;
+      background: {{COLOR_ACCENT}};
+      display: inline-block;
+    }
+
+    .exp-glass-description {
+      font-family: {{FONT_BODY}}, sans-serif;
+      color: {{COLOR_TEXT}};
+      line-height: 1.7;
+      font-size: 0.95rem;
+      margin-top: 1rem;
+      padding-top: 1rem;
+      border-top: 1px solid rgba(255, 255, 255, 0.08);
+    }
+
+    .no-experience {
+      text-align: center;
+      color: {{COLOR_TEXT_SECONDARY}};
+      font-style: italic;
+      padding: 2rem;
+    }
+
+    /* Responsive breakpoints */
+    @media (max-width: 1024px) {
+      .exp-glass-position {
+        font-size: 1.25rem;
+      }
+
+      .exp-glass-company {
+        font-size: 1rem;
+      }
+    }
+
+    @media (max-width: 768px) {
+      .experience-glass {
+        padding: 4rem 1rem;
+      }
+
+      .experience-glass .section-title {
+        font-size: 2rem;
+        margin-bottom: 2rem;
+      }
+
+      .exp-glass-card {
+        padding: 1.5rem;
+      }
+
+      .exp-glass-header {
+        flex-direction: column;
+        gap: 0.75rem;
+      }
+
+      .exp-glass-position {
+        font-size: 1.15rem;
+      }
+
+      .exp-glass-company {
+        font-size: 0.95rem;
+      }
+
+      .exp-glass-description {
+        font-size: 0.9rem;
+      }
+
+      .exp-orb {
+        opacity: 0.2;
+      }
+    }
+
+    @media (max-width: 480px) {
+      .experience-glass {
+        padding: 3rem 1rem;
+      }
+
+      .exp-glass-card {
+        padding: 1.25rem;
+        border-radius: 16px;
+      }
+
+      .exp-glass-position {
+        font-size: 1.1rem;
+      }
+
+      .exp-glass-duration {
+        font-size: 0.8rem;
+        padding: 0.35rem 0.75rem;
+      }
+    }
+
+    @media (prefers-reduced-motion: reduce) {
+      .exp-orb {
+        animation: none;
+      }
+
+      .exp-glass-card {
+        opacity: 1;
+        transform: none;
+        transition: box-shadow 0.3s ease;
+      }
+
+      .exp-glass-card:hover {
+        transform: none;
+      }
+    }
+  `,
+  jsTemplate: `
+    // Scroll-triggered animations for glass cards
+    document.addEventListener('DOMContentLoaded', function() {
+      const observerOptions = {
+        threshold: 0.15,
+        rootMargin: '0px 0px -50px 0px'
+      };
+
+      const observer = new IntersectionObserver((entries) => {
+        entries.forEach(entry => {
+          if (entry.isIntersecting) {
+            entry.target.classList.add('visible');
+          }
+        });
+      }, observerOptions);
+
+      document.querySelectorAll('.exp-glass-card').forEach(card => {
+        observer.observe(card);
+      });
+    });
+  `,
+  placeholders: [
+    "{{EXPERIENCE_ITEMS}}",
+    "{{COLOR_PRIMARY}}", "{{COLOR_SECONDARY}}", "{{COLOR_BACKGROUND}}",
+    "{{COLOR_ACCENT}}", "{{COLOR_TEXT}}", "{{COLOR_TEXT_SECONDARY}}",
+    "{{COLOR_SURFACE}}", "{{FONT_HEADING}}", "{{FONT_BODY}}"
+  ]
+};
+
+/**
+ * Experience Template 8 - Animated Gradient
+ * Dinamik animated gradient arka plan, shimmer efektli kartlar, staggered entry animasyonları
+ * Uyumluluk: hero-animated-gradient, portfolio-animated-gradient, footer-animated-gradient, languages-animated-gradient
+ */
+export const experienceTemplate8: ComponentTemplate = {
+  id: "experience-animated-gradient",
+  name: "Animated Gradient Experience",
+  category: "experience",
+  htmlTemplate: `
+    <section class="experience-gradient" id="experience" role="region" aria-labelledby="experience-gradient-heading">
+      <!-- Animated gradient background -->
+      <div class="exp-gradient-bg" aria-hidden="true"></div>
+      
+      <div class="container">
+        <h2 class="section-title" id="experience-gradient-heading">İş Deneyimlerim</h2>
+        <div class="exp-gradient-timeline">
+          {{EXPERIENCE_ITEMS}}
+        </div>
+      </div>
+    </section>
+  `,
+  cssTemplate: `
+    .experience-gradient {
+      padding: 6rem 2rem;
+      background: {{COLOR_BACKGROUND}};
+      color: {{COLOR_TEXT}};
+      font-family: {{FONT_BODY}}, sans-serif;
+      position: relative;
+      overflow: hidden;
+      isolation: isolate;
+    }
+
+    /* Animated gradient background */
+    .exp-gradient-bg {
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: linear-gradient(
+        135deg,
+        {{COLOR_PRIMARY}}12 0%,
+        transparent 35%,
+        {{COLOR_ACCENT}}12 55%,
+        transparent 75%,
+        {{COLOR_SECONDARY}}10 100%
+      );
+      animation: expGradientShift 18s ease-in-out infinite;
+      pointer-events: none;
+      z-index: 1;
+    }
+
+    @keyframes expGradientShift {
+      0%, 100% {
+        opacity: 0.6;
+        transform: scale(1) rotate(0deg);
+      }
+      33% {
+        opacity: 0.8;
+        transform: scale(1.05) rotate(2deg);
+      }
+      66% {
+        opacity: 0.7;
+        transform: scale(1.1) rotate(-1deg);
+      }
+    }
+
+    .experience-gradient .container {
+      position: relative;
+      z-index: 2;
+      max-width: 900px;
+      margin: 0 auto;
+    }
+
+    .experience-gradient .section-title {
+      font-family: {{FONT_HEADING}}, sans-serif;
+      text-align: center;
+      font-size: 2.5rem;
+      font-weight: 700;
+      margin-bottom: 3rem;
+      background: linear-gradient(135deg, {{COLOR_PRIMARY}}, {{COLOR_ACCENT}});
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+    }
+
+    .exp-gradient-timeline {
+      display: flex;
+      flex-direction: column;
+      gap: 2rem;
+    }
+
+    /* Gradient-styled card */
+    .exp-gradient-card {
+      background: rgba(255, 255, 255, 0.06);
+      backdrop-filter: blur(10px);
+      -webkit-backdrop-filter: blur(10px);
+      border-radius: 16px;
+      padding: 2rem;
+      border: 1px solid rgba(255, 255, 255, 0.08);
+      transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+      position: relative;
+      overflow: hidden;
+      opacity: 0;
+      transform: translateX(-30px);
+    }
+
+    .exp-gradient-card.visible {
+      opacity: 1;
+      transform: translateX(0);
+    }
+
+    /* Shimmer overlay on hover */
+    .exp-gradient-card::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: -100%;
+      width: 100%;
+      height: 100%;
+      background: linear-gradient(
+        90deg,
+        transparent,
+        rgba(255, 255, 255, 0.1),
+        transparent
+      );
+      transition: left 0.6s ease;
+    }
+
+    .exp-gradient-card:hover::before {
+      left: 100%;
+    }
+
+    .exp-gradient-card:hover {
+      transform: translateX(8px);
+      background: rgba(255, 255, 255, 0.1);
+      box-shadow: 
+        0 15px 40px rgba(0, 0, 0, 0.15),
+        0 0 25px {{COLOR_PRIMARY}}10;
+    }
+
+    /* Card header */
+    .exp-gradient-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-start;
+      margin-bottom: 1rem;
+      gap: 1rem;
+    }
+
+    .exp-gradient-duration {
+      font-size: 0.85rem;
+      padding: 0.5rem 1.25rem;
+      background: linear-gradient(135deg, {{COLOR_PRIMARY}}, {{COLOR_ACCENT}});
+      color: white;
+      border-radius: 25px;
+      font-weight: 600;
+      white-space: nowrap;
+      box-shadow: 0 4px 12px {{COLOR_PRIMARY}}30;
+    }
+
+    .exp-gradient-position {
+      font-family: {{FONT_HEADING}}, sans-serif;
+      font-size: 1.4rem;
+      font-weight: 600;
+      color: {{COLOR_TEXT}};
+      margin-bottom: 0.35rem;
+      line-height: 1.3;
+    }
+
+    .exp-gradient-company {
+      font-size: 1.1rem;
+      color: {{COLOR_PRIMARY}};
+      font-weight: 500;
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+    }
+
+    .exp-gradient-company::before {
+      content: '';
+      width: 10px;
+      height: 10px;
+      border-radius: 50%;
+      background: linear-gradient(135deg, {{COLOR_PRIMARY}}, {{COLOR_ACCENT}});
+      display: inline-block;
+    }
+
+    .exp-gradient-description {
+      font-family: {{FONT_BODY}}, sans-serif;
+      color: {{COLOR_TEXT}};
+      line-height: 1.7;
+      font-size: 0.95rem;
+      margin-top: 1.25rem;
+      padding-top: 1.25rem;
+      border-top: 1px solid rgba(255, 255, 255, 0.08);
+    }
+
+    .no-experience {
+      text-align: center;
+      color: {{COLOR_TEXT_SECONDARY}};
+      font-style: italic;
+      padding: 2rem;
+    }
+
+    /* Responsive breakpoints */
+    @media (max-width: 1024px) {
+      .exp-gradient-position {
+        font-size: 1.25rem;
+      }
+
+      .exp-gradient-company {
+        font-size: 1rem;
+      }
+    }
+
+    @media (max-width: 768px) {
+      .experience-gradient {
+        padding: 4rem 1rem;
+      }
+
+      .experience-gradient .section-title {
+        font-size: 2rem;
+        margin-bottom: 2rem;
+      }
+
+      .exp-gradient-card {
+        padding: 1.5rem;
+      }
+
+      .exp-gradient-header {
+        flex-direction: column;
+        gap: 0.75rem;
+      }
+
+      .exp-gradient-duration {
+        align-self: flex-start;
+      }
+
+      .exp-gradient-position {
+        font-size: 1.15rem;
+      }
+
+      .exp-gradient-company {
+        font-size: 0.95rem;
+      }
+
+      .exp-gradient-description {
+        font-size: 0.9rem;
+      }
+    }
+
+    @media (max-width: 480px) {
+      .experience-gradient {
+        padding: 3rem 1rem;
+      }
+
+      .exp-gradient-card {
+        padding: 1.25rem;
+        border-radius: 12px;
+      }
+
+      .exp-gradient-position {
+        font-size: 1.1rem;
+      }
+
+      .exp-gradient-duration {
+        font-size: 0.8rem;
+        padding: 0.4rem 1rem;
+      }
+    }
+
+    @media (prefers-reduced-motion: reduce) {
+      .exp-gradient-bg {
+        animation: none;
+      }
+
+      .exp-gradient-card {
+        opacity: 1;
+        transform: none;
+        transition: background 0.3s ease, box-shadow 0.3s ease;
+      }
+
+      .exp-gradient-card::before {
+        display: none;
+      }
+
+      .exp-gradient-card:hover {
+        transform: none;
+      }
+    }
+  `,
+  jsTemplate: `
+    // Wave-like stagger animation for gradient cards
+    document.addEventListener('DOMContentLoaded', function() {
+      const observerOptions = {
+        threshold: 0.15,
+        rootMargin: '0px 0px -50px 0px'
+      };
+
+      const observer = new IntersectionObserver((entries) => {
+        entries.forEach(entry => {
+          if (entry.isIntersecting) {
+            const cards = entry.target.querySelectorAll('.exp-gradient-card');
+            cards.forEach((card, index) => {
+              setTimeout(() => {
+                card.classList.add('visible');
+              }, index * 120);
+            });
+            observer.unobserve(entry.target);
+          }
+        });
+      }, observerOptions);
+
+      const timeline = document.querySelector('.exp-gradient-timeline');
+      if (timeline) {
+        observer.observe(timeline);
+      }
+    });
+  `,
+  placeholders: [
+    "{{EXPERIENCE_ITEMS}}",
+    "{{COLOR_PRIMARY}}", "{{COLOR_SECONDARY}}", "{{COLOR_BACKGROUND}}",
+    "{{COLOR_ACCENT}}", "{{COLOR_TEXT}}", "{{COLOR_TEXT_SECONDARY}}",
+    "{{FONT_HEADING}}", "{{FONT_BODY}}"
+  ]
+};
+
+export const experienceTemplates = [experienceTemplate1, experienceTemplate2, experienceTemplate3, experienceTemplate4, experienceTemplate5, experienceTemplate6, experienceTemplate7, experienceTemplate8];

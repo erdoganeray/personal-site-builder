@@ -108,8 +108,20 @@ EXPERIENCE SECTION:
 4. experience-minimal: Minimal liste düzeni, typography odaklı, sade ve temiz görünüm
 5. experience-horizontal-timeline: Yatay akan timeline, scroll ile gezinme, modern ve dinamik
 6. experience-tabs: Tab bazlı navigasyon, şirket adına göre organize, kompakt görünüm
+7. experience-glass-modern: 🆕 Premium glassmorphism, backdrop blur, animated orbs, neon glow border
+   - "Glass", "Premium", "Modern", "Futuristic" stil isteniyorsa tercih et
+   - nav-glass-morphism, skills-glass-modern, portfolio-glass-modern ile uyumlu
+   - UI/UX Designer, Frontend Developer, Creative Technologist için ideal
+8. experience-animated-gradient: 🆕 Dinamik animated gradient, shimmer hover, gradient text title
+   - "Gradient", "Animated", "Dynamic", "Colorful" stil isteniyorsa tercih et
+   - hero-animated-gradient, portfolio-animated-gradient, footer-animated-gradient ile uyumlu
+   - Creative Director, Digital Marketer, Startup Founder için ideal
 
 SEÇİM KURALLARI (EXPERIENCE):
+- "Glass", "Premium", "Modern" isteniyorsa → experience-glass-modern
+- "Gradient", "Animated", "Dynamic" isteniyorsa → experience-animated-gradient
+- nav-glass-morphism seçilmişse → experience-glass-modern (uyumluluk için)
+- hero-animated-gradient seçilmişse → experience-animated-gradient (uyumluluk için)
 - 4+ deneyim varsa → experience-accordion veya experience-tabs (alan tasarrufu için)
 - 1-3 deneyim varsa → experience-cards veya experience-timeline (detaylı göstermek için)
 - Çok uzun görev tanımları varsa → experience-accordion
