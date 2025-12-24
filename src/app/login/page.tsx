@@ -1,12 +1,12 @@
 "use client";
 
-import { useState } from "react";
+import { useState, Suspense } from "react";
 import { signIn } from "next-auth/react";
 import { useRouter, useSearchParams } from "next/navigation";
 import Link from "next/link";
 import { ArrowLeft, Sparkles } from "lucide-react";
 
-export default function LoginPage() {
+function LoginContent() {
     const router = useRouter();
     const searchParams = useSearchParams();
     const [email, setEmail] = useState("");
@@ -171,5 +171,22 @@ export default function LoginPage() {
                 </div>
             </div>
         </div>
+    );
+}
+
+// Loading fallback for Suspense
+function LoginLoading() {
+    return (
+        <div className="min-h-screen bg-[#0a0a0a] flex items-center justify-center">
+            <div className="w-8 h-8 border-2 border-purple-500/30 border-t-purple-500 rounded-full animate-spin" />
+        </div>
+    );
+}
+
+export default function LoginPage() {
+    return (
+        <Suspense fallback={<LoginLoading />}>
+            <LoginContent />
+        </Suspense>
     );
 }
