@@ -19,9 +19,10 @@ export async function DELETE(request: NextRequest) {
             return NextResponse.json({ error: "Site ID is required" }, { status: 400 });
         }
 
-        // Önce site'ın kullanıcıya ait olduğunu kontrol et
+        // Site ve kullanıcı bilgisini çek (plan tipi için user gerekli)
         const site = await prisma.site.findUnique({
             where: { id: siteId },
+            include: { user: true },
         });
 
         if (!site) {
@@ -32,7 +33,15 @@ export async function DELETE(request: NextRequest) {
             return NextResponse.json({ error: "Bu siteyi silme yetkiniz yok" }, { status: 403 });
         }
 
-        // Sadece preview datalarını sil, status'ü draft'a çek
+        // Subdomain varsa rezervasyon süresini ayarla/yenile
+        let subdomainReservationExpiresAt: Date | null = null;
+        if (site.subdomain) {
+            const reservationDays = site.user.planType === "PAID" ? 30 : 7;
+            subdomainReservationExpiresAt = new Date();
+            subdomainReservationExpiresAt.setDate(subdomainReservationExpiresAt.getDate() + reservationDays);
+        }
+
+        // Sadece preview datalarını sil, status'ü draft'a çek, subdomain rezervasyonunu koru/ayarla
         await prisma.site.update({
             where: { id: siteId },
             data: {
@@ -41,6 +50,7 @@ export async function DELETE(request: NextRequest) {
                 jsContent: null,
                 designPlan: Prisma.DbNull,
                 status: "draft",
+                subdomainReservationExpiresAt: subdomainReservationExpiresAt,
             },
         });
 
