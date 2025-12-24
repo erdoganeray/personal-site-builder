@@ -75,7 +75,7 @@ const AVAILABLE_TEMPLATES = {
     "hero-bento-grid"        // 🆕 Bento grid layout
   ],
   experience: ["experience-timeline", "experience-cards", "experience-accordion", "experience-minimal", "experience-horizontal-timeline", "experience-tabs", "experience-glass-modern", "experience-animated-gradient"],
-  education: ["education-timeline", "education-cards", "education-modern", "education-accordion", "education-horizontal-timeline", "education-tabs"],
+  education: ["education-timeline", "education-cards", "education-modern", "education-accordion", "education-horizontal-timeline", "education-tabs", "education-glass-modern", "education-animated-gradient"],
   skills: ["skills-progress-bars", "skills-card-grid", "skills-categorized", "skills-minimal-list", "skills-tag-cloud", "skills-glass-modern"],
   languages: ["languages-progress-bars", "languages-card-grid", "languages-minimalist", "languages-certification", "languages-accordion", "languages-badge-cloud", "languages-animated-gradient"],
   portfolio: [

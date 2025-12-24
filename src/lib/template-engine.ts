@@ -276,7 +276,9 @@ export function generateEducationItems(
     MODERN: 'education-modern',
     ACCORDION: 'education-accordion',
     HORIZONTAL_TIMELINE: 'education-horizontal-timeline',
-    TABS: 'education-tabs'
+    TABS: 'education-tabs',
+    GLASS_MODERN: 'education-glass-modern',
+    ANIMATED_GRADIENT: 'education-animated-gradient'
   } as const;
 
   // Empty data validation - Template-specific empty states
@@ -318,6 +320,20 @@ export function generateEducationItems(
         </div>
       `,
       [EDUCATION_TEMPLATE_IDS.TABS]: `
+        <div class="education-empty-state">
+          <div class="empty-icon">🎓</div>
+          <p class="empty-message">Henüz eğitim bilgisi eklenmemiş. Eğitim geçmişinizi ekleyerek profilinizi tamamlayın.</p>
+          <a href="/dashboard?tab=my-info" class="empty-action">Eğitim Ekle</a>
+        </div>
+      `,
+      [EDUCATION_TEMPLATE_IDS.GLASS_MODERN]: `
+        <div class="education-empty-state">
+          <div class="empty-icon">🎓</div>
+          <p class="empty-message">Henüz eğitim bilgisi eklenmemiş. Eğitim geçmişinizi ekleyerek profilinizi tamamlayın.</p>
+          <a href="/dashboard?tab=my-info" class="empty-action">Eğitim Ekle</a>
+        </div>
+      `,
+      [EDUCATION_TEMPLATE_IDS.ANIMATED_GRADIENT]: `
         <div class="education-empty-state">
           <div class="empty-icon">🎓</div>
           <p class="empty-message">Henüz eğitim bilgisi eklenmemiş. Eğitim geçmişinizi ekleyerek profilinizi tamamlayın.</p>
@@ -428,6 +444,40 @@ export function generateEducationItems(
            </div>`
         : '<div class="tab-content-edu" role="tabpanel"></div>'}
       </div>
+    `,
+    [EDUCATION_TEMPLATE_IDS.GLASS_MODERN]: (edu) => `
+      <article class="edu-glass-card">
+        <div class="edu-glass-header">
+          <div>
+            <h3 class="edu-glass-degree">${escapeHtml(edu.degree)}</h3>
+            <div class="edu-glass-school">${escapeHtml(edu.school)}</div>
+            ${edu.gpa && edu.gpa.trim()
+        ? `<p class="edu-glass-gpa">GPA: ${escapeHtml(edu.gpa)}</p>`
+        : ''}
+          </div>
+          <time class="edu-glass-duration" datetime="${escapeHtml(edu.year)}">${escapeHtml(formatEducationYear(edu.year))}</time>
+        </div>
+        ${edu.field && edu.field.trim() && edu.field !== edu.degree
+        ? `<p class="edu-glass-description">${escapeHtml(edu.field)}</p>`
+        : ''}
+      </article>
+    `,
+    [EDUCATION_TEMPLATE_IDS.ANIMATED_GRADIENT]: (edu) => `
+      <article class="edu-gradient-card">
+        <div class="edu-gradient-header">
+          <div>
+            <h3 class="edu-gradient-degree">${escapeHtml(edu.degree)}</h3>
+            <div class="edu-gradient-school">${escapeHtml(edu.school)}</div>
+            ${edu.gpa && edu.gpa.trim()
+        ? `<p class="edu-gradient-gpa">GPA: ${escapeHtml(edu.gpa)}</p>`
+        : ''}
+          </div>
+          <time class="edu-gradient-duration" datetime="${escapeHtml(edu.year)}">${escapeHtml(formatEducationYear(edu.year))}</time>
+        </div>
+        ${edu.field && edu.field.trim() && edu.field !== edu.degree
+        ? `<p class="edu-gradient-description">${escapeHtml(edu.field)}</p>`
+        : ''}
+      </article>
     `
   };
 

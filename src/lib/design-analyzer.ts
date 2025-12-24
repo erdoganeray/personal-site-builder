@@ -153,6 +153,27 @@ EDUCATION SECTION:
    - 3-6 eğitim varsa tercih et
    - Organize ve düzenli görünüm isteniyorsa
    - Detaylı bilgi gösterimi gerekiyorsa
+7. education-glass-modern: 🆕 Premium glassmorphism, backdrop blur(20px), animated orbs, neon glow border
+   - "Glass", "Premium", "Modern", "Futuristic" stil isteniyorsa tercih et
+   - nav-glass-morphism, skills-glass-modern, experience-glass-modern, portfolio-glass-modern ile uyumlu
+   - UI/UX Designer, Frontend Developer, Creative Technologist için ideal
+   - Eğitim sayısı: 1-5 (ideal: 2-4)
+8. education-animated-gradient: 🆕 Dinamik animated gradient, shimmer hover, gradient text title
+   - "Gradient", "Animated", "Dynamic", "Colorful" stil isteniyorsa tercih et
+   - hero-animated-gradient, experience-animated-gradient, portfolio-animated-gradient, footer-animated-gradient ile uyumlu
+   - Creative Director, Digital Marketer, Startup Founder için ideal
+   - Eğitim sayısı: 1-5 (ideal: 2-4)
+
+SEÇİM KURALLARI (EDUCATION):
+- "Glass", "Premium", "Modern" isteniyorsa → education-glass-modern
+- "Gradient", "Animated", "Dynamic" isteniyorsa → education-animated-gradient
+- nav-glass-morphism seçilmişse → education-glass-modern (uyumluluk için)
+- hero-animated-gradient seçilmişse → education-animated-gradient (uyumluluk için)
+- experience-glass-modern seçilmişse → education-glass-modern (uyumluluk için)
+- experience-animated-gradient seçilmişse → education-animated-gradient (uyumluluk için)
+- 4+ eğitim varsa → education-accordion veya education-tabs (alan tasarrufu için)
+- 1-3 eğitim varsa → education-cards veya education-modern (detaylı göstermek için)
+- Görsel/dinamik site isteniyorsa → education-horizontal-timeline
 
 PORTFOLIO SECTION (OPTIONAL - sadece portfolio fotoğrafları varsa ekle):
 1. portfolio-grid: Grid düzeninde portfolio, hover efekti, lightbox ile büyütme
@@ -616,10 +637,28 @@ JSON'dan önce veya sonra hiçbir metin olmasın.
       const responseText = result.response.text();
 
       try {
-         // JSON bloğunu temizle
+         // JSON bloğunu temizle - Gemini bazen markdown code block ve trailing content ekliyor
          let cleanedText = responseText.trim();
+
+         // Markdown code block'larını kaldır
          cleanedText = cleanedText.replace(/^```json\s*/i, '').replace(/^```\s*/, '');
-         cleanedText = cleanedText.replace(/\s*```$/g, '');
+         cleanedText = cleanedText.replace(/\s*```\s*"?\s*$/g, ''); // Handle trailing ``` with optional " and whitespace
+         cleanedText = cleanedText.trim();
+
+         // Eğer hala parse edilemiyorsa, JSON objesini { ve } arasından çıkar
+         if (!cleanedText.startsWith('{')) {
+            const firstBrace = cleanedText.indexOf('{');
+            if (firstBrace !== -1) {
+               cleanedText = cleanedText.substring(firstBrace);
+            }
+         }
+
+         // Trailing content varsa, son } karakterinden sonrasını kaldır
+         const lastBrace = cleanedText.lastIndexOf('}');
+         if (lastBrace !== -1 && lastBrace < cleanedText.length - 1) {
+            cleanedText = cleanedText.substring(0, lastBrace + 1);
+         }
+
          cleanedText = cleanedText.trim();
 
          const parsed = JSON.parse(cleanedText);

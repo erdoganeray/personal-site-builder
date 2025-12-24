@@ -13,7 +13,9 @@ export const EDUCATION_TEMPLATE_IDS = {
   MODERN: 'education-modern',
   ACCORDION: 'education-accordion',
   HORIZONTAL_TIMELINE: 'education-horizontal-timeline',
-  TABS: 'education-tabs'
+  TABS: 'education-tabs',
+  GLASS_MODERN: 'education-glass-modern',
+  ANIMATED_GRADIENT: 'education-animated-gradient'
 } as const;
 
 export const educationTemplate1: ComponentTemplate = {
@@ -37,6 +39,7 @@ export const educationTemplate1: ComponentTemplate = {
     }
 
     .section-title {
+      font-family: {{FONT_HEADING}}, sans-serif;
       font-size: 2.5rem;
       font-weight: 700;
       text-align: center;
@@ -84,6 +87,7 @@ export const educationTemplate1: ComponentTemplate = {
     }
 
     .education-degree {
+      font-family: {{FONT_HEADING}}, sans-serif;
       font-size: 1.5rem;
       font-weight: 600;
       color: {{COLOR_TEXT}};
@@ -104,6 +108,7 @@ export const educationTemplate1: ComponentTemplate = {
     }
 
     .education-description {
+      font-family: {{FONT_BODY}}, sans-serif;
       color: {{COLOR_TEXT}};
       line-height: 1.6;
     }
@@ -244,7 +249,8 @@ export const educationTemplate1: ComponentTemplate = {
   placeholders: [
     "{{EDUCATION_ITEMS}}",
     "{{COLOR_PRIMARY}}", "{{COLOR_BACKGROUND}}",
-    "{{COLOR_ACCENT}}", "{{COLOR_TEXT}}", "{{COLOR_TEXT_SECONDARY}}"
+    "{{COLOR_ACCENT}}", "{{COLOR_TEXT}}", "{{COLOR_TEXT_SECONDARY}}",
+    "{{FONT_HEADING}}", "{{FONT_BODY}}"
   ]
 };
 
@@ -308,6 +314,7 @@ export const educationTemplate2: ComponentTemplate = {
     }
 
     .education-degree {
+      font-family: {{FONT_HEADING}}, sans-serif;
       font-size: 1.5rem;
       font-weight: 600;
       color: {{COLOR_TEXT}};
@@ -329,6 +336,7 @@ export const educationTemplate2: ComponentTemplate = {
     }
 
     .education-description {
+      font-family: {{FONT_BODY}}, sans-serif;
       color: {{COLOR_TEXT}};
       line-height: 1.6;
     }
@@ -470,7 +478,8 @@ export const educationTemplate2: ComponentTemplate = {
   placeholders: [
     "{{EDUCATION_ITEMS}}",
     "{{COLOR_PRIMARY}}", "{{COLOR_BACKGROUND}}",
-    "{{COLOR_ACCENT}}", "{{COLOR_TEXT}}", "{{COLOR_TEXT_SECONDARY}}"
+    "{{COLOR_ACCENT}}", "{{COLOR_TEXT}}", "{{COLOR_TEXT_SECONDARY}}",
+    "{{FONT_HEADING}}", "{{FONT_BODY}}"
   ]
 };
 
@@ -541,6 +550,7 @@ export const educationTemplate3: ComponentTemplate = {
     }
 
     .education-degree {
+      font-family: {{FONT_HEADING}}, sans-serif;
       font-size: 1.6rem;
       font-weight: 700;
       color: {{COLOR_TEXT}};
@@ -571,6 +581,7 @@ export const educationTemplate3: ComponentTemplate = {
     }
 
     .education-description {
+      font-family: {{FONT_BODY}}, sans-serif;
       color: {{COLOR_TEXT}};
       line-height: 1.8;
       margin-top: 1rem;
@@ -720,7 +731,8 @@ export const educationTemplate3: ComponentTemplate = {
   placeholders: [
     "{{EDUCATION_ITEMS}}",
     "{{COLOR_PRIMARY}}", "{{COLOR_BACKGROUND}}",
-    "{{COLOR_ACCENT}}", "{{COLOR_TEXT}}", "{{COLOR_TEXT_SECONDARY}}"
+    "{{COLOR_ACCENT}}", "{{COLOR_TEXT}}", "{{COLOR_TEXT_SECONDARY}}",
+    "{{FONT_HEADING}}", "{{FONT_BODY}}"
   ]
 };
 
@@ -798,6 +810,7 @@ export const educationTemplate4: ComponentTemplate = {
     }
 
     .accordion-degree-edu {
+      font-family: {{FONT_HEADING}}, sans-serif;
       font-size: 1.3rem;
       font-weight: 600;
       color: {{COLOR_TEXT}};
@@ -848,6 +861,7 @@ export const educationTemplate4: ComponentTemplate = {
     }
 
     .accordion-description-edu {
+      font-family: {{FONT_BODY}}, sans-serif;
       color: {{COLOR_TEXT}};
       line-height: 1.6;
       padding-top: 1rem;
@@ -1058,7 +1072,8 @@ export const educationTemplate4: ComponentTemplate = {
   placeholders: [
     "{{EDUCATION_ITEMS}}",
     "{{COLOR_PRIMARY}}", "{{COLOR_BACKGROUND}}",
-    "{{COLOR_ACCENT}}", "{{COLOR_TEXT}}", "{{COLOR_TEXT_SECONDARY}}"
+    "{{COLOR_ACCENT}}", "{{COLOR_TEXT}}", "{{COLOR_TEXT_SECONDARY}}",
+    "{{FONT_HEADING}}", "{{FONT_BODY}}"
   ]
 };
 
@@ -1190,6 +1205,7 @@ export const educationTemplate5: ComponentTemplate = {
     }
 
     .horizontal-timeline-degree-edu {
+      font-family: {{FONT_HEADING}}, sans-serif;
       font-size: 1.2rem;
       font-weight: 600;
       color: {{COLOR_TEXT}};
@@ -1212,6 +1228,7 @@ export const educationTemplate5: ComponentTemplate = {
     }
 
     .horizontal-timeline-description-edu {
+      font-family: {{FONT_BODY}}, sans-serif;
       color: {{COLOR_TEXT}};
       line-height: 1.5;
       font-size: 0.9rem;
@@ -1413,7 +1430,8 @@ export const educationTemplate5: ComponentTemplate = {
   placeholders: [
     "{{EDUCATION_ITEMS}}",
     "{{COLOR_PRIMARY}}", "{{COLOR_BACKGROUND}}",
-    "{{COLOR_ACCENT}}", "{{COLOR_TEXT}}", "{{COLOR_TEXT_SECONDARY}}"
+    "{{COLOR_ACCENT}}", "{{COLOR_TEXT}}", "{{COLOR_TEXT_SECONDARY}}",
+    "{{FONT_HEADING}}", "{{FONT_BODY}}"
   ]
 };
 
@@ -1495,6 +1513,7 @@ export const educationTemplate6: ComponentTemplate = {
     }
 
     .tab-degree-edu {
+      font-family: {{FONT_HEADING}}, sans-serif;
       font-size: 1.2rem;
       font-weight: 600;
       color: {{COLOR_TEXT}};
@@ -1548,6 +1567,7 @@ export const educationTemplate6: ComponentTemplate = {
     }
 
     .tab-description-edu {
+      font-family: {{FONT_BODY}}, sans-serif;
       color: {{COLOR_TEXT}};
       line-height: 1.6;
       padding-top: 1rem;
@@ -1753,7 +1773,808 @@ export const educationTemplate6: ComponentTemplate = {
   placeholders: [
     "{{EDUCATION_ITEMS}}",
     "{{COLOR_PRIMARY}}", "{{COLOR_BACKGROUND}}",
-    "{{COLOR_ACCENT}}", "{{COLOR_TEXT}}", "{{COLOR_TEXT_SECONDARY}}"
+    "{{COLOR_ACCENT}}", "{{COLOR_TEXT}}", "{{COLOR_TEXT_SECONDARY}}",
+    "{{FONT_HEADING}}", "{{FONT_BODY}}"
+  ]
+};
+
+/**
+ * Education Template 7 - Glass Modern (Glassmorphism)
+ * Premium glassmorphism kartları, animated orb arka plan, neon glow efektleri
+ * Uyumluluk: nav-glass-morphism, skills-glass-modern, portfolio-glass-modern, footer-glass-modern
+ */
+export const educationTemplate7: ComponentTemplate = {
+  id: EDUCATION_TEMPLATE_IDS.GLASS_MODERN,
+  name: "Glass Modern Education",
+  category: "education",
+  htmlTemplate: `
+    <section class="education-glass" id="education" role="region" aria-labelledby="education-glass-heading">
+      <!-- Animated background orbs -->
+      <div class="edu-glass-orbs" aria-hidden="true">
+        <div class="edu-orb edu-orb-1"></div>
+        <div class="edu-orb edu-orb-2"></div>
+        <div class="edu-orb edu-orb-3"></div>
+      </div>
+      
+      <div class="container">
+        <h2 class="section-title" id="education-glass-heading">Eğitim Geçmişim</h2>
+        <div class="edu-glass-timeline">
+          {{EDUCATION_ITEMS}}
+        </div>
+      </div>
+    </section>
+  `,
+  cssTemplate: `
+    .education-glass {
+      padding: 6rem 2rem;
+      background: {{COLOR_BACKGROUND}};
+      color: {{COLOR_TEXT}};
+      font-family: {{FONT_BODY}}, sans-serif;
+      position: relative;
+      overflow: hidden;
+      isolation: isolate;
+    }
+
+    .education-glass .section-title {
+      font-family: {{FONT_HEADING}}, sans-serif;
+      text-align: center;
+      font-size: 2.5rem;
+      font-weight: 700;
+      margin-bottom: 3rem;
+      position: relative;
+      z-index: 2;
+      color: {{COLOR_PRIMARY}};
+    }
+
+    /* Animated background orbs */
+    .edu-glass-orbs {
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      pointer-events: none;
+      overflow: hidden;
+    }
+
+    .edu-orb {
+      position: absolute;
+      border-radius: 50%;
+      filter: blur(80px);
+      opacity: 0.35;
+      animation: eduGlassOrbFloat 20s ease-in-out infinite;
+    }
+
+    .edu-orb-1 {
+      width: 400px;
+      height: 400px;
+      background: {{COLOR_PRIMARY}};
+      top: -15%;
+      right: -10%;
+      animation-delay: 0s;
+    }
+
+    .edu-orb-2 {
+      width: 300px;
+      height: 300px;
+      background: {{COLOR_ACCENT}};
+      bottom: -10%;
+      left: -8%;
+      animation-delay: -7s;
+    }
+
+    .edu-orb-3 {
+      width: 250px;
+      height: 250px;
+      background: {{COLOR_SECONDARY}};
+      top: 50%;
+      left: 40%;
+      animation-delay: -14s;
+    }
+
+    @keyframes eduGlassOrbFloat {
+      0%, 100% {
+        transform: translate(0, 0) scale(1);
+      }
+      25% {
+        transform: translate(40px, -40px) scale(1.1);
+      }
+      50% {
+        transform: translate(-30px, 30px) scale(0.9);
+      }
+      75% {
+        transform: translate(25px, 15px) scale(1.05);
+      }
+    }
+
+    /* Timeline container */
+    .edu-glass-timeline {
+      max-width: 900px;
+      margin: 0 auto;
+      position: relative;
+      z-index: 2;
+      display: flex;
+      flex-direction: column;
+      gap: 2rem;
+    }
+
+    /* Glassmorphism card */
+    .edu-glass-card {
+      background: rgba(255, 255, 255, 0.08);
+      backdrop-filter: blur(20px);
+      -webkit-backdrop-filter: blur(20px);
+      border-radius: 20px;
+      padding: 2rem;
+      border: 1px solid rgba(255, 255, 255, 0.1);
+      transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+      position: relative;
+      overflow: hidden;
+      opacity: 0;
+      transform: translateY(30px);
+    }
+
+    .edu-glass-card.visible {
+      opacity: 1;
+      transform: translateY(0);
+    }
+
+    /* Staggered animation delays */
+    .edu-glass-card:nth-child(1) { transition-delay: 0.1s; }
+    .edu-glass-card:nth-child(2) { transition-delay: 0.2s; }
+    .edu-glass-card:nth-child(3) { transition-delay: 0.3s; }
+    .edu-glass-card:nth-child(4) { transition-delay: 0.4s; }
+    .edu-glass-card:nth-child(5) { transition-delay: 0.5s; }
+
+    /* Gradient border glow on hover */
+    .edu-glass-card::before {
+      content: '';
+      position: absolute;
+      inset: -2px;
+      border-radius: 22px;
+      background: linear-gradient(135deg, {{COLOR_PRIMARY}}, {{COLOR_ACCENT}});
+      z-index: -1;
+      opacity: 0;
+      transition: opacity 0.4s ease;
+    }
+
+    .edu-glass-card::after {
+      content: '';
+      position: absolute;
+      inset: 0;
+      border-radius: 20px;
+      background: {{COLOR_SURFACE}};
+      z-index: -1;
+    }
+
+    .edu-glass-card:hover {
+      transform: translateY(-8px);
+      box-shadow: 
+        0 20px 50px rgba(0, 0, 0, 0.25),
+        0 0 40px {{COLOR_PRIMARY}}15;
+    }
+
+    .edu-glass-card:hover::before {
+      opacity: 1;
+    }
+
+    /* Card header with duration badge */
+    .edu-glass-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-start;
+      margin-bottom: 1rem;
+      gap: 1rem;
+    }
+
+    .edu-glass-duration {
+      font-size: 0.85rem;
+      padding: 0.4rem 1rem;
+      background: linear-gradient(135deg, {{COLOR_PRIMARY}}25, {{COLOR_ACCENT}}25);
+      color: {{COLOR_ACCENT}};
+      border-radius: 20px;
+      font-weight: 500;
+      white-space: nowrap;
+    }
+
+    .edu-glass-degree {
+      font-family: {{FONT_HEADING}}, sans-serif;
+      font-size: 1.4rem;
+      font-weight: 600;
+      color: {{COLOR_TEXT}};
+      margin-bottom: 0.25rem;
+      line-height: 1.3;
+    }
+
+    .edu-glass-school {
+      font-size: 1.1rem;
+      color: {{COLOR_PRIMARY}};
+      font-weight: 500;
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+    }
+
+    .edu-glass-school::before {
+      content: '';
+      width: 8px;
+      height: 8px;
+      border-radius: 50%;
+      background: {{COLOR_ACCENT}};
+      display: inline-block;
+    }
+
+    .edu-glass-gpa {
+      font-size: 0.9rem;
+      color: {{COLOR_ACCENT}};
+      font-weight: 500;
+      margin-top: 0.5rem;
+    }
+
+    .edu-glass-description {
+      font-family: {{FONT_BODY}}, sans-serif;
+      color: {{COLOR_TEXT}};
+      line-height: 1.7;
+      font-size: 0.95rem;
+      margin-top: 1rem;
+      padding-top: 1rem;
+      border-top: 1px solid rgba(255, 255, 255, 0.08);
+    }
+
+    /* Empty State */
+    .education-empty-state {
+      text-align: center;
+      padding: 4rem 2rem;
+      max-width: 500px;
+      margin: 0 auto;
+    }
+
+    .empty-icon {
+      font-size: 4rem;
+      margin-bottom: 1.5rem;
+      opacity: 0.5;
+    }
+
+    .empty-message {
+      font-size: 1.1rem;
+      color: {{COLOR_TEXT_SECONDARY}};
+      margin-bottom: 2rem;
+      line-height: 1.6;
+    }
+
+    /* Responsive breakpoints */
+    @media (max-width: 1024px) {
+      .edu-glass-degree {
+        font-size: 1.25rem;
+      }
+
+      .edu-glass-school {
+        font-size: 1rem;
+      }
+    }
+
+    @media (max-width: 768px) {
+      .education-glass {
+        padding: 4rem 1rem;
+      }
+
+      .education-glass .section-title {
+        font-size: 2rem;
+        margin-bottom: 2rem;
+      }
+
+      .edu-glass-card {
+        padding: 1.5rem;
+      }
+
+      .edu-glass-header {
+        flex-direction: column;
+        gap: 0.75rem;
+      }
+
+      .edu-glass-degree {
+        font-size: 1.15rem;
+      }
+
+      .edu-glass-school {
+        font-size: 0.95rem;
+      }
+
+      .edu-glass-description {
+        font-size: 0.9rem;
+      }
+
+      .edu-orb {
+        opacity: 0.2;
+      }
+    }
+
+    @media (max-width: 480px) {
+      .education-glass {
+        padding: 3rem 1rem;
+      }
+
+      .edu-glass-card {
+        padding: 1.25rem;
+        border-radius: 16px;
+      }
+
+      .edu-glass-degree {
+        font-size: 1.1rem;
+      }
+
+      .edu-glass-duration {
+        font-size: 0.8rem;
+        padding: 0.35rem 0.75rem;
+      }
+    }
+
+    @media (prefers-reduced-motion: reduce) {
+      .edu-orb {
+        animation: none;
+      }
+
+      .edu-glass-card {
+        opacity: 1;
+        transform: none;
+        transition: box-shadow 0.3s ease;
+      }
+
+      .edu-glass-card:hover {
+        transform: none;
+      }
+    }
+
+    /* Print Styles */
+    @media print {
+      .education-glass {
+        padding: 2rem 0;
+        background: white;
+      }
+
+      .edu-glass-orbs {
+        display: none;
+      }
+
+      .edu-glass-card {
+        opacity: 1;
+        transform: none;
+        background: white;
+        border: 1px solid #ddd;
+        box-shadow: none;
+        page-break-inside: avoid;
+        margin-bottom: 1rem;
+      }
+
+      .edu-glass-card::before,
+      .edu-glass-card::after {
+        display: none;
+      }
+
+      .edu-glass-card:hover {
+        transform: none;
+        box-shadow: none;
+      }
+    }
+  `,
+  jsTemplate: `
+    // Scroll-triggered animations for glass cards
+    document.addEventListener('DOMContentLoaded', function() {
+      const observerOptions = {
+        threshold: 0.15,
+        rootMargin: '0px 0px -50px 0px'
+      };
+
+      const observer = new IntersectionObserver((entries) => {
+        entries.forEach(entry => {
+          if (entry.isIntersecting) {
+            entry.target.classList.add('visible');
+          }
+        });
+      }, observerOptions);
+
+      document.querySelectorAll('.edu-glass-card').forEach(card => {
+        observer.observe(card);
+      });
+    });
+  `,
+  placeholders: [
+    "{{EDUCATION_ITEMS}}",
+    "{{COLOR_PRIMARY}}", "{{COLOR_SECONDARY}}", "{{COLOR_BACKGROUND}}",
+    "{{COLOR_ACCENT}}", "{{COLOR_TEXT}}", "{{COLOR_TEXT_SECONDARY}}",
+    "{{COLOR_SURFACE}}", "{{FONT_HEADING}}", "{{FONT_BODY}}"
+  ]
+};
+
+/**
+ * Education Template 8 - Animated Gradient
+ * Dinamik animated gradient arka plan, shimmer efektli kartlar, staggered entry animasyonları
+ * Uyumluluk: hero-animated-gradient, portfolio-animated-gradient, footer-animated-gradient, languages-animated-gradient
+ */
+export const educationTemplate8: ComponentTemplate = {
+  id: EDUCATION_TEMPLATE_IDS.ANIMATED_GRADIENT,
+  name: "Animated Gradient Education",
+  category: "education",
+  htmlTemplate: `
+    <section class="education-gradient" id="education" role="region" aria-labelledby="education-gradient-heading">
+      <!-- Animated gradient background -->
+      <div class="edu-gradient-bg" aria-hidden="true"></div>
+      
+      <div class="container">
+        <h2 class="section-title" id="education-gradient-heading">Eğitim Geçmişim</h2>
+        <div class="edu-gradient-timeline">
+          {{EDUCATION_ITEMS}}
+        </div>
+      </div>
+    </section>
+  `,
+  cssTemplate: `
+    .education-gradient {
+      padding: 6rem 2rem;
+      background: {{COLOR_BACKGROUND}};
+      color: {{COLOR_TEXT}};
+      font-family: {{FONT_BODY}}, sans-serif;
+      position: relative;
+      overflow: hidden;
+      isolation: isolate;
+    }
+
+    /* Animated gradient background */
+    .edu-gradient-bg {
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: linear-gradient(
+        135deg,
+        {{COLOR_PRIMARY}}12 0%,
+        transparent 35%,
+        {{COLOR_ACCENT}}12 55%,
+        transparent 75%,
+        {{COLOR_SECONDARY}}10 100%
+      );
+      animation: eduGradientShift 18s ease-in-out infinite;
+      pointer-events: none;
+      z-index: 1;
+    }
+
+    @keyframes eduGradientShift {
+      0%, 100% {
+        opacity: 0.6;
+        transform: scale(1) rotate(0deg);
+      }
+      33% {
+        opacity: 0.8;
+        transform: scale(1.05) rotate(2deg);
+      }
+      66% {
+        opacity: 0.7;
+        transform: scale(1.1) rotate(-1deg);
+      }
+    }
+
+    .education-gradient .container {
+      position: relative;
+      z-index: 2;
+      max-width: 900px;
+      margin: 0 auto;
+    }
+
+    .education-gradient .section-title {
+      font-family: {{FONT_HEADING}}, sans-serif;
+      text-align: center;
+      font-size: 2.5rem;
+      font-weight: 700;
+      margin-bottom: 3rem;
+      background: linear-gradient(135deg, {{COLOR_PRIMARY}}, {{COLOR_ACCENT}});
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+    }
+
+    .edu-gradient-timeline {
+      display: flex;
+      flex-direction: column;
+      gap: 2rem;
+    }
+
+    /* Gradient-styled card */
+    .edu-gradient-card {
+      background: rgba(255, 255, 255, 0.06);
+      backdrop-filter: blur(10px);
+      -webkit-backdrop-filter: blur(10px);
+      border-radius: 16px;
+      padding: 2rem;
+      border: 1px solid rgba(255, 255, 255, 0.08);
+      transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+      position: relative;
+      overflow: hidden;
+      opacity: 0;
+      transform: translateX(-30px);
+    }
+
+    .edu-gradient-card.visible {
+      opacity: 1;
+      transform: translateX(0);
+    }
+
+    /* Shimmer overlay on hover */
+    .edu-gradient-card::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: -100%;
+      width: 100%;
+      height: 100%;
+      background: linear-gradient(
+        90deg,
+        transparent,
+        rgba(255, 255, 255, 0.1),
+        transparent
+      );
+      transition: left 0.6s ease;
+    }
+
+    .edu-gradient-card:hover::before {
+      left: 100%;
+    }
+
+    .edu-gradient-card:hover {
+      transform: translateX(8px);
+      background: rgba(255, 255, 255, 0.1);
+      box-shadow: 
+        0 15px 40px rgba(0, 0, 0, 0.15),
+        0 0 25px {{COLOR_PRIMARY}}10;
+    }
+
+    /* Card header */
+    .edu-gradient-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-start;
+      margin-bottom: 1rem;
+      gap: 1rem;
+    }
+
+    .edu-gradient-duration {
+      font-size: 0.85rem;
+      padding: 0.5rem 1.25rem;
+      background: linear-gradient(135deg, {{COLOR_PRIMARY}}, {{COLOR_ACCENT}});
+      color: white;
+      border-radius: 25px;
+      font-weight: 600;
+      white-space: nowrap;
+      box-shadow: 0 4px 12px {{COLOR_PRIMARY}}30;
+    }
+
+    .edu-gradient-degree {
+      font-family: {{FONT_HEADING}}, sans-serif;
+      font-size: 1.4rem;
+      font-weight: 600;
+      color: {{COLOR_TEXT}};
+      margin-bottom: 0.35rem;
+      line-height: 1.3;
+    }
+
+    .edu-gradient-school {
+      font-size: 1.1rem;
+      color: {{COLOR_PRIMARY}};
+      font-weight: 500;
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+    }
+
+    .edu-gradient-school::before {
+      content: '';
+      width: 10px;
+      height: 10px;
+      border-radius: 50%;
+      background: linear-gradient(135deg, {{COLOR_PRIMARY}}, {{COLOR_ACCENT}});
+      display: inline-block;
+    }
+
+    .edu-gradient-gpa {
+      font-size: 0.9rem;
+      color: {{COLOR_ACCENT}};
+      font-weight: 500;
+      margin-top: 0.5rem;
+    }
+
+    .edu-gradient-description {
+      font-family: {{FONT_BODY}}, sans-serif;
+      color: {{COLOR_TEXT}};
+      line-height: 1.7;
+      font-size: 0.95rem;
+      margin-top: 1.25rem;
+      padding-top: 1.25rem;
+      border-top: 1px solid rgba(255, 255, 255, 0.08);
+    }
+
+    /* Empty State */
+    .education-empty-state {
+      text-align: center;
+      padding: 4rem 2rem;
+      max-width: 500px;
+      margin: 0 auto;
+    }
+
+    .empty-icon {
+      font-size: 4rem;
+      margin-bottom: 1.5rem;
+      opacity: 0.5;
+    }
+
+    .empty-message {
+      font-size: 1.1rem;
+      color: {{COLOR_TEXT_SECONDARY}};
+      margin-bottom: 2rem;
+      line-height: 1.6;
+    }
+
+    /* Responsive breakpoints */
+    @media (max-width: 1024px) {
+      .edu-gradient-degree {
+        font-size: 1.25rem;
+      }
+
+      .edu-gradient-school {
+        font-size: 1rem;
+      }
+    }
+
+    @media (max-width: 768px) {
+      .education-gradient {
+        padding: 4rem 1rem;
+      }
+
+      .education-gradient .section-title {
+        font-size: 2rem;
+        margin-bottom: 2rem;
+      }
+
+      .edu-gradient-card {
+        padding: 1.5rem;
+      }
+
+      .edu-gradient-header {
+        flex-direction: column;
+        gap: 0.75rem;
+      }
+
+      .edu-gradient-duration {
+        align-self: flex-start;
+      }
+
+      .edu-gradient-degree {
+        font-size: 1.15rem;
+      }
+
+      .edu-gradient-school {
+        font-size: 0.95rem;
+      }
+
+      .edu-gradient-description {
+        font-size: 0.9rem;
+      }
+    }
+
+    @media (max-width: 480px) {
+      .education-gradient {
+        padding: 3rem 1rem;
+      }
+
+      .edu-gradient-card {
+        padding: 1.25rem;
+        border-radius: 12px;
+      }
+
+      .edu-gradient-degree {
+        font-size: 1.1rem;
+      }
+
+      .edu-gradient-duration {
+        font-size: 0.8rem;
+        padding: 0.4rem 1rem;
+      }
+    }
+
+    @media (prefers-reduced-motion: reduce) {
+      .edu-gradient-bg {
+        animation: none;
+      }
+
+      .edu-gradient-card {
+        opacity: 1;
+        transform: none;
+        transition: background 0.3s ease, box-shadow 0.3s ease;
+      }
+
+      .edu-gradient-card::before {
+        display: none;
+      }
+
+      .edu-gradient-card:hover {
+        transform: none;
+      }
+    }
+
+    /* Print Styles */
+    @media print {
+      .education-gradient {
+        padding: 2rem 0;
+        background: white;
+      }
+
+      .edu-gradient-bg {
+        display: none;
+      }
+
+      .edu-gradient-card {
+        opacity: 1;
+        transform: none;
+        background: white;
+        border: 1px solid #ddd;
+        box-shadow: none;
+        page-break-inside: avoid;
+        margin-bottom: 1rem;
+      }
+
+      .edu-gradient-card::before {
+        display: none;
+      }
+
+      .edu-gradient-card:hover {
+        transform: none;
+        box-shadow: none;
+      }
+
+      .education-gradient .section-title {
+        background: none;
+        -webkit-text-fill-color: {{COLOR_PRIMARY}};
+        color: {{COLOR_PRIMARY}};
+      }
+
+      .edu-gradient-duration {
+        background: #f0f0f0;
+        color: #333;
+        box-shadow: none;
+      }
+    }
+  `,
+  jsTemplate: `
+    // Wave-like stagger animation for gradient cards
+    document.addEventListener('DOMContentLoaded', function() {
+      const observerOptions = {
+        threshold: 0.15,
+        rootMargin: '0px 0px -50px 0px'
+      };
+
+      const observer = new IntersectionObserver((entries) => {
+        entries.forEach(entry => {
+          if (entry.isIntersecting) {
+            const cards = entry.target.querySelectorAll('.edu-gradient-card');
+            cards.forEach((card, index) => {
+              setTimeout(() => {
+                card.classList.add('visible');
+              }, index * 120);
+            });
+            observer.unobserve(entry.target);
+          }
+        });
+      }, observerOptions);
+
+      const timeline = document.querySelector('.edu-gradient-timeline');
+      if (timeline) {
+        observer.observe(timeline);
+      }
+    });
+  `,
+  placeholders: [
+    "{{EDUCATION_ITEMS}}",
+    "{{COLOR_PRIMARY}}", "{{COLOR_SECONDARY}}", "{{COLOR_BACKGROUND}}",
+    "{{COLOR_ACCENT}}", "{{COLOR_TEXT}}", "{{COLOR_TEXT_SECONDARY}}",
+    "{{FONT_HEADING}}", "{{FONT_BODY}}"
   ]
 };
 
@@ -1763,5 +2584,7 @@ export const educationTemplates = [
   educationTemplate3,
   educationTemplate4,
   educationTemplate5,
-  educationTemplate6
+  educationTemplate6,
+  educationTemplate7,
+  educationTemplate8
 ];
