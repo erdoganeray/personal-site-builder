@@ -1,12 +1,12 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, Suspense } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 import Link from "next/link";
 import PasswordStrengthMeter, { isPasswordStrong } from "@/components/ui/PasswordStrengthMeter";
 import { ArrowLeft, Sparkles, UserPlus } from "lucide-react";
 
-export default function RegisterPage() {
+function RegisterContent() {
     const router = useRouter();
     const searchParams = useSearchParams();
     const [name, setName] = useState("");
@@ -182,5 +182,22 @@ export default function RegisterPage() {
                 </div>
             </div>
         </div>
+    );
+}
+
+// Loading fallback for Suspense
+function RegisterLoading() {
+    return (
+        <div className="min-h-screen bg-[#0a0a0a] flex items-center justify-center">
+            <div className="w-8 h-8 border-2 border-purple-500/30 border-t-purple-500 rounded-full animate-spin" />
+        </div>
+    );
+}
+
+export default function RegisterPage() {
+    return (
+        <Suspense fallback={<RegisterLoading />}>
+            <RegisterContent />
+        </Suspense>
     );
 }
