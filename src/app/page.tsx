@@ -30,9 +30,13 @@ export default async function Home() {
           <div className="flex justify-between items-center">
             {/* Scroll to top link */}
             <Link href="#" className="flex items-center gap-2 group">
-              <div className="w-8 h-8 rounded-lg bg-gradient-to-tr from-purple-600 to-blue-600 flex items-center justify-center group-hover:scale-105 transition-transform">
-                <span className="text-white font-bold text-lg">P</span>
-              </div>
+              <Image
+                src="/logo.png"
+                alt="Profilly"
+                width={32}
+                height={32}
+                className="rounded-lg group-hover:scale-105 transition-transform"
+              />
               <span className="text-xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-white to-gray-400 group-hover:from-white group-hover:to-white transition-all">
                 Profilly
               </span>
@@ -347,9 +351,13 @@ export default async function Home() {
       <footer className="border-t border-white/5 py-12 bg-[#050505]">
         <div className="max-w-6xl mx-auto px-4 flex flex-col md:flex-row justify-between items-center gap-6">
           <div className="flex items-center gap-2">
-            <div className="w-8 h-8 rounded-lg bg-white/10 flex items-center justify-center">
-              <span className="text-white font-bold">P</span>
-            </div>
+            <Image
+              src="/logo.png"
+              alt="Profilly"
+              width={32}
+              height={32}
+              className="rounded-lg"
+            />
             <span className="text-xl font-bold text-white">Profilly</span>
           </div>
 

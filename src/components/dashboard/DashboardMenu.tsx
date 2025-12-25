@@ -205,9 +205,13 @@ export default function DashboardMenu({
                 {/* Profilly Logo */}
                 <div className="pt-4 pb-2">
                     <Link href="/" className={`flex items-center gap-2 group transition-all duration-300 ${isCollapsed ? 'justify-center' : ''}`}>
-                        <div className="w-8 h-8 rounded-lg bg-gradient-to-tr from-purple-600 to-blue-600 flex items-center justify-center group-hover:scale-105 transition-transform flex-shrink-0">
-                            <span className="text-white font-bold text-lg">P</span>
-                        </div>
+                        <Image
+                            src="/logo.png"
+                            alt="Profilly"
+                            width={32}
+                            height={32}
+                            className="rounded-lg group-hover:scale-105 transition-transform flex-shrink-0"
+                        />
                         <span className={`text-lg font-bold bg-clip-text text-transparent bg-gradient-to-r from-white to-gray-400 group-hover:from-white group-hover:to-white whitespace-nowrap overflow-hidden transition-all duration-300 ease-in-out ${isCollapsed ? 'w-0 opacity-0' : 'w-auto opacity-100'}`}>
                             Profilly
                         </span>

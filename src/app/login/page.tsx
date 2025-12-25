@@ -4,6 +4,7 @@ import { useState, Suspense } from "react";
 import { signIn } from "next-auth/react";
 import { useRouter, useSearchParams } from "next/navigation";
 import Link from "next/link";
+import Image from "next/image";
 import { ArrowLeft, Sparkles } from "lucide-react";
 
 function LoginContent() {
@@ -91,9 +92,13 @@ function LoginContent() {
                     {/* Logo and Title */}
                     <div className="text-center mb-8 relative z-10">
                         <div className="flex justify-center mb-4">
-                            <div className="w-14 h-14 rounded-2xl bg-gradient-to-tr from-purple-600 to-blue-600 flex items-center justify-center shadow-lg shadow-purple-500/25">
-                                <span className="text-white font-bold text-2xl">P</span>
-                            </div>
+                            <Image
+                                src="/logo.png"
+                                alt="Profilly"
+                                width={56}
+                                height={56}
+                                className="rounded-2xl shadow-lg shadow-purple-500/25"
+                            />
                         </div>
                         <h1 className="text-3xl md:text-4xl font-bold text-white mb-2">
                             Tekrar Hoş Geldiniz

@@ -226,7 +226,7 @@ function DashboardContent() {
         <>
             <div className="min-h-screen bg-[#0a0a0a] flex">
                 {/* Left Menu */}
-                <div className={`relative h-screen transition-all duration-300 flex-shrink-0 ${isMenuCollapsed ? 'w-16' : 'w-56'}`}>
+                <div className={`sticky top-0 h-screen transition-all duration-300 flex-shrink-0 z-30 ${isMenuCollapsed ? 'w-16' : 'w-56'}`}>
                     <DashboardMenu
                         activeTab={activeTab}
                         onTabChange={handleTabChange}

@@ -29,32 +29,6 @@
 - portfolioda video
 - belki more belirli mb storage
 
-# Geliştime Planı
-
-## Vercel Deploydan Sonra Yapılacaklar
-
-### Vercel Cron Job
-- landing page i vercel e deploy ettikten sonra yapılacak
-
-#### Subdomain Rezervasyon Temizliği
-- /api/cron/cleanup-reservations/route.ts endpoint'i oluştur (süresi dolmuş subdomain rezervasyonlarını temizler)
-- vercel.json dosyasına cron job ekle (her 6 saatte bir çalışacak şekilde)
-- CRON_SECRET environment variable'ı Vercel'e ekle (güvenlik için)
-- Deploy sonrası Vercel Dashboard'dan manuel test et
-
-#### Soft Delete Fotoğraf Temizliği (Rollback Sistemi)
-- /api/cron/cleanup-deleted-assets/route.ts endpoint'i oluştur (30 günden eski soft-deleted fotoğrafları temizler)
-- vercel.json dosyasına cron job ekle (her gece saat 02:00'de çalışacak şekilde: "0 2 * * *")
-- CRON_SECRET environment variable'ı kullan (aynı secret her iki cron job için kullanılabilir)
-- DeletedAsset tablosundan 30 günden eski kayıtları bul ve ilgili R2 dosyalarını sil
-- Deploy sonrası Vercel Dashboard'dan manuel test et
-
-#### Anonim Session Temizliği
-- /api/cron/cleanup-anonymous-sessions/route.ts endpoint'i oluştur
-- Kayıt/giriş yapılmamış (isAnonymous=true) anonim session'ları belirli bir süreden sonra (örn: 7 gün) sil
-- İlgili Site kayıtlarını ve R2'deki CV dosyalarını da temizle
-- vercel.json dosyasına cron job ekle
-
 
 # MVP'de Olmasına Gerek Var Mı?
 - npm run build deki lint hatalarını ignore ettik, düzeltilmesi gerek.
@@ -90,6 +64,5 @@
     4. Tombstone pattern: Silinen dosyalar için kalıcı kayıt tut
   - **Önerilen:** Seçenek 1 + 3 kombinasyonu (DeletedAsset kayıtlarını sakla + rollback sırasında dosya kontrolü)
 
-  # Feedback
-  - site oluştururken prompt alanına hiçbir şey yazmadığımız durumunu sürekli tekrarladığımda sanki her seferinde aynı templateler seçiliyormuş gibi hissettim. (az önce farklı bir template kullanıldı)
-  - 
+# Feedback
+- Vercel Hobby plan limitleri nedeniyle (max 2 cron job) tüm temizlik işlemleri `/api/cron/cleanup-all` altında tek bir job olarak birleştirildi.
