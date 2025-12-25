@@ -78,6 +78,91 @@ export interface CVData {
 }
 
 /**
+ * Cleans up language data by extracting level from parentheses
+ * Examples:
+ * - "Turkish (Native)" → { name: "Turkish", level: "native", percentage: 100 }
+ * - "English (Fluent)" → { name: "English", level: "fluent", percentage: 90 }
+ * - { name: "Spanish (Advanced)", level: "intermediate" } → { name: "Spanish", level: "advanced", percentage: 75 }
+ */
+function cleanLanguageData(languages: (string | CVLanguage)[]): (string | CVLanguage)[] {
+  const levelMapping: Record<string, CVLanguage['level']> = {
+    'native': 'native',
+    'fluent': 'fluent',
+    'advanced': 'advanced',
+    'intermediate': 'intermediate',
+    'basic': 'basic',
+    'ana dil': 'native',
+    'akıcı': 'fluent',
+    'ileri': 'advanced',
+    'orta': 'intermediate',
+    'başlangıç': 'basic',
+  };
+
+  const levelPercentages: Record<NonNullable<CVLanguage['level']>, number> = {
+    'native': 100,
+    'fluent': 90,
+    'advanced': 75,
+    'intermediate': 60,
+    'basic': 40,
+  };
+
+  return languages.map(lang => {
+    // If it's already a proper CVLanguage object without parentheses, return as-is
+    if (typeof lang === 'object' && !lang.name.includes('(')) {
+      return lang;
+    }
+
+    // Extract language name and level from parentheses pattern
+    let name: string;
+    let extractedLevel: CVLanguage['level'] | undefined;
+
+    if (typeof lang === 'string') {
+      name = lang;
+    } else {
+      name = lang.name;
+      extractedLevel = lang.level;
+    }
+
+    // Match pattern like "Turkish (Native)" or "English (Fluent)"
+    const match = name.match(/^(.+?)\s*\((.+?)\)$/);
+    if (match) {
+      const cleanName = match[1].trim();
+      const levelText = match[2].trim().toLowerCase();
+
+      // Map the extracted level text to our enum
+      const mappedLevel: CVLanguage['level'] | undefined = levelMapping[levelText];
+
+      if (mappedLevel) {
+        // Return as CVLanguage object with extracted level
+        return {
+          name: cleanName,
+          level: mappedLevel,
+          percentage: levelPercentages[mappedLevel],
+          certifications: typeof lang === 'object' ? lang.certifications : undefined,
+          cefr: typeof lang === 'object' ? lang.cefr : undefined,
+        } as CVLanguage;
+      } else {
+        // Level text not recognized, just clean the name
+        name = cleanName;
+      }
+    }
+
+    // Return cleaned data
+    if (typeof lang === 'string') {
+      // If no level was extracted, keep as string
+      return name;
+    } else {
+      // Keep as object with cleaned name
+      return {
+        ...lang,
+        name,
+        level: extractedLevel || lang.level,
+      };
+    }
+  });
+}
+
+/**
  * PDF dosyasını Gemini API kullanarak analiz eder ve yapılandırılmış CV verisi döndürür
  * @param pdfBuffer PDF dosyasının Buffer formatında içeriği
  * @returns CVData nesnesi
@@ -145,10 +230,19 @@ JSON formatında yapılandırılmış olarak döndür:
 
 Diller için özel kurallar:
 - Diller basit string olarak veya obje olarak döndürülebilir
+- ÖNEMLİ: Dil adı ASLA parantez içinde seviye bilgisi içermemeli! 
+  YANLIŞ: "Turkish (Native)", "English (Fluent)"
+  DOĞRU: {"name": "Turkish", "level": "native"} veya {"name": "English", "level": "fluent"}
 - Eğer CV'de dil seviyesi belirtilmişse (Native, Fluent, Advanced, Intermediate, Basic), obje formatını kullan
+- "level" alanı için SADECE şu değerleri kullan: "native", "fluent", "advanced", "intermediate", "basic"
 - Eğer TOEFL, IELTS, CEFR gibi sertifikalar varsa bunları "certifications" array'ine ekle
 - CEFR seviyeleri: A1, A2, B1, B2, C1, C2
 - Seviye belirtilmemişse sadece dil adını string olarak döndür
+
+Örnekler:
+- CV'de "Turkish (Native)" yazıyorsa → {"name": "Turkish", "level": "native"}
+- CV'de "English (Fluent)" yazıyorsa → {"name": "English", "level": "fluent"}
+- CV'de sadece "Spanish" yazıyorsa → "Spanish"
 
 Eğitim için özel kurallar:
 - Eğer CV'de GPA/not ortalaması belirtilmişse "gpa" alanına ekle
@@ -208,6 +302,9 @@ Eğitim için özel kurallar:
     cvData.education = cvData.education || [];
     cvData.skills = cvData.skills || [];
     cvData.languages = cvData.languages || [];
+
+    // Clean up language data (remove level from parentheses in name field)
+    cvData.languages = cleanLanguageData(cvData.languages);
 
     return cvData;
   } catch (error) {

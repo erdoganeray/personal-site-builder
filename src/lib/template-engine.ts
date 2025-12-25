@@ -98,14 +98,37 @@ export function convertR2UrlToRelativePath(url: string, forPublish: boolean = tr
 
 /**
  * HTML içeriğindeki tüm R2 URL'lerini relative path'e çevirir (published siteler için)
+ * Aşağıdaki formatları destekler:
+ * 1. R2 public URL: https://pub-xxx.r2.dev/users/{userId}/profile/photo.jpg
+ * 2. Proxy URL: /api/proxy-image?url=https://pub-xxx.r2.dev/users/{userId}/profile/photo.jpg
+ * 3. Anonymous URL: /api/anonymous/assets/{userId}/profile/photo.jpg
+ * 
+ * Hepsi şu formata dönüştürülür: /_assets/profile/photo.jpg
  */
 export function convertHtmlAssetsToRelativePaths(html: string): string {
-  // Tüm R2 public URL'lerini bul ve değiştir
-  const r2UrlPattern = /https?:\/\/pub-[a-f0-9]+\.r2\.dev\/users\/[^/]+\/(profile|portfolio)\/([^"'\s>]+)/g;
+  let result = html;
 
-  return html.replace(r2UrlPattern, (match, folder, fileName) => {
+  // 1. R2 public URL'lerini dönüştür
+  const r2UrlPattern = /https?:\/\/pub-[a-f0-9]+\.r2\.dev\/users\/[^/]+\/(profile|portfolio)\/([^"'\s>]+)/g;
+  result = result.replace(r2UrlPattern, (match, folder, fileName) => {
     return `/_assets/${folder}/${fileName}`;
   });
+
+  // 2. Proxy URL'lerini dönüştür: /api/proxy-image?url=https://pub-xxx.r2.dev/users/{userId}/profile/photo.jpg
+  const proxyUrlPattern = /\/api\/proxy-image\?url=https?%3A%2F%2Fpub-[a-f0-9]+\.r2\.dev%2Fusers%2F[^%]+%2F(profile|portfolio)%2F([^"'\s>&]+)/g;
+  result = result.replace(proxyUrlPattern, (match, folder, fileName) => {
+    // URL decode the filename
+    const decodedFileName = decodeURIComponent(fileName);
+    return `/_assets/${folder}/${decodedFileName}`;
+  });
+
+  // 3. Anonymous asset URL'lerini dönüştür: /api/anonymous/assets/{userId}/profile/photo.jpg
+  const anonymousUrlPattern = /\/api\/anonymous\/assets\/[^/]+\/(profile|portfolio)\/([^"'\s>]+)/g;
+  result = result.replace(anonymousUrlPattern, (match, folder, fileName) => {
+    return `/_assets/${folder}/${fileName}`;
+  });
+
+  return result;
 }
 
 /**

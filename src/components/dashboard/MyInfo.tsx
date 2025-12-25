@@ -1235,7 +1235,7 @@ export default function MyInfo({ site, cvData, onDelete, onCVAnalyzed, deleting 
                                                             <button onClick={() => removeLanguage(index)} className="px-2 py-1 text-red-400 hover:text-red-300 text-sm">Sil</button>
                                                         </div>
                                                         <select value={langObj.cefr || ''} onChange={(e) => updateLanguage(index, 'cefr', e.target.value || undefined)} className="w-full px-3 py-2 bg-white/5 border border-white/10 text-white rounded-xl text-sm focus:ring-2 focus:ring-purple-500">
-                                                            <option value="">CEFR Seviyesi (Opsiyonel)</option>
+                                                            <option value="" disabled hidden={!!langObj.cefr}>CEFR Seviyesi (Opsiyonel)</option>
                                                             <option value="A1">A1 - Başlangıç</option>
                                                             <option value="A2">A2 - Temel</option>
                                                             <option value="B1">B1 - Orta Seviye</option>
