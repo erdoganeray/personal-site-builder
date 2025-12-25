@@ -30,5 +30,17 @@ export function convertRelativeAssetsToAbsolute(html: string): string {
         `src="${origin}/api/assets/`
     );
 
+    // 🐛 FIX: /api/proxy-image URL'lerini de absolute URL'e çevir (blob iframe için - profil fotoğrafı)
+    result = result.replace(
+        /src=["']\/api\/proxy-image\?/g,
+        `src="${origin}/api/proxy-image?`
+    );
+
+    // 🐛 FIX: /api/anonymous/assets URL'lerini de absolute URL'e çevir (blob iframe için - portfolio)
+    result = result.replace(
+        /src=["']\/api\/anonymous\/assets\//g,
+        `src="${origin}/api/anonymous/assets/`
+    );
+
     return result;
 }

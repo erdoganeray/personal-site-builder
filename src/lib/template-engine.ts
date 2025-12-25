@@ -143,6 +143,10 @@ export function getHeroReplacements(
   // Generate profile image content - either <img> tag or initials
   const profilePhotoUrl = cvData.personalInfo.profilePhotoUrl;
 
+  // 🐛 DEBUG: Log profil fotoğrafı URL'i
+  console.log('🖼️ [getHeroReplacements] profilePhotoUrl:', profilePhotoUrl);
+  console.log('🖼️ [getHeroReplacements] useAbsoluteUrls:', useAbsoluteUrls);
+
   // URL conversion based on context:
   // - Preview (useAbsoluteUrls=true): Use proxy /api/proxy-image for R2 URLs
   // - Publish (useAbsoluteUrls=false): Convert to /_assets relative path
@@ -151,15 +155,21 @@ export function getHeroReplacements(
     if (useAbsoluteUrls) {
       // Preview: use proxy to avoid CORS issues
       convertedPhotoUrl = `/api/proxy-image?url=${encodeURIComponent(convertedPhotoUrl)}`;
+      console.log('🖼️ [getHeroReplacements] Converted to proxy URL:', convertedPhotoUrl);
     } else {
       // Publish: convert to relative path for Cloudflare Worker
       convertedPhotoUrl = convertR2UrlToRelativePath(convertedPhotoUrl, true);
+      console.log('🖼️ [getHeroReplacements] Converted to relative path:', convertedPhotoUrl);
     }
+  } else {
+    console.log('🖼️ [getHeroReplacements] No conversion needed (not R2 URL or empty)');
   }
 
   const profileImageContent = convertedPhotoUrl
     ? `<img src="${escapeHtml(convertedPhotoUrl)}" alt="${escapeHtml(cvData.personalInfo.name)}" style="width: 100%; height: 100%; object-fit: cover; border-radius: inherit;" />`
     : escapeHtml(initials);
+
+  console.log('🖼️ [getHeroReplacements] Final profileImageContent type:', convertedPhotoUrl ? 'IMG' : 'INITIALS');
 
   // Generate social links HTML
   const socialLinksHtml: string[] = [];
