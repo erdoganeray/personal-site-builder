@@ -160,35 +160,91 @@ export default async function Home() {
         <div className="max-w-7xl mx-auto">
           <div className="text-center mb-16">
             <h2 className="text-3xl md:text-5xl font-bold text-white mb-6">Nasıl Çalışır?</h2>
-            <p className="text-gray-400 max-w-xl mx-auto">Karmaşık süreçleri unutun. Modern web teknolojisi ile tanışın.</p>
+            <p className="text-gray-400 max-w-2xl mx-auto">
+              CV'nizi yükleyin, yapay zeka sihirini yapsın, editörle özelleştirin ve tek tıkla yayınlayın.
+            </p>
           </div>
 
-          <div className="grid md:grid-cols-3 gap-8">
-            {[
-              {
-                icon: <Upload className="w-6 h-6 text-purple-400" />,
-                title: "1. İçerik Sağlayın",
-                desc: "CV'nizi yükleyin veya kendinizi kısaca anlatın."
-              },
-              {
-                icon: <Zap className="w-6 h-6 text-blue-400" />,
-                title: "2. AI Analizi",
-                desc: "Yapay zeka içeriğinizi analiz eder ve en uygun yapıyı kurgular."
-              },
-              {
-                icon: <Layout className="w-6 h-6 text-pink-400" />,
-                title: "3. Canlıya Alın",
-                desc: "Siteniz saniyeler içinde oluşturulur ve yayınlanır."
-              }
-            ].map((step, i) => (
-              <div key={i} className="group p-8 rounded-3xl bg-white/5 border border-white/5 hover:bg-white/10 transition-all duration-300">
-                <div className="w-12 h-12 rounded-2xl bg-white/5 flex items-center justify-center mb-6 group-hover:scale-110 transition-transform">
-                  {step.icon}
+          {/* Step by step with connecting line */}
+          <div className="relative">
+            {/* Connecting line - hidden on mobile */}
+            <div className="hidden lg:block absolute top-24 left-[10%] right-[10%] h-0.5 bg-gradient-to-r from-purple-500/20 via-blue-500/30 to-pink-500/20" />
+
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-6 lg:gap-4">
+              {[
+                {
+                  icon: <Upload className="w-6 h-6 text-purple-400" />,
+                  step: "1",
+                  title: "İçerik Sağlayın",
+                  desc: "CV'nizi (PDF) yükleyin veya kendinizi birkaç cümleyle tanıtın.",
+                  detail: "Desteklenen formatlar: PDF, metin"
+                },
+                {
+                  icon: <Zap className="w-6 h-6 text-blue-400" />,
+                  step: "2",
+                  title: "AI Sihri",
+                  desc: "Yapay zeka bilgilerinizi analiz eder, kategorize eder ve sitenizi oluşturur.",
+                  detail: "İsim, deneyim, yetenekler otomatik çıkarılır"
+                },
+                {
+                  icon: <Layout className="w-6 h-6 text-pink-400" />,
+                  step: "3",
+                  title: "Editörle Özelleştirin",
+                  desc: "Görsel editör ile renkler, fontlar ve şablonları değiştirin.",
+                  detail: "Tasarım değişiklikleri için editörü kullanın"
+                },
+                {
+                  icon: <Globe className="w-6 h-6 text-green-400" />,
+                  step: "4",
+                  title: "Subdomain Seçin",
+                  desc: "Size özel bir adres belirleyin: adiniz.profilly.com",
+                  detail: "7 gün boyunca sizin için rezerve edilir"
+                },
+                {
+                  icon: <CheckCircle2 className="w-6 h-6 text-orange-400" />,
+                  step: "5",
+                  title: "Yayınlayın",
+                  desc: "Tek tıkla sitenizi canlıya alın ve dünyayla paylaşın!",
+                  detail: "Değişiklikler anında yansır"
+                }
+              ].map((item, i) => (
+                <div key={i} className="group relative">
+                  {/* Step number bubble */}
+                  <div className="lg:absolute lg:-top-3 lg:left-1/2 lg:-translate-x-1/2 flex lg:justify-center mb-4 lg:mb-0">
+                    <div className="w-10 h-10 rounded-full bg-gradient-to-br from-purple-600 to-blue-600 flex items-center justify-center text-white font-bold text-sm shadow-lg shadow-purple-500/20 group-hover:scale-110 transition-transform z-10">
+                      {item.step}
+                    </div>
+                  </div>
+
+                  {/* Card */}
+                  <div className="p-6 lg:pt-12 rounded-2xl bg-white/5 border border-white/5 hover:bg-white/10 hover:border-white/10 transition-all duration-300 h-full">
+                    <div className="w-12 h-12 rounded-xl bg-white/5 flex items-center justify-center mb-4 group-hover:scale-110 transition-transform">
+                      {item.icon}
+                    </div>
+                    <h3 className="text-lg font-bold text-white mb-2">{item.title}</h3>
+                    <p className="text-gray-400 text-sm leading-relaxed mb-3">{item.desc}</p>
+                    <p className="text-xs text-gray-500 border-t border-white/5 pt-3">{item.detail}</p>
+                  </div>
                 </div>
-                <h3 className="text-xl font-bold text-white mb-3">{step.title}</h3>
-                <p className="text-gray-400 leading-relaxed">{step.desc}</p>
+              ))}
+            </div>
+          </div>
+
+          {/* Quick tips */}
+          <div className="mt-16 p-6 rounded-2xl bg-gradient-to-r from-purple-500/10 to-blue-500/10 border border-white/5">
+            <div className="flex items-start gap-4">
+              <div className="w-10 h-10 rounded-xl bg-purple-500/20 flex items-center justify-center flex-shrink-0">
+                <HelpCircle className="w-5 h-5 text-purple-400" />
               </div>
-            ))}
+              <div>
+                <h4 className="text-white font-semibold mb-2">💡 Bilmeniz Gerekenler</h4>
+                <ul className="text-gray-400 text-sm space-y-1">
+                  <li>• <strong className="text-gray-300">Bilgi değişiklikleri</strong> (isim, deneyim vb.) panelden yapılır ve önizlemede anında görünür.</li>
+                  <li>• <strong className="text-gray-300">Tasarım değişiklikleri</strong> (renkler, fontlar, şablonlar) için Editör'ü kullanın.</li>
+                  <li>• Subdomain'iniz yayınladığınızda 7 gün boyunca size özel olarak rezerve edilir.</li>
+                </ul>
+              </div>
+            </div>
           </div>
         </div>
       </section>
