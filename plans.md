@@ -65,6 +65,8 @@
   - **Önerilen:** Seçenek 1 + 3 kombinasyonu (DeletedAsset kayıtlarını sakla + rollback sırasında dosya kontrolü)
 
 # Feedback
+- Dashboard>Bilgilerim>Diller de dil seviyesi (ana dil, akıcı vb.) seçme kısmında ui hatası var.
+- Dil bilgisi çekilirken Native mi Fluent mi bilgisi yanlış çekiliyor.
 
 ## Beta Testi Sonrası Güncellenecekler
 - Vercel Hobby plan limitleri nedeniyle (max 2 cron job) tüm temizlik işlemleri `/api/cron/cleanup-all` altında tek bir job olarak birleştirildi.

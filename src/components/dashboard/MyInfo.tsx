@@ -1081,7 +1081,7 @@ export default function MyInfo({ site, cvData, onDelete, onCVAnalyzed, deleting 
                                             ) : (
                                                 <div className="text-sm">
                                                     <p className="font-medium text-white">{edu.degree} - {edu.field}</p>
-                                                    <p className="text-gray-400">{edu.school} ({edu.year}){edu.gpa && <span className="ml-2 text-green-400">â€¢ GPA: {edu.gpa}</span>}</p>
+                                                    <p className="text-gray-400">{edu.school} ({edu.year}){edu.gpa && <span className="ml-2 text-green-400">GPA: {edu.gpa}</span>}</p>
                                                 </div>
                                             )}
                                         </div>

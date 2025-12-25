@@ -130,7 +130,8 @@ export function replacePlaceholders(
  */
 export function getHeroReplacements(
   cvData: CVData,
-  themeColors: ThemeColors
+  themeColors: ThemeColors,
+  useAbsoluteUrls: boolean = false
 ): PlaceholderReplacements {
   const initials = cvData.personalInfo.name
     .split(' ')
@@ -141,8 +142,21 @@ export function getHeroReplacements(
 
   // Generate profile image content - either <img> tag or initials
   const profilePhotoUrl = cvData.personalInfo.profilePhotoUrl;
-  // Convert old R2 URLs to new relative paths
-  const convertedPhotoUrl = convertR2UrlToRelativePath(profilePhotoUrl || '');
+
+  // URL conversion based on context:
+  // - Preview (useAbsoluteUrls=true): Use proxy /api/proxy-image for R2 URLs
+  // - Publish (useAbsoluteUrls=false): Convert to /_assets relative path
+  let convertedPhotoUrl = profilePhotoUrl || '';
+  if (convertedPhotoUrl && convertedPhotoUrl.includes('.r2.dev')) {
+    if (useAbsoluteUrls) {
+      // Preview: use proxy to avoid CORS issues
+      convertedPhotoUrl = `/api/proxy-image?url=${encodeURIComponent(convertedPhotoUrl)}`;
+    } else {
+      // Publish: convert to relative path for Cloudflare Worker
+      convertedPhotoUrl = convertR2UrlToRelativePath(convertedPhotoUrl, true);
+    }
+  }
+
   const profileImageContent = convertedPhotoUrl
     ? `<img src="${escapeHtml(convertedPhotoUrl)}" alt="${escapeHtml(cvData.personalInfo.name)}" style="width: 100%; height: 100%; object-fit: cover; border-radius: inherit;" />`
     : escapeHtml(initials);
@@ -1408,7 +1422,7 @@ export function getReplacementsForComponent(
         iconSizes
       );
     case 'hero':
-      return getHeroReplacements(cvData, themeColors);
+      return getHeroReplacements(cvData, themeColors, useAbsoluteUrls);
     case 'experience':
       return getExperienceReplacements(cvData, themeColors, component.id);
     case 'education':

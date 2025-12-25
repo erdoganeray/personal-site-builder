@@ -170,7 +170,7 @@ ${seoTags}
           designPlan.iconStyle,
           designPlan.iconSizes,
           designPlan.stockImages, // Stock images parametresi
-          false, // useAbsoluteUrls
+          true, // useAbsoluteUrls - Preview için proxy URL kullan
           site.user.email || undefined // siteOwnerEmail - hesap emaili
         );
 
