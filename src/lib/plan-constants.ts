@@ -3,6 +3,9 @@
  * Defines plan types, limits, and features for the subscription system
  */
 
+// Test modu - production'a geçerken .env'den NEXT_PUBLIC_TEST_MODE_UNLIMITED değişkenini kaldır veya false yap
+const TEST_MODE_UNLIMITED_EDITS = process.env.NEXT_PUBLIC_TEST_MODE_UNLIMITED === 'true';
+
 export enum PlanType {
     FREE = "FREE",
     PAID = "PAID",
@@ -30,7 +33,7 @@ export interface PlanLimits {
 
 export const PLAN_LIMITS: Record<PlanType, PlanLimits> = {
     [PlanType.FREE]: {
-        editsPerMonth: 5,
+        editsPerMonth: TEST_MODE_UNLIMITED_EDITS ? 999999 : 5,
         versionHistory: 1,
         domainReservationDays: 7,
         totalPages: "one",
@@ -49,7 +52,7 @@ export const PLAN_LIMITS: Record<PlanType, PlanLimits> = {
         custom404: false,
     },
     [PlanType.PAID]: {
-        editsPerMonth: 20,
+        editsPerMonth: TEST_MODE_UNLIMITED_EDITS ? 999999 : 20,
         versionHistory: 3,
         domainReservationDays: 30,
         totalPages: "multiple",

@@ -65,4 +65,7 @@
   - **Önerilen:** Seçenek 1 + 3 kombinasyonu (DeletedAsset kayıtlarını sakla + rollback sırasında dosya kontrolü)
 
 # Feedback
+
+## Beta Testi Sonrası Güncellenecekler
 - Vercel Hobby plan limitleri nedeniyle (max 2 cron job) tüm temizlik işlemleri `/api/cron/cleanup-all` altında tek bir job olarak birleştirildi.
+- Düzenleme hakkı limiti özelliğini kaldır
