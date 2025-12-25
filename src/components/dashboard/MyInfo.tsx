@@ -1171,10 +1171,10 @@ export default function MyInfo({ site, cvData, onDelete, onCVAnalyzed, deleting 
                                                         <div className="flex gap-2 items-center">
                                                             <input type="text" value={skillObj.name} onChange={(e) => updateSkill(index, 'name', e.target.value)} placeholder="Yetenek adı" className="flex-1 px-3 py-2 bg-white/5 border border-white/10 text-white rounded-xl text-sm focus:ring-2 focus:ring-purple-500" />
                                                             <select value={skillObj.level || 'intermediate'} onChange={(e) => updateSkill(index, 'level', e.target.value as CVSkill['level'])} className="px-3 py-2 bg-white/5 border border-white/10 text-white rounded-xl text-sm focus:ring-2 focus:ring-purple-500">
-                                                                <option value="beginner">Başlangıç</option>
-                                                                <option value="intermediate">Orta</option>
-                                                                <option value="advanced">İleri</option>
-                                                                <option value="expert">Uzman</option>
+                                                                <option value="beginner" className="bg-[#1a1a1a] text-white">Başlangıç</option>
+                                                                <option value="intermediate" className="bg-[#1a1a1a] text-white">Orta</option>
+                                                                <option value="advanced" className="bg-[#1a1a1a] text-white">İleri</option>
+                                                                <option value="expert" className="bg-[#1a1a1a] text-white">Uzman</option>
                                                             </select>
                                                             <button onClick={() => removeSkill(index)} className="px-2 py-1 text-red-400 hover:text-red-300 text-sm">Sil</button>
                                                         </div>
@@ -1226,22 +1226,22 @@ export default function MyInfo({ site, cvData, onDelete, onCVAnalyzed, deleting 
                                                         <div className="flex gap-2 items-center">
                                                             <input type="text" value={langObj.name} onChange={(e) => updateLanguage(index, 'name', e.target.value)} placeholder="Dil adı (ör: İngilizce)" className="flex-1 px-3 py-2 bg-white/5 border border-white/10 text-white rounded-xl text-sm focus:ring-2 focus:ring-purple-500" />
                                                             <select value={langObj.level || 'intermediate'} onChange={(e) => updateLanguage(index, 'level', e.target.value as CVLanguage['level'])} className="px-3 py-2 bg-white/5 border border-white/10 text-white rounded-xl text-sm focus:ring-2 focus:ring-purple-500">
-                                                                <option value="native">Ana Dil</option>
-                                                                <option value="fluent">Akıcı</option>
-                                                                <option value="advanced">İleri</option>
-                                                                <option value="intermediate">Orta</option>
-                                                                <option value="basic">Başlangıç</option>
+                                                                <option value="native" className="bg-[#1a1a1a] text-white">Ana Dil</option>
+                                                                <option value="fluent" className="bg-[#1a1a1a] text-white">Akıcı</option>
+                                                                <option value="advanced" className="bg-[#1a1a1a] text-white">İleri</option>
+                                                                <option value="intermediate" className="bg-[#1a1a1a] text-white">Orta</option>
+                                                                <option value="basic" className="bg-[#1a1a1a] text-white">Başlangıç</option>
                                                             </select>
                                                             <button onClick={() => removeLanguage(index)} className="px-2 py-1 text-red-400 hover:text-red-300 text-sm">Sil</button>
                                                         </div>
                                                         <select value={langObj.cefr || ''} onChange={(e) => updateLanguage(index, 'cefr', e.target.value || undefined)} className="w-full px-3 py-2 bg-white/5 border border-white/10 text-white rounded-xl text-sm focus:ring-2 focus:ring-purple-500">
-                                                            <option value="" disabled hidden={!!langObj.cefr}>CEFR Seviyesi (Opsiyonel)</option>
-                                                            <option value="A1">A1 - Başlangıç</option>
-                                                            <option value="A2">A2 - Temel</option>
-                                                            <option value="B1">B1 - Orta Seviye</option>
-                                                            <option value="B2">B2 - Orta-İleri</option>
-                                                            <option value="C1">C1 - İleri</option>
-                                                            <option value="C2">C2 - Üst Düzey</option>
+                                                            <option value="" disabled hidden={!!langObj.cefr} className="bg-[#1a1a1a] text-white">CEFR Seviyesi (Opsiyonel)</option>
+                                                            <option value="A1" className="bg-[#1a1a1a] text-white">A1 - Başlangıç</option>
+                                                            <option value="A2" className="bg-[#1a1a1a] text-white">A2 - Temel</option>
+                                                            <option value="B1" className="bg-[#1a1a1a] text-white">B1 - Orta Seviye</option>
+                                                            <option value="B2" className="bg-[#1a1a1a] text-white">B2 - Orta-İleri</option>
+                                                            <option value="C1" className="bg-[#1a1a1a] text-white">C1 - İleri</option>
+                                                            <option value="C2" className="bg-[#1a1a1a] text-white">C2 - Üst Düzey</option>
                                                         </select>
                                                     </div>
                                                 ) : (
